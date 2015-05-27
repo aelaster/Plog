@@ -18,9 +18,12 @@ package com.lastsoft.plog;
 
 import android.app.Activity;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -56,6 +59,7 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
         private final TextView gameNameView;
         private final TextView playDateView;
         private final ImageView imageView;
+        private final ImageView overflowView;
         private final View myView;
 
         public ViewHolder(View v) {
@@ -70,6 +74,7 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
             gameNameView = (TextView) v.findViewById(R.id.gameName);
             playDateView = (TextView) v.findViewById(R.id.playDate);
             imageView = (ImageView) v.findViewById(R.id.imageView1);
+            overflowView = (ImageView) v.findViewById(R.id.overflowMenu);
             myView = v;
         }
 
@@ -81,6 +86,9 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
         }
         public TextView getGameNameView() {
             return gameNameView;
+        }
+        public ImageView getOverflowView() {
+            return overflowView;
         }
         public View getView() {
             return myView;
@@ -133,21 +141,18 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
                 public void onClick(View v) {
                     if (!plays.get(position).playPhoto.equals("")) {
                         ((MainActivity) myActivity).onPlayClicked(plays.get(position), myFragment, viewHolder.getImageView(), viewHolder.getGameNameView(), viewHolder.getPlayDateView());
-                    }else{
+                    } else {
                         ((MainActivity) myActivity).onPlayClicked(plays.get(position), myFragment, null, viewHolder.getGameNameView(), viewHolder.getPlayDateView());
                     }
                 }
             });
-            viewHolder.getView().setOnLongClickListener(new View.OnLongClickListener() {
+            viewHolder.getOverflowView().setOnClickListener(new View.OnClickListener() {
                 @Override
-                public boolean onLongClick(View view) {
-                    //show dialog
-                    //edit - open the "Add" page, pre-populated, and save any changes
-                    //delete - delete all traces of the play
-                    ((MainActivity) myActivity).openAddPlay(GamesPerPlay.getBaseGame(plays.get(position)).gameName, plays.get(position).getId());
-                    return true;
+                public void onClick(View view) {
+                    playPopup(view, position);
                 }
             });
+
             ImageLoader.getInstance().displayImage(plays.get(position).playPhoto, viewHolder.getImageView(), options);
         //}
 
@@ -159,4 +164,30 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
     public int getItemCount() {
         return plays.size();
     }
+
+    public void playPopup(View v, final int position) {
+        PopupMenu popup = new PopupMenu(myActivity, v);
+
+        MenuInflater inflater = popup.getMenuInflater();
+        inflater.inflate(R.menu.play_overflow, popup.getMenu());
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.edit_play:
+                        ((MainActivity) myActivity).openAddPlay(GamesPerPlay.getBaseGame(plays.get(position)).gameName, plays.get(position).getId());
+                        return true;
+                    case R.id.delete_play:
+                        //delete the play
+                        //refresh play list
+                        ((MainActivity) myActivity).deletePlay(plays.get(position).getId());
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        });
+        popup.show();
+    }
+
 }

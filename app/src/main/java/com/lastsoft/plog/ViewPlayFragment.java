@@ -38,14 +38,6 @@ public class ViewPlayFragment extends Fragment {
     String imageTransID;
     String nameTransID;
     String dateTransID;
-    // Hold a reference to the current animator,
-    // so that it can be canceled mid-way.
-    private Animator mCurrentAnimator;
-
-    // The system "short" animation time duration, in milliseconds. This
-    // duration is ideal for subtle animations or animations that occur
-    // very frequently.
-    private int mShortAnimationDuration;
     private OnFragmentInteractionListener mListener;
 
     // TODO: Rename and change types and number of parameters
@@ -164,11 +156,6 @@ public class ViewPlayFragment extends Fragment {
         if (mListener != null) {
             mListener.onFragmentInteraction(string);
         }
-    }
-
-
-    public void setImageId(String id){
-        id = imageTransID;
     }
 
     @Override
