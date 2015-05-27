@@ -1,0 +1,12 @@
+<resources>
+
+    <!-- swingview_pro -->
+    <dimen name="swingview_pro_swing_title_textSize">40sp</dimen>
+    <dimen name="swingview_pro_buttons_textSize">30sp</dimen>
+    <dimen name="swingview_pro_desc_textSize">20sp</dimen>
+    <dimen name="swingview_pro_desc_box_height">150dp</dimen>
+    <dimen name="swingview_pro_desc_box_textSize">30sp</dimen>
+    <dimen name="swingview_pro_label_textSize">20sp</dimen>
+    <dimen name="swingview_pro_image_text_padding">16dp</dimen>
+
+</resources>

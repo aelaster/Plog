@@ -1,0 +1,20 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+
+    <!-- Per the design guidelines, navigation drawers should be between 240dp and 320dp:
+         https://developer.android.com/design/patterns/navigation-drawer.html -->
+    <dimen name="navigation_drawer_width">240dp</dimen>
+
+    <dimen name="list_item_height">72dp</dimen>
+
+    <!-- swingview_pro -->
+    <dimen name="swingview_pro_swing_title_textSize">24sp</dimen>
+    <dimen name="swingview_pro_buttons_textSize">18sp</dimen>
+    <dimen name="swingview_pro_desc_textSize">18sp</dimen>
+    <dimen name="swingview_pro_desc_box_height">60dp</dimen>
+    <dimen name="swingview_pro_desc_box_textSize">18sp</dimen>
+    <dimen name="swingview_pro_label_textSize">16sp</dimen>
+    <dimen name="swingview_pro_image_text_padding">8dp</dimen>
+</resources>
