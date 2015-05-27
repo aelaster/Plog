@@ -2,7 +2,9 @@ package com.lastsoft.plog;
 
 import android.animation.Animator;
 import android.app.Activity;
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -18,7 +20,9 @@ import com.lastsoft.plog.db.Play;
 import com.lastsoft.plog.db.Player;
 import com.lastsoft.plog.db.PlayersPerPlay;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
 
+import java.lang.ref.WeakReference;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -86,7 +90,10 @@ public class ViewPlayFragment extends Fragment {
 
         ImageView playImage = (ImageView) viewPlayLayout.findViewById(R.id.imageView1);
         if (!thisPlay.playPhoto.equals("")){
-            playImage.setImageDrawable(Drawable.createFromPath(thisPlay.playPhoto.substring(7, thisPlay.playPhoto.length())));
+            //playImage.setImageDrawable(Drawable.createFromPath(thisPlay.playPhoto.substring(7, thisPlay.playPhoto.length())));
+            ImageLoader.getInstance().displayImage(thisPlay.playPhoto, playImage, options);
+            //final BitmapWorkerTask task = new BitmapWorkerTask(playImage);
+            //task.execute(thisPlay.playPhoto.substring(7, thisPlay.playPhoto.length()));
             playImage.setTransitionName(imageTransID);
         }
 
@@ -125,7 +132,7 @@ public class ViewPlayFragment extends Fragment {
         for(PlayersPerPlay player:players){
             Player thisPlayer = player.player;
             TextView showPlayer = new TextView(getActivity());
-            showPlayer.setText(thisPlayer.playerName + " - Score=" + player.score);
+            showPlayer.setText(thisPlayer.playerName + " - Color= " + player.color + " / Score=" + player.score);
             linLayout.addView(showPlayer);
         }
 
@@ -187,7 +194,36 @@ public class ViewPlayFragment extends Fragment {
      */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
+
         public void onFragmentInteraction(String string);
+    }
+
+    class BitmapWorkerTask extends AsyncTask<String, Void, Drawable> {
+        private final WeakReference<ImageView> imageViewReference;
+        private String data = "";
+
+        public BitmapWorkerTask(ImageView imageView) {
+            // Use a WeakReference to ensure the ImageView can be garbage collected
+            imageViewReference = new WeakReference<ImageView>(imageView);
+        }
+
+        // Decode image in background.
+        @Override
+        protected Drawable doInBackground(String... params) {
+            data = params[0];
+            return Drawable.createFromPath(data);
+        }
+
+        // Once complete, see if ImageView is still around and set bitmap.
+        @Override
+        protected void onPostExecute(Drawable drawable) {
+            if (imageViewReference != null && drawable != null) {
+                final ImageView imageView = imageViewReference.get();
+                if (imageView != null) {
+                    imageView.setImageDrawable(drawable);
+                }
+            }
+        }
     }
 
 }

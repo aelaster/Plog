@@ -25,6 +25,13 @@
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
         <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
+        <item name="android:actionBarStyle">@style/MyActionBar</item>
+        <item name="actionBarStyle">@style/MyActionBar</item>
+    </style>
+
+    <style name="MyActionBar" parent="@android:style/Widget.Holo.Light.ActionBar">
+        <item name="android:background">@color/logo_blue</item>
+        <item name="background">@color/logo_blue</item>
     </style>
     <!-- Widget styling -->
 
@@ -55,12 +62,12 @@
     <style name="AudioFileInfoOverlayText">
         <item name="android:paddingLeft">4px</item>
         <item name="android:paddingBottom">4px</item>
-        <item name="android:textColor">#ffffffff</item>
+        <item name="android:textColor">#FFFFFF</item>
         <item name="android:textSize">12sp</item>
         <item name="android:shadowColor">#000000</item>
-        <item name="android:shadowDx">1</item>
-        <item name="android:shadowDy">1</item>
-        <item name="android:shadowRadius">1</item>
+        <item name="android:shadowDx">4</item>
+        <item name="android:shadowDy">4</item>
+        <item name="android:shadowRadius">4</item>
     </style>
 
 </resources>

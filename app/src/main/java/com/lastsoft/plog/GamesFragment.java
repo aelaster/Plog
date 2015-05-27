@@ -122,7 +122,7 @@ public class GamesFragment extends Fragment{
         setRecyclerViewLayoutManager(mCurrentLayoutManagerType);
 
         //mAdapter = new CustomAdapter(mDataset, mDataset_Thumb);
-        mAdapter = new GameAdapter(getActivity(),mSearchQuery);
+        mAdapter = new GameAdapter(this, getActivity(),mSearchQuery);
         // Set CustomAdapter as the adapter for RecyclerView.
         mRecyclerView.setAdapter(mAdapter);
 
@@ -143,7 +143,7 @@ public class GamesFragment extends Fragment{
                 // When user changed the Text
                 mSearchQuery = cs.toString();
                 //initDataset();
-                mAdapter = new GameAdapter(getActivity(),mSearchQuery);
+                mAdapter = new GameAdapter(GamesFragment.this, getActivity(),mSearchQuery);
                 // Set CustomAdapter as the adapter for RecyclerView.
                 mRecyclerView.setAdapter(mAdapter);
             }
@@ -227,11 +227,6 @@ public class GamesFragment extends Fragment{
         ((MainActivity)getActivity()).getSupportActionBar().setDisplayShowCustomEnabled(false);
     }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-    }
-
     /**
      * Set RecyclerView's LayoutManager to the one given.
      *
@@ -284,7 +279,7 @@ public class GamesFragment extends Fragment{
 
     protected void refreshDataset(){
         initDataset();
-        mAdapter = new GameAdapter(getActivity(),mSearchQuery);
+        mAdapter = new GameAdapter(this, getActivity(),mSearchQuery);
         // Set CustomAdapter as the adapter for RecyclerView.
         mRecyclerView.setAdapter(mAdapter);
     }
@@ -311,7 +306,7 @@ public class GamesFragment extends Fragment{
             myTask = null;
 
             //mAdapter = new CustomAdapter(mDataset, mDataset_Thumb);
-            mAdapter = new GameAdapter(getActivity(),mSearchQuery);
+            mAdapter = new GameAdapter(GamesFragment.this, getActivity(),mSearchQuery);
             // Set CustomAdapter as the adapter for RecyclerView.
             mRecyclerView.setAdapter(mAdapter);
 

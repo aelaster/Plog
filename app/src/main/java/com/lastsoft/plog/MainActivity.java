@@ -151,7 +151,7 @@ public class MainActivity extends ActionBarActivity
         ActionBar actionBar = getSupportActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         actionBar.setDisplayShowTitleEnabled(true);
-        //if(mTitle.equals(getString(R.string.title_section3))) actionBar.setDisplayShowCustomEnabled(true);
+        if(mTitle.equals(getString(R.string.title_section3))) actionBar.setDisplayShowCustomEnabled(true);
         actionBar.setTitle(mTitle);
     }
 
@@ -204,6 +204,7 @@ public class MainActivity extends ActionBarActivity
                     getSupportFragmentManager().findFragmentByTag("plays");
             if (playsFrag != null) {
                 playsFrag.refreshDataset();
+                onSectionAttached(3);
             }
         }
     }
@@ -227,17 +228,22 @@ public class MainActivity extends ActionBarActivity
         }catch (Exception e){}
 
         mFragment.setSharedElementReturnTransition(TransitionInflater.from(this).inflateTransition(R.transition.change_image_transform));
-        mFragment.setExitTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.move));
+        mFragment.setExitTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.slide_top));
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction ft = fragmentManager.beginTransaction();
 
-        mViewPlayFragment = ViewPlayFragment.newInstance(clickedPlay.getId(),view.getTransitionName(), nameView.getTransitionName(), dateView.getTransitionName());
-        mViewPlayFragment.setSharedElementEnterTransition(TransitionInflater.from(this).inflateTransition(R.transition.change_image_transform));
-        mViewPlayFragment.setEnterTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.explode));
+
+
         if (view != null) {
+            mViewPlayFragment = ViewPlayFragment.newInstance(clickedPlay.getId(),view.getTransitionName(), nameView.getTransitionName(), dateView.getTransitionName());
             ft.addSharedElement(view, view.getTransitionName());
+        }else{
+            mViewPlayFragment = ViewPlayFragment.newInstance(clickedPlay.getId(),null, nameView.getTransitionName(), dateView.getTransitionName());
         }
+        mViewPlayFragment.setSharedElementEnterTransition(TransitionInflater.from(this).inflateTransition(R.transition.change_image_transform));
+        mViewPlayFragment.setEnterTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.slide_bottom));
+
         ft.addSharedElement(nameView, nameView.getTransitionName());
         ft.addSharedElement(dateView, dateView.getTransitionName());
         ft.replace(R.id.container, mViewPlayFragment, "view_play");
@@ -246,7 +252,7 @@ public class MainActivity extends ActionBarActivity
         fragmentManager.executePendingTransactions(); //Prevents the flashing.
     }
 
-    public void openAddPlay(String game_name, long playID){
+    public void openAddPlay(Fragment mFragment, String game_name, long playID){
 
 
         try{
@@ -257,13 +263,17 @@ public class MainActivity extends ActionBarActivity
                     InputMethodManager.HIDE_NOT_ALWAYS);
         }catch (Exception e){}
 
-
+        //mFragment.setExitTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.slide_top));
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction ft = fragmentManager.beginTransaction();
         fragUp = true;
         mAddPlayFragment = AddPlayFragment.newInstance((int) 0, (int) 0, true, game_name, playID);
-        ft.add(R.id.container, mAddPlayFragment, "add_play");
+        //mAddPlayFragment.setEnterTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.slide_bottom));
+        //mAddPlayFragment.setExitTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.slide_top));
+
+        ft.setCustomAnimations(R.anim.slide_in_bottom, R.anim.slide_out_top, R.anim.slide_in_top, R.anim.slide_out_bottom);
+        ft.replace(R.id.container, mAddPlayFragment, "add_play");
         ft.addToBackStack("add_play");
         ft.commit();
 

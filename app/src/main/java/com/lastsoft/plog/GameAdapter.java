@@ -17,6 +17,7 @@
 package com.lastsoft.plog;
 
 import android.app.Activity;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -41,6 +42,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
     private DisplayImageOptions options;
     private String searchQuery;
     private Activity myActivity;
+    private Fragment myFragment;
 
     // BEGIN_INCLUDE(recyclerViewSampleViewHolder)
     /**
@@ -60,7 +62,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
                     Log.d(TAG, "Element " + getPosition() + " clicked.");
                 }
             });
-            textView = (TextView) v.findViewById(R.id.textView);
+            textView = (TextView) v.findViewById(R.id.gameName);
             imageView = (ImageView) v.findViewById(R.id.imageView1);
             myView = v;
         }
@@ -77,10 +79,10 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
     }
     // END_INCLUDE(recyclerViewSampleViewHolder)
 
-    public GameAdapter(Activity mActivity, String mSearchQuery) {
+    public GameAdapter(Fragment mFragment, Activity mActivity, String mSearchQuery) {
         //games = Game.listAll(Game.class);
         //find(Class<T> type, String whereClause, String[] whereArgs, String groupBy, String orderBy, String limit)
-
+        myFragment = mFragment;
         myActivity = mActivity;
 
 
@@ -100,7 +102,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         // Create a new view.
         View v = LayoutInflater.from(viewGroup.getContext())
-                .inflate(R.layout.text_row_item, viewGroup, false);
+                .inflate(R.layout.game_row_item, viewGroup, false);
 
         return new ViewHolder(v);
     }
@@ -125,7 +127,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
             viewHolder.getView().setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ((MainActivity)myActivity).openAddPlay(games.get(position).gameName, -1);
+                    ((MainActivity)myActivity).openAddPlay(myFragment, games.get(position).gameName, -1);
                 }
             });
         //}

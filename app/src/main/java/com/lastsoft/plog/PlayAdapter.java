@@ -154,7 +154,8 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
             });
 
             ImageLoader.getInstance().displayImage(plays.get(position).playPhoto, viewHolder.getImageView(), options);
-        //}
+            ImageLoader.getInstance().loadImage(plays.get(position).playPhoto, options, null);
+                    //}
 
     }
     // END_INCLUDE(recyclerViewOnBindViewHolder)
@@ -175,7 +176,7 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.edit_play:
-                        ((MainActivity) myActivity).openAddPlay(GamesPerPlay.getBaseGame(plays.get(position)).gameName, plays.get(position).getId());
+                        ((MainActivity) myActivity).openAddPlay(myFragment, GamesPerPlay.getBaseGame(plays.get(position)).gameName, plays.get(position).getId());
                         return true;
                     case R.id.delete_play:
                         //delete the play

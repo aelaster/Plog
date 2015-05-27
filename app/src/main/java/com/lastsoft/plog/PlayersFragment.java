@@ -124,7 +124,7 @@ public class PlayersFragment extends Fragment{
         // Set CustomAdapter as the adapter for RecyclerView.
         mRecyclerView.setAdapter(mAdapter);
 
-        pullToRefreshView = (SwipeRefreshLayout) rootView.findViewById(R.id.pull_to_refresh_listview);
+        /*pullToRefreshView = (SwipeRefreshLayout) rootView.findViewById(R.id.pull_to_refresh_listview);
         pullToRefreshView.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
 
             @Override
@@ -132,7 +132,7 @@ public class PlayersFragment extends Fragment{
                 // TODO Auto-generated method stub
                 pullToRefreshView.setRefreshing(false);
             }
-        });
+        });*/
 
 
         // END_INCLUDE(initializeRecyclerView)

@@ -35,7 +35,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/date"
                     android:id="@+id/datePicker"
-                     />
+                    />
 
             </LinearLayout>
 
@@ -92,12 +92,15 @@
             </LinearLayout>
 
 
-
-            <ListView
+            <LinearLayout android:id="@+id/container_players"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/addPlayerList"
-                android:layout_weight="1"/>
+                android:orientation="vertical"
+                android:showDividers="middle"
+                android:divider="?android:dividerHorizontal"
+                android:animateLayoutChanges="true"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp" />
 
             <LinearLayout
                 android:orientation="horizontal"
@@ -119,11 +122,15 @@
                     />
             </LinearLayout>
 
-            <ListView
+            <LinearLayout android:id="@+id/container_expansions"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/addGameList"
-                android:layout_weight="1"/>
+                android:orientation="vertical"
+                android:showDividers="middle"
+                android:divider="?android:dividerHorizontal"
+                android:animateLayoutChanges="true"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp" />
 
             <EditText
                 android:layout_width="match_parent"

@@ -45,4 +45,15 @@ public class GamesPerPlay extends SugarRecord<GamesPerPlay> {
         return getGames.list();
     }
 
+    public static boolean doesExpansionExist(Play play, Game testExpansion){
+        Select getExpansion = Select.from(GamesPerPlay.class);
+        getExpansion.where(Condition.prop(StringUtil.toSQLName("play")).eq(play.getId()), Condition.prop(StringUtil.toSQLName("game")).eq(testExpansion.getId()));
+        List<GamesPerPlay> tester = getExpansion.list();
+        if (tester.isEmpty()){
+            return false;
+        }else{
+            return true;
+        }
+    }
+
 }

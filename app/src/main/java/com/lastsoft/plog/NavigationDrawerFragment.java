@@ -1,6 +1,7 @@
 package com.lastsoft.plog;
 
 import android.app.Activity;
+import android.os.Handler;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
@@ -190,15 +191,20 @@ public class NavigationDrawerFragment extends Fragment {
 
     private void selectItem(int position) {
         mCurrentSelectedPosition = position;
-        if (mDrawerListView != null) {
-            mDrawerListView.setItemChecked(position, true);
-        }
         if (mDrawerLayout != null) {
             mDrawerLayout.closeDrawer(mFragmentContainerView);
         }
-        if (mCallbacks != null) {
-            mCallbacks.onNavigationDrawerItemSelected(position);
-        }
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (mDrawerListView != null) {
+                    mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
+                }
+                if (mCallbacks != null) {
+                    mCallbacks.onNavigationDrawerItemSelected(mCurrentSelectedPosition);
+                }
+            }
+        }, 300);
     }
 
     @Override

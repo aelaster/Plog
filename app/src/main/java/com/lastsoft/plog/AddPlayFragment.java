@@ -18,7 +18,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 
 import android.view.Menu;
@@ -84,11 +83,13 @@ public class AddPlayFragment extends Fragment {
     // Create the adapter to convert the array to views
     AddPlayerAdapter adapter;
 
-    static ExpansionsAdapter expansionAdapter;
     // Attach the adapter to a ListView
     String gameName;
     long playID;
     static TextView textViewDate;
+
+    private ViewGroup mContainerView_Players;
+    private ViewGroup mContainerView_Expansions;
 
     static List<Game> expansions;
 
@@ -132,11 +133,10 @@ public class AddPlayFragment extends Fragment {
         ActionBar actionBar = ((MainActivity)getActivity()).getSupportActionBar();
         actionBar.setDisplayShowCustomEnabled(false);
 
-        expansions = Game.findExpansionsFor(gameName);
-        checkedItems = new boolean[expansions.size()];
+        //expansions = Game.findExpansionsFor(gameName);
+        //checkedItems = new boolean[expansions.size()];
 
         addedExpansions = new ArrayList<Game>();
-        //List<Player> players = Player.listAll(Player.class);
         List<Player> players = Player.listPlayersAZ();
         playersName = new ArrayList<String>();
         playersID = new ArrayList<Integer>();
@@ -166,7 +166,7 @@ public class AddPlayFragment extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_add_play, container, false);
         rootView.setBackgroundColor(getResources().getColor(R.color.cardview_initial_background));
-        rootView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+        /*rootView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
             @Override
             public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop,
                                        int oldRight, int oldBottom) {
@@ -183,9 +183,23 @@ public class AddPlayFragment extends Fragment {
                 reveal.setDuration(700);
                 reveal.start();
             }
-        });
+        });*/
+
+        mContainerView_Players = (ViewGroup) rootView.findViewById(R.id.container_players);
+        mContainerView_Expansions = (ViewGroup) rootView.findViewById(R.id.container_expansions);
 
         View addButton = rootView.findViewById(R.id.addButton);
+        addButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //listItems.add("Clicked : "+clickCounter++);
+                AddPlayer newUser = new AddPlayer(-1, "", "", 0);
+                adapter.add(newUser);
+                adapter.notifyDataSetChanged();
+                addPlayer(newUser);
+            }
+        });
+
         notesText = (EditText) rootView.findViewById(R.id.notesText);
 
         View expansionButton = rootView.findViewById(R.id.addGameButton);
@@ -202,10 +216,6 @@ public class AddPlayFragment extends Fragment {
         photoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                /*Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
-                    startActivityForResult(takePictureIntent, 0);
-                }*/
                 Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 // Ensure that there's a camera activity to handle the intent
                 if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
@@ -225,16 +235,6 @@ public class AddPlayFragment extends Fragment {
                         startActivityForResult(takePictureIntent, 0);
                     }
                 }
-                /*try {
-                    Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    f = createImageFile();
-                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
-                    startActivityForResult(takePictureIntent, 0);
-                    //startActivity(takePictureIntent);
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }*/
             }
         });
 
@@ -261,38 +261,37 @@ public class AddPlayFragment extends Fragment {
         arrayOfUsers = new ArrayList<AddPlayer>();
         // Create the adapter to convert the array to views
         adapter = new AddPlayerAdapter(getActivity(), arrayOfUsers);
+        //expansionAdapter = new ExpansionsAdapter(getActivity(), addedExpansions);
+        //ListView listView2 = (ListView) rootView.findViewById(R.id.addGameList);
+        //listView2.setAdapter(expansionAdapter);
 
-        expansionAdapter = new ExpansionsAdapter(getActivity(), addedExpansions);
-        ListView listView2 = (ListView) rootView.findViewById(R.id.addGameList);
-        listView2.setAdapter(expansionAdapter);
-
-
-        // Attach the adapter to a ListView
-        ListView listView = (ListView) rootView.findViewById(R.id.addPlayerList);
-        listView.setAdapter(adapter);
-
-
-        addButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //listItems.add("Clicked : "+clickCounter++);
-                AddPlayer newUser = new AddPlayer(-1, "", "", -9999999);
-                adapter.add(newUser);
-                adapter.notifyDataSetChanged();
-            }
-        });
+        expansions = Game.findExpansionsFor(gameName);
+        checkedItems = new boolean[expansions.size()];
 
         if (playID >= 0){
             //we're editing a play
+            //Log.d("V1", "editing a play");
             Play editPlay = Play.findById(Play.class, playID);
             //set up the values, based on DB
 
             //expansions
-            List<GamesPerPlay> expansions = GamesPerPlay.getExpansions(editPlay);
-            for(GamesPerPlay expansion:expansions){
-                addedExpansions.add(expansion.game);
+            //for each expansion the game has
+            int x = 0;
+            for(Game expansion0:expansions){
+                //if the added expansions contains it
+                if (GamesPerPlay.doesExpansionExist(editPlay, expansion0)) {
+                    //add to added expansions
+                    addedExpansions.add(expansion0);
+                    //add the game to the list
+                    addGame(expansion0);
+                    //check it
+                    checkedItems[x] = true;
+                }else{
+                    //don't check it
+                    checkedItems[x] = false;
+                }
+                x++;
             }
-            expansionAdapter.notifyDataSetChanged();
 
             //date
             DateFormat outputFormatter = new SimpleDateFormat("MM/dd/yyyy");
@@ -314,7 +313,9 @@ public class AddPlayFragment extends Fragment {
             List<PlayersPerPlay> players = PlayersPerPlay.getPlayers(editPlay);
             for(PlayersPerPlay player:players){
                 Player thisPlayer = player.player;
+                //Log.d("V1", "score = " + player.score);
                 AddPlayer addedPlayer = new AddPlayer(thisPlayer.getId(),thisPlayer.playerName,player.color, player.score); //id, name, color, score
+                addPlayer(addedPlayer);
                 adapter.add(addedPlayer);
             }
             adapter.notifyDataSetChanged();
@@ -324,6 +325,75 @@ public class AddPlayFragment extends Fragment {
         }
 
         return rootView;
+    }
+
+    private void addGame(Game game){
+        final ViewGroup newView = (ViewGroup) LayoutInflater.from(getActivity()).inflate(
+                R.layout.play_showexpansions_item, mContainerView_Expansions, false);
+
+        TextView gameName = (TextView) newView.findViewById(R.id.gameName);
+        gameName.setText(game.gameName);
+        mContainerView_Expansions.addView(newView, 0);
+    }
+    private void clearGames(){
+        mContainerView_Expansions.removeAllViews();
+    }
+
+    private void addPlayer(final AddPlayer addedPlayer) {
+        // Instantiate a new "row" view.
+        final ViewGroup newView = (ViewGroup) LayoutInflater.from(getActivity()).inflate(
+                R.layout.play_addplayer_item, mContainerView_Players, false);
+        Spinner player = (Spinner) newView.findViewById(R.id.player);
+        ArrayAdapter<String> playerSpinnerArrayAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, playersName);
+        playerSpinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); // The drop down view
+        player.setAdapter(playerSpinnerArrayAdapter);
+        if (!addedPlayer.playerName.equals("")) {
+            int spinnerPostion = playerSpinnerArrayAdapter.getPosition(addedPlayer.playerName);
+            player.setSelection(spinnerPostion);
+        }
+        MySpinnerListener playerListener = new MySpinnerListener(addedPlayer, 2);
+        player.setOnItemSelectedListener(playerListener);
+
+
+
+        EditText scoreValue = (EditText) newView.findViewById(R.id.score);
+        scoreValue.addTextChangedListener(new MyTextWatcher(player, addedPlayer));
+        //if (addedPlayer.score != -9999999) {
+            scoreValue.setText(""+addedPlayer.score);
+        //}
+
+
+        Spinner color = (Spinner) newView.findViewById(R.id.color);
+        ArrayAdapter<CharSequence> colorSpinnerArrayAdapter = ArrayAdapter.createFromResource(getActivity(), R.array.color_choices, android.R.layout.simple_spinner_item);
+        colorSpinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); // The drop down view
+        color.setAdapter(colorSpinnerArrayAdapter);
+        if (!addedPlayer.color.equals("")) {
+            int spinnerPostion = colorSpinnerArrayAdapter.getPosition(addedPlayer.color);
+            color.setSelection(spinnerPostion);
+        }
+        MySpinnerListener colorListener = new MySpinnerListener(addedPlayer, 1);
+        color.setOnItemSelectedListener(colorListener);
+
+        // Set a click listener for the "X" button in the row that will remove the row.
+        newView.findViewById(R.id.closeButton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Remove the row from its parent (the container view).
+                // Because mContainerView has android:animateLayoutChanges set to true,
+                // this removal is automatically animated.
+                adapter.remove(addedPlayer);
+                mContainerView_Players.removeView(newView);
+
+                // If there are no rows remaining, show the empty view.
+                /*if (mContainerView.getChildCount() == 0) {
+                    findViewById(android.R.id.empty).setVisibility(View.VISIBLE);
+                }*/
+            }
+        });
+
+        // Because mContainerView has android:animateLayoutChanges set to true,
+        // adding this view is automatically animated.
+        mContainerView_Players.addView(newView, 0);
     }
 
     private File createImageFile() throws IOException {
@@ -409,10 +479,10 @@ public class AddPlayFragment extends Fragment {
 
                     for (int i = 0; i < adapter.getCount(); i++) {
                         AddPlayer thisGuy = adapter.getItem(i);
-                        if (thisGuy.score != -9999999) {
+                        //if (thisGuy.score != -9999999) {
                             PlayersPerPlay newPlayer = new PlayersPerPlay(Player.findById(Player.class, thisGuy.playerID), thePlay, thisGuy.score, thisGuy.color);
                             newPlayer.save();
-                        }
+                        //}
                     /*Log.d("V1", i + " / playerID=" + thisGuy.playerID);
                     Log.d("V1", i + " / playerName=" + thisGuy.playerName);
                     Log.d("V1", i + " / color=" + thisGuy.color);
@@ -429,7 +499,7 @@ public class AddPlayFragment extends Fragment {
                             game.delete();
                         }
                     }else{//not a play yet, add the base game
-                        Log.d("V1", "game name= " + gameName);
+                        //Log.d("V1", "game name= " + gameName);
                         GamesPerPlay newBaseGame = new GamesPerPlay(thePlay, Game.findGameByName(gameName), false);
                         newBaseGame.save();
                     }
@@ -548,7 +618,15 @@ public class AddPlayFragment extends Fragment {
      */
     public void removeYourself(){
         final AddPlayFragment mfragment = this;
-        Animator unreveal = mfragment.prepareUnrevealAnimator(cx, cy);
+        if (playID<0) {
+            ((MainActivity) getActivity()).getSupportActionBar().setDisplayShowCustomEnabled(true);
+        }else{
+            onButtonPressed("refresh_plays");
+        }
+        getFragmentManager().popBackStack();
+        getFragmentManager().beginTransaction().remove(mfragment).commit();
+        getFragmentManager().executePendingTransactions(); //Prevents the flashing.
+        /*Animator unreveal = mfragment.prepareUnrevealAnimator(cx, cy);
         if(unreveal != null) {
             unreveal.addListener(new Animator.AnimatorListener() {
                 @Override
@@ -588,7 +666,7 @@ public class AddPlayFragment extends Fragment {
                 }
             });
             unreveal.start();
-        }
+        }*/
     }
 
     public class AddPlayer {
@@ -609,85 +687,6 @@ public class AddPlayFragment extends Fragment {
         public AddPlayerAdapter(Context context, ArrayList<AddPlayer> users) {
             super(context, 0, users);
         }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            // Get the data item for this position
-            final AddPlayer addedPlayer = getItem(position);
-            // Check if an existing view is being reused, otherwise inflate the view
-            if (convertView == null) {
-                convertView = LayoutInflater.from(getContext()).inflate(R.layout.play_addplayer_item, parent, false);
-            }
-
-            Spinner player = (Spinner) convertView.findViewById(R.id.player);
-            ArrayAdapter<String> playerSpinnerArrayAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, playersName);
-            playerSpinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); // The drop down view
-            player.setAdapter(playerSpinnerArrayAdapter);
-            if (!addedPlayer.playerName.equals("")) {
-                int spinnerPostion = playerSpinnerArrayAdapter.getPosition(addedPlayer.playerName);
-                player.setSelection(spinnerPostion);
-            }
-            MySpinnerListener playerListener = new MySpinnerListener(addedPlayer, 2);
-            player.setOnItemSelectedListener(playerListener);
-
-
-
-            EditText scoreValue = (EditText) convertView.findViewById(R.id.score);
-            scoreValue.addTextChangedListener(new MyTextWatcher(player, addedPlayer));
-            if (addedPlayer.score != -9999999) {
-                scoreValue.setText(""+addedPlayer.score);
-            }
-
-
-            Spinner color = (Spinner) convertView.findViewById(R.id.color);
-            ArrayAdapter<CharSequence> colorSpinnerArrayAdapter = ArrayAdapter.createFromResource(getActivity(), R.array.color_choices, android.R.layout.simple_spinner_item);
-            colorSpinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); // The drop down view
-            color.setAdapter(colorSpinnerArrayAdapter);
-            if (!addedPlayer.color.equals("")) {
-                int spinnerPostion = colorSpinnerArrayAdapter.getPosition(addedPlayer.color);
-                color.setSelection(spinnerPostion);
-            }
-            MySpinnerListener colorListener = new MySpinnerListener(addedPlayer, 1);
-            color.setOnItemSelectedListener(colorListener);
-
-
-
-            View expansionButton = convertView.findViewById(R.id.closeButton);
-            expansionButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    adapter.remove(addedPlayer);
-                    adapter.notifyDataSetChanged();
-                }
-            });
-
-            return convertView;
-        }
-
-
-    }
-
-    public class ExpansionsAdapter extends ArrayAdapter<Game> {
-        public ExpansionsAdapter(Context context, ArrayList<Game> games) {
-            super(context, 0, games);
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            // Get the data item for this position
-            final Game addedExpansion = getItem(position);
-            // Check if an existing view is being reused, otherwise inflate the view
-            if (convertView == null) {
-                convertView = LayoutInflater.from(getContext()).inflate(R.layout.play_showexpansions_item, parent, false);
-            }
-
-            TextView gameName = (TextView) convertView.findViewById(R.id.gameName);
-            gameName.setText(addedExpansion.gameName);
-
-            return convertView;
-        }
-
-
     }
 
     public class MySpinnerListener implements AdapterView.OnItemSelectedListener{
@@ -739,7 +738,7 @@ public class AddPlayFragment extends Fragment {
         @Override
         public void afterTextChanged(Editable editable) {
             if (playerSpinner.getSelectedItem().toString().equals(playerToUpdate.playerName)) {
-                Log.d("V1", playerToUpdate.playerName);
+                //Log.d("V1", playerToUpdate.playerName);
                 String score = editable.toString().trim();
                 if (!score.toString().equals("")) {
                     playerToUpdate.score = Integer.parseInt(score.toString());
@@ -801,11 +800,11 @@ public class AddPlayFragment extends Fragment {
     }
 
 
-    public static class CheckBoxAlertDialogFragment extends DialogFragment {
+    public class CheckBoxAlertDialogFragment extends DialogFragment {
 
 
 
-        public static CheckBoxAlertDialogFragment newInstance(boolean[] checkedItems, String gameName) {
+        public CheckBoxAlertDialogFragment newInstance(boolean[] checkedItems, String gameName) {
             CheckBoxAlertDialogFragment frag = new CheckBoxAlertDialogFragment();
             Bundle args = new Bundle();
             args.putBooleanArray("checkedItem", checkedItems);
@@ -842,18 +841,22 @@ public class AddPlayFragment extends Fragment {
                                 }else{
                                     addedExpansions.remove(checked);
                                 }
-                                Log.d("V1", checked.gameName);
-                                Log.d("V1", ""+checked.getId());
+                                //Log.d("V1", checked.gameName);
+                                //Log.d("V1", "isChecked="+isChecked);
                             }
                         })
                         // Set the action buttons
                         .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
+                                clearGames();
                                 // User clicked OK, so save the checkedItems results somewhere
                                 // or return them to the component that opened the dialog
-                                expansionAdapter.notifyDataSetChanged();
-
+                                //Log.d("V1", "addedExpansions size = " + addedExpansions.size());
+                                for (int i = 0; i < addedExpansions.size(); i++){
+                                    Game addMe = addedExpansions.get(i);
+                                    addGame(addMe);
+                                }
                             }
                         })
                         .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
