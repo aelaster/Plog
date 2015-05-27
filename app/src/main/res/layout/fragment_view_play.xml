@@ -41,7 +41,6 @@
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:layout_alignBottom="@id/belowBack"
-                android:background="#00000000"
                 android:padding="8dp" >
 
                 <TextView
@@ -81,11 +80,51 @@
             </RelativeLayout>
         </RelativeLayout>
     </RelativeLayout>
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="0.5"
-        android:id="@+id/linearLayout"
+        android:id="@+id/relativeLayout"
         android:orientation="vertical">
-    </LinearLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/notesText"
+            android:padding="16dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_alignParentBottom="true"
+            android:layout_centerInParent="true"/>
+        <ScrollView
+            android:id="@+id/scrollview"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:linksClickable="true"
+            android:fillViewport="true"
+            android:layout_above="@id/notesText">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/linearLayout"
+                android:orientation="vertical">
+                <LinearLayout android:id="@+id/container_expansions"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:showDividers="middle"
+                    android:divider="?android:dividerHorizontal"
+                    android:animateLayoutChanges="true"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp" />
+                <LinearLayout android:id="@+id/container_players"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:showDividers="middle"
+                    android:divider="?android:dividerHorizontal"
+                    android:animateLayoutChanges="true"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp" />
+            </LinearLayout>
+        </ScrollView>
+    </RelativeLayout>
 </LinearLayout>

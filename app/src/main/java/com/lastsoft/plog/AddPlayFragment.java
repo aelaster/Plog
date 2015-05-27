@@ -185,6 +185,9 @@ public class AddPlayFragment extends Fragment {
             }
         });*/
 
+        expansions = Game.findExpansionsFor(gameName);
+        checkedItems = new boolean[expansions.size()];
+
         mContainerView_Players = (ViewGroup) rootView.findViewById(R.id.container_players);
         mContainerView_Expansions = (ViewGroup) rootView.findViewById(R.id.container_expansions);
 
@@ -203,13 +206,20 @@ public class AddPlayFragment extends Fragment {
         notesText = (EditText) rootView.findViewById(R.id.notesText);
 
         View expansionButton = rootView.findViewById(R.id.addGameButton);
-        expansionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                CheckBoxAlertDialogFragment newFragment = new CheckBoxAlertDialogFragment().newInstance(checkedItems, gameName);
-                newFragment.show(getActivity().getSupportFragmentManager(), "datePicker");
-            }
-        });
+        if (expansions.size()==0) {
+            mContainerView_Expansions.setVisibility(View.GONE);
+            mContainerView_Expansions.setVisibility(View.GONE);
+            ViewGroup expLayout = (ViewGroup) rootView.findViewById(R.id.expansionsLayout);
+            expLayout.setVisibility(View.GONE);
+        }else{
+            expansionButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    CheckBoxAlertDialogFragment newFragment = new CheckBoxAlertDialogFragment().newInstance(checkedItems, gameName);
+                    newFragment.show(getActivity().getSupportFragmentManager(), "datePicker");
+                }
+            });
+        }
 
         playPhoto = (ImageView) rootView.findViewById(R.id.gamePhoto);
         View photoButton = rootView.findViewById(R.id.takePhoto);
@@ -265,8 +275,7 @@ public class AddPlayFragment extends Fragment {
         //ListView listView2 = (ListView) rootView.findViewById(R.id.addGameList);
         //listView2.setAdapter(expansionAdapter);
 
-        expansions = Game.findExpansionsFor(gameName);
-        checkedItems = new boolean[expansions.size()];
+
 
         if (playID >= 0){
             //we're editing a play

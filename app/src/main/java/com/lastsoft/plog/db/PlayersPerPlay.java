@@ -1,5 +1,7 @@
 package com.lastsoft.plog.db;
 
+import android.util.Log;
+
 import com.orm.StringUtil;
 import com.orm.SugarRecord;
 import com.orm.query.Condition;
@@ -41,6 +43,18 @@ public class PlayersPerPlay extends SugarRecord<PlayersPerPlay> {
         return getPlayers.list();
     }
 
+
+    public static List<PlayersPerPlay> getPlayers_Winners(Play play){
+        Select getPlayers = Select.from(PlayersPerPlay.class);
+        getPlayers.where(Condition.prop(StringUtil.toSQLName("play")).eq(play.getId()));
+        getPlayers.orderBy(StringUtil.toSQLName("score") + " ASC");
+        return getPlayers.list();
+    }
+
+    public static int getHighScore(Play play){
+        List<PlayersPerPlay> queery = PlayersPerPlay.findWithQuery(PlayersPerPlay.class, "Select * from " + StringUtil.toSQLName("PlayersPerPlay") + " where " + StringUtil.toSQLName("play") + " = ? and " + StringUtil.toSQLName("score") + " = (Select Max(" + StringUtil.toSQLName("score") + ") from " + StringUtil.toSQLName("PlayersPerPlay") + " where " + StringUtil.toSQLName("play") + " = ?)", play.getId().toString(), play.getId().toString());
+        return queery.get(0).score;
+    }
     public static List<PlayersPerPlay> getWinners(Play play){
         //Select getPlayers = Select.from(PlayersPerPlay.class);
         //getPlayers.where(Condition.prop(StringUtil.toSQLName("play")).eq(play.getId()));

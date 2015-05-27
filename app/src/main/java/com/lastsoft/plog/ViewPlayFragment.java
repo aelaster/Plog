@@ -1,17 +1,17 @@
 package com.lastsoft.plog;
 
-import android.animation.Animator;
 import android.app.Activity;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.lastsoft.plog.db.Game;
@@ -22,7 +22,6 @@ import com.lastsoft.plog.db.PlayersPerPlay;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
-import java.lang.ref.WeakReference;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -43,6 +42,8 @@ public class ViewPlayFragment extends Fragment {
     String nameTransID;
     String dateTransID;
     private OnFragmentInteractionListener mListener;
+    private ViewGroup mContainerView_Players;
+    private ViewGroup mContainerView_Expansions;
 
     // TODO: Rename and change types and number of parameters
     public static ViewPlayFragment newInstance(long playID, String transID, String transID2, String transID3) {
@@ -88,6 +89,9 @@ public class ViewPlayFragment extends Fragment {
                 .considerExifParams(true)
                 .build();
 
+        mContainerView_Players = (ViewGroup) viewPlayLayout.findViewById(R.id.container_players);
+        mContainerView_Expansions = (ViewGroup) viewPlayLayout.findViewById(R.id.container_expansions);
+
         ImageView playImage = (ImageView) viewPlayLayout.findViewById(R.id.imageView1);
         if (!thisPlay.playPhoto.equals("")){
             //playImage.setImageDrawable(Drawable.createFromPath(thisPlay.playPhoto.substring(7, thisPlay.playPhoto.length())));
@@ -110,13 +114,7 @@ public class ViewPlayFragment extends Fragment {
         gameName.setText(thisBaseGame.gameName);
         gameName.setTransitionName(nameTransID);
 
-        //expansions
-        List<GamesPerPlay> expansions = GamesPerPlay.getExpansions(thisPlay);
-        for(GamesPerPlay expansion:expansions){
-            TextView showPlayer = new TextView(getActivity());
-            showPlayer.setText(expansion.game.gameName);
-            linLayout.addView(showPlayer);
-        }
+
 
         //date
         TextView playDate = (TextView) viewPlayLayout.findViewById(R.id.gameDate);
@@ -125,37 +123,60 @@ public class ViewPlayFragment extends Fragment {
         playDate.setText(output);
         playDate.setTransitionName(dateTransID);
 
-        //players
-        List<PlayersPerPlay> players = PlayersPerPlay.getPlayers(thisPlay);
-        List<PlayersPerPlay> winners = PlayersPerPlay.getWinners(thisPlay);
-
-        for(PlayersPerPlay player:players){
-            Player thisPlayer = player.player;
-            TextView showPlayer = new TextView(getActivity());
-            showPlayer.setText(thisPlayer.playerName + " - Color= " + player.color + " / Score=" + player.score);
-            linLayout.addView(showPlayer);
+        //expansions
+        List<GamesPerPlay> expansions = GamesPerPlay.getExpansions(thisPlay);
+        for(GamesPerPlay expansion:expansions){
+            addGame(expansion.game);
         }
 
-        //output winner
-        if (winners.size() > 1){
-            for(PlayersPerPlay winner:winners){
-                Player thisPlayer = winner.player;
-                TextView showWinners = new TextView(getActivity());
-                showWinners.setText("Winners = " + winner.player.playerName);
-                linLayout.addView(showWinners);
+        List<PlayersPerPlay> players = PlayersPerPlay.getPlayers_Winners(thisPlay);
+        int highScore = PlayersPerPlay.getHighScore(thisPlay);
+        for(PlayersPerPlay player:players){
+            Player thisPlayer = player.player;
+            if (player.score < highScore) {
+                addPlayer(thisPlayer.playerName, "" + player.score, false);
+            } else {
+                addPlayer(thisPlayer.playerName, "" + player.score, true);
             }
-        }else {
-            TextView showWinner = new TextView(getActivity());
-            showWinner.setText("Winner = " + winners.get(0).player.playerName);
-            linLayout.addView(showWinner);
         }
 
         //output note
-        TextView showNote = new TextView(getActivity());
-        showNote.setText("Note = " + thisPlay.playNotes);
-        linLayout.addView(showNote);
-
+        TextView showNote = (TextView) viewPlayLayout.findViewById(R.id.notesText);
+        showNote.setText("\"" + thisPlay.playNotes + "\"");
+        showNote.setTextSize(24);
+        showNote.setTypeface(null, Typeface.ITALIC);
         return viewPlayLayout;
+    }
+
+    private void addPlayer(String playerName, String score, boolean winnerFlag) {
+        // Instantiate a new "row" view.
+        final ViewGroup newView = (ViewGroup) LayoutInflater.from(getActivity()).inflate(
+                R.layout.play_viewplayer_item, mContainerView_Players, false);
+
+        TextView playerView = (TextView) newView.findViewById(R.id.player);
+        TextView scoreView = (TextView) newView.findViewById(R.id.score);
+        playerView.setText(playerName);
+        scoreView.setText(score);
+        if (winnerFlag){
+            playerView.setTextSize(20);
+            scoreView.setTextSize(20);
+            playerView.setTypeface(null, Typeface.BOLD);
+            scoreView.setTypeface(null, Typeface.BOLD);
+        }else{
+            playerView.setTextSize(16);
+            scoreView.setTextSize(16);
+        }
+
+        mContainerView_Players.addView(newView, 0);
+    }
+
+    private void addGame(Game game){
+        final ViewGroup newView = (ViewGroup) LayoutInflater.from(getActivity()).inflate(
+                R.layout.play_showexpansions_item, mContainerView_Expansions, false);
+
+        TextView gameName = (TextView) newView.findViewById(R.id.gameName);
+        gameName.setText(game.gameName);
+        mContainerView_Expansions.addView(newView, 0);
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -197,33 +218,4 @@ public class ViewPlayFragment extends Fragment {
 
         public void onFragmentInteraction(String string);
     }
-
-    class BitmapWorkerTask extends AsyncTask<String, Void, Drawable> {
-        private final WeakReference<ImageView> imageViewReference;
-        private String data = "";
-
-        public BitmapWorkerTask(ImageView imageView) {
-            // Use a WeakReference to ensure the ImageView can be garbage collected
-            imageViewReference = new WeakReference<ImageView>(imageView);
-        }
-
-        // Decode image in background.
-        @Override
-        protected Drawable doInBackground(String... params) {
-            data = params[0];
-            return Drawable.createFromPath(data);
-        }
-
-        // Once complete, see if ImageView is still around and set bitmap.
-        @Override
-        protected void onPostExecute(Drawable drawable) {
-            if (imageViewReference != null && drawable != null) {
-                final ImageView imageView = imageViewReference.get();
-                if (imageView != null) {
-                    imageView.setImageDrawable(drawable);
-                }
-            }
-        }
-    }
-
 }

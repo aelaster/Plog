@@ -228,7 +228,7 @@ public class MainActivity extends ActionBarActivity
         }catch (Exception e){}
 
         mFragment.setSharedElementReturnTransition(TransitionInflater.from(this).inflateTransition(R.transition.change_image_transform));
-        mFragment.setExitTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.slide_top));
+        mFragment.setExitTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.move));
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction ft = fragmentManager.beginTransaction();
@@ -242,7 +242,7 @@ public class MainActivity extends ActionBarActivity
             mViewPlayFragment = ViewPlayFragment.newInstance(clickedPlay.getId(),null, nameView.getTransitionName(), dateView.getTransitionName());
         }
         mViewPlayFragment.setSharedElementEnterTransition(TransitionInflater.from(this).inflateTransition(R.transition.change_image_transform));
-        mViewPlayFragment.setEnterTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.slide_bottom));
+        mViewPlayFragment.setEnterTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.explode));
 
         ft.addSharedElement(nameView, nameView.getTransitionName());
         ft.addSharedElement(dateView, dateView.getTransitionName());
