@@ -67,31 +67,19 @@ import java.util.List;
  */
 public class AddPlayFragment extends Fragment {
     String mCurrentPhotoPath = "";
-
     private OnFragmentInteractionListener mListener;
-
     int cx, cy;
     File f;
-    //LIST OF ARRAY STRINGS WHICH WILL SERVE AS LIST ITEMS
-    //ArrayList<String> listItems=new ArrayList<String>();
-
-    //DEFINING A STRING ADAPTER WHICH WILL HANDLE THE DATA OF THE LISTVIEW
-    //ArrayAdapter<String> adapter;
-
-    // Construct the data source
     ArrayList<AddPlayer> arrayOfUsers;
-    // Create the adapter to convert the array to views
     AddPlayerAdapter adapter;
-
-    // Attach the adapter to a ListView
     String gameName;
     long playID;
-    static TextView textViewDate;
+    TextView textViewDate;
 
     private ViewGroup mContainerView_Players;
     private ViewGroup mContainerView_Expansions;
 
-    static List<Game> expansions;
+    List<Game> expansions;
 
     // TODO: Rename and change types and number of parameters
     public static AddPlayFragment newInstance(int centerX, int centerY, boolean doAccelerate, String mGameName, long playID) {
@@ -130,7 +118,7 @@ public class AddPlayFragment extends Fragment {
         }
 
 
-        ActionBar actionBar = ((MainActivity)getActivity()).getSupportActionBar();
+        ActionBar actionBar = ((MainActivity)mActivity).getSupportActionBar();
         actionBar.setDisplayShowCustomEnabled(false);
 
         //expansions = Game.findExpansionsFor(gameName);
@@ -158,13 +146,13 @@ public class AddPlayFragment extends Fragment {
     }
 
 
-
+    View rootView;
     EditText notesText;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.fragment_add_play, container, false);
+        rootView = inflater.inflate(R.layout.fragment_add_play, container, false);
         rootView.setBackgroundColor(getResources().getColor(R.color.cardview_initial_background));
         /*rootView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
             @Override
@@ -216,7 +204,7 @@ public class AddPlayFragment extends Fragment {
                 @Override
                 public void onClick(View view) {
                     CheckBoxAlertDialogFragment newFragment = new CheckBoxAlertDialogFragment().newInstance(checkedItems, gameName);
-                    newFragment.show(getActivity().getSupportFragmentManager(), "datePicker");
+                    newFragment.show(((MainActivity)mActivity).getSupportFragmentManager(), "datePicker");
                 }
             });
         }
@@ -228,7 +216,7 @@ public class AddPlayFragment extends Fragment {
             public void onClick(View view) {
                 Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 // Ensure that there's a camera activity to handle the intent
-                if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+                if (takePictureIntent.resolveActivity(mActivity.getPackageManager()) != null) {
                     // Create the File where the photo should go
                     photoFile = null;
                     try {
@@ -253,7 +241,7 @@ public class AddPlayFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 DatePickerFragment newFragment = new DatePickerFragment();
-                newFragment.show(getActivity().getSupportFragmentManager(), "datePicker");
+                newFragment.show(((MainActivity)mActivity).getSupportFragmentManager(), "datePicker");
             }
         });
 
@@ -270,8 +258,8 @@ public class AddPlayFragment extends Fragment {
         // Construct the data source
         arrayOfUsers = new ArrayList<AddPlayer>();
         // Create the adapter to convert the array to views
-        adapter = new AddPlayerAdapter(getActivity(), arrayOfUsers);
-        //expansionAdapter = new ExpansionsAdapter(getActivity(), addedExpansions);
+        adapter = new AddPlayerAdapter(mActivity, arrayOfUsers);
+        //expansionAdapter = new ExpansionsAdapter(mActivity, addedExpansions);
         //ListView listView2 = (ListView) rootView.findViewById(R.id.addGameList);
         //listView2.setAdapter(expansionAdapter);
 
@@ -337,7 +325,7 @@ public class AddPlayFragment extends Fragment {
     }
 
     private void addGame(Game game){
-        final ViewGroup newView = (ViewGroup) LayoutInflater.from(getActivity()).inflate(
+        final ViewGroup newView = (ViewGroup) LayoutInflater.from(mActivity).inflate(
                 R.layout.play_showexpansions_item, mContainerView_Expansions, false);
 
         TextView gameName = (TextView) newView.findViewById(R.id.gameName);
@@ -350,10 +338,10 @@ public class AddPlayFragment extends Fragment {
 
     private void addPlayer(final AddPlayer addedPlayer) {
         // Instantiate a new "row" view.
-        final ViewGroup newView = (ViewGroup) LayoutInflater.from(getActivity()).inflate(
+        final ViewGroup newView = (ViewGroup) LayoutInflater.from(mActivity).inflate(
                 R.layout.play_addplayer_item, mContainerView_Players, false);
         Spinner player = (Spinner) newView.findViewById(R.id.player);
-        ArrayAdapter<String> playerSpinnerArrayAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, playersName);
+        ArrayAdapter<String> playerSpinnerArrayAdapter = new ArrayAdapter<String>(mActivity, android.R.layout.simple_spinner_item, playersName);
         playerSpinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); // The drop down view
         player.setAdapter(playerSpinnerArrayAdapter);
         if (!addedPlayer.playerName.equals("")) {
@@ -373,7 +361,7 @@ public class AddPlayFragment extends Fragment {
 
 
         Spinner color = (Spinner) newView.findViewById(R.id.color);
-        ArrayAdapter<CharSequence> colorSpinnerArrayAdapter = ArrayAdapter.createFromResource(getActivity(), R.array.color_choices, android.R.layout.simple_spinner_item);
+        ArrayAdapter<CharSequence> colorSpinnerArrayAdapter = ArrayAdapter.createFromResource(mActivity, R.array.color_choices, android.R.layout.simple_spinner_item);
         colorSpinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); // The drop down view
         color.setAdapter(colorSpinnerArrayAdapter);
         if (!addedPlayer.color.equals("")) {
@@ -527,11 +515,11 @@ public class AddPlayFragment extends Fragment {
 
             //removeYourself();
             if (playID<0) {
-                ((MainActivity) getActivity()).getSupportActionBar().setDisplayShowCustomEnabled(true);
+                ((MainActivity) mActivity).getSupportActionBar().setDisplayShowCustomEnabled(true);
             }else{
                 onButtonPressed("refresh_plays");
             }
-            ((MainActivity) getActivity()).onBackPressed();
+            ((MainActivity) mActivity).onBackPressed();
             return true;
         }
 
@@ -545,11 +533,13 @@ public class AddPlayFragment extends Fragment {
         }
     }
 
+    Activity mActivity;
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
+        mActivity = activity;
         try {
-            ((MainActivity) activity).onSectionAttached(6);
+            ((MainActivity) mActivity).onSectionAttached(6);
             mListener = (OnFragmentInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
@@ -561,6 +551,14 @@ public class AddPlayFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+        mActivity = null;
+    }
+
+    @Override
+    public void onDestroy() {
+        // TODO Auto-generated method stub
+        super.onDestroy();
+        ((MainActivity)mActivity).unbindDrawables(rootView);
     }
 
     /**
@@ -578,7 +576,7 @@ public class AddPlayFragment extends Fragment {
         public void onFragmentInteraction(String string);
     }
 
-    public static class DatePickerFragment extends DialogFragment
+    public class DatePickerFragment extends DialogFragment
             implements DatePickerDialog.OnDateSetListener {
 
         @Override
@@ -595,7 +593,7 @@ public class AddPlayFragment extends Fragment {
                 int month = c.get(Calendar.MONTH);
                 int day = c.get(Calendar.DAY_OF_MONTH);
                 // Create a new instance of DatePickerDialog and return it
-                return new DatePickerDialog(getActivity(), this, year, month, day);
+                return new DatePickerDialog(mActivity, this, year, month, day);
             } catch (ParseException e) {
                 e.printStackTrace();
             }
@@ -626,15 +624,17 @@ public class AddPlayFragment extends Fragment {
     Executes fragment removal animation and removes the fragment from view.
      */
     public void removeYourself(){
-        final AddPlayFragment mfragment = this;
-        if (playID<0) {
-            ((MainActivity) getActivity()).getSupportActionBar().setDisplayShowCustomEnabled(true);
-        }else{
-            onButtonPressed("refresh_plays");
-        }
-        getFragmentManager().popBackStack();
-        getFragmentManager().beginTransaction().remove(mfragment).commit();
-        getFragmentManager().executePendingTransactions(); //Prevents the flashing.
+        try {
+            final AddPlayFragment mfragment = this;
+            if (playID < 0) {
+                ((MainActivity) mActivity).getSupportActionBar().setDisplayShowCustomEnabled(true);
+            } else {
+                onButtonPressed("refresh_plays");
+            }
+            getFragmentManager().popBackStack();
+            getFragmentManager().beginTransaction().remove(mfragment).commit();
+            getFragmentManager().executePendingTransactions(); //Prevents the flashing.
+        }catch (Exception e){}
         /*Animator unreveal = mfragment.prepareUnrevealAnimator(cx, cy);
         if(unreveal != null) {
             unreveal.addListener(new Animator.AnimatorListener() {
@@ -642,9 +642,9 @@ public class AddPlayFragment extends Fragment {
                 public void onAnimationStart(Animator animation) {
                     try{
                         InputMethodManager inputManager = (InputMethodManager)
-                                getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                                mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
 
-                        inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),
+                        inputManager.hideSoftInputFromWindow(mActivity.getCurrentFocus().getWindowToken(),
                                 InputMethodManager.HIDE_NOT_ALWAYS);
                     }catch (Exception e){}
                 }
@@ -654,7 +654,7 @@ public class AddPlayFragment extends Fragment {
                     // removeFragment the fragment only when the animation finishes
                     try {
                         if (playID<0) {
-                            ((MainActivity) getActivity()).getSupportActionBar().setDisplayShowCustomEnabled(true);
+                            ((MainActivity) mActivity).getSupportActionBar().setDisplayShowCustomEnabled(true);
                         }else{
                             onButtonPressed("refresh_plays");
                         }
@@ -662,7 +662,7 @@ public class AddPlayFragment extends Fragment {
                         getFragmentManager().beginTransaction().remove(mfragment).commit();
                         getFragmentManager().executePendingTransactions(); //Prevents the flashing.
                     }catch (Exception e){}
-                    //((MainActivity)getActivity()).onBackPressed();
+                    //((MainActivity)mActivity).onBackPressed();
 
                 }
 
@@ -833,7 +833,7 @@ public class AddPlayFragment extends Fragment {
                 expansionNames.add(expansion.gameName);
             }
 
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
             // Set the dialog title
             builder.setTitle(R.string.choose_expansions)
                 // Specify the list array, the items to be selected by default (null for none),

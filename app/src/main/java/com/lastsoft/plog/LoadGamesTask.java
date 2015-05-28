@@ -104,7 +104,7 @@ public class LoadGamesTask extends AsyncTask<String, Void, String> {
                             //mDataset_Thumb = new String[total];
                         } else if (name.equals("item")) {
                             //Log.d("V1", "name = " + mDataset[i]);
-                            if (readEntry(parser, i) != null) {
+                            if (readEntry(parser, i, readBGGID(parser)) != null) {
                                 i++;
                             }
                         } else {
@@ -159,7 +159,7 @@ public class LoadGamesTask extends AsyncTask<String, Void, String> {
                             //mDataset_Thumb = new String[total];
                         } else if (name.equals("item")) {
                             //Log.d("V1", "name = " + mDataset[i]);
-                            readEntry_Expansion(parser, i);
+                                readEntry_Expansion(parser, i);
                             i++;
                         } else {
                             skip(parser);
@@ -178,8 +178,8 @@ public class LoadGamesTask extends AsyncTask<String, Void, String> {
 
     }
 
-    private Game readEntry(XmlPullParser parser, int i) throws XmlPullParserException, IOException {
-        String gameName = "", gameThumb = "";
+    private Game readEntry(XmlPullParser parser, int i, String gameBGGID) throws XmlPullParserException, IOException {
+        String gameName = "", gameThumb = "", gameOwn = "", gameImage = "";
 
         parser.require(XmlPullParser.START_TAG, null, "item");
         while (parser.next() != XmlPullParser.END_TAG) {
@@ -188,7 +188,6 @@ public class LoadGamesTask extends AsyncTask<String, Void, String> {
             }
             String name = parser.getName();
 
-
             if (name.equals("name")) {
                 gameName = readName(parser);
                 List<Game> finders = null;
@@ -196,21 +195,32 @@ public class LoadGamesTask extends AsyncTask<String, Void, String> {
                 if (finders.size() != 0){
                     return null;
                 }
+            } else if (name.equals("status")) {
+                //gameOwn = readOwn(parser);
+                gameOwn = parser.getAttributeValue(null, "own");
+                skip(parser);
             } else if (name.equals("thumbnail")) {
                 gameThumb = readThumbnail(parser);
-            } else {
+            }else if (name.equals("image")) {
+                gameImage = readImage(parser);
+            }else {
                 skip(parser);
             }
         }
 
         parser.require(XmlPullParser.END_TAG, null, "item");
-        Game game = new Game(gameName, gameThumb, false);
-        game.save();
-        return game;
+        if (gameOwn.equals("1")) {
+            Game game = new Game(gameName, gameBGGID, gameImage, gameThumb, false);
+            game.save();
+            return game;
+        }else{
+            return null;
+        }
+
     }
 
     private void readEntry_Expansion(XmlPullParser parser, int i) throws XmlPullParserException, IOException {
-        String gameName = "", gameThumb = "";
+        String gameName = "", gameOwn = "";
 
         parser.require(XmlPullParser.START_TAG, null, "item");
         while (parser.next() != XmlPullParser.END_TAG) {
@@ -223,17 +233,31 @@ public class LoadGamesTask extends AsyncTask<String, Void, String> {
             if (name.equals("name")) {
                 gameName = readName(parser);
                 //Log.d("V1", gameName);
-                Game updateMe = Game.findGameByName(gameName);
-                if (updateMe.expansionFlag == false) {
-                    updateMe.expansionFlag = true;
-                    updateMe.save();
-                }
+            }  else if (name.equals("status")) {
+                //gameOwn = readOwn(parser);
+                gameOwn = parser.getAttributeValue(null, "own");
+                skip(parser);
             } else {
                 skip(parser);
             }
         }
-
         parser.require(XmlPullParser.END_TAG, null, "item");
+        if (gameOwn.equals("1")) {
+            Game updateMe = Game.findGameByName(gameName);
+            if (updateMe.expansionFlag == false) {
+                updateMe.expansionFlag = true;
+                updateMe.save();
+            }
+        }
+    }
+
+    private String readBGGID(XmlPullParser parser) throws IOException, XmlPullParserException {
+        String bggid = "";
+        String tag = parser.getName();
+        if (tag.equals("item")) {
+            bggid = parser.getAttributeValue(null, "objectid");
+        }
+        return bggid;
     }
 
     private String readTotal(XmlPullParser parser) throws IOException, XmlPullParserException {
@@ -243,6 +267,16 @@ public class LoadGamesTask extends AsyncTask<String, Void, String> {
             total = parser.getAttributeValue(null, "totalitems");
         }
         return total;
+    }
+
+    private String readOwn(XmlPullParser parser) throws IOException, XmlPullParserException {
+        String own = "";
+        String tag = parser.getName();
+        if (tag.equals("status")) {
+            own = parser.getAttributeValue(null, "own");
+        }
+        Log.d("V1", "own = " + own);
+        return own;
     }
 
     private String readName(XmlPullParser parser) throws IOException, XmlPullParserException {
@@ -256,6 +290,13 @@ public class LoadGamesTask extends AsyncTask<String, Void, String> {
         parser.require(XmlPullParser.START_TAG, null, "thumbnail");
         String title = readText(parser);
         parser.require(XmlPullParser.END_TAG, null, "thumbnail");
+        return title;
+    }
+
+    private String readImage(XmlPullParser parser) throws IOException, XmlPullParserException {
+        parser.require(XmlPullParser.START_TAG, null, "image");
+        String title = readText(parser);
+        parser.require(XmlPullParser.END_TAG, null, "image");
         return title;
     }
 

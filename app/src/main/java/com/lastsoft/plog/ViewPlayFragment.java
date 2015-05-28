@@ -5,6 +5,9 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -44,6 +47,7 @@ public class ViewPlayFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
     private ViewGroup mContainerView_Players;
     private ViewGroup mContainerView_Expansions;
+    ImageView playImage;
 
     // TODO: Rename and change types and number of parameters
     public static ViewPlayFragment newInstance(long playID, String transID, String transID2, String transID3) {
@@ -70,14 +74,15 @@ public class ViewPlayFragment extends Fragment {
             nameTransID = getArguments().getString("nameTransID");
             dateTransID = getArguments().getString("dateTransID");
         }
+        setHasOptionsMenu(true);
     }
 
-
+    View viewPlayLayout;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View viewPlayLayout = inflater.inflate(R.layout.fragment_view_play, container, false);
+        viewPlayLayout = inflater.inflate(R.layout.fragment_view_play, container, false);
         viewPlayLayout.setBackgroundColor(getResources().getColor(R.color.cardview_initial_background));
         LinearLayout linLayout = (LinearLayout) viewPlayLayout.findViewById(R.id.linearLayout);
 
@@ -92,13 +97,18 @@ public class ViewPlayFragment extends Fragment {
         mContainerView_Players = (ViewGroup) viewPlayLayout.findViewById(R.id.container_players);
         mContainerView_Expansions = (ViewGroup) viewPlayLayout.findViewById(R.id.container_expansions);
 
-        ImageView playImage = (ImageView) viewPlayLayout.findViewById(R.id.imageView1);
+        playImage = (ImageView) viewPlayLayout.findViewById(R.id.imageView1);
         if (!thisPlay.playPhoto.equals("")){
             //playImage.setImageDrawable(Drawable.createFromPath(thisPlay.playPhoto.substring(7, thisPlay.playPhoto.length())));
             ImageLoader.getInstance().displayImage(thisPlay.playPhoto, playImage, options);
             //final BitmapWorkerTask task = new BitmapWorkerTask(playImage);
             //task.execute(thisPlay.playPhoto.substring(7, thisPlay.playPhoto.length()));
             playImage.setTransitionName(imageTransID);
+        }else{
+            if (GamesPerPlay.getBaseGame(thisPlay).gameImage != null) {
+                ImageLoader.getInstance().displayImage("http:" + GamesPerPlay.getBaseGame(thisPlay).gameImage, playImage, options);
+                playImage.setTransitionName(imageTransID);
+            }
         }
 
         //ImageLoader.getInstance().displayImage(thisPlay.playPhoto, playImage, options);
@@ -142,15 +152,19 @@ public class ViewPlayFragment extends Fragment {
 
         //output note
         TextView showNote = (TextView) viewPlayLayout.findViewById(R.id.notesText);
-        showNote.setText("\"" + thisPlay.playNotes + "\"");
-        showNote.setTextSize(24);
-        showNote.setTypeface(null, Typeface.ITALIC);
+        if (!thisPlay.playNotes.equals("")) {
+            showNote.setText("\"" + thisPlay.playNotes + "\"");
+            showNote.setTextSize(24);
+            showNote.setTypeface(null, Typeface.ITALIC);
+        }else{
+            showNote.setVisibility(View.GONE);
+        }
         return viewPlayLayout;
     }
 
     private void addPlayer(String playerName, String score, boolean winnerFlag) {
         // Instantiate a new "row" view.
-        final ViewGroup newView = (ViewGroup) LayoutInflater.from(getActivity()).inflate(
+        final ViewGroup newView = (ViewGroup) LayoutInflater.from(mActivity).inflate(
                 R.layout.play_viewplayer_item, mContainerView_Players, false);
 
         TextView playerView = (TextView) newView.findViewById(R.id.player);
@@ -171,7 +185,7 @@ public class ViewPlayFragment extends Fragment {
     }
 
     private void addGame(Game game){
-        final ViewGroup newView = (ViewGroup) LayoutInflater.from(getActivity()).inflate(
+        final ViewGroup newView = (ViewGroup) LayoutInflater.from(mActivity).inflate(
                 R.layout.play_showexpansions_item, mContainerView_Expansions, false);
 
         TextView gameName = (TextView) newView.findViewById(R.id.gameName);
@@ -187,8 +201,38 @@ public class ViewPlayFragment extends Fragment {
     }
 
     @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        // TODO Add your menu entries here
+        super.onCreateOptionsMenu(menu, inflater);
+
+        inflater.inflate(R.menu.view_play, menu);
+
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.edit_play) {
+            ((MainActivity) mActivity).openAddPlay(this, GamesPerPlay.getBaseGame(Play.findById(Play.class, playID)).gameName, playID);
+            return true;
+        }else if (id == R.id.delete_play) {
+            ((MainActivity) mActivity).deletePlay(playID, true);
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    Activity mActivity;
+    @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
+        mActivity = activity;
         try {
             mListener = (OnFragmentInteractionListener) activity;
         } catch (ClassCastException e) {
@@ -201,7 +245,17 @@ public class ViewPlayFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+        mActivity = null;
     }
+
+    @Override
+    public void onDestroy() {
+        // TODO Auto-generated method stub
+        super.onDestroy();
+        ((MainActivity)mActivity).unbindDrawables(viewPlayLayout);
+    }
+
+
 
     /**
      * This interface must be implemented by activities that contain this

@@ -90,7 +90,7 @@ public class AddPlayerFragment extends Fragment {
             });
         }
 
-        app_preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        app_preferences = PreferenceManager.getDefaultSharedPreferences(mActivity);
         editor = app_preferences.edit();
 
         Button button = (Button) rootView.findViewById(R.id.button);
@@ -113,7 +113,7 @@ public class AddPlayerFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 view.setEnabled(false);
-                ((MainActivity)getActivity()).deletePlayer(playerID);
+                ((MainActivity)mActivity).deletePlayer(playerID);
             }
         });
 
@@ -141,7 +141,7 @@ public class AddPlayerFragment extends Fragment {
                     }
 
                     if (nameTakenFlag){
-                        Toast.makeText(getActivity(), getString(R.string.name_taken), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mActivity, getString(R.string.name_taken), Toast.LENGTH_SHORT).show();
                     }else {
                         if (playerID >= 0) {
                             editPlayer.bggUsername = bggUsername.getText().toString();
@@ -186,11 +186,13 @@ public class AddPlayerFragment extends Fragment {
         }
     }
 
+    Activity mActivity;
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
+        mActivity = activity;
         try {
-            ((MainActivity) activity).onSectionAttached(6);
+            ((MainActivity) mActivity).onSectionAttached(6);
             mListener = (OnFragmentInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
@@ -202,6 +204,7 @@ public class AddPlayerFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+        mActivity = null;
     }
 
     /**
@@ -239,9 +242,9 @@ public class AddPlayerFragment extends Fragment {
                     public void onAnimationStart(Animator animation) {
                         try {
                             InputMethodManager inputManager = (InputMethodManager)
-                                    getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                                    mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
 
-                            inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),
+                            inputManager.hideSoftInputFromWindow(mActivity.getCurrentFocus().getWindowToken(),
                                     InputMethodManager.HIDE_NOT_ALWAYS);
                         } catch (Exception e) {
                         }

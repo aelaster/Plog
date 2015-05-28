@@ -100,7 +100,7 @@ public class AddGroupFragment extends Fragment {
             view.setEnabled(false);
             if (!playerName.getText().toString().isEmpty()) {
                 /*Player newPlayer = new Player(playerName.getText().toString(), bggUsername.getText().toString());
-                MyDBHandler dbHandler = new MyDBHandler(getActivity(), null, null, 1);
+                MyDBHandler dbHandler = new MyDBHandler(mActivity, null, null, 1);
                 dbHandler.addPlayer(newPlayer);*/
                 Player player = new Player(playerName.getText().toString(), bggUsername.getText().toString());
                 player.save();
@@ -119,11 +119,13 @@ public class AddGroupFragment extends Fragment {
         }
     }
 
+    Activity mActivity;
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
+        mActivity = activity;
         try {
-            ((MainActivity) activity).onSectionAttached(6);
+            ((MainActivity) mActivity).onSectionAttached(6);
             mListener = (OnFragmentInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
@@ -135,6 +137,7 @@ public class AddGroupFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+        mActivity = null;
     }
 
     /**
@@ -164,9 +167,9 @@ public class AddGroupFragment extends Fragment {
                 public void onAnimationStart(Animator animation) {
                     try{
                         InputMethodManager inputManager = (InputMethodManager)
-                                getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                                mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
 
-                        inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),
+                        inputManager.hideSoftInputFromWindow(mActivity.getCurrentFocus().getWindowToken(),
                                 InputMethodManager.HIDE_NOT_ALWAYS);
                     }catch (Exception e){}
                 }

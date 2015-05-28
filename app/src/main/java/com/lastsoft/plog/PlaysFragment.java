@@ -77,7 +77,7 @@ public class PlaysFragment extends Fragment{
         // LinearLayoutManager is used here, this will layout the elements in a similar fashion
         // to the way ListView would layout elements. The RecyclerView.LayoutManager defines how
         // elements are laid out.
-        mLayoutManager = new LinearLayoutManager(getActivity());
+        mLayoutManager = new LinearLayoutManager(mActivity);
 
         mCurrentLayoutManagerType = LayoutManagerType.LINEAR_LAYOUT_MANAGER;
 
@@ -88,7 +88,7 @@ public class PlaysFragment extends Fragment{
         }
         setRecyclerViewLayoutManager(mCurrentLayoutManagerType);
 
-        mAdapter = new PlayAdapter(getActivity(), this);
+        mAdapter = new PlayAdapter(mActivity, this);
         // Set CustomAdapter as the adapter for RecyclerView.
         mRecyclerView.setAdapter(mAdapter);
 
@@ -105,10 +105,12 @@ public class PlaysFragment extends Fragment{
         return rootView;
     }
 
+    Activity mActivity;
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        ((MainActivity) activity).onSectionAttached(3);
+        mActivity = activity;
+        ((MainActivity) mActivity).onSectionAttached(3);
         try {
             mListener = (OnFragmentInteractionListener) activity;
         } catch (ClassCastException e) {
@@ -121,6 +123,7 @@ public class PlaysFragment extends Fragment{
     public void onDetach() {
         super.onDetach();
         mListener = null;
+        mActivity = null;
     }
 
     /**
@@ -139,11 +142,11 @@ public class PlaysFragment extends Fragment{
 
         switch (layoutManagerType) {
             case LINEAR_LAYOUT_MANAGER:
-                mLayoutManager = new LinearLayoutManager(getActivity());
+                mLayoutManager = new LinearLayoutManager(mActivity);
                 mCurrentLayoutManagerType = LayoutManagerType.LINEAR_LAYOUT_MANAGER;
                 break;
             default:
-                mLayoutManager = new LinearLayoutManager(getActivity());
+                mLayoutManager = new LinearLayoutManager(mActivity);
                 mCurrentLayoutManagerType = LayoutManagerType.LINEAR_LAYOUT_MANAGER;
         }
 
@@ -158,6 +161,14 @@ public class PlaysFragment extends Fragment{
         super.onSaveInstanceState(savedInstanceState);
     }
 
+    @Override
+    public void onDestroy() {
+        // TODO Auto-generated method stub
+        super.onDestroy();
+        ((MainActivity)mActivity).unbindDrawables(mRecyclerView);
+    }
+
+
     /**
      * Generates Strings for RecyclerView's adapter. This data would usually come
      * from a local content provider or remote server.
@@ -171,7 +182,7 @@ public class PlaysFragment extends Fragment{
 
     protected void refreshDataset(){
         initDataset();
-        mAdapter = new PlayAdapter(getActivity(), this);
+        mAdapter = new PlayAdapter(mActivity, this);
         // Set CustomAdapter as the adapter for RecyclerView.
         mRecyclerView.setAdapter(mAdapter);
     }

@@ -56,4 +56,15 @@ public class GamesPerPlay extends SugarRecord<GamesPerPlay> {
         }
     }
 
+    public static boolean hasGameBeenPlayed(Game game){
+        Select hasGameBeenPlayed = Select.from(GamesPerPlay.class);
+        hasGameBeenPlayed.where(Condition.prop(StringUtil.toSQLName("game")).eq(game.getId()));
+        List<GamesPerPlay> tester = hasGameBeenPlayed.list();
+        if (tester.isEmpty()){
+            return false;
+        }else{
+            return true;
+        }
+    }
+
 }

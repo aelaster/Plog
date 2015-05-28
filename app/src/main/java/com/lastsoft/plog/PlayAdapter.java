@@ -29,6 +29,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.lastsoft.plog.db.Game;
 import com.lastsoft.plog.db.GamesPerPlay;
 import com.lastsoft.plog.db.Play;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -104,6 +105,7 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
                 .cacheOnDisk(true)
                 .cacheInMemory(true)
                 .considerExifParams(true)
+                .resetViewBeforeLoading(true)
                 .build();
     }
 
@@ -139,11 +141,11 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
             viewHolder.getView().setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (!plays.get(position).playPhoto.equals("")) {
+                    //if (!plays.get(position).playPhoto.equals("")) {
+                    //    ((MainActivity) myActivity).onPlayClicked(plays.get(position), myFragment, viewHolder.getImageView(), viewHolder.getGameNameView(), viewHolder.getPlayDateView());
+                    //} else {
                         ((MainActivity) myActivity).onPlayClicked(plays.get(position), myFragment, viewHolder.getImageView(), viewHolder.getGameNameView(), viewHolder.getPlayDateView());
-                    } else {
-                        ((MainActivity) myActivity).onPlayClicked(plays.get(position), myFragment, null, viewHolder.getGameNameView(), viewHolder.getPlayDateView());
-                    }
+                    //}
                 }
             });
             viewHolder.getOverflowView().setOnClickListener(new View.OnClickListener() {
@@ -152,11 +154,15 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
                     playPopup(view, position);
                 }
             });
-
-            ImageLoader.getInstance().displayImage(plays.get(position).playPhoto, viewHolder.getImageView(), options);
-            ImageLoader.getInstance().loadImage(plays.get(position).playPhoto, options, null);
-                    //}
-
+            if(plays.get(position).playPhoto.equals("")) {
+                if (GamesPerPlay.getBaseGame(plays.get(position)).gameThumb != null) {
+                    ImageLoader.getInstance().displayImage("http:" + GamesPerPlay.getBaseGame(plays.get(position)).gameThumb, viewHolder.getImageView(), options);
+                    ImageLoader.getInstance().loadImage("http:" + GamesPerPlay.getBaseGame(plays.get(position)).gameImage, options, null);
+                }
+            }else{
+                ImageLoader.getInstance().displayImage(plays.get(position).playPhoto, viewHolder.getImageView(), options);
+                ImageLoader.getInstance().loadImage(plays.get(position).playPhoto, options, null);
+            }
     }
     // END_INCLUDE(recyclerViewOnBindViewHolder)
 
@@ -181,7 +187,7 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
                     case R.id.delete_play:
                         //delete the play
                         //refresh play list
-                        ((MainActivity) myActivity).deletePlay(plays.get(position).getId());
+                        ((MainActivity) myActivity).deletePlay(plays.get(position).getId(), false);
                         return true;
                     default:
                         return false;

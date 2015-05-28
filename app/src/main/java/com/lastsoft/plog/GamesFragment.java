@@ -75,7 +75,7 @@ public class GamesFragment extends Fragment{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ActionBar actionBar = ((MainActivity)getActivity()).getSupportActionBar();
+        ActionBar actionBar = ((MainActivity)mActivity).getSupportActionBar();
         actionBar.setDisplayShowCustomEnabled(true);
         actionBar.setCustomView(R.layout.search_bar);
         mSearch = (EditText) actionBar.getCustomView()
@@ -83,6 +83,8 @@ public class GamesFragment extends Fragment{
         mCancel = (ImageView) actionBar.getCustomView()
                 .findViewById(R.id.closeButton);
     }
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -112,7 +114,7 @@ public class GamesFragment extends Fragment{
         // LinearLayoutManager is used here, this will layout the elements in a similar fashion
         // to the way ListView would layout elements. The RecyclerView.LayoutManager defines how
         // elements are laid out.
-        mLayoutManager = new LinearLayoutManager(getActivity());
+        mLayoutManager = new LinearLayoutManager(mActivity);
 
         mCurrentLayoutManagerType = LayoutManagerType.LINEAR_LAYOUT_MANAGER;
 
@@ -124,7 +126,7 @@ public class GamesFragment extends Fragment{
         setRecyclerViewLayoutManager(mCurrentLayoutManagerType);
 
         //mAdapter = new CustomAdapter(mDataset, mDataset_Thumb);
-        mAdapter = new GameAdapter(this, getActivity(),mSearchQuery);
+        mAdapter = new GameAdapter(this, mActivity,mSearchQuery);
         // Set CustomAdapter as the adapter for RecyclerView.
         mRecyclerView.setAdapter(mAdapter);
 
@@ -145,7 +147,7 @@ public class GamesFragment extends Fragment{
                 // When user changed the Text
                 mSearchQuery = cs.toString();
                 //initDataset();
-                mAdapter = new GameAdapter(GamesFragment.this, getActivity(),mSearchQuery);
+                mAdapter = new GameAdapter(GamesFragment.this, mActivity,mSearchQuery);
                 // Set CustomAdapter as the adapter for RecyclerView.
                 mRecyclerView.setAdapter(mAdapter);
             }
@@ -171,13 +173,13 @@ public class GamesFragment extends Fragment{
                 if (!mSearch.getText().toString().equals("")) {
                     mSearchQuery = "";
                     mSearch.setText(mSearchQuery);
-                    //getActivity().onBackPressed();
+                    //mActivity.onBackPressed();
                 }
 
                 InputMethodManager inputManager = (InputMethodManager)
-                        getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                        mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
 
-                inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),
+                inputManager.hideSoftInputFromWindow(mActivity.getCurrentFocus().getWindowToken(),
                         InputMethodManager.HIDE_NOT_ALWAYS);
                 mSearch.clearFocus();
                 mRecyclerView.requestFocus();
@@ -207,10 +209,12 @@ public class GamesFragment extends Fragment{
         return mSearchQuery;
     }
 
+    Activity mActivity;
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        ((MainActivity) activity).onSectionAttached(1);
+        mActivity = activity;
+        ((MainActivity) mActivity).onSectionAttached(1);
         try {
             mListener = (OnFragmentInteractionListener) activity;
         } catch (ClassCastException e) {
@@ -225,12 +229,15 @@ public class GamesFragment extends Fragment{
         mListener = null;
         try{
             InputMethodManager inputManager = (InputMethodManager)
-                    getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
 
-            inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),
+            inputManager.hideSoftInputFromWindow(mActivity.getCurrentFocus().getWindowToken(),
                     InputMethodManager.HIDE_NOT_ALWAYS);
         }catch (Exception e){}
-        ((MainActivity)getActivity()).getSupportActionBar().setDisplayShowCustomEnabled(false);
+        if (mActivity != null) {
+            ((MainActivity) mActivity).getSupportActionBar().setDisplayShowCustomEnabled(false);
+            mActivity = null;
+        }
     }
 
     /**
@@ -249,16 +256,23 @@ public class GamesFragment extends Fragment{
 
         switch (layoutManagerType) {
             case LINEAR_LAYOUT_MANAGER:
-                mLayoutManager = new LinearLayoutManager(getActivity());
+                mLayoutManager = new LinearLayoutManager(mActivity);
                 mCurrentLayoutManagerType = LayoutManagerType.LINEAR_LAYOUT_MANAGER;
                 break;
             default:
-                mLayoutManager = new LinearLayoutManager(getActivity());
+                mLayoutManager = new LinearLayoutManager(mActivity);
                 mCurrentLayoutManagerType = LayoutManagerType.LINEAR_LAYOUT_MANAGER;
         }
 
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.scrollToPosition(scrollPosition);
+    }
+
+    @Override
+    public void onDestroy() {
+        // TODO Auto-generated method stub
+        super.onDestroy();
+        ((MainActivity)mActivity).unbindDrawables(mRecyclerView);
     }
 
     @Override
@@ -274,7 +288,7 @@ public class GamesFragment extends Fragment{
      */
     GamesLoader myTask;
     private void initDataset() {
-        myTask = new GamesLoader(getActivity());
+        myTask = new GamesLoader(mActivity);
         try {
             myTask.execute();
 
@@ -283,9 +297,11 @@ public class GamesFragment extends Fragment{
         }
     }
 
-    protected void refreshDataset(){
-        initDataset();
-        mAdapter = new GameAdapter(this, getActivity(),mSearchQuery);
+    protected void refreshDataset(boolean reInit){
+        if (reInit) {
+            initDataset();
+        }
+        mAdapter = new GameAdapter(this, mActivity,mSearchQuery);
         // Set CustomAdapter as the adapter for RecyclerView.
         mRecyclerView.setAdapter(mAdapter);
     }
@@ -316,7 +332,7 @@ public class GamesFragment extends Fragment{
             myTask = null;
 
             //mAdapter = new CustomAdapter(mDataset, mDataset_Thumb);
-            mAdapter = new GameAdapter(GamesFragment.this, getActivity(),mSearchQuery);
+            mAdapter = new GameAdapter(GamesFragment.this, mActivity,mSearchQuery);
             // Set CustomAdapter as the adapter for RecyclerView.
             mRecyclerView.setAdapter(mAdapter);
 

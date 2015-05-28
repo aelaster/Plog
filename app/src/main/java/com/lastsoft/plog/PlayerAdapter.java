@@ -17,6 +17,7 @@
 package com.lastsoft.plog;
 
 import android.app.Activity;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,6 +39,7 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.ViewHolder
 
     private DisplayImageOptions options;
     private Activity myActivity;
+    private Fragment myFragment;
     private List<Player> players;
 
 
@@ -76,8 +78,9 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.ViewHolder
     }
     // END_INCLUDE(recyclerViewSampleViewHolder)
 
-    public PlayerAdapter(Activity mActivity) {
+    public PlayerAdapter(Activity mActivity, Fragment mFragment) {
         myActivity = mActivity;
+        myFragment = mFragment;
         players = Player.listPlayersAZ();
         options = new DisplayImageOptions.Builder()
                 .cacheOnDisk(true)
@@ -109,7 +112,7 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.ViewHolder
         viewHolder.getView().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((MainActivity)myActivity).openAddPlayer(players.get(position).getId());
+                ((MainActivity)myActivity).openAddPlayer(myFragment, players.get(position).getId());
             }
         });
     }

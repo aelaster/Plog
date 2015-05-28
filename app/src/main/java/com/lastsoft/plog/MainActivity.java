@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.PopupMenu;
 import android.transition.TransitionInflater;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -23,6 +24,7 @@ import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
+import com.lastsoft.plog.db.Game;
 import com.lastsoft.plog.db.GamesPerPlay;
 import com.lastsoft.plog.db.Play;
 import com.lastsoft.plog.db.Player;
@@ -101,7 +103,7 @@ public class MainActivity extends ActionBarActivity
         FragmentManager fragmentManager = getSupportFragmentManager();
         if (fragmentManager.getBackStackEntryCount() > 0){
             //int backStackCount = manager.getBackStackEntryCount();
-            fragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+            fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
             //fragmentManager.popBackStack(fragmentManager.getBackStackEntryAt(0).getId(), FragmentManager.POP_BACK_STACK_INCLUSIVE);
             fragUp = false;
         }
@@ -195,9 +197,10 @@ public class MainActivity extends ActionBarActivity
             }
         }else if (id.contains("refresh_games")){
             GamesFragment collectionFrag = (GamesFragment)
-                    getSupportFragmentManager().findFragmentByTag("collection");
+                    getSupportFragmentManager().findFragmentByTag("games");
             if (collectionFrag != null) {
-                collectionFrag.refreshDataset();
+                collectionFrag.refreshDataset(false);
+                onSectionAttached(1);
             }
         }else if (id.contains("refresh_plays")){
             PlaysFragment playsFrag = (PlaysFragment)
@@ -218,7 +221,7 @@ public class MainActivity extends ActionBarActivity
         Toast.makeText(this, id + " List Item Clicked", Toast.LENGTH_SHORT).show();
     }
 
-    public void openAddPlayer(long playerID){
+    public void openAddPlayer(Fragment mFragment, long playerID){
         try{
             InputMethodManager inputManager = (InputMethodManager)
                     getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -228,6 +231,10 @@ public class MainActivity extends ActionBarActivity
         }catch (Exception e){}
 
         //mFragment.setExitTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.slide_top));
+
+        //mFragment.setSharedElementReturnTransition(null);
+        //mFragment.setExitTransition(null);
+
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction ft = fragmentManager.beginTransaction();
@@ -240,6 +247,7 @@ public class MainActivity extends ActionBarActivity
         ft.replace(R.id.container, mAddPlayerFragment, "add_player");
         ft.addToBackStack("add_play");
         ft.commit();
+        fragmentManager.executePendingTransactions(); //Prevents the flashing.
     }
 
     public void onPlayClicked(Play clickedPlay, Fragment mFragment, View view, View nameView, View dateView){
@@ -251,8 +259,8 @@ public class MainActivity extends ActionBarActivity
                     InputMethodManager.HIDE_NOT_ALWAYS);
         }catch (Exception e){}
 
-        mFragment.setSharedElementReturnTransition(TransitionInflater.from(this).inflateTransition(R.transition.change_image_transform));
-        mFragment.setExitTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.move));
+        //mFragment.setSharedElementReturnTransition(TransitionInflater.from(this).inflateTransition(R.transition.change_image_transform));
+        //mFragment.setExitTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.move));
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction ft = fragmentManager.beginTransaction();
@@ -295,13 +303,13 @@ public class MainActivity extends ActionBarActivity
         mAddPlayFragment = AddPlayFragment.newInstance((int) 0, (int) 0, true, game_name, playID);
         //mAddPlayFragment.setEnterTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.slide_bottom));
         //mAddPlayFragment.setExitTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.slide_top));
-
         ft.setCustomAnimations(R.anim.slide_in_bottom, R.anim.slide_out_top, R.anim.slide_in_top, R.anim.slide_out_bottom);
         ft.replace(R.id.container, mAddPlayFragment, "add_play");
         ft.addToBackStack("add_play");
         ft.commit();
 
         mTitle = game_name;
+
 
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
@@ -314,11 +322,24 @@ public class MainActivity extends ActionBarActivity
                         getSupportFragmentManager().findFragmentByTag("games");
                 if (collectionFrag != null && !collectionFrag.getQuery().equals("")) {
                     collectionFrag.clearQuery();
-                    collectionFrag.refreshDataset();
+                    collectionFrag.refreshDataset(false);
                 }
             }
         }, 1000);
 
+    }
+
+    public void deleteGame(long gameId){
+        Game deleteMe = Game.findById(Game.class, gameId);
+
+        //check if this game has been played
+        //if so, can't delete
+        if (GamesPerPlay.hasGameBeenPlayed(deleteMe) == false){
+            deleteMe.delete();
+        }
+
+        onFragmentInteraction("refresh_games");
+        //onBackPressed();
     }
 
     public void deletePlayer(long playerID){
@@ -341,7 +362,7 @@ public class MainActivity extends ActionBarActivity
         onBackPressed();
     }
 
-    public void deletePlay(long playID){
+    public void deletePlay(long playID, boolean backFlag){
         Play deleteMe = Play.findById(Play.class, playID);
 
         //delete PlayersPerPlay
@@ -363,6 +384,10 @@ public class MainActivity extends ActionBarActivity
         deleteMe.delete();
 
         onFragmentInteraction("refresh_plays");
+        if (backFlag){
+            //this was deleted via view
+            onNavigationDrawerItemSelected(2);
+        }
     }
 
     private Boolean fragUp = false;
@@ -415,13 +440,15 @@ public class MainActivity extends ActionBarActivity
     }
     @Override
     public void onBackPressed(){
-        if(fragUp){
-            if (mAddPlayerFragment != null) removeFragment(mAddPlayerFragment.getView());
-            if (mAddGameFragment != null) removeFragment(mAddGameFragment.getView());
-            if (mAddPlayFragment != null)removeFragment(mAddPlayFragment.getView());
-            if (mAddGroupFragment != null) removeFragment(mAddGroupFragment.getView());
-        }else{
-            super.onBackPressed();
+        if (mNavigationDrawerFragment.isDrawerOpen() == false) {
+            if (fragUp) {
+                if (mAddPlayerFragment != null) removeFragment(mAddPlayerFragment.getView());
+                if (mAddGameFragment != null) removeFragment(mAddGameFragment.getView());
+                if (mAddPlayFragment != null) removeFragment(mAddPlayFragment.getView());
+                if (mAddGroupFragment != null) removeFragment(mAddGroupFragment.getView());
+            } else {
+                super.onBackPressed();
+            }
         }
     }
 
@@ -446,6 +473,26 @@ public class MainActivity extends ActionBarActivity
             mAddGroupFragment.removeYourself();
             mAddGroupFragment = null;
         }
+    }
+
+    protected void unbindDrawables(View view) {
+        //Log.d("V1", "unbinding drawables");
+        if (view.getBackground() != null) {
+            view.getBackground().setCallback(null);
+        }
+        if (view instanceof ViewGroup) {
+            for (int i = 0; i < ((ViewGroup) view).getChildCount(); i++) {
+                //Log.d("V1", "unbinding drawables " + i);
+                unbindDrawables(((ViewGroup) view).getChildAt(i));
+            }
+            try{
+                ((ViewGroup) view).removeAllViews();
+                //Log.d("V1", "unbinding drawables x");
+            } catch (Exception e){
+                //Log.d("V1", "exception");
+            }
+        }
+        System.gc();
     }
 
     /**
@@ -486,5 +533,7 @@ public class MainActivity extends ActionBarActivity
                     getArguments().getInt(ARG_SECTION_NUMBER));
         }
     }
+
+
 
 }

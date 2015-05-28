@@ -11,6 +11,7 @@
     <string name="delete_player">Delete Player</string>
     <string name="add_play">Add Play</string>
     <string name="edit_play">Edit Play</string>
+    <string name="delete_play">Delete Play</string>
     <string name="edit_player">Edit Player</string>
     <string name="add_group">Add Group</string>
     <string name="add_game">Add Game</string>

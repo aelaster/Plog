@@ -18,15 +18,19 @@ package com.lastsoft.plog;
 
 import android.app.Activity;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.lastsoft.plog.db.Game;
+import com.lastsoft.plog.db.GamesPerPlay;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
@@ -51,6 +55,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private final TextView textView;
         private final ImageView imageView;
+        private final ImageView overflowView;
         private final View myView;
 
         public ViewHolder(View v) {
@@ -64,6 +69,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
             });
             textView = (TextView) v.findViewById(R.id.gameName);
             imageView = (ImageView) v.findViewById(R.id.imageView1);
+            overflowView = (ImageView) v.findViewById(R.id.overflowMenu);
             myView = v;
         }
 
@@ -72,6 +78,9 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
         }
         public TextView getTextView() {
             return textView;
+        }
+        public ImageView getOverflowView() {
+            return overflowView;
         }
         public View getView() {
             return myView;
@@ -123,7 +132,12 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
             } else {
                 viewHolder.getImageView().setImageDrawable(null);
             }
-
+            viewHolder.getOverflowView().setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    playPopup(view, position);
+                }
+            });
             viewHolder.getView().setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -139,5 +153,27 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
     @Override
     public int getItemCount() {
         return games.size();
+    }
+
+    public void playPopup(View v, final int position) {
+        PopupMenu popup = new PopupMenu(myActivity, v);
+
+        MenuInflater inflater = popup.getMenuInflater();
+        inflater.inflate(R.menu.game_overflow, popup.getMenu());
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.delete_game:
+                        //delete the play
+                        //refresh play list
+                        ((MainActivity) myActivity).deleteGame(games.get(position).getId());
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        });
+        popup.show();
     }
 }
