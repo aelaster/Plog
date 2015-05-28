@@ -53,7 +53,7 @@ public class PlayersPerPlay extends SugarRecord<PlayersPerPlay> {
     public static List<PlayersPerPlay> getPlayers_Winners(Play play){
         Select getPlayers = Select.from(PlayersPerPlay.class);
         getPlayers.where(Condition.prop(StringUtil.toSQLName("play")).eq(play.getId()));
-        getPlayers.orderBy(StringUtil.toSQLName("score") + " ASC");
+        getPlayers.orderBy(StringUtil.toSQLName("score") + " DESC");
         return getPlayers.list();
     }
 

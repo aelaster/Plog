@@ -167,7 +167,7 @@ public class ViewPlayFragment extends Fragment {
             scoreView.setTextSize(16);
         }
 
-        mContainerView_Players.addView(newView, 0);
+        mContainerView_Players.addView(newView);
     }
 
     private void addGame(Game game){
@@ -176,7 +176,7 @@ public class ViewPlayFragment extends Fragment {
 
         TextView gameName = (TextView) newView.findViewById(R.id.gameName);
         gameName.setText(game.gameName);
-        mContainerView_Expansions.addView(newView, 0);
+        mContainerView_Expansions.addView(newView);
     }
 
     // TODO: Rename method, update argument and hook method into UI event

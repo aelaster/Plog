@@ -342,7 +342,7 @@ public class AddPlayFragment extends Fragment {
 
         TextView gameName = (TextView) newView.findViewById(R.id.gameName);
         gameName.setText(game.gameName);
-        mContainerView_Expansions.addView(newView, 0);
+        mContainerView_Expansions.addView(newView);
     }
     private void clearGames(){
         mContainerView_Expansions.removeAllViews();
@@ -402,7 +402,7 @@ public class AddPlayFragment extends Fragment {
 
         // Because mContainerView has android:animateLayoutChanges set to true,
         // adding this view is automatically animated.
-        mContainerView_Players.addView(newView, 0);
+        mContainerView_Players.addView(newView);
     }
 
     private File createImageFile() throws IOException {
