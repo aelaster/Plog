@@ -1,0 +1,33 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" tools:context="com.lastsoft.plog.StatsFragment"
+    android:orientation="vertical">
+
+    <!-- TODO: Update blank fragment layout -->
+    <TextView android:id="@+id/total_games_played"  android:layout_width="match_parent" android:layout_height="wrap_content"
+         />
+    <TextView android:id="@+id/unique_games_played"  android:layout_width="match_parent" android:layout_height="wrap_content"
+         />
+
+    <TextView android:id="@+id/adam_total_wins"  android:layout_width="match_parent" android:layout_height="wrap_content"
+         />
+    <TextView android:id="@+id/adam_total_wins_percentage"  android:layout_width="match_parent" android:layout_height="wrap_content"
+         />
+
+    <TextView android:id="@+id/adam_asterisk_wins" android:layout_width="match_parent" android:layout_height="wrap_content"
+         />
+    <TextView android:id="@+id/adam_asterisk_wins_percentage"  android:layout_width="match_parent" android:layout_height="wrap_content"
+         />
+
+    <TextView android:id="@+id/sher_total_wins"  android:layout_width="match_parent" android:layout_height="wrap_content"
+         />
+    <TextView android:id="@+id/sher_total_wins_percentage"  android:layout_width="match_parent" android:layout_height="wrap_content"
+         />
+
+    <TextView android:id="@+id/sher_asterisk_wins" android:layout_width="match_parent" android:layout_height="wrap_content"
+         />
+    <TextView android:id="@+id/sher_asterisk_wins_percentage"  android:layout_width="match_parent" android:layout_height="wrap_content"
+         />
+
+
+</LinearLayout>

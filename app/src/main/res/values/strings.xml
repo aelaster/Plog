@@ -16,6 +16,7 @@
     <string name="add_group">Add Group</string>
     <string name="add_game">Add Game</string>
     <string name="filter_games">Filter Games</string>
+    <string name="calculating">Calculating...</string>
 
     <string name="color">Color</string>
     <string name="score">Score</string>

@@ -14,7 +14,7 @@
         android:name="com.orm.SugarApp">
 
         <meta-data android:name="DATABASE" android:value="SRX.db" />
-        <meta-data android:name="VERSION" android:value="40" />
+        <meta-data android:name="VERSION" android:value="42" />
         <meta-data android:name="QUERY_LOG" android:value="false" />
         <meta-data android:name="DOMAIN_PACKAGE_NAME" android:value="com.lastsoft" />
 

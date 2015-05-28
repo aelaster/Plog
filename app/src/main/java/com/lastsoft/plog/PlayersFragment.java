@@ -166,34 +166,34 @@ public class PlayersFragment extends Fragment{
 
                             int score;
                             if (next[4].trim().contains("AEL and SKG")) {
-                                PlayersPerPlay newPlayer = new PlayersPerPlay(Player.findById(Player.class, (long) 1), newPlay, totalPlayers);
+                                PlayersPerPlay newPlayer = new PlayersPerPlay(Player.findById(Player.class, (long) 1), newPlay, totalPlayers, totalPlayers);
                                 newPlayer.save();
-                                PlayersPerPlay newPlayer2 = new PlayersPerPlay(Player.findById(Player.class, (long) 2), newPlay, totalPlayers);
+                                PlayersPerPlay newPlayer2 = new PlayersPerPlay(Player.findById(Player.class, (long) 2), newPlay, totalPlayers, totalPlayers);
                                 newPlayer2.save();
                             }else if (next[4].trim().contains("AEL")){
                                 if (next[4].trim().endsWith("*")){
-                                    PlayersPerPlay newPlayer = new PlayersPerPlay(Player.findById(Player.class, (long) 1), newPlay, totalPlayers-1);
+                                    PlayersPerPlay newPlayer = new PlayersPerPlay(Player.findById(Player.class, (long) 1), newPlay, totalPlayers-1, totalPlayers);
                                     newPlayer.save();
                                 }else {
-                                    PlayersPerPlay newPlayer = new PlayersPerPlay(Player.findById(Player.class, (long) 1), newPlay, 1);
+                                    PlayersPerPlay newPlayer = new PlayersPerPlay(Player.findById(Player.class, (long) 1), newPlay, totalPlayers, totalPlayers);
                                     newPlayer.save();
                                 }
-                                PlayersPerPlay newPlayer2 = new PlayersPerPlay(Player.findById(Player.class, (long)2), newPlay, 0);
+                                PlayersPerPlay newPlayer2 = new PlayersPerPlay(Player.findById(Player.class, (long)2), newPlay, 0, totalPlayers);
                                 newPlayer2.save();
                             }else if (next[4].trim().contains("SKG")){
                                 if (next[4].trim().endsWith("*")){
-                                    PlayersPerPlay newPlayer = new PlayersPerPlay(Player.findById(Player.class, (long) 2), newPlay, totalPlayers-1);
+                                    PlayersPerPlay newPlayer = new PlayersPerPlay(Player.findById(Player.class, (long) 2), newPlay, totalPlayers-1, totalPlayers);
                                     newPlayer.save();
                                 }else {
-                                    PlayersPerPlay newPlayer = new PlayersPerPlay(Player.findById(Player.class, (long) 2), newPlay, 1);
+                                    PlayersPerPlay newPlayer = new PlayersPerPlay(Player.findById(Player.class, (long) 2), newPlay, totalPlayers, totalPlayers);
                                     newPlayer.save();
                                 }
-                                PlayersPerPlay newPlayer2 = new PlayersPerPlay(Player.findById(Player.class, (long)1), newPlay, 0);
+                                PlayersPerPlay newPlayer2 = new PlayersPerPlay(Player.findById(Player.class, (long)1), newPlay, 0, totalPlayers);
                                 newPlayer2.save();
                             }else{
-                                PlayersPerPlay newPlayer = new PlayersPerPlay(Player.findById(Player.class, (long)1), newPlay, 0);
+                                PlayersPerPlay newPlayer = new PlayersPerPlay(Player.findById(Player.class, (long)1), newPlay, 0, totalPlayers);
                                 newPlayer.save();
-                                PlayersPerPlay newPlayer2 = new PlayersPerPlay(Player.findById(Player.class, (long)2), newPlay, 0);
+                                PlayersPerPlay newPlayer2 = new PlayersPerPlay(Player.findById(Player.class, (long)2), newPlay, 0, totalPlayers);
                                 newPlayer2.save();
                             }
 
@@ -286,7 +286,7 @@ public class PlayersFragment extends Fragment{
             score = 0;
         }
 
-        PlayersPerPlay newPlayer = new PlayersPerPlay(Player.findById(Player.class, playerID), newPlay, score);
+        PlayersPerPlay newPlayer = new PlayersPerPlay(Player.findById(Player.class, playerID), newPlay, score, totalPlayers);
         newPlayer.save();
     }
 

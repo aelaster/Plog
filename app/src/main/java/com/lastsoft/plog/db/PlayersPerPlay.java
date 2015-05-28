@@ -18,23 +18,26 @@ public class PlayersPerPlay extends SugarRecord<PlayersPerPlay> {
     public Play play;
     public int score;
     public String color;
+    public int playHighScore;
 
     public PlayersPerPlay() {
     }
 
 
-    public PlayersPerPlay(Player player, Play play, int score, String color) {
+    public PlayersPerPlay(Player player, Play play, int score, String color, int playHighScore) {
         this.player = player;
         this.play = play;
         this.score = score;
         this.color = color;
+        this.playHighScore = playHighScore;
     }
 
-    public PlayersPerPlay(Player player, Play play, int score) {
+    public PlayersPerPlay(Player player, Play play, int score, int playHighScore) {
         this.player = player;
         this.play = play;
         this.score = score;
         this.color = "";
+        this.playHighScore = playHighScore;
     }
 
     public static List<PlayersPerPlay> getPlayers(Play play){
@@ -47,6 +50,19 @@ public class PlayersPerPlay extends SugarRecord<PlayersPerPlay> {
         Select getPlayers = Select.from(PlayersPerPlay.class);
         getPlayers.where(Condition.prop(StringUtil.toSQLName("player")).eq(player.getId()));
         return getPlayers.list();
+    }
+
+    public static List<PlayersPerPlay> totalPlays(Player player){
+        Select getPlayers = Select.from(PlayersPerPlay.class);
+        getPlayers.where(Condition.prop(StringUtil.toSQLName("player")).eq(player.getId()));
+        return getPlayers.list();
+    }
+
+    public static int getScoreByPlayer(Player player, Play play){
+        Select getPlayers = Select.from(PlayersPerPlay.class);
+        getPlayers.where(Condition.prop(StringUtil.toSQLName("player")).eq(player.getId()), Condition.prop(StringUtil.toSQLName("play")).eq(play.getId()));
+        List<PlayersPerPlay> output =  getPlayers.list();
+        return output.get(0).score;
     }
 
 
@@ -66,11 +82,6 @@ public class PlayersPerPlay extends SugarRecord<PlayersPerPlay> {
         //getPlayers.where(Condition.prop(StringUtil.toSQLName("play")).eq(play.getId()));
         //return  PlayersPerPlay.findWithQuery(PlayersPerPlay.class, "Select Max(" + StringUtil.toSQLName("score") + ") from " + StringUtil.toSQLName("PlayersPerPlay") + " where " + StringUtil.toSQLName("play") + " = ?", play.getId().toString());
         return PlayersPerPlay.findWithQuery(PlayersPerPlay.class, "Select * from " + StringUtil.toSQLName("PlayersPerPlay") + " where " + StringUtil.toSQLName("play") + " = ? and " + StringUtil.toSQLName("score") + " = (Select Max(" + StringUtil.toSQLName("score") + ") from " + StringUtil.toSQLName("PlayersPerPlay") + " where " + StringUtil.toSQLName("play") + " = ?)", play.getId().toString(), play.getId().toString());
-
-        /*
-        find(Class<T> type, String whereClause, String[] whereArgs, String groupBy, String orderBy, String limit)
-        I tend to use db.rawQuery(String sql, String[] selectionArgs), so it would be: db.rawQuery("SELECT MAX(price) FROM spendings", null).
-         */
     }
 
 }

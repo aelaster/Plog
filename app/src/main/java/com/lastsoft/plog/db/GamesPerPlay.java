@@ -25,6 +25,11 @@ public class GamesPerPlay extends SugarRecord<GamesPerPlay> {
         this.expansionFlag = expansionFlag;
     }
 
+    public static int getUniquePlays(){
+        List<GamesPerPlay> queery = GamesPerPlay.findWithQuery(GamesPerPlay.class, "Select DISTINCT " + StringUtil.toSQLName("game") + " from " + StringUtil.toSQLName("GamesPerPlay") + " where " + StringUtil.toSQLName("expansionFlag") + " = 0");
+        return queery.size();
+    }
+
     public static Game getBaseGame(Play play){
         Select getBaseGame = Select.from(GamesPerPlay.class);
         getBaseGame.where(Condition.prop(StringUtil.toSQLName("play")).eq(play.getId()), Condition.prop(StringUtil.toSQLName("expansionFlag")).eq("0"));

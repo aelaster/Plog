@@ -440,6 +440,14 @@ public class AddPlayFragment extends Fragment {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
+        try{
+            InputMethodManager inputManager = (InputMethodManager)
+                    mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
+
+            inputManager.hideSoftInputFromWindow(mActivity.getCurrentFocus().getWindowToken(),
+                    InputMethodManager.HIDE_NOT_ALWAYS);
+        }catch (Exception e){}
+
         //noinspection SimplifiableIfStatement
         if (id == R.id.add_play) {
             adapter.notifyDataSetChanged();
@@ -474,16 +482,20 @@ public class AddPlayFragment extends Fragment {
                         }
                     }
 
+                    int highScore = -99999;
+                    for (int i = 0; i < adapter.getCount(); i++) {
+                        AddPlayer thisGuy = adapter.getItem(i);
+                        if (thisGuy.score > highScore){
+                            highScore = thisGuy.score;
+                        }
+
+                    }
                     for (int i = 0; i < adapter.getCount(); i++) {
                         AddPlayer thisGuy = adapter.getItem(i);
                         //if (thisGuy.score != -9999999) {
-                            PlayersPerPlay newPlayer = new PlayersPerPlay(Player.findById(Player.class, thisGuy.playerID), thePlay, thisGuy.score, thisGuy.color);
+                            PlayersPerPlay newPlayer = new PlayersPerPlay(Player.findById(Player.class, thisGuy.playerID), thePlay, thisGuy.score, thisGuy.color, highScore);
                             newPlayer.save();
                         //}
-                    /*Log.d("V1", i + " / playerID=" + thisGuy.playerID);
-                    Log.d("V1", i + " / playerName=" + thisGuy.playerName);
-                    Log.d("V1", i + " / color=" + thisGuy.color);
-                    Log.d("V1", i + " / score=" + thisGuy.score);*/
                     }
 
 

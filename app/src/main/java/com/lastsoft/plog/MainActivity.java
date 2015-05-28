@@ -10,12 +10,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.widget.PopupMenu;
 import android.transition.TransitionInflater;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,7 +44,16 @@ public class MainActivity extends ActionBarActivity
         PlayersFragment.OnFragmentInteractionListener,
         GamesFragment.OnFragmentInteractionListener,
         ViewPlayFragment.OnFragmentInteractionListener,
+        StatsFragment.OnFragmentInteractionListener,
         View.OnClickListener {
+
+
+    private Boolean fragUp = false;
+    private AddPlayerFragment mAddPlayerFragment;
+    private AddGameFragment mAddGameFragment;
+    private AddPlayFragment mAddPlayFragment;
+    private AddGroupFragment mAddGroupFragment;
+    private ViewPlayFragment mViewPlayFragment;
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -118,6 +124,10 @@ public class MainActivity extends ActionBarActivity
         }else if (position == 0){
             fragmentManager.beginTransaction()
                     .replace(R.id.container, new GamesFragment(), "games")
+                    .commit();
+        }else if (position == 3){
+            fragmentManager.beginTransaction()
+                    .replace(R.id.container, new StatsFragment(), "stats")
                     .commit();
         }else {
             fragmentManager.beginTransaction()
@@ -390,12 +400,6 @@ public class MainActivity extends ActionBarActivity
         }
     }
 
-    private Boolean fragUp = false;
-    private AddPlayerFragment mAddPlayerFragment;
-    private AddGameFragment mAddGameFragment;
-    private AddPlayFragment mAddPlayFragment;
-    private AddGroupFragment mAddGroupFragment;
-    private ViewPlayFragment mViewPlayFragment;
     @Override
     public void onFragmentInteraction(String id, float x, float y) {
         //Log.d("V1", "x = " + x);
