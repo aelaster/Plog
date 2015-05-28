@@ -48,4 +48,12 @@ public class Player extends SugarRecord<Player> {
 
         return alphaSort_AZ.list();
     }
+
+    public static boolean playerExists(String playerName){
+        if (Player.find(Player.class, StringUtil.toSQLName("playerName") + " = ?", playerName).size() > 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
 }

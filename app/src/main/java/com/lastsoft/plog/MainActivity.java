@@ -26,6 +26,7 @@ import android.widget.Toast;
 import com.lastsoft.plog.db.GamesPerPlay;
 import com.lastsoft.plog.db.Play;
 import com.lastsoft.plog.db.Player;
+import com.lastsoft.plog.db.PlayersPerGameGroup;
 import com.lastsoft.plog.db.PlayersPerPlay;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
@@ -85,7 +86,7 @@ public class MainActivity extends ActionBarActivity
                 this,  mDrawerLayout, R.string.navigation_drawer_open, R.string.navigation_drawer_close
         );
 
-        LoadGamesTask initDb = new LoadGamesTask();
+        LoadGamesTask initDb = new LoadGamesTask(this);
         try {
             initDb.execute();
         } catch (Exception e) {
@@ -187,7 +188,6 @@ public class MainActivity extends ActionBarActivity
     @Override
     public void onFragmentInteraction(String id) {
         if (id.contains("refresh_players")){
-            onSectionAttached(3);
             PlayersFragment playersFrag = (PlayersFragment)
                     getSupportFragmentManager().findFragmentByTag("players");
             if (playersFrag != null) {
@@ -216,6 +216,30 @@ public class MainActivity extends ActionBarActivity
 
     public void onListItemClicked(String id){
         Toast.makeText(this, id + " List Item Clicked", Toast.LENGTH_SHORT).show();
+    }
+
+    public void openAddPlayer(long playerID){
+        try{
+            InputMethodManager inputManager = (InputMethodManager)
+                    getSystemService(Context.INPUT_METHOD_SERVICE);
+
+            inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
+                    InputMethodManager.HIDE_NOT_ALWAYS);
+        }catch (Exception e){}
+
+        //mFragment.setExitTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.slide_top));
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction ft = fragmentManager.beginTransaction();
+        fragUp = true;
+        mAddPlayerFragment = AddPlayerFragment.newInstance((int) 0, (int) 0, true, playerID);
+        //mAddPlayFragment.setEnterTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.slide_bottom));
+        //mAddPlayFragment.setExitTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.slide_top));
+
+        ft.setCustomAnimations(R.anim.slide_in_bottom, R.anim.slide_out_top, R.anim.slide_in_top, R.anim.slide_out_bottom);
+        ft.replace(R.id.container, mAddPlayerFragment, "add_player");
+        ft.addToBackStack("add_play");
+        ft.commit();
     }
 
     public void onPlayClicked(Play clickedPlay, Fragment mFragment, View view, View nameView, View dateView){
@@ -288,13 +312,33 @@ public class MainActivity extends ActionBarActivity
                 //Log.d("V1", "background status free=" + Long.toString(Debug.getNativeHeapFreeSize()));
                 GamesFragment collectionFrag = (GamesFragment)
                         getSupportFragmentManager().findFragmentByTag("games");
-                if (collectionFrag != null) {
+                if (collectionFrag != null && !collectionFrag.getQuery().equals("")) {
                     collectionFrag.clearQuery();
                     collectionFrag.refreshDataset();
                 }
             }
         }, 1000);
 
+    }
+
+    public void deletePlayer(long playerID){
+        Player deleteMe = Player.findById(Player.class, playerID);
+
+        //delete PlayersPerPlay
+        List<PlayersPerPlay> players = PlayersPerPlay.getPlayer(deleteMe);
+        for(PlayersPerPlay player:players){
+            player.delete();
+        }
+        //delete PlayersPerGameGroup
+        List<PlayersPerGameGroup> groupers = PlayersPerGameGroup.getPlayer(deleteMe);
+        for(PlayersPerGameGroup grouper:groupers){
+            grouper.delete();
+        }
+
+        //delete player
+        deleteMe.delete();
+        onFragmentInteraction("refresh_players");
+        onBackPressed();
     }
 
     public void deletePlay(long playID){
@@ -335,7 +379,7 @@ public class MainActivity extends ActionBarActivity
         FragmentTransaction ft = fragmentManager.beginTransaction();
         if (id.equals("add_player")) {
             fragUp = true;
-            mAddPlayerFragment = AddPlayerFragment.newInstance((int) x, (int) y, true);
+            mAddPlayerFragment = AddPlayerFragment.newInstance((int) x, (int) y, true, -1);
             ft.add(R.id.container, mAddPlayerFragment, id);
             ft.addToBackStack(id);
             ft.commit();

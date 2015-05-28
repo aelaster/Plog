@@ -3,7 +3,9 @@ package com.lastsoft.plog;
 import android.animation.Animator;
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,7 +14,10 @@ import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Switch;
+import android.widget.Toast;
 
 import com.lastsoft.plog.db.Player;
 
@@ -26,26 +31,22 @@ import com.lastsoft.plog.db.Player;
  * create an instance of this fragment.
  */
 public class AddPlayerFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
     private OnFragmentInteractionListener mListener;
-
+    long playerID;
     int cx, cy;
+    Player editPlayer;
+    SharedPreferences app_preferences;
+    SharedPreferences.Editor editor;
+
 
     // TODO: Rename and change types and number of parameters
-    public static AddPlayerFragment newInstance(int centerX, int centerY, boolean doAccelerate) {
+    public static AddPlayerFragment newInstance(int centerX, int centerY, boolean doAccelerate, long playerID) {
         AddPlayerFragment fragment = new AddPlayerFragment();
         Bundle args = new Bundle();
         args.putInt("cx", centerX);
         args.putInt("cy", centerY);
         args.putBoolean("doAccelerate", doAccelerate);
+        args.putLong("playerID", playerID);
         fragment.setArguments(args);
         return fragment;
     }
@@ -58,8 +59,7 @@ public class AddPlayerFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            playerID = getArguments().getLong("playerID");
         }
     }
 
@@ -69,44 +69,111 @@ public class AddPlayerFragment extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_add_player, container, false);
         rootView.setBackgroundColor(getResources().getColor(R.color.cardview_initial_background));
-        rootView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-            @Override
-            public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop,
-                                       int oldRight, int oldBottom) {
-                v.removeOnLayoutChangeListener(this);
-                cx = getArguments().getInt("cx");
-                cy = getArguments().getInt("cy");
-                // get the hypothenuse so the radius is from one corner to the other
-                int radius = (int) Math.hypot(right, bottom);
+        if (playerID<0) {
+            rootView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+                @Override
+                public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop,
+                                           int oldRight, int oldBottom) {
+                    v.removeOnLayoutChangeListener(this);
+                    cx = getArguments().getInt("cx");
+                    cy = getArguments().getInt("cy");
+                    // get the hypothenuse so the radius is from one corner to the other
+                    int radius = (int) Math.hypot(right, bottom);
 
-                Animator reveal = ViewAnimationUtils.createCircularReveal(v, cx, cy, 0, radius);
-                if (getArguments().getBoolean("doAccelerate")) {
-                    reveal.setInterpolator(new DecelerateInterpolator(1.5f));
+                    Animator reveal = ViewAnimationUtils.createCircularReveal(v, cx, cy, 0, radius);
+                    if (getArguments().getBoolean("doAccelerate")) {
+                        reveal.setInterpolator(new DecelerateInterpolator(1.5f));
+                    }
+                    reveal.setDuration(700);
+                    reveal.start();
                 }
-                reveal.setDuration(700);
-                reveal.start();
+            });
+        }
+
+        app_preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        editor = app_preferences.edit();
+
+        Button button = (Button) rootView.findViewById(R.id.button);
+        View deleteButton = rootView.findViewById(R.id.deleteButton);
+        final EditText playerName = (EditText) rootView.findViewById(R.id.playerName);
+        final EditText bggUsername = (EditText) rootView.findViewById(R.id.bggUsername);
+        final Switch defaultSwitch = (Switch) rootView.findViewById(R.id.defaultSwitch);
+
+        if (playerID >= 0){
+            //edit me
+            editPlayer = Player.findById(Player.class, playerID);
+            playerName.setText(editPlayer.playerName);
+            bggUsername.setText(editPlayer.bggUsername);
+            button.setText(getString(R.string.edit_player));
+            if (app_preferences.getLong("defaultPlayer", -1) == playerID){
+                defaultSwitch.setChecked(true);
+            }
+        }
+        deleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                view.setEnabled(false);
+                ((MainActivity)getActivity()).deletePlayer(playerID);
             }
         });
 
-        View button = rootView.findViewById(R.id.button);
-        final EditText playerName = (EditText) rootView.findViewById(R.id.playerName);
-        final EditText bggUsername = (EditText) rootView.findViewById(R.id.bggUsername);
-
-
-        // Set a listener to reveal the view when clicked.
+            // Set a listener to reveal the view when clicked.
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-            view.setEnabled(false);
-            if (!playerName.getText().toString().isEmpty()) {
-                /*Player newPlayer = new Player(playerName.getText().toString(), bggUsername.getText().toString());
-                MyDBHandler dbHandler = new MyDBHandler(getActivity(), null, null, 1);
-                dbHandler.addPlayer(newPlayer);*/
-                Player player = new Player(playerName.getText().toString(), bggUsername.getText().toString());
-                player.save();
-                onButtonPressed("refresh_players");
-            }
-            removeYourself();
+                view.setEnabled(false);
+                if (!playerName.getText().toString().isEmpty()) {
+                    //check to see if this name already exists
+                    //for now, toast them if it does.
+                    boolean nameTakenFlag = false;
+
+                    if (playerID >= 0){
+                        //edit
+                        if (editPlayer.playerName.equals(playerName.getText().toString())==false && Player.playerExists(playerName.getText().toString())){
+                            //if the edit player's name isn't equal to the input name AND the player name already exists
+                            nameTakenFlag = true;
+                        }
+                    }else{
+                        //if this new player's name already exists
+                        if (Player.playerExists(playerName.getText().toString())){
+                            nameTakenFlag = true;
+                        }
+                    }
+
+                    if (nameTakenFlag){
+                        Toast.makeText(getActivity(), getString(R.string.name_taken), Toast.LENGTH_SHORT).show();
+                    }else {
+                        if (playerID >= 0) {
+                            editPlayer.bggUsername = bggUsername.getText().toString();
+                            editPlayer.playerName = playerName.getText().toString();
+                            editPlayer.save();
+
+
+
+
+                        } else {
+                            Player player = new Player(playerName.getText().toString(), bggUsername.getText().toString());
+                            player.save();
+                            playerID = player.getId();
+                        }
+
+
+                        if (defaultSwitch.isChecked()) {
+                            //set app preference
+                            editor.putLong("defaultPlayer", playerID);
+                            editor.commit();
+                        } else {
+                            //check to see if the pref is this bggusername.  if so, clear it.
+                            long currentDefaultPlayer = app_preferences.getLong("defaultPlayer", -1);
+                            if (currentDefaultPlayer == playerID){
+                                editor.putLong("defaultPlayer", -1);
+                                editor.commit();
+                            }
+                        }
+                        onButtonPressed("refresh_players");
+                    }
+                }
+                removeYourself();
             }
         });
         return rootView;
@@ -157,39 +224,50 @@ public class AddPlayerFragment extends Fragment {
      */
     public void removeYourself(){
         final AddPlayerFragment mfragment = this;
-        Animator unreveal = mfragment.prepareUnrevealAnimator(cx, cy);
-        if(unreveal != null) {
-            unreveal.addListener(new Animator.AnimatorListener() {
-                @Override
-                public void onAnimationStart(Animator animation) {
-                    try{
-                        InputMethodManager inputManager = (InputMethodManager)
-                                getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (playerID >= 0){
+            try {
+                getFragmentManager().popBackStack();
+                getFragmentManager().beginTransaction().remove(mfragment).commit();
+                getFragmentManager().executePendingTransactions(); //Prevents the flashing.
+            } catch (Exception e) {
+            }
+        }else {
+            Animator unreveal = mfragment.prepareUnrevealAnimator(cx, cy);
+            if (unreveal != null) {
+                unreveal.addListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {
+                        try {
+                            InputMethodManager inputManager = (InputMethodManager)
+                                    getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
 
-                        inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),
-                                InputMethodManager.HIDE_NOT_ALWAYS);
-                    }catch (Exception e){}
-                }
+                            inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),
+                                    InputMethodManager.HIDE_NOT_ALWAYS);
+                        } catch (Exception e) {
+                        }
+                    }
 
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    // removeFragment the fragment only when the animation finishes
-                    try {
-                        getFragmentManager().popBackStack();
-                        getFragmentManager().beginTransaction().remove(mfragment).commit();
-                        getFragmentManager().executePendingTransactions(); //Prevents the flashing.
-                    }catch (Exception e){}
-                }
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        // removeFragment the fragment only when the animation finishes
+                        try {
+                            getFragmentManager().popBackStack();
+                            getFragmentManager().beginTransaction().remove(mfragment).commit();
+                            getFragmentManager().executePendingTransactions(); //Prevents the flashing.
+                        } catch (Exception e) {
+                        }
+                    }
 
-                @Override
-                public void onAnimationCancel(Animator animation) {
-                }
+                    @Override
+                    public void onAnimationCancel(Animator animation) {
+                    }
 
-                @Override
-                public void onAnimationRepeat(Animator animation) {
-                }
-            });
-            unreveal.start();
+                    @Override
+                    public void onAnimationRepeat(Animator animation) {
+                    }
+                });
+                unreveal.start();
+            }
         }
     }
 

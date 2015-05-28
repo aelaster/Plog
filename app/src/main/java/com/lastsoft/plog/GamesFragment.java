@@ -20,12 +20,14 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -201,6 +203,10 @@ public class GamesFragment extends Fragment{
         mSearch.setText(mSearchQuery);
     }
 
+    public String getQuery(){
+        return mSearchQuery;
+    }
+
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -268,12 +274,12 @@ public class GamesFragment extends Fragment{
      */
     GamesLoader myTask;
     private void initDataset() {
-        myTask = new GamesLoader();
+        myTask = new GamesLoader(getActivity());
         try {
             myTask.execute();
 
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
     }
 
@@ -300,6 +306,10 @@ public class GamesFragment extends Fragment{
     }
 
     public class GamesLoader extends LoadGamesTask {
+        public GamesLoader(Context context) {
+            super(context);
+        }
+
         @Override
         protected void onPostExecute(final String result) {
             pullToRefreshView.setRefreshing(false);

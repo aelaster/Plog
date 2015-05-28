@@ -40,6 +40,12 @@
             android:layout_alignStart="@+id/bggUsername"
             android:layout_alignEnd="@+id/bggUsername" />-->
 
+        <Switch
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/default_player"
+            android:id="@+id/defaultSwitch" />
+
         <Button
             android:id="@+id/button"
             style="?android:attr/buttonStyleSmall"
@@ -47,6 +53,18 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_medium"
             android:text="@string/add_player"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="16dp"
+            android:layout_gravity="center_horizontal|bottom"
+            android:layout_alignParentBottom="true"
+            />
+        <Button
+            android:id="@+id/deleteButton"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_medium"
+            android:text="@string/delete_player"
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="16dp"
             android:layout_gravity="center_horizontal|bottom"

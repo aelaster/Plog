@@ -26,6 +26,8 @@
         <!-- Customize your theme here. -->
         <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
         <item name="android:actionBarStyle">@style/MyActionBar</item>
+        <item name="android:colorPrimaryDark">@color/darker_logo_blue</item>
+        <item name="colorPrimaryDark">@color/darker_logo_blue</item>
         <item name="actionBarStyle">@style/MyActionBar</item>
     </style>
 

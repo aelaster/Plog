@@ -53,7 +53,7 @@ public class PlayersFragment extends Fragment{
     protected LayoutManagerType mCurrentLayoutManagerType;
 
     protected RecyclerView mRecyclerView;
-    protected CustomAdapter mAdapter;
+    protected PlayerAdapter mAdapter;
     protected RecyclerView.LayoutManager mLayoutManager;
     protected String[] mDataset;
     private SwipeRefreshLayout pullToRefreshView;
@@ -120,7 +120,7 @@ public class PlayersFragment extends Fragment{
         }
         setRecyclerViewLayoutManager(mCurrentLayoutManagerType);
 
-        mAdapter = new CustomAdapter(getActivity(), mDataset, null);
+        mAdapter = new PlayerAdapter(getActivity());
         // Set CustomAdapter as the adapter for RecyclerView.
         mRecyclerView.setAdapter(mAdapter);
 
@@ -211,7 +211,7 @@ public class PlayersFragment extends Fragment{
 
     protected void refreshDataset(){
         initDataset();
-        mAdapter = new CustomAdapter(getActivity(), mDataset, null);
+        mAdapter = new PlayerAdapter(getActivity());
         // Set CustomAdapter as the adapter for RecyclerView.
         mRecyclerView.setAdapter(mAdapter);
     }

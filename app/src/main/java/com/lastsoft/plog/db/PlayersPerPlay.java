@@ -43,6 +43,12 @@ public class PlayersPerPlay extends SugarRecord<PlayersPerPlay> {
         return getPlayers.list();
     }
 
+    public static List<PlayersPerPlay> getPlayer(Player player){
+        Select getPlayers = Select.from(PlayersPerPlay.class);
+        getPlayers.where(Condition.prop(StringUtil.toSQLName("player")).eq(player.getId()));
+        return getPlayers.list();
+    }
+
 
     public static List<PlayersPerPlay> getPlayers_Winners(Play play){
         Select getPlayers = Select.from(PlayersPerPlay.class);

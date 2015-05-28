@@ -264,7 +264,7 @@ public class AddPlayFragment extends Fragment {
             Date date1 = dateFormat.parse(gameDate);
             DateFormat outputFormatter = new SimpleDateFormat("MM/dd/yyyy");
             String output_date = outputFormatter.format(date1); // Output : 01/20/2012
-            textViewDate.setText(getString(R.string.play_date) + output_date);
+            textViewDate.setText(output_date);
         }catch (ParseException e) {}
 
         // Construct the data source
@@ -305,7 +305,7 @@ public class AddPlayFragment extends Fragment {
             //date
             DateFormat outputFormatter = new SimpleDateFormat("MM/dd/yyyy");
             String output_date = outputFormatter.format(editPlay.playDate); // Output : 01/20/2012
-            textViewDate.setText(getString(R.string.play_date) + output_date);
+            textViewDate.setText(output_date);
             DateFormat inputUser = new SimpleDateFormat("yyyy-MM-dd");
             gameDate = inputUser.format(editPlay.playDate);
 
@@ -617,7 +617,7 @@ public class AddPlayFragment extends Fragment {
                 Date date1 = dateFormat.parse(gameDate);
                 DateFormat outputFormatter = new SimpleDateFormat("MM/dd/yyyy");
                 String output_date = outputFormatter.format(date1); // Output : 01/20/2012
-                textViewDate.setText(getString(R.string.play_date) + output_date);
+                textViewDate.setText(output_date);
             }catch (ParseException e) {}
         }
     }

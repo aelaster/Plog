@@ -8,8 +8,10 @@
     <string name="title_section5">Settings</string>
 
     <string name="add_player">Add Player</string>
+    <string name="delete_player">Delete Player</string>
     <string name="add_play">Add Play</string>
     <string name="edit_play">Edit Play</string>
+    <string name="edit_player">Edit Player</string>
     <string name="add_group">Add Group</string>
     <string name="add_game">Add Game</string>
     <string name="filter_games">Filter Games</string>
@@ -40,6 +42,7 @@
     <string name="play_date">Play Date:</string>
     <string name="take_photo">Take Photo</string>
     <string name="game_photo">Game Photo:</string>
+    <string name="name_taken">Name taken</string>
 
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
@@ -47,6 +50,7 @@
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
     <string name="choose_task">Choose:</string>
+    <string name="default_player">Default User</string>
 
     <string-array name="color_choices">
         <item>Blue</item>
