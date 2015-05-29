@@ -65,4 +65,22 @@ public class Player extends SugarRecord<Player> {
             return thePlayer.get(0).getId();
         }
     }
+
+    public static boolean hasPlayerPlayedGame(Player player, Game game){
+        List<GamesPerPlay> queery = GamesPerPlay.findWithQuery(GamesPerPlay.class,
+                "Select " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("play") +
+                        " from " + StringUtil.toSQLName("PlayersPerPlay") +
+                        ", " + StringUtil.toSQLName("GamesPerPlay") +
+                        " where " + StringUtil.toSQLName("PlayersPerPlay") +
+                        "." + StringUtil.toSQLName("player") +
+                        " = ? and " + StringUtil.toSQLName("PlayersPerPlay") +
+                        "."  + StringUtil.toSQLName("play") + " =  "+ StringUtil.toSQLName("GamesPerPlay") +
+                        "."  + StringUtil.toSQLName("play") + " and " + StringUtil.toSQLName("GamesPerPlay") +
+                        "."  + StringUtil.toSQLName("game") + " = ?" , player.getId().toString(), game.getId().toString());
+        if (queery.size() == 0){
+            return false;
+        }else {
+            return true;
+        }
+    }
 }

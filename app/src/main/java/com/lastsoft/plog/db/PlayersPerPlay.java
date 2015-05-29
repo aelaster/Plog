@@ -38,8 +38,12 @@ public class PlayersPerPlay extends SugarRecord<PlayersPerPlay> {
         this.playHighScore = playHighScore;
     }
 
-    public static List<PlayersPerPlay> totalPlays_GameGroup(GameGroup groupID){
-        return PlayersPerPlay.findWithQuery(PlayersPerPlay.class, "Select * from " + StringUtil.toSQLName("PlayersPerPlay") + " where " + StringUtil.toSQLName("player") + " in (Select " + StringUtil.toSQLName("player") + " from " + StringUtil.toSQLName("PlayersPerGameGroup") + " where " + StringUtil.toSQLName("GameGroup") + " = ?) ORDER BY PLAY, PLAYER", groupID.getId().toString());
+    public static List<PlayersPerPlay> totalPlays_GameGroup(GameGroup group){
+        return PlayersPerPlay.findWithQuery(PlayersPerPlay.class, "Select * from " + StringUtil.toSQLName("PlayersPerPlay") + " where " + StringUtil.toSQLName("player") + " in (Select " + StringUtil.toSQLName("player") + " from " + StringUtil.toSQLName("PlayersPerGameGroup") + " where " + StringUtil.toSQLName("GameGroup") + " = ?) ORDER BY PLAY, PLAYER", group.getId().toString());
+        /*return PlayersPerPlay.findWithQuery(PlayersPerPlay.class, "Select " + StringUtil.toSQLName("PlayersPerPlay") +  ".* from " + StringUtil.toSQLName("PlayersPerGameGroup") + ", " + StringUtil.toSQLName("PlayersPerPlay") + " where "
+                + StringUtil.toSQLName("PlayersPerGameGroup") + "." + StringUtil.toSQLName("GameGroup") + "= ? and "
+                + StringUtil.toSQLName("PlayersPerGameGroup") + "." + StringUtil.toSQLName("Player") + " = " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("Player"), group.getId()+"");
+                */
     }
 
     public static List<PlayersPerPlay> getPlayers(Play play){
