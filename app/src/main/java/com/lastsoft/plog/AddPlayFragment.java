@@ -1,43 +1,45 @@
 package com.lastsoft.plog;
 
-import android.animation.Animator;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
-
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
-import android.view.animation.AccelerateInterpolator;
-import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.kbeanie.imagechooser.api.ChooserType;
+import com.kbeanie.imagechooser.api.ChosenImage;
+import com.kbeanie.imagechooser.api.ImageChooserListener;
+import com.kbeanie.imagechooser.api.ImageChooserManager;
 import com.lastsoft.plog.db.Game;
 import com.lastsoft.plog.db.GamesPerPlay;
 import com.lastsoft.plog.db.Play;
@@ -65,7 +67,8 @@ import java.util.List;
  * Use the {@link AddPlayFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class AddPlayFragment extends Fragment {
+public class AddPlayFragment extends Fragment implements
+        ImageChooserListener {
     String mCurrentPhotoPath = "";
     private OnFragmentInteractionListener mListener;
     int cx, cy;
@@ -108,6 +111,7 @@ public class AddPlayFragment extends Fragment {
     ImageView playPhoto;
     Uri photoUri;
     File photoFile;
+    ImageChooserManager imageChooserManager;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -236,6 +240,15 @@ public class AddPlayFragment extends Fragment {
             }
         });
 
+
+        View galleryButton = rootView.findViewById(R.id.choosePhoto);
+        galleryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                chooseImage();
+            }
+        });
+
         View dateButton = rootView.findViewById(R.id.datePicker);
         dateButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -324,6 +337,20 @@ public class AddPlayFragment extends Fragment {
         return rootView;
     }
 
+    private void chooseImage() {
+        int chooserType = ChooserType.REQUEST_PICK_PICTURE;
+        imageChooserManager = new ImageChooserManager(this,
+                ChooserType.REQUEST_PICK_PICTURE, "myfolder", true);
+        imageChooserManager.setImageChooserListener(this);
+        try {
+            String filePath = imageChooserManager.choose();
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     private void addGame(Game game){
         final ViewGroup newView = (ViewGroup) LayoutInflater.from(mActivity).inflate(
                 R.layout.play_showexpansions_item, mContainerView_Expansions, false);
@@ -332,6 +359,7 @@ public class AddPlayFragment extends Fragment {
         gameName.setText(game.gameName);
         mContainerView_Expansions.addView(newView);
     }
+
     private void clearGames(){
         mContainerView_Expansions.removeAllViews();
     }
@@ -412,15 +440,151 @@ public class AddPlayFragment extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        DisplayImageOptions options = new DisplayImageOptions.Builder()
+                .cacheOnDisk(true)
+                .cacheInMemory(true)
+                .considerExifParams(true)
+                .build();
         if (requestCode == 0 && resultCode == -1) {
-            DisplayImageOptions options = new DisplayImageOptions.Builder()
-                    .cacheOnDisk(true)
-                    .cacheInMemory(true)
-                    .considerExifParams(true)
-                    .build();
             ImageLoader.getInstance().displayImage(mCurrentPhotoPath, playPhoto, options);
+        }else if (resultCode == -1 && (requestCode == ChooserType.REQUEST_PICK_PICTURE || requestCode == ChooserType.REQUEST_CAPTURE_PICTURE)) {
+            imageChooserManager.submit(requestCode, data);
         }
     }
+
+    public static String getPath(final Context context, final Uri uri) {
+
+        final boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
+
+        // DocumentProvider
+        if (isKitKat && DocumentsContract.isDocumentUri(context, uri)) {
+            // ExternalStorageProvider
+            if (isExternalStorageDocument(uri)) {
+                final String docId = DocumentsContract.getDocumentId(uri);
+                final String[] split = docId.split(":");
+                final String type = split[0];
+
+                if ("primary".equalsIgnoreCase(type)) {
+                    return Environment.getExternalStorageDirectory() + "/" + split[1];
+                }
+
+                // TODO handle non-primary volumes
+            }
+            // DownloadsProvider
+            else if (isDownloadsDocument(uri)) {
+
+                final String id = DocumentsContract.getDocumentId(uri);
+                final Uri contentUri = ContentUris.withAppendedId(
+                        Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
+
+                return getDataColumn(context, contentUri, null, null);
+            }
+            // MediaProvider
+            else if (isMediaDocument(uri)) {
+                final String docId = DocumentsContract.getDocumentId(uri);
+                final String[] split = docId.split(":");
+                final String type = split[0];
+
+                Uri contentUri = null;
+                if ("image".equals(type)) {
+                    contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+                } else if ("video".equals(type)) {
+                    contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+                } else if ("audio".equals(type)) {
+                    contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+                }
+
+                final String selection = "_id=?";
+                final String[] selectionArgs = new String[] {
+                        split[1]
+                };
+
+                return getDataColumn(context, contentUri, selection, selectionArgs);
+            }
+        }
+        // MediaStore (and general)
+        else if ("content".equalsIgnoreCase(uri.getScheme())) {
+
+            // Return the remote address
+            if (isGooglePhotosUri(uri))
+                return uri.getLastPathSegment();
+
+            return getDataColumn(context, uri, null, null);
+        }
+        // File
+        else if ("file".equalsIgnoreCase(uri.getScheme())) {
+            return uri.getPath();
+        }
+
+        return null;
+    }
+
+
+    /**
+     * Get the value of the data column for this Uri. This is useful for
+     * MediaStore Uris, and other file-based ContentProviders.
+     *
+     * @param context The context.
+     * @param uri The Uri to query.
+     * @param selection (Optional) Filter used in the query.
+     * @param selectionArgs (Optional) Selection arguments used in the query.
+     * @return The value of the _data column, which is typically a file path.
+     */
+    public static String getDataColumn(Context context, Uri uri, String selection,
+                                       String[] selectionArgs) {
+
+        Cursor cursor = null;
+        final String column = "_data";
+        final String[] projection = {
+                column
+        };
+
+        try {
+            cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs,
+                    null);
+            if (cursor != null && cursor.moveToFirst()) {
+                final int index = cursor.getColumnIndexOrThrow(column);
+                return cursor.getString(index);
+            }
+        } finally {
+            if (cursor != null)
+                cursor.close();
+        }
+        return null;
+    }
+
+    /**
+     * @param uri The Uri to check.
+     * @return Whether the Uri authority is ExternalStorageProvider.
+     */
+    public static boolean isExternalStorageDocument(Uri uri) {
+        return "com.android.externalstorage.documents".equals(uri.getAuthority());
+    }
+
+    /**
+     * @param uri The Uri to check.
+     * @return Whether the Uri authority is DownloadsProvider.
+     */
+    public static boolean isDownloadsDocument(Uri uri) {
+        return "com.android.providers.downloads.documents".equals(uri.getAuthority());
+    }
+
+    /**
+     * @param uri The Uri to check.
+     * @return Whether the Uri authority is MediaProvider.
+     */
+    public static boolean isMediaDocument(Uri uri) {
+        return "com.android.providers.media.documents".equals(uri.getAuthority());
+    }
+
+    /**
+     * @param uri The Uri to check.
+     * @return Whether the Uri authority is Google Photos.
+     */
+    public static boolean isGooglePhotosUri(Uri uri) {
+        return "com.google.android.apps.photos.content".equals(uri.getAuthority());
+    }
+
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -490,6 +654,7 @@ public class AddPlayFragment extends Fragment {
                         }
 
                     }
+
                     for (int i = 0; i < adapter.getCount(); i++) {
                         AddPlayer thisGuy = adapter.getItem(i);
                         //if (thisGuy.score != -9999999) {
@@ -573,16 +738,31 @@ public class AddPlayFragment extends Fragment {
         ((MainActivity)mActivity).unbindDrawables(rootView);
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
+    @Override
+    public void onImageChosen(final ChosenImage chosenImage) {
+        mActivity.runOnUiThread(new Runnable() {
+
+            @Override
+            public void run() {
+                if (chosenImage != null) {
+                    DisplayImageOptions options = new DisplayImageOptions.Builder()
+                            .cacheOnDisk(true)
+                            .cacheInMemory(true)
+                            .considerExifParams(true)
+                            .build();
+                    mCurrentPhotoPath = "file://" + chosenImage.getFilePathOriginal();
+                    ImageLoader.getInstance().displayImage(mCurrentPhotoPath, playPhoto, options);
+                }
+            }
+        });
+
+    }
+
+    @Override
+    public void onError(String s) {
+        Log.d("V1", "error =" + s);
+    }
+
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         public void onFragmentInteraction(String string);
@@ -647,47 +827,6 @@ public class AddPlayFragment extends Fragment {
             getFragmentManager().beginTransaction().remove(mfragment).commit();
             getFragmentManager().executePendingTransactions(); //Prevents the flashing.
         }catch (Exception e){}
-        /*Animator unreveal = mfragment.prepareUnrevealAnimator(cx, cy);
-        if(unreveal != null) {
-            unreveal.addListener(new Animator.AnimatorListener() {
-                @Override
-                public void onAnimationStart(Animator animation) {
-                    try{
-                        InputMethodManager inputManager = (InputMethodManager)
-                                mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
-
-                        inputManager.hideSoftInputFromWindow(mActivity.getCurrentFocus().getWindowToken(),
-                                InputMethodManager.HIDE_NOT_ALWAYS);
-                    }catch (Exception e){}
-                }
-
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    // removeFragment the fragment only when the animation finishes
-                    try {
-                        if (playID<0) {
-                            ((MainActivity) mActivity).getSupportActionBar().setDisplayShowCustomEnabled(true);
-                        }else{
-                            onButtonPressed("refresh_plays");
-                        }
-                        getFragmentManager().popBackStack();
-                        getFragmentManager().beginTransaction().remove(mfragment).commit();
-                        getFragmentManager().executePendingTransactions(); //Prevents the flashing.
-                    }catch (Exception e){}
-                    //((MainActivity)mActivity).onBackPressed();
-
-                }
-
-                @Override
-                public void onAnimationCancel(Animator animation) {
-                }
-
-                @Override
-                public void onAnimationRepeat(Animator animation) {
-                }
-            });
-            unreveal.start();
-        }*/
     }
 
     public class AddPlayer {
@@ -767,59 +906,6 @@ public class AddPlayFragment extends Fragment {
             }
         }
     }
-
-    /**
-     * Get the animator to unreveal the circle
-     *
-     * @param cx center x of the circle (or where the view was touched)
-     * @param cy center y of the circle (or where the view was touched)
-     * @return Animator object that will be used for the animation
-     */
-    public Animator prepareUnrevealAnimator(float cx, float cy)
-    {
-
-        int radius = getEnclosingCircleRadius(getView(), (int)cx, (int)cy);
-        if(radius == -1){
-            return null;
-        }
-        Animator anim = ViewAnimationUtils.createCircularReveal(getView(), (int) cx, (int) cy, radius, 0);
-        if(getArguments().getBoolean("doAccelerate")) {
-            anim.setInterpolator(new AccelerateInterpolator(1.5f));
-        }
-        anim.setDuration(600);
-        return anim;
-    }
-
-    /**
-     * To be really accurate we have to start the circle on the furthest corner of the view
-     *
-     * @param v the view to unreveal
-     * @param cx center x of the circle
-     * @param cy center y of the circle
-     * @return the maximum radius
-     */
-    private int getEnclosingCircleRadius(View v, int cx, int cy)
-    {
-        if(v == null){
-            return -1;
-        }
-        int realCenterX = cx + v.getLeft();
-        int realCenterY = cy + v.getTop();
-        int distanceTopLeft = (int)Math.hypot(realCenterX - v.getLeft(), realCenterY - v.getTop());
-        int distanceTopRight = (int)Math.hypot(v.getRight() - realCenterX, realCenterY - v.getTop());
-        int distanceBottomLeft = (int)Math.hypot(realCenterX - v.getLeft(), v.getBottom() - realCenterY);
-        int distanceBotomRight = (int)Math.hypot(v.getRight() - realCenterX, v.getBottom() - realCenterY);
-
-        int[] distances = new int[] {distanceTopLeft, distanceTopRight, distanceBottomLeft, distanceBotomRight};
-        int radius = distances[0];
-        for (int i = 1; i < distances.length; i++)
-        {
-            if (distances[i] > radius)
-                radius = distances[i];
-        }
-        return radius;
-    }
-
 
     public class CheckBoxAlertDialogFragment extends DialogFragment {
 

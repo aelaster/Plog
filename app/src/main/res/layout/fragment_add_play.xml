@@ -77,6 +77,13 @@
                     android:id="@+id/takePhoto"
                     />
 
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/choose_photo"
+                    android:id="@+id/choosePhoto"
+                    />
+
             </LinearLayout>
 
             <LinearLayout
@@ -144,7 +151,7 @@
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textMultiLine|textPersonName|textCapWords"
+                android:inputType="textMultiLine|textPersonName|textCapSentences"
                 android:ems="10"
                 android:id="@+id/notesText"
                 android:hint="@string/game_notes"

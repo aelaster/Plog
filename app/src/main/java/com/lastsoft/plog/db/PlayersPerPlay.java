@@ -40,6 +40,10 @@ public class PlayersPerPlay extends SugarRecord<PlayersPerPlay> {
         this.playHighScore = playHighScore;
     }
 
+    public static List<PlayersPerPlay> totalPlays_GameGroup(GameGroup groupID){
+        return PlayersPerPlay.findWithQuery(PlayersPerPlay.class, "Select * from " + StringUtil.toSQLName("PlayersPerPlay") + " where " + StringUtil.toSQLName("player") + " in (Select " + StringUtil.toSQLName("player") + " from " + StringUtil.toSQLName("PlayersPerGameGroup") + " where " + StringUtil.toSQLName("GameGroup") + " = ?)", groupID.getId().toString());
+    }
+
     public static List<PlayersPerPlay> getPlayers(Play play){
         Select getPlayers = Select.from(PlayersPerPlay.class);
         getPlayers.where(Condition.prop(StringUtil.toSQLName("play")).eq(play.getId()));

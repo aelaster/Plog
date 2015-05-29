@@ -98,15 +98,15 @@ public class ViewPlayFragment extends Fragment {
         mContainerView_Expansions = (ViewGroup) viewPlayLayout.findViewById(R.id.container_expansions);
 
         playImage = (ImageView) viewPlayLayout.findViewById(R.id.imageView1);
-        if (!thisPlay.playPhoto.equals("")){
+        if (thisPlay.playPhoto != null && !thisPlay.playPhoto.equals("")){
             //playImage.setImageDrawable(Drawable.createFromPath(thisPlay.playPhoto.substring(7, thisPlay.playPhoto.length())));
             ImageLoader.getInstance().displayImage(thisPlay.playPhoto, playImage, options);
             //final BitmapWorkerTask task = new BitmapWorkerTask(playImage);
             //task.execute(thisPlay.playPhoto.substring(7, thisPlay.playPhoto.length()));
             playImage.setTransitionName(imageTransID);
         }else{
-            if (GamesPerPlay.getBaseGame(thisPlay).gameImage != null) {
-                ImageLoader.getInstance().displayImage("http:" + GamesPerPlay.getBaseGame(thisPlay).gameImage, playImage, options);
+            if (GamesPerPlay.getBaseGame(thisPlay).gameThumb != null) {
+                ImageLoader.getInstance().displayImage("http:" + GamesPerPlay.getBaseGame(thisPlay).gameThumb, playImage, options);
                 playImage.setTransitionName(imageTransID);
             }
         }

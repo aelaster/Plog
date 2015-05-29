@@ -5,16 +5,28 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.Spinner;
 
+import com.lastsoft.plog.db.GameGroup;
 import com.lastsoft.plog.db.Player;
+import com.lastsoft.plog.db.PlayersPerGameGroup;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -26,18 +38,15 @@ import com.lastsoft.plog.db.Player;
  * create an instance of this fragment.
  */
 public class AddGroupFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
 
     private OnFragmentInteractionListener mListener;
-
+    private ViewGroup mContainerView_Players;
     int cx, cy;
+    ArrayList<AddPlayer> arrayOfUsers;
+    AddPlayerAdapter adapter;
+    ArrayList<Integer> playersID;
+    ArrayList<String> playersName;
+    EditText groupName;
 
     // TODO: Rename and change types and number of parameters
     public static AddGroupFragment newInstance(int centerX, int centerY, boolean doAccelerate) {
@@ -58,16 +67,24 @@ public class AddGroupFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+
         }
+        List<Player> players = Player.listPlayersAZ();
+        playersName = new ArrayList<String>();
+        playersID = new ArrayList<Integer>();
+        for(Player player:players){
+            playersName.add(player.playerName);
+            playersID.add(player.getId().intValue());
+        }
+        setHasOptionsMenu(true);
     }
 
+    View rootView;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.fragment_add_player, container, false);
+        rootView = inflater.inflate(R.layout.fragment_add_group, container, false);
         rootView.setBackgroundColor(getResources().getColor(R.color.cardview_initial_background));
         rootView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
             @Override
@@ -88,28 +105,148 @@ public class AddGroupFragment extends Fragment {
             }
         });
 
-        View button = rootView.findViewById(R.id.button);
-        final EditText playerName = (EditText) rootView.findViewById(R.id.playerName);
-        final EditText bggUsername = (EditText) rootView.findViewById(R.id.bggUsername);
+        mContainerView_Players = (ViewGroup) rootView.findViewById(R.id.container_players);
+        groupName  = (EditText) rootView.findViewById(R.id.groupName);
 
-
-        // Set a listener to reveal the view when clicked.
-        button.setOnClickListener(new View.OnClickListener() {
+        View addButton = rootView.findViewById(R.id.addButton);
+        addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-            view.setEnabled(false);
-            if (!playerName.getText().toString().isEmpty()) {
-                /*Player newPlayer = new Player(playerName.getText().toString(), bggUsername.getText().toString());
-                MyDBHandler dbHandler = new MyDBHandler(mActivity, null, null, 1);
-                dbHandler.addPlayer(newPlayer);*/
-                Player player = new Player(playerName.getText().toString(), bggUsername.getText().toString());
-                player.save();
-                onButtonPressed("refresh_players");
-            }
-            removeYourself();
+                AddPlayer newUser = new AddPlayer(-1, "");
+                adapter.add(newUser);
+                adapter.notifyDataSetChanged();
+                addPlayer(newUser);
             }
         });
+
+
+        // Construct the data source
+        arrayOfUsers = new ArrayList<AddPlayer>();
+        // Create the adapter to convert the array to views
+        adapter = new AddPlayerAdapter(mActivity, arrayOfUsers);
+
         return rootView;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        // TODO Add your menu entries here
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.add_group, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        try{
+            InputMethodManager inputManager = (InputMethodManager)
+                    mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
+
+            inputManager.hideSoftInputFromWindow(mActivity.getCurrentFocus().getWindowToken(),
+                    InputMethodManager.HIDE_NOT_ALWAYS);
+        }catch (Exception e){}
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.add_group) {
+            adapter.notifyDataSetChanged();
+            if (adapter.getCount()>0) {
+
+                if (!groupName.getText().toString().isEmpty()) {
+                    //first, add the group
+                    GameGroup newGroup = new GameGroup(groupName.getText().toString());
+                    newGroup.save();
+
+                    //then add the players to the group
+                    for (int i = 0; i < adapter.getCount(); i++) {
+                        AddPlayer thisGuy = adapter.getItem(i);
+                        PlayersPerGameGroup newPlayer = new PlayersPerGameGroup(Player.findById(Player.class, thisGuy.playerID), newGroup);
+                        newPlayer.save();
+                    }
+                }
+            }
+            ((MainActivity) mActivity).onBackPressed();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void addPlayer(final AddPlayer addedPlayer) {
+        // Instantiate a new "row" view.
+        final ViewGroup newView = (ViewGroup) LayoutInflater.from(mActivity).inflate(
+                R.layout.group_addplayer_item, mContainerView_Players, false);
+        Spinner player = (Spinner) newView.findViewById(R.id.player);
+        ArrayAdapter<String> playerSpinnerArrayAdapter = new ArrayAdapter<String>(mActivity, android.R.layout.simple_spinner_item, playersName);
+        playerSpinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); // The drop down view
+        player.setAdapter(playerSpinnerArrayAdapter);
+        if (!addedPlayer.playerName.equals("")) {
+            int spinnerPostion = playerSpinnerArrayAdapter.getPosition(addedPlayer.playerName);
+            player.setSelection(spinnerPostion);
+        }
+        MySpinnerListener playerListener = new MySpinnerListener(addedPlayer, 2);
+        player.setOnItemSelectedListener(playerListener);
+
+        // Set a click listener for the "X" button in the row that will remove the row.
+        newView.findViewById(R.id.closeButton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Remove the row from its parent (the container view).
+                // Because mContainerView has android:animateLayoutChanges set to true,
+                // this removal is automatically animated.
+                adapter.remove(addedPlayer);
+                mContainerView_Players.removeView(newView);
+
+
+            }
+        });
+
+        // Because mContainerView has android:animateLayoutChanges set to true,
+        // adding this view is automatically animated.
+
+        mContainerView_Players.addView(newView);
+    }
+
+    public class AddPlayer {
+        public long playerID;
+        public String playerName;
+
+        public AddPlayer(long playerID, String playerName) {
+            this.playerID = playerID;
+            this.playerName = playerName;
+        }
+    }
+
+    public class AddPlayerAdapter extends ArrayAdapter<AddPlayer> {
+        public AddPlayerAdapter(Context context, ArrayList<AddPlayer> users) {
+            super(context, 0, users);
+        }
+    }
+
+
+    public class MySpinnerListener implements AdapterView.OnItemSelectedListener{
+
+        private AddPlayer playerToUpdate;
+        private int updateType;
+
+        public MySpinnerListener(AddPlayer thePlayer, int updateType) {
+            this.playerToUpdate = thePlayer;
+            this.updateType = updateType;
+        }
+
+        @Override
+        public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+            playerToUpdate.playerID = playersID.get(i);
+            playerToUpdate.playerName = playersName.get(i);
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> adapterView) {
+
+        }
     }
 
     // TODO: Rename method, update argument and hook method into UI event

@@ -141,11 +141,11 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
             viewHolder.getView().setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //if (!plays.get(position).playPhoto.equals("")) {
-                    //    ((MainActivity) myActivity).onPlayClicked(plays.get(position), myFragment, viewHolder.getImageView(), viewHolder.getGameNameView(), viewHolder.getPlayDateView());
-                    //} else {
+                    if (plays.get(position).playPhoto != null && !plays.get(position).playPhoto.equals("") && GamesPerPlay.getBaseGame(plays.get(position)).gameThumb == null) {
+                        ((MainActivity) myActivity).onPlayClicked(plays.get(position), myFragment, null, viewHolder.getGameNameView(), viewHolder.getPlayDateView());
+                    } else {
                         ((MainActivity) myActivity).onPlayClicked(plays.get(position), myFragment, viewHolder.getImageView(), viewHolder.getGameNameView(), viewHolder.getPlayDateView());
-                    //}
+                    }
                 }
             });
             viewHolder.getOverflowView().setOnClickListener(new View.OnClickListener() {
@@ -154,10 +154,12 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
                     playPopup(view, position);
                 }
             });
-            if(plays.get(position).playPhoto.equals("")) {
+            if(plays.get(position).playPhoto != null && plays.get(position).playPhoto.equals("")) {
                 if (GamesPerPlay.getBaseGame(plays.get(position)).gameThumb != null) {
                     ImageLoader.getInstance().displayImage("http:" + GamesPerPlay.getBaseGame(plays.get(position)).gameThumb, viewHolder.getImageView(), options);
-                    ImageLoader.getInstance().loadImage("http:" + GamesPerPlay.getBaseGame(plays.get(position)).gameImage, options, null);
+                    ImageLoader.getInstance().loadImage("http:" + GamesPerPlay.getBaseGame(plays.get(position)).gameThumb, options, null);
+                }else{
+                    viewHolder.getImageView().setImageDrawable(null);
                 }
             }else{
                 ImageLoader.getInstance().displayImage(plays.get(position).playPhoto, viewHolder.getImageView(), options);

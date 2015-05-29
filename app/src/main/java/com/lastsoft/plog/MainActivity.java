@@ -129,10 +129,13 @@ public class MainActivity extends ActionBarActivity
             fragmentManager.beginTransaction()
                     .replace(R.id.container, new StatsFragment(), "stats")
                     .commit();
-        }else {
+        }else if (position == 4){
             fragmentManager.beginTransaction()
                     .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
                     .commit();
+        }else{
+            super.onBackPressed();
+            //android.os.Process.killProcess(android.os.Process.myPid());
         }
     }
 
@@ -451,8 +454,16 @@ public class MainActivity extends ActionBarActivity
                 if (mAddPlayFragment != null) removeFragment(mAddPlayFragment.getView());
                 if (mAddGroupFragment != null) removeFragment(mAddGroupFragment.getView());
             } else {
-                super.onBackPressed();
+                //super.onBackPressed();
+                if (mViewPlayFragment != null){
+                    super.onBackPressed();
+                    mViewPlayFragment = null;
+                }else {
+                    mNavigationDrawerFragment.openDrawer();
+                }
             }
+        }else{
+            mNavigationDrawerFragment.closeDrawer();
         }
     }
 

@@ -6,6 +6,7 @@
     <string name="title_section3">Games</string>
     <string name="title_section4">Statistics</string>
     <string name="title_section5">Settings</string>
+    <string name="title_section6">Exit</string>
 
     <string name="add_player">Add Player</string>
     <string name="delete_player">Delete Player</string>
@@ -14,6 +15,7 @@
     <string name="delete_play">Delete Play</string>
     <string name="edit_player">Edit Player</string>
     <string name="add_group">Add Group</string>
+    <string name="delete_group">Delete Group</string>
     <string name="add_game">Add Game</string>
     <string name="filter_games">Filter Games</string>
     <string name="calculating">Calculating...</string>
@@ -40,9 +42,11 @@
     <string name="name">Name</string>
     <string name="game_name">Game Name</string>
     <string name="game_notes">Game Notes</string>
+    <string name="group_name">Group Name</string>
     <string name="choose_expansions">Choose Expansions</string>
     <string name="play_date">Play Date:</string>
     <string name="take_photo">Take Photo</string>
+    <string name="choose_photo">Choose Photo</string>
     <string name="game_photo">Game Photo:</string>
     <string name="name_taken">Name taken</string>
 

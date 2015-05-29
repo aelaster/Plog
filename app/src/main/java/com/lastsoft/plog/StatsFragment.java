@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.lastsoft.plog.db.GameGroup;
 import com.lastsoft.plog.db.GamesPerPlay;
 import com.lastsoft.plog.db.Play;
 import com.lastsoft.plog.db.Player;
@@ -166,10 +167,12 @@ public class StatsFragment extends Fragment {
                 output[1] = uniquePlays;
 
 
+                long adam_regularTotalWins = 0;
+                long adam_asteriskTotalWins = 0;
+                long sher_regularTotalWins = 0;
+                long sher_asteriskTotalWins = 0;
 
-                long regularTotalWins = 0;
-                long asteriskTotalWins = 0;
-                List<PlayersPerPlay> playerTotalPlays = PlayersPerPlay.totalPlays(Player.findById(Player.class, (long) 1));
+                /*List<PlayersPerPlay> playerTotalPlays = PlayersPerPlay.totalPlays(Player.findById(Player.class, (long) 1));
                 for(PlayersPerPlay eachPlay:playerTotalPlays){
                     //int highScore = PlayersPerPlay.getHighScore(eachPlay.play);
                     if (eachPlay.score == eachPlay.playHighScore && eachPlay.score != 0){
@@ -179,32 +182,68 @@ public class StatsFragment extends Fragment {
                     if (eachPlay.score >= sherScore && eachPlay.score != 0){
                         asteriskTotalWins++;
                     }
+                }*/
+
+                List<PlayersPerPlay> groupTotalPlays = PlayersPerPlay.totalPlays_GameGroup(GameGroup.findById(GameGroup.class, (long) 1));
+                long playCounter = -1;
+                int highScore = 0;
+                int adamScore = 0;
+                int sherScore = 0;
+                for(PlayersPerPlay eachPlay:groupTotalPlays){
+                    if (playCounter == -1){
+                        //first time in
+                        //set play counter to current play
+                        playCounter = eachPlay.play.getId();
+                        //set high score for play
+                        highScore = eachPlay.playHighScore;
+                    }else if (eachPlay.play.getId() != playCounter){
+                        //we've moved on to the next play
+                        //calculate winner from past playCounter play
+                        if (adamScore == highScore && adamScore != 0){
+                            adam_regularTotalWins++;
+                        }
+                        if (sherScore == highScore && sherScore != 0){
+                            sher_regularTotalWins++;
+                        }
+                        if (adamScore >= sherScore && adamScore != 0) {
+                            adam_asteriskTotalWins++;
+                        }
+                        if (sherScore >= adamScore && sherScore != 0){
+                            sher_asteriskTotalWins++;
+                        }
+                        //set playCounter to new play
+                        playCounter = eachPlay.play.getId();
+                        //set high score for new play
+                        highScore = eachPlay.playHighScore;
+                        //zero out scores
+                        adamScore = 0;
+                        sherScore = 0;
+                    }
+                    if (eachPlay.player.getId() == 1){
+                        adamScore = eachPlay.score;
+                    }else if (eachPlay.player.getId() == 2){
+                        sherScore = eachPlay.score;
+                    }
                 }
 
-                output[2] = regularTotalWins;
-                output[3] = asteriskTotalWins;
-
-
-
-
-                long stotalPlays = Play.count(Play.class, null, null);
-                long sregularTotalWins = 0;
-                long sasteriskTotalWins = 0;
-                List<PlayersPerPlay> splayerTotalPlays = PlayersPerPlay.totalPlays(Player.findById(Player.class, (long) 2));
-                for(PlayersPerPlay eachPlay:splayerTotalPlays){
-                    //int shighScore = PlayersPerPlay.getHighScore(eachPlay.play);
-                    if (eachPlay.score == eachPlay.playHighScore && eachPlay.score != 0){
-                        sregularTotalWins++;
-                    }
-                    int adamScore = PlayersPerPlay.getScoreByPlayer(Player.findById(Player.class, (long)1), eachPlay.play);
-                    if (eachPlay.score >= adamScore && eachPlay.score != 0){
-                        sasteriskTotalWins++;
-                    }
+                //calculate the last winner
+                if (adamScore == highScore && adamScore != 0){
+                    adam_regularTotalWins++;
+                }
+                if (sherScore == highScore && sherScore != 0){
+                    sher_regularTotalWins++;
+                }
+                if (adamScore >= sherScore && adamScore != 0) {
+                    adam_asteriskTotalWins++;
+                }
+                if (sherScore >= adamScore && sherScore != 0){
+                    sher_asteriskTotalWins++;
                 }
 
-
-                output[4] = sregularTotalWins;
-                output[5] = sasteriskTotalWins;
+                output[2] = adam_regularTotalWins;
+                output[3] = adam_asteriskTotalWins;
+                output[4] = sher_regularTotalWins;
+                output[5] = sher_asteriskTotalWins;
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -225,7 +264,7 @@ public class StatsFragment extends Fragment {
             TextView percentSasteriskWins = (TextView) statsView.findViewById(R.id.sher_asterisk_wins_percentage);
 
             totalPlaysView.setText("Total Plays: " + result[0]);
-            uniquePlaysView.setText("Unique Plays: " + result[1]);
+            uniquePlaysView.setText("Unique Games: " + result[1]);
             totalWins.setText("Adam Total Wins: " + result[2]);
             percentTotalWins.setText("Adam Total Wins Percentage: " + ((int)(result[2] * 100.0 / result[0] + 0.5)) + "%");
             asteriskWins.setText("Adam Asterisk Wins:" + result[3]);
