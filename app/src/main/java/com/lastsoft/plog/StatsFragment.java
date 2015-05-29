@@ -189,7 +189,6 @@ public class StatsFragment extends Fragment {
                         //set high score for new play
                         highScore = eachPlay.playHighScore;
                         //zero out scores
-                        playerScoreHolder = null;
                         playerScoreHolder = new int[groupPlayers.size()];
                         scoreIndex = 0;
                     }
@@ -239,8 +238,6 @@ public class StatsFragment extends Fragment {
         protected void onPostExecute(final Long[] result) {
             addStat("Total Plays: ", result[0]+"");
             addStat("Unique Games: ", result[1]+"");
-            //totalPlaysView.setText("Total Plays: " + result[0]);
-            //uniquePlaysView.setText("Unique Games: " + result[1]);
             for(int x = 0; x < groupPlayers.size(); x++) {
                 int arrayBounds = 2 + (x * groupPlayers.size());
                 addStat(groupPlayers.get(x).playerName + " Total Wins:", result[arrayBounds]+"");
