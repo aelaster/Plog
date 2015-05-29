@@ -11,7 +11,6 @@ import com.lastsoft.plog.db.PlayersPerPlay;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.net.URLDecoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

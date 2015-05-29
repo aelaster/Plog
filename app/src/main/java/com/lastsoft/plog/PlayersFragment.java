@@ -23,26 +23,14 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.lastsoft.plog.db.Game;
-import com.lastsoft.plog.db.GamesPerPlay;
-import com.lastsoft.plog.db.Play;
 import com.lastsoft.plog.db.Player;
-import com.lastsoft.plog.db.PlayersPerPlay;
 
 import net.i2p.android.ext.floatingactionbutton.FloatingActionButton;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URLDecoder;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**

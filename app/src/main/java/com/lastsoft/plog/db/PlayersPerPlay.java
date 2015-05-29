@@ -1,7 +1,5 @@
 package com.lastsoft.plog.db;
 
-import android.util.Log;
-
 import com.orm.StringUtil;
 import com.orm.SugarRecord;
 import com.orm.query.Condition;
@@ -41,7 +39,7 @@ public class PlayersPerPlay extends SugarRecord<PlayersPerPlay> {
     }
 
     public static List<PlayersPerPlay> totalPlays_GameGroup(GameGroup groupID){
-        return PlayersPerPlay.findWithQuery(PlayersPerPlay.class, "Select * from " + StringUtil.toSQLName("PlayersPerPlay") + " where " + StringUtil.toSQLName("player") + " in (Select " + StringUtil.toSQLName("player") + " from " + StringUtil.toSQLName("PlayersPerGameGroup") + " where " + StringUtil.toSQLName("GameGroup") + " = ?)", groupID.getId().toString());
+        return PlayersPerPlay.findWithQuery(PlayersPerPlay.class, "Select * from " + StringUtil.toSQLName("PlayersPerPlay") + " where " + StringUtil.toSQLName("player") + " in (Select " + StringUtil.toSQLName("player") + " from " + StringUtil.toSQLName("PlayersPerGameGroup") + " where " + StringUtil.toSQLName("GameGroup") + " = ?) ORDER BY PLAY, PLAYER", groupID.getId().toString());
     }
 
     public static List<PlayersPerPlay> getPlayers(Play play){
