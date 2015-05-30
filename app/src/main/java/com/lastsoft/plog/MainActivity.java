@@ -520,9 +520,10 @@ public class MainActivity extends ActionBarActivity
             } else {
                 //super.onBackPressed();
                 if (mViewPlayFragment != null){
-                    overridePendingTransition(0,0);
+                    int holder = mViewPlayFragment.mPager.getCurrentItem();
                     super.onBackPressed();
                     mViewPlayFragment = null;
+                    mPlaysFragment.mRecyclerView.scrollToPosition(holder);
                 }else {
                     PlayersFragment playersFrag = (PlayersFragment)
                             getSupportFragmentManager().findFragmentByTag("players");

@@ -153,7 +153,7 @@ public class PlaysFragment extends Fragment{
         }
 
         mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.scrollToPosition(scrollPosition);
+        //mRecyclerView.scrollToPosition(scrollPosition);
     }
 
     @Override
