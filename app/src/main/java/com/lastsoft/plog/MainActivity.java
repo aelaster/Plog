@@ -55,6 +55,7 @@ public class MainActivity extends ActionBarActivity
         GamesFragment.OnFragmentInteractionListener,
         ViewPlayFragment.OnFragmentInteractionListener,
         StatsFragment.OnFragmentInteractionListener,
+        StatsFragment_TenByTen.OnFragmentInteractionListener,
         View.OnClickListener {
 
 
@@ -145,7 +146,7 @@ public class MainActivity extends ActionBarActivity
                     .commit();
         }else if (position == 4){
             fragmentManager.beginTransaction()
-                    .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
+                    .replace(R.id.container, new StatsFragment_TenByTen(), "stats")
                     .commit();
         }else{
             super.onBackPressed();

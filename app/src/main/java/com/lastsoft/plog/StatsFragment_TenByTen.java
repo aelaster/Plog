@@ -6,6 +6,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,8 +17,13 @@ import com.lastsoft.plog.db.GameGroup;
 import com.lastsoft.plog.db.GamesPerPlay;
 import com.lastsoft.plog.db.Player;
 import com.lastsoft.plog.db.PlayersPerPlay;
+import com.lastsoft.plog.db.TenByTen;
+import com.lastsoft.plog.db.TenByTen_Stats;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
@@ -106,7 +112,7 @@ public class StatsFragment_TenByTen extends Fragment {
         public void onFragmentInteraction(String string);
     }
 
-    public class LoadStatsTask extends AsyncTask<Long, Void, Long[]> {
+    public class LoadStatsTask extends AsyncTask<Long, Void, Integer[]> {
 
         ArrayList<String> filteredGames;
         Context theContext;
@@ -124,10 +130,12 @@ public class StatsFragment_TenByTen extends Fragment {
             this.theContext = context;
         }
 
+        List<TenByTen> gamesToCheck;
+
         // can use UI thread here
         @Override
         protected void onPreExecute() {
-
+            gamesToCheck = TenByTen.tenByTens_Group(GameGroup.findById(GameGroup.class, (long) 1));
             mydialog.setMessage(getString(R.string.calculating));
             mydialog.setCancelable(false);
             try{
@@ -137,164 +145,53 @@ public class StatsFragment_TenByTen extends Fragment {
 
         // automatically done on worker thread (separate from UI thread)
         @Override
-        protected Long[] doInBackground(final Long... args) {
-
-            filteredGames = new ArrayList<String>();
-            int outputBounds = ((groupPlayers.size() * 2) + 2);
-            Long[] output = new Long[outputBounds];
-            //times 2 because each player needs regular and asterisk totals
-            //plus two because we put total and unique plays on the top
-            int[] playerScoreHolder = new int[groupPlayers.size()];
+        protected Integer[] doInBackground(final Long... args) {
+            Integer[] output = new Integer[gamesToCheck.size()];
+            DateFormat outputFormatter = new SimpleDateFormat("MM/dd/yyyy");
             try {
-
-                List<PlayersPerPlay> groupTotalPlays = PlayersPerPlay.totalPlays_GameGroup(GameGroup.findById(GameGroup.class, args[0]));
-                long uniquePlays  = GamesPerPlay.getUniquePlays_GameGroup(GameGroup.findById(GameGroup.class, args[0]));
-                //Log.d("V1", "groupTotalPlays = " + groupTotalPlays.size());
-
-                output[0] = ((long)groupTotalPlays.size()/(long)groupPlayers.size());
-                output[1] = uniquePlays;
-                long playCounter = -1;
-                PlayersPerPlay playHolder = null;
-                int highScore = 0;
-                int scoreIndex = 0;
-                for(PlayersPerPlay eachPlay:groupTotalPlays){
-                    playHolder = eachPlay;
-                    if (playCounter == -1){
-                        //first time in
-                        //set play counter to current play
-                        playCounter = eachPlay.play.getId();
-                        //set high score for play
-                        highScore = eachPlay.playHighScore;
-                    }else if (eachPlay.play.getId() != playCounter){
-                        //we've moved on to the next play
-                        //calculate winner from past playCounter play
-                        //Log.d("V1", "scoreIndex = " + scoreIndex);
-                        if (scoreIndex == groupPlayers.size()) {
-                            //only included if all of the group has been scored
-                            int max = playerScoreHolder[0];
-
-                            for (int i = 0; i < playerScoreHolder.length; i++) {
-                                if (playerScoreHolder[i] > max) {
-                                    max = playerScoreHolder[i];
+                int gameCounter = 0;
+                for (TenByTen gameToCheck : gamesToCheck) {
+                    List<TenByTen_Stats> tenByTenOut = TenByTen_Stats.getUniquePlays_GameGroup(gameToCheck.game.gameName, GameGroup.findById(GameGroup.class, (long) 1));
+                    int scoreIndex = 0;
+                    int gamePlays = 0;
+                    long playCounter = -1;
+                    TenByTen_Stats currentStat = null;
+                    for (TenByTen_Stats eachStat : tenByTenOut) {
+                        if (playCounter == -1) {
+                            //first time in
+                            //set play counter to current play
+                            playCounter = eachStat.play.getId();
+                            currentStat = eachStat;
+                        } else if (eachStat.play.getId() != playCounter) {
+                            //output
+                            if (scoreIndex == groupPlayers.size()) {
+                                //this means we both played ths game, so it's part of our TenByTen, so log that shit
+                                String output_date = outputFormatter.format(currentStat.playDate); // Output : 01/20/2012
+                                if (output_date.endsWith(""+gameToCheck.year)) {
+                                    gamePlays++;
                                 }
                             }
-
-                            for (int x = 0; x < playerScoreHolder.length; x++) {
-                                int arrayBounds = 2 + (x * groupPlayers.size());
-                                if (playerScoreHolder[x] == highScore && playerScoreHolder[x] != 0) {
-                                    if (output[(arrayBounds)] == null) {
-                                        output[(arrayBounds)] = (long) 1;
-                                    } else {
-                                        output[arrayBounds] = output[arrayBounds] + (long) 1;
-                                    }
-                                    loserFlag = false;
-                                }else{
-                                    sharedFlag = false;
-                                }
-                                if (playerScoreHolder[x] >= max && playerScoreHolder[x] != 0) {
-                                    if (output[(arrayBounds + 1)] == null) {
-                                        output[(arrayBounds + 1)] = (long) 1;
-                                    } else {
-                                        output[(arrayBounds + 1)] = output[(arrayBounds + 1)] + (long) 1;
-                                    }
-                                    loserFlag = false;
-                                }
-
-                            }
-                        }else{
-                            filteredPlays++;
-                            //ths is filtred.  is this a unique game being filtered?
-                            Game getGame = GamesPerPlay.getBaseGame(eachPlay.play);
-                            if (!filteredGames.contains(getGame.gameName)) {
-                                boolean uniqueFlag;
-                                for (Player eachPlayer : groupPlayers) {
-                                    if (Player.hasPlayerPlayedGame(eachPlayer, GamesPerPlay.getBaseGame(eachPlay.play)) == false) {
-                                        //nope, one of us hasn't played, so it's not a unique game for us
-                                        uniqueFilter++;
-                                        filteredGames.add(getGame.gameName);
-                                        break;
-                                    }
-                                }
-                            }
+                            playCounter = eachStat.play.getId();
+                            currentStat = eachStat;
+                            scoreIndex = 0;
                         }
 
-                        if (sharedFlag){
-                            sharedCounter++;
-                        }
-                        if (loserFlag){
-                            loserCounter++;
-                        }
-                        loserFlag = true;
-                        sharedFlag = true;
-
-
-                        //set playCounter to new play
-                        playCounter = eachPlay.play.getId();
-                        //set high score for new play
-                        highScore = eachPlay.playHighScore;
-                        //zero out scores
-                        playerScoreHolder = new int[groupPlayers.size()];
-                        scoreIndex = 0;
-                    }
-
-                    for(Player eachPlayer:groupPlayers){
-                        if (eachPlay.player.getId() == eachPlayer.getId()){
-                            playerScoreHolder[scoreIndex] = eachPlay.score;
-                            scoreIndex++;
-                            break;
-                        }
-                    }
-                }
-                //Log.d("V1", "scoreIndex = " + scoreIndex);
-                if (scoreIndex == groupPlayers.size()) {
-                    //calculate the last winner
-                    int max = playerScoreHolder[0];
-
-                    for (int i = 0; i < playerScoreHolder.length; i++) {
-                        if (playerScoreHolder[i] > max) {
-                            max = playerScoreHolder[i];
-                        }
-                    }
-
-                    for (int x = 0; x < playerScoreHolder.length; x++) {
-                        int arrayBounds = 2 + (x * groupPlayers.size());
-                        if (playerScoreHolder[x] == highScore && playerScoreHolder[x] != 0) {
-                            if (output[(arrayBounds)] == null) {
-                                output[(arrayBounds)] = (long) 1;
-                            } else {
-                                output[arrayBounds] = output[arrayBounds] + (long) 1;
-                            }
-                            loserFlag = false;
-                        }else{
-                            sharedFlag = false;
-                        }
-                        if (playerScoreHolder[x] >= max) {
-                            if (output[(arrayBounds + 1)] == null) {
-                                output[(arrayBounds + 1)] = (long) 1;
-                            } else {
-                                output[(arrayBounds + 1)] = output[(arrayBounds + 1)] + (long) 1;
-                            }
-                            loserFlag = false;
-                        }
-                    }
-                }else{
-                    filteredPlays++;
-                    Game getGame = GamesPerPlay.getBaseGame(playHolder.play);
-                    if (!filteredGames.contains(getGame.gameName)) {
-                        boolean uniqueFlag;
                         for (Player eachPlayer : groupPlayers) {
-                            if (Player.hasPlayerPlayedGame(eachPlayer, getGame) == false) {
-                                uniqueFilter++;
+                            if (eachStat.player.getId() == eachPlayer.getId()) {
+                                scoreIndex++;
                                 break;
                             }
                         }
                     }
-                }
-                if (sharedFlag){
-                    sharedCounter++;
-                }
-                if (loserFlag){
-                    loserCounter++;
+                    if (scoreIndex == groupPlayers.size()) {
+                        //this means we both played ths game, so it's part of our TenByTen, so log that shit
+                        String output_date = outputFormatter.format(currentStat.playDate); // Output : 01/20/2012
+                        if (output_date.endsWith(""+gameToCheck.year)) {
+                            gamePlays++;
+                        }
+                    }
+                    output[gameCounter] = gamePlays;
+                    gameCounter++;
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -303,28 +200,12 @@ public class StatsFragment_TenByTen extends Fragment {
         }
 
         @Override
-        protected void onPostExecute ( final Long[] result){
-            long totalPlays = (result[0] - (filteredPlays/groupPlayers.size()));
-            long totalUnique = (result[1] - (uniqueFilter));
-            addStat("Total Plays: ", totalPlays + "");
-            addStat("Unique Games: ", totalUnique + "");
-            for(int x = 0; x < groupPlayers.size(); x++) {
-                int arrayBounds = 2 + (x * groupPlayers.size());
-                addStat(groupPlayers.get(x).playerName + " Total Wins:", result[arrayBounds]+"");
-                addStat(groupPlayers.get(x).playerName + " Asterisk Wins:", result[arrayBounds+1]+"");
+        protected void onPostExecute ( final Integer[] result){
+            for(int x = 0; x < result.length; x++) {
+                addStat(gamesToCheck.get(x).game.gameName + " Plays:", result[x]+"");
             }
-            addStat("Shared Wins: ", sharedCounter + "");
-            addStat("Total Losses: ", loserCounter + "");
-
-            for(int x = 0; x < groupPlayers.size(); x++) {
-                int arrayBounds = 2 + (x * groupPlayers.size());
-                addStat(groupPlayers.get(x).playerName + " Total Wins Percentage:", ((int) (result[arrayBounds] * 100.0 / totalPlays + 0.5)) + "%");
-                addStat(groupPlayers.get(x).playerName + " Asterisk Wins Percentage:", ((int) (result[arrayBounds+1] * 100.0 / totalPlays + 0.5)) + "%");
-            }
-            addStat("Shared Wins Percentage: ", ((int) (sharedCounter * 100.0 / totalPlays + 0.5)) + "%");
-            addStat("Total Losses Percentage: ", ((int) (loserCounter * 100.0 / totalPlays + 0.5)) + "%");
             mydialog.dismiss();
-            }
+        }
     }
 
     private void addStat(String statType, String statValue) {
