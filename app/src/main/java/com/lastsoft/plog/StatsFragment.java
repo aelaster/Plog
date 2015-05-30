@@ -114,6 +114,12 @@ public class StatsFragment extends Fragment {
         Context theContext;
         int filteredPlays = 0;
         int uniqueFilter = 0;
+        boolean loserFlag = true;
+        boolean sharedFlag = true;
+        int sharedCounter = 0;
+        int loserCounter = 0;
+
+
         private final ProgressDialog mydialog = new ProgressDialog(mActivity);
 
         public LoadStatsTask(Context context) {
@@ -183,6 +189,9 @@ public class StatsFragment extends Fragment {
                                     } else {
                                         output[arrayBounds] = output[arrayBounds] + (long) 1;
                                     }
+                                    loserFlag = false;
+                                }else{
+                                    sharedFlag = false;
                                 }
                                 if (playerScoreHolder[x] >= max && playerScoreHolder[x] != 0) {
                                     if (output[(arrayBounds + 1)] == null) {
@@ -190,7 +199,9 @@ public class StatsFragment extends Fragment {
                                     } else {
                                         output[(arrayBounds + 1)] = output[(arrayBounds + 1)] + (long) 1;
                                     }
+                                    loserFlag = false;
                                 }
+
                             }
                         }else{
                             filteredPlays++;
@@ -208,6 +219,16 @@ public class StatsFragment extends Fragment {
                                 }
                             }
                         }
+
+                        if (sharedFlag){
+                            sharedCounter++;
+                        }
+                        if (loserFlag){
+                            loserCounter++;
+                        }
+                        loserFlag = true;
+                        sharedFlag = true;
+
 
                         //set playCounter to new play
                         playCounter = eachPlay.play.getId();
@@ -245,6 +266,9 @@ public class StatsFragment extends Fragment {
                             } else {
                                 output[arrayBounds] = output[arrayBounds] + (long) 1;
                             }
+                            loserFlag = false;
+                        }else{
+                            sharedFlag = false;
                         }
                         if (playerScoreHolder[x] >= max) {
                             if (output[(arrayBounds + 1)] == null) {
@@ -252,6 +276,7 @@ public class StatsFragment extends Fragment {
                             } else {
                                 output[(arrayBounds + 1)] = output[(arrayBounds + 1)] + (long) 1;
                             }
+                            loserFlag = false;
                         }
                     }
                 }else{
@@ -267,6 +292,12 @@ public class StatsFragment extends Fragment {
                         }
                     }
                 }
+                if (sharedFlag){
+                    sharedCounter++;
+                }
+                if (loserFlag){
+                    loserCounter++;
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -279,13 +310,21 @@ public class StatsFragment extends Fragment {
             long totalUnique = (result[1] - (uniqueFilter));
             addStat("Total Plays: ", totalPlays + "");
             addStat("Unique Games: ", totalUnique + "");
-                for(int x = 0; x < groupPlayers.size(); x++) {
+            for(int x = 0; x < groupPlayers.size(); x++) {
                 int arrayBounds = 2 + (x * groupPlayers.size());
                 addStat(groupPlayers.get(x).playerName + " Total Wins:", result[arrayBounds]+"");
-                addStat(groupPlayers.get(x).playerName + " Total Wins Percentage:", ((int) (result[arrayBounds] * 100.0 / totalPlays + 0.5)) + "%");
                 addStat(groupPlayers.get(x).playerName + " Asterisk Wins:", result[arrayBounds+1]+"");
+            }
+            addStat("Shared Wins: ", sharedCounter + "");
+            addStat("Total Losses: ", loserCounter + "");
+
+            for(int x = 0; x < groupPlayers.size(); x++) {
+                int arrayBounds = 2 + (x * groupPlayers.size());
+                addStat(groupPlayers.get(x).playerName + " Total Wins Percentage:", ((int) (result[arrayBounds] * 100.0 / totalPlays + 0.5)) + "%");
                 addStat(groupPlayers.get(x).playerName + " Asterisk Wins Percentage:", ((int) (result[arrayBounds+1] * 100.0 / totalPlays + 0.5)) + "%");
             }
+            addStat("Shared Wins Percentage: ", ((int) (sharedCounter * 100.0 / totalPlays + 0.5)) + "%");
+            addStat("Total Losses Percentage: ", ((int) (loserCounter * 100.0 / totalPlays + 0.5)) + "%");
             mydialog.dismiss();
             }
     }

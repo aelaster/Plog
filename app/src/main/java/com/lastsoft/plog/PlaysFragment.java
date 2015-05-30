@@ -61,8 +61,6 @@ public class PlaysFragment extends Fragment{
         //String currentDBPath = currentDB.toString();
         //Log.d("V1", "database directory=" + currentDBPath);
         //Log.d("V1", "file directory=" + V1GolfLib.this.getFilesDir().toString());
-
-        initDataset();
     }
 
     @Override
@@ -169,19 +167,7 @@ public class PlaysFragment extends Fragment{
     }
 
 
-    /**
-     * Generates Strings for RecyclerView's adapter. This data would usually come
-     * from a local content provider or remote server.
-     */
-    private void initDataset() {
-        mDataset = new String[DATASET_COUNT];
-        for (int i = 0; i < DATASET_COUNT; i++) {
-            mDataset[i] = "This is element #" + i;
-        }
-    }
-
     protected void refreshDataset(){
-        initDataset();
         mAdapter = new PlayAdapter(mActivity, this);
         // Set CustomAdapter as the adapter for RecyclerView.
         mRecyclerView.setAdapter(mAdapter);

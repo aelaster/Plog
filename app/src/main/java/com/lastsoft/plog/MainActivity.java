@@ -1,9 +1,12 @@
 package com.lastsoft.plog;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -11,6 +14,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.transition.TransitionInflater;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -31,6 +35,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -342,6 +347,14 @@ public class MainActivity extends ActionBarActivity
 
     }
 
+    public void addToTenXTen(long gameId){
+        //prsent dialog of all available groups
+        //just like expansions
+        //this is also a way to remove them from the table
+        onFragmentInteraction("refresh_games");
+        //onBackPressed();
+    }
+
     public void deleteGame(long gameId){
         Game deleteMe = Game.findById(Game.class, gameId);
 
@@ -549,6 +562,73 @@ public class MainActivity extends ActionBarActivity
         }
     }
 
+    public class TenByTenDialogFragment extends DialogFragment {
 
+        public TenByTenDialogFragment newInstance(boolean[] checkedItems, String gameName) {
+            TenByTenDialogFragment frag = new TenByTenDialogFragment();
+            Bundle args = new Bundle();
+            args.putBooleanArray("checkedItem", checkedItems);
+            args.putString("gameName", gameName);
+
+            frag.setArguments(args);
+            return frag;
+        }
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            //final boolean[] checkedItems = getArguments().getBooleanArray("checkedItems");
+            /*final String gameName = getArguments().getString("gameName");
+
+            List<String> expansionNames = new ArrayList<String>();
+            for(Game expansion:expansions){
+                expansionNames.add(expansion.gameName);
+            }
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
+            // Set the dialog title
+            builder.setTitle(R.string.choose_expansions)
+                    // Specify the list array, the items to be selected by default (null for none),
+                    // and the listener through which to receive callbacks when items are selected
+                    .setMultiChoiceItems(expansionNames.toArray(new CharSequence[expansionNames.size()]), checkedItems,
+                            new DialogInterface.OnMultiChoiceClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which,
+                                                    boolean isChecked) {
+                                    checkedItems[which] = isChecked;
+                                    Game checked = expansions.get(which);
+                                    if (isChecked){
+                                        addedExpansions.add(checked);
+                                    }else{
+                                        addedExpansions.remove(checked);
+                                    }
+                                    //Log.d("V1", checked.gameName);
+                                    //Log.d("V1", "isChecked="+isChecked);
+                                }
+                            })
+                            // Set the action buttons
+                    .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int id) {
+                            clearGames();
+                            // User clicked OK, so save the checkedItems results somewhere
+                            // or return them to the component that opened the dialog
+                            //Log.d("V1", "addedExpansions size = " + addedExpansions.size());
+                            for (int i = 0; i < addedExpansions.size(); i++){
+                                Game addMe = addedExpansions.get(i);
+                                addGame(addMe);
+                            }
+                        }
+                    })
+                    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int id) {
+
+                        }
+                    });
+            */
+            //return builder.create();
+            return null;
+        }
+    }
 
 }

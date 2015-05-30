@@ -2,15 +2,24 @@
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent" tools:context="com.lastsoft.plog.StatsFragment"
     android:orientation="vertical">
-
-    <LinearLayout android:id="@+id/container_players"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:showDividers="middle"
-        android:divider="?android:dividerHorizontal"
-        android:animateLayoutChanges="true"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp" />
-
+    <ScrollView
+        android:id="@+id/scrollview"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:linksClickable="true"
+        android:fillViewport="true">
+        <LinearLayout android:layout_width="match_parent"
+            android:layout_height="match_parent" android:orientation="vertical"
+            >
+            <LinearLayout android:id="@+id/container_players"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:showDividers="middle"
+                android:divider="?android:dividerHorizontal"
+                android:animateLayoutChanges="true"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp" />
+        </LinearLayout>
+    </ScrollView>
 </LinearLayout>

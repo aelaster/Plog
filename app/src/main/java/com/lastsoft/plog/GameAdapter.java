@@ -168,6 +168,11 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
                         //refresh play list
                         ((MainActivity) myActivity).deleteGame(games.get(position).getId());
                         return true;
+                    case R.id.add_tenbyten:
+                        //delete the play
+                        //refresh play list
+                        ((MainActivity) myActivity).addToTenXTen(games.get(position).getId());
+                        return true;
                     default:
                         return false;
                 }

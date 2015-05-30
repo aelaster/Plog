@@ -19,6 +19,8 @@
     <string name="add_game">Add Game</string>
     <string name="filter_games">Filter Games</string>
     <string name="calculating">Calculating...</string>
+    <string name="add_tenbyten">Add to 10x10</string>
+
 
     <string name="color">Color</string>
     <string name="score">Score</string>
