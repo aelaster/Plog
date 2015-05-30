@@ -19,6 +19,7 @@ package com.lastsoft.plog;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.SharedElementCallback;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -86,9 +87,12 @@ public class PlaysFragment extends Fragment{
         }
         setRecyclerViewLayoutManager(mCurrentLayoutManagerType);
 
-        mAdapter = new PlayAdapter(mActivity, this);
+        //mAdapter = new PlayAdapter(mActivity, this);
+        mAdapter = ((MainActivity)mActivity).mPlayAdapter;
         // Set CustomAdapter as the adapter for RecyclerView.
         mRecyclerView.setAdapter(mAdapter);
+
+        //mRecyclerView.scrollToPosition(300);
 
         /*pullToRefreshView = (SwipeRefreshLayout) rootView.findViewById(R.id.pull_to_refresh_listview);
         pullToRefreshView.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -169,6 +173,7 @@ public class PlaysFragment extends Fragment{
 
     protected void refreshDataset(){
         mAdapter = new PlayAdapter(mActivity, this);
+        ((MainActivity)mActivity).mPlayAdapter = mAdapter;
         // Set CustomAdapter as the adapter for RecyclerView.
         mRecyclerView.setAdapter(mAdapter);
     }

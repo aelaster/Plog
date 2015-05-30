@@ -4,6 +4,12 @@ import android.app.Activity;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -41,19 +47,20 @@ public class ViewPlayFragment extends Fragment {
     String imageTransID;
     String nameTransID;
     String dateTransID;
+    int adapterPosition;
     private OnFragmentInteractionListener mListener;
     private ViewGroup mContainerView_Players;
     private ViewGroup mContainerView_Expansions;
     ImageView playImage;
 
-    // TODO: Rename and change types and number of parameters
-    public static ViewPlayFragment newInstance(long playID, String transID, String transID2, String transID3) {
+    public static ViewPlayFragment newInstance(long playID, String transID, String transID2, String transID3, int position) {
         ViewPlayFragment fragment = new ViewPlayFragment();
         Bundle args = new Bundle();
         args.putLong("playID", playID);
         args.putString("imageTransID", transID);
         args.putString("nameTransID", transID2);
         args.putString("dateTransID", transID3);
+        args.putInt("adapterPosition", position);
         fragment.setArguments(args);
         return fragment;
     }
@@ -70,131 +77,59 @@ public class ViewPlayFragment extends Fragment {
             imageTransID = getArguments().getString("imageTransID");
             nameTransID = getArguments().getString("nameTransID");
             dateTransID = getArguments().getString("dateTransID");
+            adapterPosition = getArguments().getInt("adapterPosition");
         }
+
+        /*
+        Log.d("V1", "playID=" + playID);
+        Log.d("V1", "imageTransID=" + imageTransID);
+        Log.d("V1", "nameTransID=" + nameTransID);
+        Log.d("V1", "dateTransID=" + dateTransID);
+        */
         setHasOptionsMenu(true);
     }
 
+
+    /**
+     * The pager widget, which handles animation and allows swiping horizontally to access previous
+     * and next wizard steps.
+     */
+    private ViewPager mPager;
+
+    /**
+     * The pager adapter, which provides the pages to the view pager widget.
+     */
+    private PagerAdapter mPagerAdapter;
     View viewPlayLayout;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        viewPlayLayout = inflater.inflate(R.layout.fragment_view_play, container, false);
+        viewPlayLayout = inflater.inflate(R.layout.fragment_view_play_swipe, container, false);
         viewPlayLayout.setBackgroundColor(getResources().getColor(R.color.cardview_initial_background));
-        LinearLayout linLayout = (LinearLayout) viewPlayLayout.findViewById(R.id.linearLayout);
 
-        Play thisPlay = Play.findById(Play.class, playID);
-
-        DisplayImageOptions options = new DisplayImageOptions.Builder()
-                .cacheOnDisk(true)
-                .cacheInMemory(true)
-                .considerExifParams(true)
-                .build();
-
-        mContainerView_Players = (ViewGroup) viewPlayLayout.findViewById(R.id.container_players);
-        mContainerView_Expansions = (ViewGroup) viewPlayLayout.findViewById(R.id.container_expansions);
-
-        playImage = (ImageView) viewPlayLayout.findViewById(R.id.imageView1);
-        if (thisPlay.playPhoto != null && !thisPlay.playPhoto.equals("")){
-            //playImage.setImageDrawable(Drawable.createFromPath(thisPlay.playPhoto.substring(7, thisPlay.playPhoto.length())));
-            ImageLoader.getInstance().displayImage(thisPlay.playPhoto, playImage, options);
-            //final BitmapWorkerTask task = new BitmapWorkerTask(playImage);
-            //task.execute(thisPlay.playPhoto.substring(7, thisPlay.playPhoto.length()));
-            playImage.setTransitionName(imageTransID);
-        }else{
-            if (GamesPerPlay.getBaseGame(thisPlay).gameThumb != null) {
-                ImageLoader.getInstance().displayImage("http:" + GamesPerPlay.getBaseGame(thisPlay).gameThumb, playImage, options);
-                playImage.setTransitionName(imageTransID);
+        // Instantiate a ViewPager and a PagerAdapter.
+        mPager = (ViewPager) viewPlayLayout.findViewById(R.id.pager);
+        mPagerAdapter = new ScreenSlidePagerAdapter(getFragmentManager());
+        mPager.setAdapter(mPagerAdapter);
+        mPager.setCurrentItem(adapterPosition);
+        mPager.setPageTransformer(true, new DepthPageTransformer());
+        mPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+            @Override
+            public void onPageSelected(int position) {
+                // When changing pages, reset the action bar actions since they are dependent
+                // on which page is currently active. An alternative approach is to have each
+                // fragment expose actions itself (rather than the activity exposing actions),
+                // but for simplicity, the activity provides the actions in this sample.
+                mActivity.invalidateOptionsMenu();
             }
-        }
-
-        //ImageLoader.getInstance().displayImage(thisPlay.playPhoto, playImage, options);
-
-        //get Play object
-
-
-        //get game for this play
-        Game thisBaseGame = GamesPerPlay.getBaseGame(thisPlay);
-
-        //add a textview with the game name
-        TextView gameName = (TextView) viewPlayLayout.findViewById(R.id.gameName);
-        gameName.setText(thisBaseGame.gameName);
-        gameName.setTransitionName(nameTransID);
-
-
-
-        //date
-        TextView playDate = (TextView) viewPlayLayout.findViewById(R.id.gameDate);
-        DateFormat outputFormatter = new SimpleDateFormat("MM/dd/yyyy");
-        String output = outputFormatter.format(thisPlay.playDate); // Output : 01/20/2010
-        playDate.setText(output);
-        playDate.setTransitionName(dateTransID);
-
-        //expansions
-        List<GamesPerPlay> expansions = GamesPerPlay.getExpansions(thisPlay);
-        for(GamesPerPlay expansion:expansions){
-            addGame(expansion.game);
-        }
-
-        List<PlayersPerPlay> players = PlayersPerPlay.getPlayers_Winners(thisPlay);
-        int highScore = PlayersPerPlay.getHighScore(thisPlay);
-        for(PlayersPerPlay player:players){
-            Player thisPlayer = player.player;
-            if (player.score < highScore) {
-                addPlayer(thisPlayer.playerName, "" + player.score, false);
-            } else {
-                addPlayer(thisPlayer.playerName, "" + player.score, true);
-            }
-        }
-
-        //output note
-        TextView showNote = (TextView) viewPlayLayout.findViewById(R.id.notesText);
-        if (!thisPlay.playNotes.equals("")) {
-            showNote.setText("\"" + thisPlay.playNotes + "\"");
-            showNote.setTextSize(24);
-            showNote.setTypeface(null, Typeface.ITALIC);
-        }else{
-            showNote.setVisibility(View.GONE);
-        }
+        });
         return viewPlayLayout;
     }
 
-    private void addPlayer(String playerName, String score, boolean winnerFlag) {
-        // Instantiate a new "row" view.
-        final ViewGroup newView = (ViewGroup) LayoutInflater.from(mActivity).inflate(
-                R.layout.play_viewplayer_item, mContainerView_Players, false);
 
-        TextView playerView = (TextView) newView.findViewById(R.id.player);
-        TextView scoreView = (TextView) newView.findViewById(R.id.score);
-        playerView.setText(playerName);
-        scoreView.setText(score);
-        if (winnerFlag){
-            playerView.setTextSize(20);
-            scoreView.setTextSize(20);
-            playerView.setTypeface(null, Typeface.BOLD);
-            scoreView.setTypeface(null, Typeface.BOLD);
-        }else{
-            playerView.setTextSize(16);
-            scoreView.setTextSize(16);
-        }
-
-        mContainerView_Players.addView(newView);
-    }
-
-    private void addGame(Game game){
-        final ViewGroup newView = (ViewGroup) LayoutInflater.from(mActivity).inflate(
-                R.layout.play_showexpansions_item, mContainerView_Expansions, false);
-
-        TextView gameName = (TextView) newView.findViewById(R.id.gameName);
-        gameName.setText(game.gameName);
-        mContainerView_Expansions.addView(newView);
-    }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(String string) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(string);
-        }
+    public void resetPager(){
+        mPager.setCurrentItem(adapterPosition);
     }
 
     @Override
@@ -212,13 +147,14 @@ public class ViewPlayFragment extends Fragment {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
+        long menuPlayId = ((MainActivity)mActivity).mPlayAdapter.plays.get(mPager.getCurrentItem()).getId();
         //noinspection SimplifiableIfStatement
         if (id == R.id.edit_play) {
-            ((MainActivity) mActivity).openAddPlay(this, GamesPerPlay.getBaseGame(Play.findById(Play.class, playID)).gameName, playID);
+            mPager.getCurrentItem();
+            ((MainActivity) mActivity).openAddPlay(this, GamesPerPlay.getBaseGame(Play.findById(Play.class, menuPlayId)).gameName, menuPlayId);
             return true;
         }else if (id == R.id.delete_play) {
-            ((MainActivity) mActivity).deletePlay(playID, true);
+            ((MainActivity) mActivity).deletePlay(menuPlayId, true);
             return true;
         }
 
@@ -268,5 +204,65 @@ public class ViewPlayFragment extends Fragment {
         // TODO: Update argument type and name
 
         public void onFragmentInteraction(String string);
+    }
+
+
+    private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
+        public ScreenSlidePagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            return ViewPlayFragment_Pages.newInstance(((MainActivity)mActivity).mPlayAdapter.plays.get(position).getId(), "imageTrans"+position, "nameTrans"+position, "dateTrans"+position);
+        }
+
+        @Override
+        public int getCount() {
+            if (mActivity != null) {
+                return ((MainActivity) mActivity).mPlayAdapter.plays.size();
+            }else{
+                return 0;
+            }
+        }
+
+
+    }
+
+    public class DepthPageTransformer implements ViewPager.PageTransformer {
+        private static final float MIN_SCALE = 0.75f;
+
+        public void transformPage(View view, float position) {
+            int pageWidth = view.getWidth();
+
+            if (position < -1) { // [-Infinity,-1)
+                // This page is way off-screen to the left.
+                view.setAlpha(0);
+
+            } else if (position <= 0) { // [-1,0]
+                // Use the default slide transition when moving to the left page
+                view.setAlpha(1);
+                view.setTranslationX(0);
+                view.setScaleX(1);
+                view.setScaleY(1);
+
+            } else if (position <= 1) { // (0,1]
+                // Fade the page out.
+                view.setAlpha(1 - position);
+
+                // Counteract the default slide transition
+                view.setTranslationX(pageWidth * -position);
+
+                // Scale the page down (between MIN_SCALE and 1)
+                float scaleFactor = MIN_SCALE
+                        + (1 - MIN_SCALE) * (1 - Math.abs(position));
+                view.setScaleX(scaleFactor);
+                view.setScaleY(scaleFactor);
+
+            } else { // (1,+Infinity]
+                // This page is way off-screen to the right.
+                view.setAlpha(0);
+            }
+        }
     }
 }

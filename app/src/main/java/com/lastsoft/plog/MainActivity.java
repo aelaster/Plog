@@ -10,12 +10,14 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.SharedElementCallback;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.transition.TransitionInflater;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -59,6 +61,8 @@ public class MainActivity extends ActionBarActivity
     private AddPlayFragment mAddPlayFragment;
     private AddGroupFragment mAddGroupFragment;
     private ViewPlayFragment mViewPlayFragment;
+    PlaysFragment mPlaysFragment;
+    PlayAdapter mPlayAdapter;
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -119,8 +123,10 @@ public class MainActivity extends ActionBarActivity
             fragUp = false;
         }
         if (position == 2){
+            mPlaysFragment = new PlaysFragment();
+            mPlayAdapter = new PlayAdapter(this, mPlaysFragment);
             fragmentManager.beginTransaction()
-                    .replace(R.id.container, new PlaysFragment(), "plays")
+                    .replace(R.id.container, mPlaysFragment, "plays")
                     .commit();
         }else if (position == 1){
             fragmentManager.beginTransaction()
@@ -268,7 +274,7 @@ public class MainActivity extends ActionBarActivity
         fragmentManager.executePendingTransactions(); //Prevents the flashing.
     }
 
-    public void onPlayClicked(Play clickedPlay, Fragment mFragment, View view, View nameView, View dateView){
+    public void onPlayClicked(Play clickedPlay, Fragment mFragment, View view, View nameView, View dateView, int position){
         try{
             InputMethodManager inputManager = (InputMethodManager)
                     getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -285,14 +291,27 @@ public class MainActivity extends ActionBarActivity
 
 
 
-        if (view != null) {
-            mViewPlayFragment = ViewPlayFragment.newInstance(clickedPlay.getId(),view.getTransitionName(), nameView.getTransitionName(), dateView.getTransitionName());
-            ft.addSharedElement(view, view.getTransitionName());
-        }else{
-            mViewPlayFragment = ViewPlayFragment.newInstance(clickedPlay.getId(),null, nameView.getTransitionName(), dateView.getTransitionName());
-        }
+
+        mViewPlayFragment = ViewPlayFragment.newInstance(clickedPlay.getId(),view.getTransitionName(), nameView.getTransitionName(), dateView.getTransitionName(), position);
+        ft.addSharedElement(view, view.getTransitionName());
+
         mViewPlayFragment.setSharedElementEnterTransition(TransitionInflater.from(this).inflateTransition(R.transition.change_image_transform));
-        mViewPlayFragment.setEnterTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.explode));
+        mViewPlayFragment.setEnterTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.slide_bottom));
+        mViewPlayFragment.setEnterSharedElementCallback(new SharedElementCallback() {
+            @Override
+            public void onSharedElementStart(List<String> sharedElementNames,
+                                             List<View> sharedElements, List<View> sharedElementSnapshots) {
+                /*for (String elementName : sharedElementNames) {
+                    postponeEnterTransition();
+                    Log.d("V1", elementName);
+                }
+                for (View sharedElement : sharedElements) {
+
+                }*/
+            }
+        });
+
+        //Log.d("V1", "nameView.getTransitionName() = " + nameView.getTransitionName());
 
         ft.addSharedElement(nameView, nameView.getTransitionName());
         ft.addSharedElement(dateView, dateView.getTransitionName());
@@ -322,7 +341,7 @@ public class MainActivity extends ActionBarActivity
         //mAddPlayFragment.setEnterTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.slide_bottom));
         //mAddPlayFragment.setExitTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.slide_top));
         ft.setCustomAnimations(R.anim.slide_in_bottom, R.anim.slide_out_top, R.anim.slide_in_top, R.anim.slide_out_bottom);
-        ft.replace(R.id.container, mAddPlayFragment, "add_play");
+        ft.add(R.id.container, mAddPlayFragment, "add_play");
         ft.addToBackStack("add_play");
         ft.commit();
 
@@ -458,6 +477,16 @@ public class MainActivity extends ActionBarActivity
         }
         //Log.d("V1", id);
     }
+
+    public void scrollPlays(int position){
+        if (mPlaysFragment != null){
+            mPlaysFragment.mRecyclerView.scrollToPosition(position);
+            mPlaysFragment.mLayoutManager.scrollToPosition(position);
+        }else{
+            Log.d("V1", "plays fragment is null");
+        }
+    }
+
     @Override
     public void onBackPressed(){
         if (mNavigationDrawerFragment.isDrawerOpen() == false) {
@@ -469,6 +498,7 @@ public class MainActivity extends ActionBarActivity
             } else {
                 //super.onBackPressed();
                 if (mViewPlayFragment != null){
+                    overridePendingTransition(0,0);
                     super.onBackPressed();
                     mViewPlayFragment = null;
                 }else {

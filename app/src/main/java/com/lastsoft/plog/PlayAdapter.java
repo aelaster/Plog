@@ -44,7 +44,7 @@ import java.util.List;
 public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
     private static final String TAG = "PlayAdapter";
 
-    private List<Play> plays;
+    List<Play> plays;
     private DisplayImageOptions options;
     private String searchQuery;
     private Activity myActivity;
@@ -139,11 +139,7 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
             viewHolder.getView().setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (plays.get(position).playPhoto != null && !plays.get(position).playPhoto.equals("") && GamesPerPlay.getBaseGame(plays.get(position)).gameThumb == null) {
-                        ((MainActivity) myActivity).onPlayClicked(plays.get(position), myFragment, null, viewHolder.getGameNameView(), viewHolder.getPlayDateView());
-                    } else {
-                        ((MainActivity) myActivity).onPlayClicked(plays.get(position), myFragment, viewHolder.getImageView(), viewHolder.getGameNameView(), viewHolder.getPlayDateView());
-                    }
+                    ((MainActivity) myActivity).onPlayClicked(plays.get(position), myFragment, viewHolder.getImageView(), viewHolder.getGameNameView(), viewHolder.getPlayDateView(), position);
                 }
             });
             viewHolder.getOverflowView().setOnClickListener(new View.OnClickListener() {
