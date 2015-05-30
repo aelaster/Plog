@@ -217,6 +217,13 @@ public class AddPlayFragment extends Fragment implements
         }
 
         playPhoto = (ImageView) rootView.findViewById(R.id.gamePhoto);
+        playPhoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mCurrentPhotoPath = "";
+                playPhoto.setImageDrawable(null);
+            }
+        });
         View photoButton = rootView.findViewById(R.id.takePhoto);
         photoButton.setOnClickListener(new View.OnClickListener() {
             @Override

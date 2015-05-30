@@ -304,6 +304,12 @@ public class GamesFragment extends Fragment{
         mRecyclerView.setAdapter(mAdapter);
     }
 
+    protected void updateDataset(){
+        int current = ((GameAdapter)mRecyclerView.getAdapter()).mPosition;
+        refreshDataset(false);
+        mRecyclerView.scrollToPosition(current);
+    }
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated

@@ -1,0 +1,12 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools" tools:context=".MainActivity">
+    <item android:id="@+id/delete_game" android:title="@string/delete"
+        app:showAsAction="withText|ifRoom" />
+    <item android:id="@+id/add_tenbyten" android:title="@string/add_tenbyten"
+        app:showAsAction="withText|ifRoom" />
+    <item android:id="@+id/update_bgg" android:title="@string/update_bgg"
+        app:showAsAction="withText|ifRoom" />
+    <!--<item android:id="@+id/action_settings" android:title="@string/action_settings"
+        android:orderInCategory="100" app:showAsAction="never" />-->
+</menu>

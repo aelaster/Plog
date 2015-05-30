@@ -30,6 +30,7 @@ import android.view.ViewGroup;
 import com.lastsoft.plog.db.Player;
 
 import net.i2p.android.ext.floatingactionbutton.FloatingActionButton;
+import net.i2p.android.ext.floatingactionbutton.FloatingActionsMenu;
 
 import java.util.List;
 
@@ -59,7 +60,7 @@ public class PlayersFragment extends Fragment{
     private SwipeRefreshLayout pullToRefreshView;
 
     private OnFragmentInteractionListener mListener;
-
+    FloatingActionsMenu fabMenu;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -78,6 +79,8 @@ public class PlayersFragment extends Fragment{
 
         // BEGIN_INCLUDE(initializeRecyclerView)
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerView);
+
+        fabMenu = (FloatingActionsMenu) rootView.findViewById(R.id.multiple_actions);
 
         FloatingActionButton addPlayer = (FloatingActionButton) rootView.findViewById(R.id.add_player);
         addPlayer.setOnClickListener(new View.OnClickListener() {

@@ -27,6 +27,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.lastsoft.plog.db.Game;
@@ -46,6 +47,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
     private String searchQuery;
     private Activity myActivity;
     private Fragment myFragment;
+    int mPosition;
 
     // BEGIN_INCLUDE(recyclerViewSampleViewHolder)
     /**
@@ -55,6 +57,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
         private final TextView textView;
         private final ImageView imageView;
         private final ImageView overflowView;
+        private final LinearLayout clickLayout;
         private final View myView;
 
         public ViewHolder(View v) {
@@ -69,6 +72,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
             textView = (TextView) v.findViewById(R.id.gameName);
             imageView = (ImageView) v.findViewById(R.id.imageView1);
             overflowView = (ImageView) v.findViewById(R.id.overflowMenu);
+            clickLayout = (LinearLayout) v.findViewById(R.id.clickLayout);
             myView = v;
         }
 
@@ -83,6 +87,9 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
         }
         public View getView() {
             return myView;
+        }
+        public LinearLayout getClickLayout() {
+            return clickLayout;
         }
     }
     // END_INCLUDE(recyclerViewSampleViewHolder)
@@ -137,7 +144,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
                     playPopup(view, position);
                 }
             });
-            viewHolder.getView().setOnClickListener(new View.OnClickListener() {
+            viewHolder.getClickLayout().setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     ((MainActivity)myActivity).openAddPlay(myFragment, games.get(position).gameName, -1);
@@ -158,7 +165,11 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
         PopupMenu popup = new PopupMenu(myActivity, v);
 
         MenuInflater inflater = popup.getMenuInflater();
-        inflater.inflate(R.menu.game_overflow, popup.getMenu());
+        if(games.get(position).gameBGGID.equals("")){
+            inflater.inflate(R.menu.game_overflow_update, popup.getMenu());
+        }else {
+            inflater.inflate(R.menu.game_overflow, popup.getMenu());
+        }
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
@@ -172,6 +183,12 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
                         //delete the play
                         //refresh play list
                         ((MainActivity) myActivity).addToTenXTen(games.get(position).getId());
+                        return true;
+                    case R.id.update_bgg:
+                        //delete the play
+                        //refresh play list
+                        mPosition = position;
+                        ((MainActivity) myActivity).updateGameViaBGG(games.get(position).gameName);
                         return true;
                     default:
                         return false;

@@ -57,7 +57,7 @@ public class LoadGamesTask extends AsyncTask<String, Void, String> {
             if (currentDefaultPlayer >=0 ) {
                 Player defaultPlayer = Player.findById(Player.class, currentDefaultPlayer);
                 if (defaultPlayer != null) {
-                    Log.d("V1", "https://www.boardgamegeek.com/xmlapi2/collection?username=" + defaultPlayer.bggUsername);
+                    //Log.d("V1", "https://www.boardgamegeek.com/xmlapi2/collection?username=" + defaultPlayer.bggUsername);
                     url = new URL("https://www.boardgamegeek.com/xmlapi2/collection?username=" + defaultPlayer.bggUsername);
                     URLConnection ucon = url.openConnection();
                     ucon.setConnectTimeout(3000);
@@ -104,7 +104,7 @@ public class LoadGamesTask extends AsyncTask<String, Void, String> {
                             //mDataset_Thumb = new String[total];
                         } else if (name.equals("item")) {
                             //Log.d("V1", "name = " + mDataset[i]);
-                            if (readEntry(parser, i, readBGGID(parser)) != null) {
+                            if (readEntry(parser, readBGGID(parser)) != null) {
                                 i++;
                             }
                         } else {
@@ -159,7 +159,7 @@ public class LoadGamesTask extends AsyncTask<String, Void, String> {
                             //mDataset_Thumb = new String[total];
                         } else if (name.equals("item")) {
                             //Log.d("V1", "name = " + mDataset[i]);
-                                readEntry_Expansion(parser, i);
+                                readEntry_Expansion(parser);
                             i++;
                         } else {
                             skip(parser);
@@ -178,7 +178,7 @@ public class LoadGamesTask extends AsyncTask<String, Void, String> {
 
     }
 
-    private Game readEntry(XmlPullParser parser, int i, String gameBGGID) throws XmlPullParserException, IOException {
+    private Game readEntry(XmlPullParser parser, String gameBGGID) throws XmlPullParserException, IOException {
         String gameName = "", gameThumb = "", gameOwn = "", gameImage = "";
 
         parser.require(XmlPullParser.START_TAG, null, "item");
@@ -219,7 +219,7 @@ public class LoadGamesTask extends AsyncTask<String, Void, String> {
 
     }
 
-    private void readEntry_Expansion(XmlPullParser parser, int i) throws XmlPullParserException, IOException {
+    private void readEntry_Expansion(XmlPullParser parser) throws XmlPullParserException, IOException {
         String gameName = "", gameOwn = "";
 
         parser.require(XmlPullParser.START_TAG, null, "item");

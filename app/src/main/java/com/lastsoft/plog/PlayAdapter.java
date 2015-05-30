@@ -27,6 +27,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.lastsoft.plog.db.GamesPerPlay;
@@ -59,6 +60,7 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
         private final TextView playDateView;
         private final ImageView imageView;
         private final ImageView overflowView;
+        private final LinearLayout clickLayout;
         private final View myView;
 
         public ViewHolder(View v) {
@@ -74,6 +76,7 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
             playDateView = (TextView) v.findViewById(R.id.playDate);
             imageView = (ImageView) v.findViewById(R.id.imageView1);
             overflowView = (ImageView) v.findViewById(R.id.overflowMenu);
+            clickLayout = (LinearLayout) v.findViewById(R.id.clickLayout);
             myView = v;
         }
 
@@ -91,6 +94,9 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
         }
         public View getView() {
             return myView;
+        }
+        public LinearLayout getClickLayout() {
+            return clickLayout;
         }
     }
     // END_INCLUDE(recyclerViewSampleViewHolder)
@@ -136,7 +142,7 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
             viewHolder.getImageView().setTransitionName("imageTrans" + position);
             viewHolder.getGameNameView().setTransitionName("nameTrans" + position);
             viewHolder.getPlayDateView().setTransitionName("dateTrans" + position);
-            viewHolder.getView().setOnClickListener(new View.OnClickListener() {
+            viewHolder.getClickLayout().setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     ((MainActivity) myActivity).onPlayClicked(plays.get(position), myFragment, viewHolder.getImageView(), viewHolder.getGameNameView(), viewHolder.getPlayDateView(), position);

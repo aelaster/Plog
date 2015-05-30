@@ -20,6 +20,7 @@
     <string name="filter_games">Filter Games</string>
     <string name="calculating">Calculating...</string>
     <string name="add_tenbyten">Add to 10x10</string>
+    <string name="update_bgg">Update Info via BGG</string>
 
 
     <string name="color">Color</string>
@@ -59,6 +60,8 @@
     <string name="delete">Delete</string>
     <string name="choose_task">Choose:</string>
     <string name="default_player">Default User</string>
+    <string name="choose_groups">Choose Groups</string>
+    <string name="contacting_the_geek">Contacting the Geek...</string>
 
     <string-array name="color_choices">
         <item>Blue</item>

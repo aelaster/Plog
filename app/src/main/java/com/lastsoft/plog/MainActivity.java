@@ -28,16 +28,19 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import com.lastsoft.plog.db.Game;
+import com.lastsoft.plog.db.GameGroup;
 import com.lastsoft.plog.db.GamesPerPlay;
 import com.lastsoft.plog.db.Play;
 import com.lastsoft.plog.db.Player;
 import com.lastsoft.plog.db.PlayersPerGameGroup;
 import com.lastsoft.plog.db.PlayersPerPlay;
+import com.lastsoft.plog.db.TenByTen;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 
@@ -226,6 +229,13 @@ public class MainActivity extends ActionBarActivity
                 collectionFrag.refreshDataset(false);
                 onSectionAttached(1);
             }
+        }else if (id.contains("update_games")){
+            GamesFragment collectionFrag = (GamesFragment)
+                    getSupportFragmentManager().findFragmentByTag("games");
+            if (collectionFrag != null) {
+                collectionFrag.updateDataset();
+                onSectionAttached(1);
+            }
         }else if (id.contains("refresh_plays")){
             PlaysFragment playsFrag = (PlaysFragment)
                     getSupportFragmentManager().findFragmentByTag("plays");
@@ -370,7 +380,8 @@ public class MainActivity extends ActionBarActivity
         //prsent dialog of all available groups
         //just like expansions
         //this is also a way to remove them from the table
-        onFragmentInteraction("refresh_games");
+        TenByTenDialogFragment newFragment = new TenByTenDialogFragment().newInstance(gameId);
+        newFragment.show(getSupportFragmentManager(), "tenByTenPicker");
         //onBackPressed();
     }
 
@@ -385,6 +396,16 @@ public class MainActivity extends ActionBarActivity
 
         onFragmentInteraction("refresh_games");
         //onBackPressed();
+    }
+
+    GameUpdater gameUpdate;
+    public void updateGameViaBGG(String gameName){
+        gameUpdate = new GameUpdater(this);
+        try {
+            gameUpdate.execute(gameName);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void deletePlayer(long playerID){
@@ -502,7 +523,17 @@ public class MainActivity extends ActionBarActivity
                     super.onBackPressed();
                     mViewPlayFragment = null;
                 }else {
-                    mNavigationDrawerFragment.openDrawer();
+                    PlayersFragment playersFrag = (PlayersFragment)
+                            getSupportFragmentManager().findFragmentByTag("players");
+                    if (playersFrag != null){
+                        if (playersFrag.fabMenu.isExpanded()){
+                            playersFrag.fabMenu.collapse();
+                        }else{
+                            mNavigationDrawerFragment.openDrawer();
+                        }
+                    }else {
+                        mNavigationDrawerFragment.openDrawer();
+                    }
                 }
             }
         }else{
@@ -592,13 +623,26 @@ public class MainActivity extends ActionBarActivity
         }
     }
 
+    public class GameUpdater extends UpdateBGGTask {
+        public GameUpdater(Context context) {
+            super(context);
+        }
+
+        @Override
+        protected void onPostExecute(final String result) {
+            super.onPostExecute(result);
+            onFragmentInteraction("update_games");
+        }
+    }
+
     public class TenByTenDialogFragment extends DialogFragment {
 
-        public TenByTenDialogFragment newInstance(boolean[] checkedItems, String gameName) {
+        ArrayList<GameGroup> addedGroups;
+
+        public TenByTenDialogFragment newInstance(long gameId) {
             TenByTenDialogFragment frag = new TenByTenDialogFragment();
             Bundle args = new Bundle();
-            args.putBooleanArray("checkedItem", checkedItems);
-            args.putString("gameName", gameName);
+            args.putLong("gameId", gameId);
 
             frag.setArguments(args);
             return frag;
@@ -606,30 +650,39 @@ public class MainActivity extends ActionBarActivity
 
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
-            //final boolean[] checkedItems = getArguments().getBooleanArray("checkedItems");
-            /*final String gameName = getArguments().getString("gameName");
+            addedGroups = new ArrayList<GameGroup>();
+            List<String> gameGroupNames = new ArrayList<String>();
 
-            List<String> expansionNames = new ArrayList<String>();
-            for(Game expansion:expansions){
-                expansionNames.add(expansion.gameName);
+            final long gameId = getArguments().getLong("gameId");
+            final Game theGame = Game.findById(Game.class, gameId);
+            final List<GameGroup> gameGroups = GameGroup.listAll(GameGroup.class);
+
+            boolean checkedItems[] = new boolean[gameGroups.size()];
+            int i = 0;
+            for(GameGroup group:gameGroups){
+                gameGroupNames.add(group.groupName);
+                if (TenByTen.isGroupAdded(group, theGame)){
+                    checkedItems[i] = true;
+                }
+                i++;
             }
 
-            AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
             // Set the dialog title
             builder.setTitle(R.string.choose_expansions)
                     // Specify the list array, the items to be selected by default (null for none),
                     // and the listener through which to receive callbacks when items are selected
-                    .setMultiChoiceItems(expansionNames.toArray(new CharSequence[expansionNames.size()]), checkedItems,
+                    .setMultiChoiceItems(gameGroupNames.toArray(new CharSequence[gameGroupNames.size()]), checkedItems,
                             new DialogInterface.OnMultiChoiceClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which,
                                                     boolean isChecked) {
-                                    checkedItems[which] = isChecked;
-                                    Game checked = expansions.get(which);
-                                    if (isChecked){
-                                        addedExpansions.add(checked);
-                                    }else{
-                                        addedExpansions.remove(checked);
+                                    //checkedItems[which] = isChecked;
+                                    GameGroup checked = gameGroups.get(which);
+                                    if (isChecked) {
+                                        addedGroups.add(checked);
+                                    } else {
+                                        addedGroups.remove(checked);
                                     }
                                     //Log.d("V1", checked.gameName);
                                     //Log.d("V1", "isChecked="+isChecked);
@@ -639,13 +692,12 @@ public class MainActivity extends ActionBarActivity
                     .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int id) {
-                            clearGames();
-                            // User clicked OK, so save the checkedItems results somewhere
-                            // or return them to the component that opened the dialog
-                            //Log.d("V1", "addedExpansions size = " + addedExpansions.size());
-                            for (int i = 0; i < addedExpansions.size(); i++){
-                                Game addMe = addedExpansions.get(i);
-                                addGame(addMe);
+                            TenByTen.deleteTenByTen(gameId);
+                            Calendar calendar = Calendar.getInstance();
+                            int year = calendar.get(Calendar.YEAR);
+                            for (int i = 0; i < addedGroups.size(); i++) {
+                                TenByTen addMe = new TenByTen(theGame, addedGroups.get(i), year);
+                                addMe.save();
                             }
                         }
                     })
@@ -655,9 +707,7 @@ public class MainActivity extends ActionBarActivity
 
                         }
                     });
-            */
-            //return builder.create();
-            return null;
+            return builder.create();
         }
     }
 
