@@ -50,6 +50,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -180,7 +181,11 @@ public class AddPlayFragment extends Fragment implements
             }
         });*/
 
-        expansions = Game.findExpansionsFor(gameName);
+        try {
+            expansions = Game.findExpansionsFor(gameName);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
         checkedItems = new boolean[expansions.size()];
 
         mContainerView_Players = (ViewGroup) rootView.findViewById(R.id.container_players);
@@ -699,7 +704,7 @@ public class AddPlayFragment extends Fragment implements
             if (playID < 0) {
                 ((MainActivity) mActivity).getSupportActionBar().setDisplayShowCustomEnabled(true);
             } else {
-                onButtonPressed("refresh_plays");
+                //onButtonPressed("refresh_plays");
             }
             getFragmentManager().popBackStack();
             getFragmentManager().beginTransaction().remove(mfragment).commit();

@@ -305,9 +305,11 @@ public class GamesFragment extends Fragment{
     }
 
     protected void updateDataset(){
-        int current = ((GameAdapter)mRecyclerView.getAdapter()).mPosition;
+        //int current = ((GameAdapter)mRecyclerView.getAdapter()).mPosition;
+        int firstVisible = ((LinearLayoutManager) mRecyclerView.getLayoutManager())
+                .findFirstCompletelyVisibleItemPosition();
         refreshDataset(false);
-        mRecyclerView.scrollToPosition(current);
+        mRecyclerView.scrollToPosition(firstVisible);
     }
 
     /**

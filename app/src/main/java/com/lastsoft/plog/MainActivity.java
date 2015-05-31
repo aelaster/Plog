@@ -241,12 +241,12 @@ public class MainActivity extends ActionBarActivity
                     getSupportFragmentManager().findFragmentByTag("plays");
             if (playsFrag != null) {
                 playsFrag.refreshDataset();
-                onSectionAttached(3);
+                //onSectionAttached(3);
             }
 
             ViewPlayFragment viewPlaysFrag = (ViewPlayFragment)
                     getSupportFragmentManager().findFragmentByTag("view_play");
-            if (playsFrag != null) {
+            if (viewPlaysFrag != null) {
                 viewPlaysFrag.refreshPager();
             }
         }
@@ -352,7 +352,9 @@ public class MainActivity extends ActionBarActivity
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction ft = fragmentManager.beginTransaction();
+
         fragUp = true;
+
         mAddPlayFragment = AddPlayFragment.newInstance((int) 0, (int) 0, true, game_name, playID);
         //mAddPlayFragment.setEnterTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.slide_bottom));
         //mAddPlayFragment.setExitTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.slide_top));
@@ -364,7 +366,7 @@ public class MainActivity extends ActionBarActivity
         mTitle = game_name;
 
 
-        Handler handler = new Handler();
+        /*Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -378,7 +380,7 @@ public class MainActivity extends ActionBarActivity
                     collectionFrag.refreshDataset(false);
                 }
             }
-        }, 1000);
+        }, 1000);*/
 
     }
 
@@ -444,8 +446,8 @@ public class MainActivity extends ActionBarActivity
         }
         //delete GamesPerPay
         List<GamesPerPlay> games = GamesPerPlay.getGames(deleteMe);
-        for(PlayersPerPlay player:players){
-            player.delete();
+        for(GamesPerPlay game:games){
+            game.delete();
         }
 
         //delete play image
@@ -458,7 +460,7 @@ public class MainActivity extends ActionBarActivity
         onFragmentInteraction("refresh_plays");
         if (backFlag){
             //this was deleted via view
-            onNavigationDrawerItemSelected(2);
+            //onNavigationDrawerItemSelected(2);
         }
     }
 
@@ -565,6 +567,11 @@ public class MainActivity extends ActionBarActivity
         if (mAddPlayFragment != null){
             mAddPlayFragment.removeYourself();
             mAddPlayFragment = null;
+            GamesFragment collectionFrag = (GamesFragment)
+                    getSupportFragmentManager().findFragmentByTag("games");
+            if (collectionFrag != null) {
+                onSectionAttached(1);
+            }
         }
         if (mAddGroupFragment != null){
             mAddGroupFragment.removeYourself();

@@ -172,10 +172,14 @@ public class PlaysFragment extends Fragment{
 
 
     protected void refreshDataset(){
+        int firstVisible = ((LinearLayoutManager) mRecyclerView.getLayoutManager())
+                .findFirstCompletelyVisibleItemPosition();
+        //int current = ((PlayAdapter)mRecyclerView.getAdapter()).mPosition;
         mAdapter = new PlayAdapter(mActivity, this);
         ((MainActivity)mActivity).mPlayAdapter = mAdapter;
         // Set CustomAdapter as the adapter for RecyclerView.
         mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.scrollToPosition(firstVisible);
     }
 
     /**

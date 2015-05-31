@@ -5,6 +5,8 @@ import com.orm.SugarRecord;
 import com.orm.query.Condition;
 import com.orm.query.Select;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.List;
 
 /**
@@ -103,9 +105,9 @@ public class Game extends SugarRecord<Game> {
         return findBaseGames.list();
     }
 
-    public static List<Game> findExpansionsFor(String name){
+    public static List<Game> findExpansionsFor(String name) throws UnsupportedEncodingException {
         Select expansionsFor = Select.from(Game.class);
-        expansionsFor.where(Condition.prop(StringUtil.toSQLName("gameName")).like("%" + name + "%"), Condition.prop(StringUtil.toSQLName("expansionFlag")).eq("1"));
+        expansionsFor.where(Condition.prop(StringUtil.toSQLName("gameName")).like("%" + URLEncoder.encode(name, "UTF-8") + "%"), Condition.prop(StringUtil.toSQLName("expansionFlag")).eq("1"));
         expansionsFor.orderBy(StringUtil.toSQLName("gameName") + " ASC");
         return expansionsFor.list();
     }

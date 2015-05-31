@@ -50,6 +50,7 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
     private String searchQuery;
     private Activity myActivity;
     private Fragment myFragment;
+    int mPosition;
 
     // BEGIN_INCLUDE(recyclerViewSampleViewHolder)
     /**
@@ -182,6 +183,7 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
+                mPosition = position;
                 switch (item.getItemId()) {
                     case R.id.edit_play:
                         ((MainActivity) myActivity).openAddPlay(myFragment, GamesPerPlay.getBaseGame(plays.get(position)).gameName, plays.get(position).getId());
