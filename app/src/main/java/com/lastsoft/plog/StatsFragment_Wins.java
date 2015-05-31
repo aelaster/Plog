@@ -20,25 +20,15 @@ import com.lastsoft.plog.db.PlayersPerPlay;
 import java.util.ArrayList;
 import java.util.List;
 
-
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link StatsFragment_Wins.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link StatsFragment_Wins#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class StatsFragment_Wins extends Fragment {
 
-    private OnFragmentInteractionListener mListener;
     List<Player> groupPlayers;
     View statsView;
     private ViewGroup mContainerView_Players;
 
 
     // TODO: Rename and change types and number of parameters
-    public static StatsFragment_Wins newInstance(String param1, String param2) {
+    public static StatsFragment_Wins newInstance() {
         StatsFragment_Wins fragment = new StatsFragment_Wins();
         Bundle args = new Bundle();
         fragment.setArguments(args);
@@ -73,37 +63,18 @@ public class StatsFragment_Wins extends Fragment {
         return statsView;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(String string) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(string);
-        }
-    }
 
     Activity mActivity;
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         mActivity = activity;
-        try {
-            mListener = (OnFragmentInteractionListener) activity;
-            ((MainActivity) mActivity).onSectionAttached(4);
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
         mActivity = null;
-    }
-
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        public void onFragmentInteraction(String string);
     }
 
     public class LoadStatsTask extends AsyncTask<Long, Void, Long[]> {

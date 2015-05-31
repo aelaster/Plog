@@ -128,6 +128,11 @@ public class ViewPlayFragment extends Fragment {
     }
 
 
+
+    public void refreshPager() {
+        mPagerAdapter.notifyDataSetChanged();
+    }
+
     public void resetPager(){
         mPager.setCurrentItem(adapterPosition);
     }
@@ -160,6 +165,7 @@ public class ViewPlayFragment extends Fragment {
 
         return super.onOptionsItemSelected(item);
     }
+
 
     Activity mActivity;
     @Override
@@ -226,6 +232,10 @@ public class ViewPlayFragment extends Fragment {
             }
         }
 
+        @Override
+        public int getItemPosition(Object object) {
+            return POSITION_NONE;
+        }
 
     }
 

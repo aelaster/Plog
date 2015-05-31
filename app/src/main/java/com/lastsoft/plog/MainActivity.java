@@ -55,7 +55,6 @@ public class MainActivity extends ActionBarActivity
         GamesFragment.OnFragmentInteractionListener,
         ViewPlayFragment.OnFragmentInteractionListener,
         StatsFragment.OnFragmentInteractionListener,
-        StatsFragment_TenByTen.OnFragmentInteractionListener,
         View.OnClickListener {
 
 
@@ -146,7 +145,7 @@ public class MainActivity extends ActionBarActivity
                     .commit();
         }else if (position == 4){
             fragmentManager.beginTransaction()
-                    .replace(R.id.container, new StatsFragment_TenByTen(), "stats")
+                    .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
                     .commit();
         }else{
             super.onBackPressed();
@@ -243,6 +242,12 @@ public class MainActivity extends ActionBarActivity
             if (playsFrag != null) {
                 playsFrag.refreshDataset();
                 onSectionAttached(3);
+            }
+
+            ViewPlayFragment viewPlaysFrag = (ViewPlayFragment)
+                    getSupportFragmentManager().findFragmentByTag("view_play");
+            if (playsFrag != null) {
+                viewPlaysFrag.refreshPager();
             }
         }
     }
@@ -520,10 +525,11 @@ public class MainActivity extends ActionBarActivity
             } else {
                 //super.onBackPressed();
                 if (mViewPlayFragment != null){
+                    mViewPlayFragment.setSharedElementReturnTransition(TransitionInflater.from(this).inflateTransition(R.transition.change_image_transform));
                     int holder = mViewPlayFragment.mPager.getCurrentItem();
                     super.onBackPressed();
                     mViewPlayFragment = null;
-                    mPlaysFragment.mRecyclerView.scrollToPosition(holder);
+                    //mPlaysFragment.mRecyclerView.scrollToPosition(holder);
                 }else {
                     PlayersFragment playersFrag = (PlayersFragment)
                             getSupportFragmentManager().findFragmentByTag("players");

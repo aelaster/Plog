@@ -56,6 +56,9 @@
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
 
+    <string name="tab0">Wins</string>
+    <string name="tab1">10x10</string>
+
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
     <string name="choose_task">Choose:</string>

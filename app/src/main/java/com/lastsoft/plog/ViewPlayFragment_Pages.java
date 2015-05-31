@@ -68,6 +68,8 @@ public class ViewPlayFragment_Pages extends Fragment {
         setHasOptionsMenu(true);
     }
 
+
+
     View viewPlayLayout;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

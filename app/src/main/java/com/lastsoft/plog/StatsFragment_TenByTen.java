@@ -37,14 +37,13 @@ import java.util.List;
  */
 public class StatsFragment_TenByTen extends Fragment {
 
-    private OnFragmentInteractionListener mListener;
     List<Player> groupPlayers;
     View statsView;
     private ViewGroup mContainerView_Players;
 
 
     // TODO: Rename and change types and number of parameters
-    public static StatsFragment_TenByTen newInstance(String param1, String param2) {
+    public static StatsFragment_TenByTen newInstance() {
         StatsFragment_TenByTen fragment = new StatsFragment_TenByTen();
         Bundle args = new Bundle();
         fragment.setArguments(args);
@@ -79,37 +78,17 @@ public class StatsFragment_TenByTen extends Fragment {
         return statsView;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(String string) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(string);
-        }
-    }
-
     Activity mActivity;
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         mActivity = activity;
-        try {
-            mListener = (OnFragmentInteractionListener) activity;
-            ((MainActivity) mActivity).onSectionAttached(4);
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
         mActivity = null;
-    }
-
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        public void onFragmentInteraction(String string);
     }
 
     public class LoadStatsTask extends AsyncTask<Long, Void, Integer[]> {

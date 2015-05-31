@@ -39,7 +39,7 @@ public class Play extends SugarRecord<Play> {
 
     public static List<Play> listPlaysNewOld(){
         Select dateSort_NewOld = Select.from(Play.class);
-        dateSort_NewOld.orderBy(StringUtil.toSQLName("playDate") + " DESC");
+        dateSort_NewOld.orderBy(StringUtil.toSQLName("playDate") + " DESC, " + StringUtil.toSQLName("ID") + " DESC");
 
         return dateSort_NewOld.list();
     }
