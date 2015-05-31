@@ -572,6 +572,16 @@ public class MainActivity extends ActionBarActivity
             if (collectionFrag != null) {
                 onSectionAttached(1);
             }
+            ViewPlayFragment viewPlayFrag = (ViewPlayFragment)
+                    getSupportFragmentManager().findFragmentByTag("view_play");
+            if (viewPlayFrag != null) {
+                onSectionAttached(3);
+            }
+            PlaysFragment playsFrag = (PlaysFragment)
+                    getSupportFragmentManager().findFragmentByTag("plays");
+            if (playsFrag != null) {
+                onSectionAttached(3);
+            }
         }
         if (mAddGroupFragment != null){
             mAddGroupFragment.removeYourself();

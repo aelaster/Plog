@@ -214,19 +214,22 @@ public class ViewPlayFragment extends Fragment {
 
 
     private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
+        PlayAdapter mAdapter;
         public ScreenSlidePagerAdapter(FragmentManager fm) {
             super(fm);
+            mAdapter = new PlayAdapter(mActivity, ViewPlayFragment.this);
         }
 
         @Override
         public Fragment getItem(int position) {
-            return ViewPlayFragment_Pages.newInstance(((MainActivity)mActivity).mPlayAdapter.plays.get(position).getId(), "imageTrans"+position, "nameTrans"+position, "dateTrans"+position);
+            //return ViewPlayFragment_Pages.newInstance(((MainActivity)mActivity).mPlayAdapter.plays.get(position).getId(), "imageTrans"+position, "nameTrans"+position, "dateTrans"+position);
+            return ViewPlayFragment_Pages.newInstance(mAdapter.plays.get(position).getId(), "imageTrans"+position, "nameTrans"+position, "dateTrans"+position);
         }
 
         @Override
         public int getCount() {
             if (mActivity != null) {
-                return ((MainActivity) mActivity).mPlayAdapter.plays.size();
+                return mAdapter.plays.size();
             }else{
                 return 0;
             }

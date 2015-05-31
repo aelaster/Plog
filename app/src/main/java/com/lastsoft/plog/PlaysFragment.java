@@ -87,8 +87,8 @@ public class PlaysFragment extends Fragment{
         }
         setRecyclerViewLayoutManager(mCurrentLayoutManagerType);
 
-        //mAdapter = new PlayAdapter(mActivity, this);
-        mAdapter = ((MainActivity)mActivity).mPlayAdapter;
+        mAdapter = new PlayAdapter(mActivity, this);
+        //mAdapter = ((MainActivity)mActivity).mPlayAdapter;
         // Set CustomAdapter as the adapter for RecyclerView.
         mRecyclerView.setAdapter(mAdapter);
 
@@ -176,7 +176,7 @@ public class PlaysFragment extends Fragment{
                 .findFirstCompletelyVisibleItemPosition();
         //int current = ((PlayAdapter)mRecyclerView.getAdapter()).mPosition;
         mAdapter = new PlayAdapter(mActivity, this);
-        ((MainActivity)mActivity).mPlayAdapter = mAdapter;
+        //((MainActivity)mActivity).mPlayAdapter = mAdapter;
         // Set CustomAdapter as the adapter for RecyclerView.
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.scrollToPosition(firstVisible);
