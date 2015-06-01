@@ -8,6 +8,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -49,6 +52,9 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
@@ -470,9 +476,58 @@ public class AddPlayFragment extends Fragment implements
                 .build();
         if (requestCode == 0 && resultCode == -1) {
             ImageLoader.getInstance().displayImage(mCurrentPhotoPath, playPhoto, options);
-        }else if (resultCode == -1 && (requestCode == ChooserType.REQUEST_PICK_PICTURE || requestCode == ChooserType.REQUEST_CAPTURE_PICTURE)) {
+
+
+
+
+            try {
+                String fixedPath = mCurrentPhotoPath.substring(6, mCurrentPhotoPath.length());
+                String thumbPath = fixedPath.substring(0, fixedPath.length() - 4) + "_thumb.jpg";
+                FileInputStream fis;
+                fis = new FileInputStream(fixedPath);
+                Bitmap imageBitmap = BitmapFactory.decodeStream(fis);
+                Bitmap b = resizeImageForImageView(imageBitmap, 500);
+                if (b != null) {
+                    try {
+                        b.compress(Bitmap.CompressFormat.JPEG, 100, new FileOutputStream(new File(thumbPath)));
+                    } catch (Exception e) {
+                        // TODO Auto-generated catch block
+                    }
+                    b = null;
+                }else{
+                    Log.d("V1", "b is null");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+    }else if (resultCode == -1 && (requestCode == ChooserType.REQUEST_PICK_PICTURE || requestCode == ChooserType.REQUEST_CAPTURE_PICTURE)) {
             imageChooserManager.submit(requestCode, data);
         }
+    }
+
+
+    public Bitmap resizeImageForImageView(Bitmap bitmap, int size) {
+        Bitmap resizedBitmap = null;
+        int originalWidth = bitmap.getWidth();
+        int originalHeight = bitmap.getHeight();
+        int newWidth = -1;
+        int newHeight = -1;
+        float multFactor = -1.0F;
+        if(originalHeight > originalWidth) {
+            newHeight = size;
+            multFactor = (float) originalWidth/(float) originalHeight;
+            newWidth = (int) (newHeight*multFactor);
+        } else if(originalWidth > originalHeight) {
+            newWidth = size;
+            multFactor = (float) originalHeight/ (float)originalWidth;
+            newHeight = (int) (newWidth*multFactor);
+        } else if(originalHeight == originalWidth) {
+            newHeight = size;
+            newWidth = size;
+        }
+        resizedBitmap = Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, false);
+        return resizedBitmap;
     }
 
 

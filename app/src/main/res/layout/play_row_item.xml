@@ -20,14 +20,18 @@
             android:layout_weight="1"
             android:orientation="horizontal"
             android:id="@+id/clickLayout"
+            android:layout_gravity="center"
             >
 
             <ImageView
                 android:layout_width="70dp"
                 android:layout_height="70dp"
+                android:maxHeight="70dp"
+                android:maxWidth="70dp"
                 android:id="@+id/imageView1"
                 android:layout_marginRight="16dp"
                 android:scaleType="centerCrop"
+                android:layout_gravity="center"
                 />
 
                 <RelativeLayout

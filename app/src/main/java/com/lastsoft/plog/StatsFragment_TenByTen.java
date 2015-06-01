@@ -26,15 +26,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link StatsFragment_TenByTen.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link StatsFragment_TenByTen#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class StatsFragment_TenByTen extends Fragment {
 
     List<Player> groupPlayers;
@@ -180,9 +171,13 @@ public class StatsFragment_TenByTen extends Fragment {
 
         @Override
         protected void onPostExecute ( final Integer[] result){
+            int totalPlayed = 0;
             for(int x = 0; x < result.length; x++) {
-                addStat(gamesToCheck.get(x).game.gameName + " Plays:", result[x]+"");
+                //addStat(gamesToCheck.get(x).game.gameName + " Plays:", result[x]+"");
+                addStat(gamesToCheck.get(x).game.gameName + ":", result[x]+"");
+                totalPlayed = totalPlayed + result[x];
             }
+            addStat("Percent Completed:", ((int) (totalPlayed * 100.0 / 100 + 0.5)) + "%");
             mydialog.dismiss();
         }
     }

@@ -17,6 +17,10 @@
 package com.lastsoft.plog;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.media.ThumbnailUtils;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -35,6 +39,9 @@ import com.lastsoft.plog.db.Play;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -163,13 +170,69 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
                     viewHolder.getImageView().setImageDrawable(null);
                 }
             }else{
-                ImageLoader.getInstance().displayImage(plays.get(position).playPhoto, viewHolder.getImageView(), options);
+                String thumbPathCheck = plays.get(position).playPhoto.substring(7, plays.get(position).playPhoto.length() - 4) + "_thumb.jpg";
+                String thumbPath = plays.get(position).playPhoto.substring(0, plays.get(position).playPhoto.length() - 4) + "_thumb.jpg";
+                if (new File(thumbPathCheck).exists()) {
+                    ImageLoader.getInstance().displayImage(thumbPath, viewHolder.getImageView(), options);
+                }else{
+                    ImageLoader.getInstance().displayImage(plays.get(position).playPhoto, viewHolder.getImageView(), options);
+
+                    // make a thumb
+                    String fixedPath = plays.get(position).playPhoto.substring(6, plays.get(position).playPhoto.length());
+                    String thumbPath2 = fixedPath.substring(0, fixedPath.length() - 4) + "_thumb.jpg";
+                    try {
+                        FileInputStream fis;
+                        fis = new FileInputStream(fixedPath);
+                        Bitmap imageBitmap = BitmapFactory.decodeStream(fis);
+                        Bitmap b = resizeImageForImageView(imageBitmap, 500);
+
+                        if (b != null) {
+                            try {
+                                b.compress(Bitmap.CompressFormat.JPEG,100, new FileOutputStream(new File(thumbPath2)));
+                            } catch (Exception e) {
+                                // TODO Auto-generated catch block
+                            }
+                            b = null;
+                        }
+                        if (imageBitmap != null){
+                            imageBitmap = null;
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    //still use the og picture.  next time there will be a thumb
+                }
                 ImageLoader.getInstance().loadImage(plays.get(position).playPhoto, options, null);
             }
     }
     // END_INCLUDE(recyclerViewOnBindViewHolder)
 
     // Return the size of your dataset (invoked by the layout manager)
+    public Bitmap resizeImageForImageView(Bitmap bitmap, int size) {
+        Bitmap resizedBitmap = null;
+        int originalWidth = bitmap.getWidth();
+        int originalHeight = bitmap.getHeight();
+        int newWidth = -1;
+        int newHeight = -1;
+        float multFactor = -1.0F;
+        if(originalHeight > originalWidth) {
+            newHeight = size;
+            multFactor = (float) originalWidth/(float) originalHeight;
+            newWidth = (int) (newHeight*multFactor);
+        } else if(originalWidth > originalHeight) {
+            newWidth = size;
+            multFactor = (float) originalHeight/ (float)originalWidth;
+            newHeight = (int) (newWidth*multFactor);
+        } else if(originalHeight == originalWidth) {
+            newHeight = size;
+            newWidth = size;
+        }
+        resizedBitmap = Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, false);
+        return resizedBitmap;
+    }
+
+
+
     @Override
     public int getItemCount() {
         return plays.size();

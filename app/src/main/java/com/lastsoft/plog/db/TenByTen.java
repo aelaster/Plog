@@ -37,9 +37,12 @@ public class TenByTen extends SugarRecord<TenByTen> {
     }
 
     public static List<TenByTen> tenByTens_Group(GameGroup group){
-        Select getPlayers = Select.from(TenByTen.class);
+        /*Select getPlayers = Select.from(TenByTen.class);
         getPlayers.where(Condition.prop(StringUtil.toSQLName("gameGroup")).eq(group.getId()));
-        return getPlayers.list();
+        return getPlayers.list();*/
+        return TenByTen.findWithQuery(TenByTen.class, "Select " + StringUtil.toSQLName("TenByTen") + ".* from " + StringUtil.toSQLName("Game") + "," + StringUtil.toSQLName("TenByTen") +
+                " where " + StringUtil.toSQLName("TenByTen") + "." + StringUtil.toSQLName("game") + " = " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("id") + " and " + StringUtil.toSQLName("TenByTen") + "." + StringUtil.toSQLName("gameGroup") + " = ? " +
+                " order by " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " ASC", ""+group.getId());
     }
 
     public static void deleteTenByTen(long gameID) {

@@ -459,8 +459,17 @@ public class MainActivity extends ActionBarActivity
         }
 
         //delete play image
-        File deleteImage = new File(deleteMe.playPhoto);
-        if (deleteImage.exists()) deleteImage.delete();
+        Log.d("V1", "play image = " + deleteMe.playPhoto);
+        File deleteImage = new File(deleteMe.playPhoto.substring(7, deleteMe.playPhoto.length()));
+        if (deleteImage.exists()){
+            deleteImage.delete();
+        }
+
+        //delete play image thumb
+        File deleteImage_thumb = new File(deleteMe.playPhoto.substring(7, deleteMe.playPhoto.length()-4) + "_thumb.jpg");
+        if (deleteImage_thumb.exists()){
+            deleteImage_thumb.delete();
+        }
 
         //delete play
         deleteMe.delete();
