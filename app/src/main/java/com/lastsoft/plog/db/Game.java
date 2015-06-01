@@ -1,5 +1,7 @@
 package com.lastsoft.plog.db;
 
+import android.util.Log;
+
 import com.orm.StringUtil;
 import com.orm.SugarRecord;
 import com.orm.query.Condition;
@@ -95,6 +97,9 @@ public class Game extends SugarRecord<Game> {
 
     public static List<Game> findBaseGames(String mSearchQuery){
         //return Game.find(Game.class, StringUtil.toSQLName("expansionFlag") + " = 0");
+        if (mSearchQuery.contains("'")) {
+            mSearchQuery = mSearchQuery.replaceAll("'", "''");
+        }
         Select findBaseGames = Select.from(Game.class);
         if (!mSearchQuery.equals("")) {
             findBaseGames.where(Condition.prop(StringUtil.toSQLName("gameName")).like("%" + mSearchQuery + "%"), Condition.prop(StringUtil.toSQLName("expansionFlag")).eq("0"));
@@ -106,8 +111,12 @@ public class Game extends SugarRecord<Game> {
     }
 
     public static List<Game> findExpansionsFor(String name) throws UnsupportedEncodingException {
+        if (name.contains("'")) {
+            name = name.replaceAll("'", "''");
+        }
+        Log.d("V1", name);
         Select expansionsFor = Select.from(Game.class);
-        expansionsFor.where(Condition.prop(StringUtil.toSQLName("gameName")).like("%" + URLEncoder.encode(name, "UTF-8") + "%"), Condition.prop(StringUtil.toSQLName("expansionFlag")).eq("1"));
+        expansionsFor.where(Condition.prop(StringUtil.toSQLName("gameName")).like("%" + name + "%"), Condition.prop(StringUtil.toSQLName("expansionFlag")).eq("1"));
         expansionsFor.orderBy(StringUtil.toSQLName("gameName") + " ASC");
         return expansionsFor.list();
     }
