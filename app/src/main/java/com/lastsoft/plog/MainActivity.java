@@ -11,6 +11,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.SharedElementCallback;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -114,6 +115,10 @@ public class MainActivity extends ActionBarActivity
         }
     }
 
+    public PlayAdapter initPlayAdapter(){
+        return new PlayAdapter(this, mPlaysFragment);
+    }
+
     @Override
     public void onNavigationDrawerItemSelected(int position) {
         // update the main content by replacing fragments
@@ -127,7 +132,8 @@ public class MainActivity extends ActionBarActivity
         }
         if (position == 2){
             mPlaysFragment = new PlaysFragment();
-            mPlayAdapter = new PlayAdapter(this, mPlaysFragment);
+            mPlayAdapter = initPlayAdapter();
+            initPlayAdapter();
             fragmentManager.beginTransaction()
                     .replace(R.id.container, mPlaysFragment, "plays")
                     .commit();
@@ -144,8 +150,11 @@ public class MainActivity extends ActionBarActivity
                     .replace(R.id.container, new StatsFragment(), "stats")
                     .commit();
         }else if (position == 4){
-            fragmentManager.beginTransaction()
+            /*fragmentManager.beginTransaction()
                     .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
+                    .commit();*/
+            fragmentManager.beginTransaction()
+                    .replace(R.id.container, new SetupWizardFragment(), "wizard")
                     .commit();
         }else{
             super.onBackPressed();
@@ -241,7 +250,6 @@ public class MainActivity extends ActionBarActivity
                     getSupportFragmentManager().findFragmentByTag("plays");
             if (playsFrag != null) {
                 playsFrag.refreshDataset();
-                //onSectionAttached(3);
             }
 
             ViewPlayFragment viewPlaysFrag = (ViewPlayFragment)
@@ -527,10 +535,14 @@ public class MainActivity extends ActionBarActivity
             } else {
                 //super.onBackPressed();
                 if (mViewPlayFragment != null){
-                    mViewPlayFragment.setSharedElementReturnTransition(TransitionInflater.from(this).inflateTransition(R.transition.change_image_transform));
-                    int holder = mViewPlayFragment.mPager.getCurrentItem();
-                    super.onBackPressed();
-                    mViewPlayFragment = null;
+                    if (mViewPlayFragment.isSwiping == ViewPager.SCROLL_STATE_IDLE) {
+                        mViewPlayFragment.setSharedElementReturnTransition(TransitionInflater.from(this).inflateTransition(R.transition.change_image_transform));
+                        //int holder = mViewPlayFragment.mPager.getCurrentItem();
+                        super.onBackPressed();
+                        mViewPlayFragment = null;
+                    }else{
+                        mViewPlayFragment.pendingBack = true;
+                    }
                     //mPlaysFragment.mRecyclerView.scrollToPosition(holder);
                 }else {
                     PlayersFragment playersFrag = (PlayersFragment)

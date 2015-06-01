@@ -78,6 +78,7 @@ public class ViewPlayFragment_Pages extends Fragment {
         viewPlayLayout = inflater.inflate(R.layout.fragment_view_play, container, false);
         viewPlayLayout.setBackgroundColor(getResources().getColor(R.color.cardview_initial_background));
         LinearLayout linLayout = (LinearLayout) viewPlayLayout.findViewById(R.id.linearLayout);
+        Log.d("V1", "playID = " + playID);
         Play thisPlay = Play.findById(Play.class, playID);
 
     //    Log.d("V1", "nameTransID = " + nameTransID);

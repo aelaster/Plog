@@ -14,8 +14,11 @@ import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.Toast;
 
@@ -98,6 +101,13 @@ public class AddPlayerFragment extends Fragment {
         final EditText playerName = (EditText) rootView.findViewById(R.id.playerName);
         final EditText bggUsername = (EditText) rootView.findViewById(R.id.bggUsername);
         final Switch defaultSwitch = (Switch) rootView.findViewById(R.id.defaultSwitch);
+        final Spinner color = (Spinner) rootView.findViewById(R.id.color);
+        ArrayAdapter<CharSequence> colorSpinnerArrayAdapter = ArrayAdapter.createFromResource(mActivity, R.array.color_choices, android.R.layout.simple_spinner_item);
+        colorSpinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); // The drop down view
+        color.setAdapter(colorSpinnerArrayAdapter);
+
+        /*MySpinnerListener colorListener = new MySpinnerListener(addedPlayer, 1);
+        color.setOnItemSelectedListener(colorListener);*/
 
         if (playerID >= 0){
             //edit me
@@ -105,6 +115,10 @@ public class AddPlayerFragment extends Fragment {
             playerName.setText(editPlayer.playerName);
             bggUsername.setText(editPlayer.bggUsername);
             button.setText(getString(R.string.edit_player));
+            if (editPlayer.defaultColor != null && !editPlayer.defaultColor.equals("")){
+                int spinnerPostion = colorSpinnerArrayAdapter.getPosition(editPlayer.defaultColor);
+                color.setSelection(spinnerPostion);
+            }
             if (app_preferences.getLong("defaultPlayer", -1) == playerID){
                 defaultSwitch.setChecked(true);
             }
@@ -146,11 +160,8 @@ public class AddPlayerFragment extends Fragment {
                         if (playerID >= 0) {
                             editPlayer.bggUsername = bggUsername.getText().toString();
                             editPlayer.playerName = playerName.getText().toString();
+                            editPlayer.defaultColor = color.getSelectedItem().toString();
                             editPlayer.save();
-
-
-
-
                         } else {
                             Player player = new Player(playerName.getText().toString(), bggUsername.getText().toString());
                             player.save();
@@ -178,6 +189,25 @@ public class AddPlayerFragment extends Fragment {
         });
         return rootView;
     }
+
+    /*public class MySpinnerListener implements AdapterView.OnItemSelectedListener{
+
+        private String playerColor;
+
+        public MySpinnerListener(String color) {
+            this.playerColor = color;
+        }
+
+        @Override
+        public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+            playerToUpdate.color = adapterView.getSelectedItem().toString();
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> adapterView) {
+
+        }
+    }*/
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(String string) {

@@ -32,13 +32,25 @@
             android:layout_below="@+id/full_name"
             android:layout_alignStart="@+id/full_name" />
 
-        <!--<Spinner
-            android:layout_width="fill_parent"
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/spinner"
-            android:layout_below="@+id/bggUsername"
-            android:layout_alignStart="@+id/bggUsername"
-            android:layout_alignEnd="@+id/bggUsername" />-->
+            >
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="@string/default_color"
+                android:id="@+id/textView2"
+                android:gravity="center" />
+
+            <Spinner
+                android:id="@+id/color"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                />
+
+        </LinearLayout>
 
         <Switch
             android:layout_width="wrap_content"

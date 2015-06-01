@@ -63,7 +63,7 @@ public class StatsFragment extends Fragment {
 
         // Instantiate a ViewPager and a PagerAdapter.
         mPager = (ViewPager) viewPlayLayout.findViewById(R.id.pager);
-        mPagerAdapter = new ScreenSlidePagerAdapter(getFragmentManager());
+        mPagerAdapter = new ScreenSlidePagerAdapter(getChildFragmentManager());
         mPager.setAdapter(mPagerAdapter);
         mPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override

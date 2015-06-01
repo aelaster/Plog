@@ -17,4 +17,8 @@
     <dimen name="swingview_pro_desc_box_textSize">18sp</dimen>
     <dimen name="swingview_pro_label_textSize">16sp</dimen>
     <dimen name="swingview_pro_image_text_padding">8dp</dimen>
+
+    <dimen name="step_pager_tab_width">32dp</dimen>
+    <dimen name="step_pager_tab_height">3dp</dimen>
+    <dimen name="step_pager_tab_spacing">4dp</dimen>
 </resources>

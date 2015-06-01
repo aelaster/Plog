@@ -113,6 +113,7 @@ public class AddPlayFragment extends Fragment implements
     Uri photoUri;
     File photoFile;
     ImageChooserManager imageChooserManager;
+    ArrayAdapter<CharSequence> colorSpinnerArrayAdapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -121,6 +122,8 @@ public class AddPlayFragment extends Fragment implements
             gameName = getArguments().getString("gameName");
             playID = getArguments().getLong("playID");
         }
+
+        colorSpinnerArrayAdapter = ArrayAdapter.createFromResource(mActivity, R.array.color_choices, android.R.layout.simple_spinner_item);
 
 
         ActionBar actionBar = ((MainActivity)mActivity).getSupportActionBar();
@@ -379,6 +382,7 @@ public class AddPlayFragment extends Fragment implements
         mContainerView_Expansions.removeAllViews();
     }
 
+
     private void addPlayer(final AddPlayer addedPlayer) {
         // Instantiate a new "row" view.
         final ViewGroup newView = (ViewGroup) LayoutInflater.from(mActivity).inflate(
@@ -391,27 +395,31 @@ public class AddPlayFragment extends Fragment implements
             int spinnerPostion = playerSpinnerArrayAdapter.getPosition(addedPlayer.playerName);
             player.setSelection(spinnerPostion);
         }
-        MySpinnerListener playerListener = new MySpinnerListener(addedPlayer, 2);
-        player.setOnItemSelectedListener(playerListener);
+
 
 
 
         EditText scoreValue = (EditText) newView.findViewById(R.id.score);
         scoreValue.addTextChangedListener(new MyTextWatcher(player, addedPlayer));
+        scoreValue.setSelectAllOnFocus(true);
         //if (addedPlayer.score != -9999999) {
             scoreValue.setText(""+addedPlayer.score);
         //}
 
 
         Spinner color = (Spinner) newView.findViewById(R.id.color);
-        ArrayAdapter<CharSequence> colorSpinnerArrayAdapter = ArrayAdapter.createFromResource(mActivity, R.array.color_choices, android.R.layout.simple_spinner_item);
+
         colorSpinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); // The drop down view
         color.setAdapter(colorSpinnerArrayAdapter);
         if (!addedPlayer.color.equals("")) {
             int spinnerPostion = colorSpinnerArrayAdapter.getPosition(addedPlayer.color);
             color.setSelection(spinnerPostion);
         }
-        MySpinnerListener colorListener = new MySpinnerListener(addedPlayer, 1);
+        //the player spinner needs to pass reference to the color spinner
+        MySpinnerListener playerListener = new MySpinnerListener(addedPlayer, color);
+        player.setOnItemSelectedListener(playerListener);
+        //the color spinner does not
+        MySpinnerListener colorListener = new MySpinnerListener(addedPlayer, null);
         color.setOnItemSelectedListener(colorListener);
 
         // Set a click listener for the "X" button in the row that will remove the row.
@@ -735,20 +743,27 @@ public class AddPlayFragment extends Fragment implements
     public class MySpinnerListener implements AdapterView.OnItemSelectedListener{
 
         private AddPlayer playerToUpdate;
-        private int updateType;
+        private Spinner colorSpinner;
 
-        public MySpinnerListener(AddPlayer thePlayer, int updateType) {
+        public MySpinnerListener(AddPlayer thePlayer, Spinner spinner) {
             this.playerToUpdate = thePlayer;
-            this.updateType = updateType;
+            this.colorSpinner = spinner;
         }
 
         @Override
         public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-            if(updateType == 1) {//color
+            if(colorSpinner == null) {//color
                 playerToUpdate.color = adapterView.getSelectedItem().toString();
-            }else if(updateType == 2) {//player
+            }else {//player
                 playerToUpdate.playerID = playersID.get(i);
                 playerToUpdate.playerName = playersName.get(i);
+                Player colorCheck = Player.findById(Player.class, playerToUpdate.playerID);
+                if (colorCheck.defaultColor != null &&  !colorCheck.defaultColor.equals("")){
+                    int spinnerPostion = colorSpinnerArrayAdapter.getPosition(colorCheck.defaultColor);
+                    colorSpinner.setSelection(spinnerPostion);
+                    playerToUpdate.color = colorSpinner.getSelectedItem().toString();
+                    //playerToUpdate.color.setSelection(spinnerPostion);
+                }
             }
         }
 

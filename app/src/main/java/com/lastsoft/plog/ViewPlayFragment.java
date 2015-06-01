@@ -101,6 +101,10 @@ public class ViewPlayFragment extends Fragment {
      */
     private PagerAdapter mPagerAdapter;
     View viewPlayLayout;
+
+    public int isSwiping = ViewPager.SCROLL_STATE_IDLE;
+    public boolean pendingBack = false;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -110,7 +114,7 @@ public class ViewPlayFragment extends Fragment {
 
         // Instantiate a ViewPager and a PagerAdapter.
         mPager = (ViewPager) viewPlayLayout.findViewById(R.id.pager);
-        mPagerAdapter = new ScreenSlidePagerAdapter(getFragmentManager());
+        mPagerAdapter = new ScreenSlidePagerAdapter(getChildFragmentManager());
         mPager.setAdapter(mPagerAdapter);
         mPager.setCurrentItem(adapterPosition);
         mPager.setPageTransformer(true, new DepthPageTransformer());
@@ -122,6 +126,15 @@ public class ViewPlayFragment extends Fragment {
                 // fragment expose actions itself (rather than the activity exposing actions),
                 // but for simplicity, the activity provides the actions in this sample.
                 mActivity.invalidateOptionsMenu();
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+                super.onPageScrollStateChanged(state);
+                isSwiping = state;
+                if (pendingBack){
+                    mActivity.onBackPressed();
+                }
             }
         });
         return viewPlayLayout;
@@ -190,8 +203,8 @@ public class ViewPlayFragment extends Fragment {
     @Override
     public void onDestroy() {
         // TODO Auto-generated method stub
+        Log.d("V1", "on destroy");
         super.onDestroy();
-        ((MainActivity)mActivity).unbindDrawables(viewPlayLayout);
     }
 
 
@@ -214,22 +227,21 @@ public class ViewPlayFragment extends Fragment {
 
 
     private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
-        PlayAdapter mAdapter;
         public ScreenSlidePagerAdapter(FragmentManager fm) {
             super(fm);
-            mAdapter = new PlayAdapter(mActivity, ViewPlayFragment.this);
         }
+
 
         @Override
         public Fragment getItem(int position) {
-            //return ViewPlayFragment_Pages.newInstance(((MainActivity)mActivity).mPlayAdapter.plays.get(position).getId(), "imageTrans"+position, "nameTrans"+position, "dateTrans"+position);
-            return ViewPlayFragment_Pages.newInstance(mAdapter.plays.get(position).getId(), "imageTrans"+position, "nameTrans"+position, "dateTrans"+position);
+            return ViewPlayFragment_Pages.newInstance(((MainActivity)mActivity).mPlayAdapter.plays.get(position).getId(), "imageTrans"+position, "nameTrans"+position, "dateTrans"+position);
+            //return ViewPlayFragment_Pages.newInstance(mAdapter.plays.get(position).getId(), "imageTrans"+position, "nameTrans"+position, "dateTrans"+position);
         }
 
         @Override
         public int getCount() {
             if (mActivity != null) {
-                return mAdapter.plays.size();
+                return ((MainActivity) mActivity).mPlayAdapter.plays.size();
             }else{
                 return 0;
             }
@@ -239,6 +251,8 @@ public class ViewPlayFragment extends Fragment {
         public int getItemPosition(Object object) {
             return POSITION_NONE;
         }
+
+
 
     }
 
