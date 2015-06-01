@@ -73,7 +73,7 @@
 
     <string name="label_your_name">Name</string>
     <string name="label_your_email">Email</string>
-    <string name="hint_your_name">e.g. Larry</string>
+    <string name="hint_your_name">e.g. Adam</string>
     <string name="hint_your_email">Optional</string>
 
     <string name="submit_confirm_message">Place the order with the deli? You will receive an email

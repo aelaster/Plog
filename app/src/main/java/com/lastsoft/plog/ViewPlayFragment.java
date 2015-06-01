@@ -203,7 +203,7 @@ public class ViewPlayFragment extends Fragment {
     @Override
     public void onDestroy() {
         // TODO Auto-generated method stub
-        Log.d("V1", "on destroy");
+        //Log.d("V1", "on destroy");
         super.onDestroy();
     }
 

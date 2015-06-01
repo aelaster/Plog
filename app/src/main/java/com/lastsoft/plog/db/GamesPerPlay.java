@@ -26,8 +26,6 @@ public class GamesPerPlay extends SugarRecord<GamesPerPlay> {
     }
 
     public static int getUniquePlays_GameGroup(GameGroup group){
-        /*List<GamesPerPlay> queery = GamesPerPlay.findWithQuery(GamesPerPlay.class, "Select DISTINCT " + StringUtil.toSQLName("game") + ", " + StringUtil.toSQLName("play") + " from " + StringUtil.toSQLName("GamesPerPlay") + " where " + StringUtil.toSQLName("expansionFlag") + " = 0 and " + StringUtil.toSQLName("play") + " in (Select " + StringUtil.toSQLName("play") + " from " + StringUtil.toSQLName("PlayersPerPlay") + " where " + StringUtil.toSQLName("player") + " in (Select " + StringUtil.toSQLName("player") + " from " + StringUtil.toSQLName("PlayersPerGameGroup") + " where " + StringUtil.toSQLName("GameGroup") + " = ?) ORDER BY PLAY, PLAYER)", group.getId().toString());
-        return queery.size();*/
         List<GamesPerPlay> queery = GamesPerPlay.findWithQuery(GamesPerPlay.class,
                 "Select DISTINCT " + StringUtil.toSQLName("game") +
                 " from " + StringUtil.toSQLName("GamesPerPlay") +
@@ -39,12 +37,6 @@ public class GamesPerPlay extends SugarRecord<GamesPerPlay> {
                 " from " + StringUtil.toSQLName("PlayersPerGameGroup") +
                 " where " + StringUtil.toSQLName("GameGroup") + " = ?))", group.getId().toString());
         return queery.size();
-        /*List<GamesPerPlay> queery = GamesPerPlay.findWithQuery(GamesPerPlay.class, "Select DISTINCT " + StringUtil.toSQLName("game") + " from " + StringUtil.toSQLName("GamesPerPlay") + ", " + StringUtil.toSQLName("PlayersPerGameGroup") + ", " + StringUtil.toSQLName("PlayersPerPlay") + " where "
-                + StringUtil.toSQLName("PlayersPerGameGroup") + "." + StringUtil.toSQLName("GameGroup") + "= ? and "
-                + StringUtil.toSQLName("PlayersPerGameGroup") + "." + StringUtil.toSQLName("Player") + " = " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("Player") + " and "
-                + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("Play") + " = " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("Play") + " and "
-                + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("expansionFlag") + " = 0", ""+group.getId());
-        return queery.size();*/
     }
 
     public static int getUniquePlays(){

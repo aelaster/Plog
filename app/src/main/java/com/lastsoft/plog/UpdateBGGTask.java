@@ -78,7 +78,7 @@ public class UpdateBGGTask extends AsyncTask<String, Void, String> {
             }
 
             myString = new String(baf.toByteArray());
-            Log.d("V1", myString);
+            //Log.d("V1", myString);
 
             bis.close();
             is.close();

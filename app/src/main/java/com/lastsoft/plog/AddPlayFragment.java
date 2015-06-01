@@ -213,6 +213,7 @@ public class AddPlayFragment extends Fragment implements
         });
 
         notesText = (EditText) rootView.findViewById(R.id.notesText);
+        notesText.setSelectAllOnFocus(true);
 
         View expansionButton = rootView.findViewById(R.id.addGameButton);
         if (expansions.size()==0) {
@@ -494,8 +495,6 @@ public class AddPlayFragment extends Fragment implements
                         // TODO Auto-generated catch block
                     }
                     b = null;
-                }else{
-                    Log.d("V1", "b is null");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -706,7 +705,7 @@ public class AddPlayFragment extends Fragment implements
 
     @Override
     public void onError(String s) {
-        Log.d("V1", "error =" + s);
+        //Log.d("V1", "error =" + s);
     }
 
     public interface OnFragmentInteractionListener {

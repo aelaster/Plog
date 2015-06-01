@@ -74,12 +74,6 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
         public ViewHolder(View v) {
             super(v);
             // Define click listener for the ViewHolder's View.
-            v.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Log.d(TAG, "Element " + getPosition() + " clicked.");
-                }
-            });
             gameNameView = (TextView) v.findViewById(R.id.gameName);
             playDateView = (TextView) v.findViewById(R.id.playDate);
             imageView = (ImageView) v.findViewById(R.id.imageView1);

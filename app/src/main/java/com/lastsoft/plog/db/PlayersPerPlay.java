@@ -40,10 +40,6 @@ public class PlayersPerPlay extends SugarRecord<PlayersPerPlay> {
 
     public static List<PlayersPerPlay> totalPlays_GameGroup(GameGroup group){
         return PlayersPerPlay.findWithQuery(PlayersPerPlay.class, "Select * from " + StringUtil.toSQLName("PlayersPerPlay") + " where " + StringUtil.toSQLName("player") + " in (Select " + StringUtil.toSQLName("player") + " from " + StringUtil.toSQLName("PlayersPerGameGroup") + " where " + StringUtil.toSQLName("GameGroup") + " = ?) ORDER BY PLAY, PLAYER", group.getId().toString());
-        /*return PlayersPerPlay.findWithQuery(PlayersPerPlay.class, "Select " + StringUtil.toSQLName("PlayersPerPlay") +  ".* from " + StringUtil.toSQLName("PlayersPerGameGroup") + ", " + StringUtil.toSQLName("PlayersPerPlay") + " where "
-                + StringUtil.toSQLName("PlayersPerGameGroup") + "." + StringUtil.toSQLName("GameGroup") + "= ? and "
-                + StringUtil.toSQLName("PlayersPerGameGroup") + "." + StringUtil.toSQLName("Player") + " = " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("Player"), group.getId()+"");
-                */
     }
 
     public static List<PlayersPerPlay> getPlayers(Play play){
@@ -84,9 +80,6 @@ public class PlayersPerPlay extends SugarRecord<PlayersPerPlay> {
         return queery.get(0).score;
     }
     public static List<PlayersPerPlay> getWinners(Play play){
-        //Select getPlayers = Select.from(PlayersPerPlay.class);
-        //getPlayers.where(Condition.prop(StringUtil.toSQLName("play")).eq(play.getId()));
-        //return  PlayersPerPlay.findWithQuery(PlayersPerPlay.class, "Select Max(" + StringUtil.toSQLName("score") + ") from " + StringUtil.toSQLName("PlayersPerPlay") + " where " + StringUtil.toSQLName("play") + " = ?", play.getId().toString());
         return PlayersPerPlay.findWithQuery(PlayersPerPlay.class, "Select * from " + StringUtil.toSQLName("PlayersPerPlay") + " where " + StringUtil.toSQLName("play") + " = ? and " + StringUtil.toSQLName("score") + " = (Select Max(" + StringUtil.toSQLName("score") + ") from " + StringUtil.toSQLName("PlayersPerPlay") + " where " + StringUtil.toSQLName("play") + " = ?)", play.getId().toString(), play.getId().toString());
     }
 

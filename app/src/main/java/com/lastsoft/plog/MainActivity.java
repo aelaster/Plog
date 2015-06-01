@@ -3,6 +3,7 @@ package com.lastsoft.plog;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
@@ -82,37 +83,52 @@ public class MainActivity extends ActionBarActivity
     protected void onCreate(Bundle savedInstanceState) {
         getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        if (doesDatabaseExist(this, "SRX.db") == false) {
+            setContentView(R.layout.activity_main0);
+            mTitle = "Welcome!";
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.container, new SetupWizardFragment(), "wizard")
+                    .commit();
+            restoreActionBar();
+        }else{
+            setContentView(R.layout.activity_main);
 
-        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this)
-                .memoryCacheSize(41943040)
-                .diskCacheSize(104857600)
-                .threadPoolSize(10)
-                .build();
-        ImageLoader.getInstance().init(config);
+            ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this)
+                    .memoryCacheSize(41943040)
+                    .diskCacheSize(104857600)
+                    .threadPoolSize(10)
+                    .build();
+            ImageLoader.getInstance().init(config);
 
-        mNavigationDrawerFragment = (NavigationDrawerFragment)
-                getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
-        mTitle = getTitle();
-
-        // Set up the drawer.
-        DrawerLayout mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mNavigationDrawerFragment.setUp(
-                R.id.navigation_drawer,
-                mDrawerLayout);
+            mNavigationDrawerFragment = (NavigationDrawerFragment)
+                    getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
+            mTitle = getTitle();
 
 
+            // Set up the drawer.
+            DrawerLayout mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+            mNavigationDrawerFragment.setUp(
+                    R.id.navigation_drawer,
+                    mDrawerLayout);
 
-        ActionBarDrawerToggle mDrawerToggle = new ActionBarDrawerToggle(
-                this,  mDrawerLayout, R.string.navigation_drawer_open, R.string.navigation_drawer_close
-        );
 
-        LoadGamesTask initDb = new LoadGamesTask(this);
-        try {
-            initDb.execute();
-        } catch (Exception e) {
+            ActionBarDrawerToggle mDrawerToggle = new ActionBarDrawerToggle(
+                    this, mDrawerLayout, R.string.navigation_drawer_open, R.string.navigation_drawer_close
+            );
 
+            /*LoadGamesTask initDb = new LoadGamesTask(this);
+            try {
+                initDb.execute();
+            } catch (Exception e) {
+
+            }*/
         }
+    }
+
+    private static boolean doesDatabaseExist(ContextWrapper context, String dbName) {
+        File dbFile = context.getDatabasePath(dbName);
+        return dbFile.exists();
     }
 
     public PlayAdapter initPlayAdapter(){
@@ -197,7 +213,7 @@ public class MainActivity extends ActionBarActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (!mNavigationDrawerFragment.isDrawerOpen()) {
+        if (mNavigationDrawerFragment != null && !mNavigationDrawerFragment.isDrawerOpen()) {
             // Only show items in the action bar relevant to this screen
             // if the drawer is not showing. Otherwise, let the drawer
             // decide what to show in the action bar.
@@ -535,7 +551,7 @@ public class MainActivity extends ActionBarActivity
 
     @Override
     public void onBackPressed(){
-        if (mNavigationDrawerFragment.isDrawerOpen() == false) {
+        if (mNavigationDrawerFragment != null && mNavigationDrawerFragment.isDrawerOpen() == false) {
             if (fragUp) {
                 if (mAddPlayerFragment != null) removeFragment(mAddPlayerFragment.getView());
                 if (mAddGameFragment != null) removeFragment(mAddGameFragment.getView());
@@ -568,7 +584,11 @@ public class MainActivity extends ActionBarActivity
                 }
             }
         }else{
-            mNavigationDrawerFragment.closeDrawer();
+            if (mNavigationDrawerFragment != null) {
+                mNavigationDrawerFragment.closeDrawer();
+            }else{
+                super.onBackPressed();
+            }
         }
     }
 

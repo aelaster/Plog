@@ -1,7 +1,9 @@
 package com.lastsoft.plog;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -78,8 +80,8 @@ public class ViewPlayFragment_Pages extends Fragment {
         viewPlayLayout = inflater.inflate(R.layout.fragment_view_play, container, false);
         viewPlayLayout.setBackgroundColor(getResources().getColor(R.color.cardview_initial_background));
         LinearLayout linLayout = (LinearLayout) viewPlayLayout.findViewById(R.id.linearLayout);
-        Log.d("V1", "playID = " + playID);
-        Play thisPlay = Play.findById(Play.class, playID);
+        //Log.d("V1", "playID = " + playID);
+        final Play thisPlay = Play.findById(Play.class, playID);
 
     //    Log.d("V1", "nameTransID = " + nameTransID);
 
@@ -96,6 +98,15 @@ public class ViewPlayFragment_Pages extends Fragment {
         if (thisPlay.playPhoto != null && !thisPlay.playPhoto.equals("")){
             ImageLoader.getInstance().displayImage(thisPlay.playPhoto, playImage, options);
             playImage.setTransitionName(imageTransID);
+            playImage.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent();
+                    intent.setAction(Intent.ACTION_VIEW);
+                    intent.setDataAndType(Uri.parse(thisPlay.playPhoto), "image/*");
+                    startActivity(intent);
+                }
+            });
         }else{
             if (GamesPerPlay.getBaseGame(thisPlay).gameThumb != null) {
                 ImageLoader.getInstance().displayImage("http:" + GamesPerPlay.getBaseGame(thisPlay).gameThumb, playImage, options);

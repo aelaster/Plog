@@ -114,7 +114,7 @@ public class Game extends SugarRecord<Game> {
         if (name.contains("'")) {
             name = name.replaceAll("'", "''");
         }
-        Log.d("V1", name);
+        //Log.d("V1", name);
         Select expansionsFor = Select.from(Game.class);
         expansionsFor.where(Condition.prop(StringUtil.toSQLName("gameName")).like("%" + name + "%"), Condition.prop(StringUtil.toSQLName("expansionFlag")).eq("1"));
         expansionsFor.orderBy(StringUtil.toSQLName("gameName") + " ASC");
