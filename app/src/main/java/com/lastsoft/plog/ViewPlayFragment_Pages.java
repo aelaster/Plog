@@ -115,6 +115,7 @@ public class ViewPlayFragment_Pages extends Fragment {
                 playImage.setImageDrawable(null);
                 playImage.setTransitionName(imageTransID);
             }
+            playImage.setOnClickListener(null);
         }
 
         //get game for this play

@@ -73,13 +73,15 @@ public class GamesFragment extends Fragment{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ActionBar actionBar = ((MainActivity)mActivity).getSupportActionBar();
-        actionBar.setDisplayShowCustomEnabled(true);
-        actionBar.setCustomView(R.layout.search_bar);
-        mSearch = (EditText) actionBar.getCustomView()
-                .findViewById(R.id.etSearch);
-        mCancel = (ImageView) actionBar.getCustomView()
-                .findViewById(R.id.closeButton);
+        try {
+            ActionBar actionBar = ((MainActivity) mActivity).getSupportActionBar();
+            actionBar.setDisplayShowCustomEnabled(true);
+            actionBar.setCustomView(R.layout.search_bar);
+            mSearch = (EditText) actionBar.getCustomView()
+                    .findViewById(R.id.etSearch);
+            mCancel = (ImageView) actionBar.getCustomView()
+                    .findViewById(R.id.closeButton);
+        }catch (Exception e){}
     }
 
 
