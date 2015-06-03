@@ -44,7 +44,6 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
 
     private List<Game> games;
     private DisplayImageOptions options;
-    private String searchQuery;
     private Activity myActivity;
     private Fragment myFragment;
     int mPosition;
@@ -102,7 +101,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
 
 
         //games = Game.find(Game.class, null, null, null, StringUtil.toSQLName("gameName")+" ASC");
-        searchQuery = mSearchQuery;
+        //searchQuery = mSearchQuery;
         games = Game.findBaseGames(mSearchQuery);
         options = new DisplayImageOptions.Builder()
                 .cacheOnDisk(true)

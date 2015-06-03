@@ -6,6 +6,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,12 +26,14 @@ public class StatsFragment_Wins extends Fragment {
     List<Player> groupPlayers;
     View statsView;
     private ViewGroup mContainerView_Players;
+    long gameGroup;
 
 
     // TODO: Rename and change types and number of parameters
-    public static StatsFragment_Wins newInstance() {
+    public static StatsFragment_Wins newInstance(long gameGroup) {
         StatsFragment_Wins fragment = new StatsFragment_Wins();
         Bundle args = new Bundle();
+        args.putLong("gameGroup", gameGroup);
         fragment.setArguments(args);
         return fragment;
     }
@@ -43,7 +46,7 @@ public class StatsFragment_Wins extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-
+            gameGroup = getArguments().getLong("gameGroup");
         }
     }
 
@@ -52,13 +55,15 @@ public class StatsFragment_Wins extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         statsView = inflater.inflate(R.layout.fragment_statistics, container, false);
-        groupPlayers = GameGroup.getGroupPlayers(GameGroup.findById(GameGroup.class, (long) 1));
-        mContainerView_Players = (ViewGroup) statsView.findViewById(R.id.container_players);
-        LoadStatsTask initStats = new LoadStatsTask(mActivity);
-        try {
-            initStats.execute((long)1);
-        } catch (Exception e) {
+        if (gameGroup > 0) {
+            groupPlayers = GameGroup.getGroupPlayers(GameGroup.findById(GameGroup.class, gameGroup));
+            mContainerView_Players = (ViewGroup) statsView.findViewById(R.id.container_players);
+            LoadStatsTask initStats = new LoadStatsTask(mActivity, gameGroup);
+            try {
+                initStats.execute();
+            } catch (Exception ignored) {
 
+            }
         }
         return statsView;
     }
@@ -87,11 +92,12 @@ public class StatsFragment_Wins extends Fragment {
         boolean sharedFlag = true;
         int sharedCounter = 0;
         int loserCounter = 0;
-
+        long theGroup;
 
         private final ProgressDialog mydialog = new ProgressDialog(mActivity);
 
-        public LoadStatsTask(Context context) {
+        public LoadStatsTask(Context context, long gameGroup) {
+            this.theGroup = gameGroup;
             this.theContext = context;
         }
 
@@ -103,14 +109,14 @@ public class StatsFragment_Wins extends Fragment {
             mydialog.setCancelable(false);
             try{
                 mydialog.show();
-            }catch (Exception e){}
+            }catch (Exception ignored){}
         }
 
         // automatically done on worker thread (separate from UI thread)
         @Override
         protected Long[] doInBackground(final Long... args) {
 
-            filteredGames = new ArrayList<String>();
+            filteredGames = new ArrayList<>();
             int outputBounds = ((groupPlayers.size() * 2) + 2);
             Long[] output = new Long[outputBounds];
             //times 2 because each player needs regular and asterisk totals
@@ -118,8 +124,8 @@ public class StatsFragment_Wins extends Fragment {
             int[] playerScoreHolder = new int[groupPlayers.size()];
             try {
 
-                List<PlayersPerPlay> groupTotalPlays = PlayersPerPlay.totalPlays_GameGroup(GameGroup.findById(GameGroup.class, args[0]));
-                long uniquePlays  = GamesPerPlay.getUniquePlays_GameGroup(GameGroup.findById(GameGroup.class, args[0]));
+                List<PlayersPerPlay> groupTotalPlays = PlayersPerPlay.totalPlays_GameGroup(GameGroup.findById(GameGroup.class, theGroup));
+                long uniquePlays  = GamesPerPlay.getUniquePlays_GameGroup(GameGroup.findById(GameGroup.class, theGroup));
                 //Log.d("V1", "groupTotalPlays = " + groupTotalPlays.size());
 
                 output[0] = ((long)groupTotalPlays.size()/(long)groupPlayers.size());
@@ -144,14 +150,15 @@ public class StatsFragment_Wins extends Fragment {
                             //only included if all of the group has been scored
                             int max = playerScoreHolder[0];
 
-                            for (int i = 0; i < playerScoreHolder.length; i++) {
-                                if (playerScoreHolder[i] > max) {
-                                    max = playerScoreHolder[i];
+                            for (int aPlayerScoreHolder : playerScoreHolder) {
+                                if (aPlayerScoreHolder > max) {
+                                    max = aPlayerScoreHolder;
                                 }
                             }
 
                             for (int x = 0; x < playerScoreHolder.length; x++) {
-                                int arrayBounds = 2 + (x * groupPlayers.size());
+                                int arrayBounds = 2 + (x * 2);
+                                //Log.d("V1", "arrayBounds = " + arrayBounds);
                                 if (playerScoreHolder[x] == highScore && playerScoreHolder[x] != 0) {
                                     if (output[(arrayBounds)] == null) {
                                         output[(arrayBounds)] = (long) 1;
@@ -172,6 +179,12 @@ public class StatsFragment_Wins extends Fragment {
                                 }
 
                             }
+                            if (sharedFlag){
+                                sharedCounter++;
+                            }
+                            if (loserFlag){
+                                loserCounter++;
+                            }
                         }else{
                             filteredPlays++;
                             //ths is filtred.  is this a unique game being filtered?
@@ -179,7 +192,7 @@ public class StatsFragment_Wins extends Fragment {
                             if (!filteredGames.contains(getGame.gameName)) {
                                 boolean uniqueFlag;
                                 for (Player eachPlayer : groupPlayers) {
-                                    if (Player.hasPlayerPlayedGame(eachPlayer, GamesPerPlay.getBaseGame(eachPlay.play)) == false) {
+                                    if (!Player.hasPlayerPlayedGame(eachPlayer, GamesPerPlay.getBaseGame(eachPlay.play))) {
                                         //nope, one of us hasn't played, so it's not a unique game for us
                                         uniqueFilter++;
                                         filteredGames.add(getGame.gameName);
@@ -189,12 +202,7 @@ public class StatsFragment_Wins extends Fragment {
                             }
                         }
 
-                        if (sharedFlag){
-                            sharedCounter++;
-                        }
-                        if (loserFlag){
-                            loserCounter++;
-                        }
+
                         loserFlag = true;
                         sharedFlag = true;
 
@@ -221,14 +229,14 @@ public class StatsFragment_Wins extends Fragment {
                     //calculate the last winner
                     int max = playerScoreHolder[0];
 
-                    for (int i = 0; i < playerScoreHolder.length; i++) {
-                        if (playerScoreHolder[i] > max) {
-                            max = playerScoreHolder[i];
+                    for (int aPlayerScoreHolder : playerScoreHolder) {
+                        if (aPlayerScoreHolder > max) {
+                            max = aPlayerScoreHolder;
                         }
                     }
 
                     for (int x = 0; x < playerScoreHolder.length; x++) {
-                        int arrayBounds = 2 + (x * groupPlayers.size());
+                        int arrayBounds = 2 + (x * 2);
                         if (playerScoreHolder[x] == highScore && playerScoreHolder[x] != 0) {
                             if (output[(arrayBounds)] == null) {
                                 output[(arrayBounds)] = (long) 1;
@@ -248,25 +256,29 @@ public class StatsFragment_Wins extends Fragment {
                             loserFlag = false;
                         }
                     }
+                    if (sharedFlag){
+                        sharedCounter++;
+                    }
+                    if (loserFlag){
+                        loserCounter++;
+                    }
                 }else{
                     filteredPlays++;
-                    Game getGame = GamesPerPlay.getBaseGame(playHolder.play);
-                    if (!filteredGames.contains(getGame.gameName)) {
-                        boolean uniqueFlag;
-                        for (Player eachPlayer : groupPlayers) {
-                            if (Player.hasPlayerPlayedGame(eachPlayer, getGame) == false) {
-                                uniqueFilter++;
-                                break;
+                    Game getGame = null;
+                    if (playHolder != null) {
+                        getGame = GamesPerPlay.getBaseGame(playHolder.play);
+                        if (!filteredGames.contains(getGame.gameName)) {
+                            boolean uniqueFlag;
+                            for (Player eachPlayer : groupPlayers) {
+                                if (!Player.hasPlayerPlayedGame(eachPlayer, getGame)) {
+                                    uniqueFilter++;
+                                    break;
+                                }
                             }
                         }
                     }
                 }
-                if (sharedFlag){
-                    sharedCounter++;
-                }
-                if (loserFlag){
-                    loserCounter++;
-                }
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -280,7 +292,7 @@ public class StatsFragment_Wins extends Fragment {
             addStat("Total Plays: ", totalPlays + "");
             addStat("Unique Games: ", totalUnique + "");
             for(int x = 0; x < groupPlayers.size(); x++) {
-                int arrayBounds = 2 + (x * groupPlayers.size());
+                int arrayBounds = 2 + (x * 2);
                 addStat(groupPlayers.get(x).playerName + " Total Wins:", result[arrayBounds]+"");
                 addStat(groupPlayers.get(x).playerName + " Asterisk Wins:", result[arrayBounds+1]+"");
             }
@@ -288,7 +300,7 @@ public class StatsFragment_Wins extends Fragment {
             addStat("Total Losses: ", loserCounter + "");
 
             for(int x = 0; x < groupPlayers.size(); x++) {
-                int arrayBounds = 2 + (x * groupPlayers.size());
+                int arrayBounds = 2 + (x * 2);
                 addStat(groupPlayers.get(x).playerName + " Total Wins Percentage:", ((int) (result[arrayBounds] * 100.0 / totalPlays + 0.5)) + "%");
                 addStat(groupPlayers.get(x).playerName + " Asterisk Wins Percentage:", ((int) (result[arrayBounds+1] * 100.0 / totalPlays + 0.5)) + "%");
             }

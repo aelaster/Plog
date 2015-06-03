@@ -1,89 +1,101 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent" tools:context="com.lastsoft.plog.AddPlayerFragment"
-    android:clickable="true">
+    android:clickable="true"
+    android:orientation="vertical">
 
-    <!-- TODO: Update blank fragment layout -->
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:orientation="vertical">
-
-        <EditText
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:inputType="textPersonName|textCapWords"
-            android:ems="10"
-            android:id="@+id/playerName"
-            android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true"
-            android:hint="@string/name" />
-
-        <EditText
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:inputType="textPersonName"
-            android:ems="10"
-            android:id="@+id/bggUsername"
-            android:hint="@string/bgg_username"
-            android:layout_below="@+id/full_name"
-            android:layout_alignStart="@+id/full_name" />
+    <ScrollView
+        android:id="@+id/scrollview"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:linksClickable="true"
+        android:fillViewport="true">
 
         <LinearLayout
-            android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/margin_small"
-            android:layout_marginBottom="@dimen/margin_small"
-            >
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName|textCapWords"
+                android:ems="10"
+                android:id="@+id/playerName"
+                android:hint="@string/name" />
+
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName"
+                android:ems="10"
+                android:id="@+id/bggUsername"
+                android:hint="@string/bgg_username"
+/>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:layout_marginTop="@dimen/margin_small"
+                android:layout_marginBottom="@dimen/margin_small"
+                >
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    android:text="@string/default_color"
+                    android:id="@+id/textView2"
+                    android:gravity="center" />
+
+                <Spinner
+                    android:id="@+id/color"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    />
+
+            </LinearLayout>
+
+            <Switch
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/default_player"
+                android:layout_marginBottom="@dimen/margin_small"
+                android:id="@+id/defaultSwitch" />
+
             <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="fill_parent"
-                android:text="@string/default_color"
-                android:id="@+id/textView2"
-                android:gravity="center" />
-
-            <Spinner
-                android:id="@+id/color"
-                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                />
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="@string/groups"
+                android:id="@+id/groupsLabel" />
 
+            <LinearLayout android:id="@+id/container_groups"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:showDividers="middle"
+                android:divider="?android:dividerHorizontal"
+                android:animateLayoutChanges="true"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp" />
+
+            <Button
+                android:id="@+id/deleteButton"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_medium"
+                android:text="@string/delete_player"
+                android:layout_marginBottom="16dp"
+                android:layout_gravity="center_horizontal|bottom"
+                />
         </LinearLayout>
 
-        <Switch
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/default_player"
-            android:layout_marginBottom="@dimen/margin_small"
-            android:id="@+id/defaultSwitch" />
+    </ScrollView>
 
-        <Button
-            android:id="@+id/button"
-            style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/margin_medium"
-            android:text="@string/add_player"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="16dp"
-            android:layout_gravity="center_horizontal|bottom"
-            android:layout_alignParentBottom="true"
-            />
-        <Button
-            android:id="@+id/deleteButton"
-            style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/margin_medium"
-            android:text="@string/delete_player"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="16dp"
-            android:layout_gravity="center_horizontal|bottom"
-            android:layout_alignParentBottom="true"
-            />
-    </LinearLayout>
-</FrameLayout>
+</LinearLayout>

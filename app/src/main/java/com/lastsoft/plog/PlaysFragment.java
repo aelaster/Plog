@@ -17,15 +17,27 @@
 package com.lastsoft.plog;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.SharedElementCallback;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.transition.TransitionInflater;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
+import android.widget.ImageView;
+
+import java.util.List;
+import java.util.Map;
 
 public class PlaysFragment extends Fragment{
 
@@ -48,6 +60,9 @@ public class PlaysFragment extends Fragment{
     protected RecyclerView.LayoutManager mLayoutManager;
     protected String[] mDataset;
     private SwipeRefreshLayout pullToRefreshView;
+    private ImageView mCancel;
+    private EditText mSearch;
+    String mSearchQuery = "";
 
     private OnFragmentInteractionListener mListener;
 
@@ -62,6 +77,17 @@ public class PlaysFragment extends Fragment{
         //String currentDBPath = currentDB.toString();
         //Log.d("V1", "database directory=" + currentDBPath);
         //Log.d("V1", "file directory=" + V1GolfLib.this.getFilesDir().toString());
+        try {
+            ActionBar actionBar = ((MainActivity) mActivity).getSupportActionBar();
+            if (actionBar != null) {
+                actionBar.setDisplayShowCustomEnabled(true);
+                actionBar.setCustomView(R.layout.search_bar_plays);
+                mSearch = (EditText) actionBar.getCustomView()
+                        .findViewById(R.id.etSearch);
+                mCancel = (ImageView) actionBar.getCustomView()
+                        .findViewById(R.id.closeButton);
+            }
+        }catch (Exception ignored){}
     }
 
     @Override
@@ -91,19 +117,58 @@ public class PlaysFragment extends Fragment{
         mAdapter = ((MainActivity)mActivity).mPlayAdapter;
         // Set CustomAdapter as the adapter for RecyclerView.
         mRecyclerView.setAdapter(mAdapter);
+        // END_INCLUDE(initializeRecyclerView)
 
-        //mRecyclerView.scrollToPosition(300);
-
-        /*pullToRefreshView = (SwipeRefreshLayout) rootView.findViewById(R.id.pull_to_refresh_listview);
-        pullToRefreshView.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        mSearch.addTextChangedListener(new TextWatcher() {
 
             @Override
-            public void onRefresh() {
-                // TODO Auto-generated method stub
-                pullToRefreshView.setRefreshing(false);
+            public void onTextChanged(CharSequence cs, int arg1, int arg2, int arg3) {
+                // When user changed the Text
+                mSearchQuery = cs.toString();
+                //initDataset();
+                //mAdapter = new GameAdapter(PlaysFragment.this, mActivity,mSearchQuery);
+                mAdapter = ((MainActivity)mActivity).initPlayAdapter(mSearchQuery);
+                // Set CustomAdapter as the adapter for RecyclerView.
+                mRecyclerView.setAdapter(mAdapter);
             }
-        });*/
-        // END_INCLUDE(initializeRecyclerView)
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence arg0, int arg1, int arg2,
+                                          int arg3) {
+                // TODO Auto-generated method stub
+
+            }
+        });
+
+
+
+        mCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!mSearch.getText().toString().equals("")) {
+                    mSearchQuery = "";
+                    ((MainActivity)mActivity).initPlayAdapter(mSearchQuery);
+                    mSearch.setText(mSearchQuery);
+                    //mActivity.onBackPressed();
+                }
+
+                InputMethodManager inputManager = (InputMethodManager)
+                        mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
+
+                inputManager.hideSoftInputFromWindow(mActivity.getCurrentFocus().getWindowToken(),
+                        InputMethodManager.HIDE_NOT_ALWAYS);
+                mSearch.clearFocus();
+                mRecyclerView.requestFocus();
+
+                refreshDataset();
+            }
+        });
+
         return rootView;
     }
 
@@ -125,7 +190,10 @@ public class PlaysFragment extends Fragment{
     public void onDetach() {
         super.onDetach();
         mListener = null;
-        mActivity = null;
+        if (mActivity != null) {
+            ((MainActivity) mActivity).getSupportActionBar().setDisplayShowCustomEnabled(false);
+            mActivity = null;
+        }
     }
 
     /**
@@ -134,13 +202,13 @@ public class PlaysFragment extends Fragment{
      * @param layoutManagerType Type of layout manager to switch to.
      */
     public void setRecyclerViewLayoutManager(LayoutManagerType layoutManagerType) {
-        int scrollPosition = 0;
+        //int scrollPosition = 0;
 
         // If a layout manager has already been set, get current scroll position.
-        if (mRecyclerView.getLayoutManager() != null) {
+        /*if (mRecyclerView.getLayoutManager() != null) {
             scrollPosition = ((LinearLayoutManager) mRecyclerView.getLayoutManager())
                     .findFirstCompletelyVisibleItemPosition();
-        }
+        }*/
 
         switch (layoutManagerType) {
             case LINEAR_LAYOUT_MANAGER:
@@ -176,8 +244,7 @@ public class PlaysFragment extends Fragment{
                 .findFirstCompletelyVisibleItemPosition();
         //int current = ((PlayAdapter)mRecyclerView.getAdapter()).mPosition;
 
-        mAdapter = new PlayAdapter(mActivity, this);
-        ((MainActivity)mActivity).mPlayAdapter = mAdapter;
+        mAdapter = ((MainActivity)mActivity).initPlayAdapter(mSearchQuery);
 
         // Set CustomAdapter as the adapter for RecyclerView.
         mRecyclerView.setAdapter(mAdapter);
@@ -196,6 +263,6 @@ public class PlaysFragment extends Fragment{
      */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        public void onFragmentInteraction(String id, float x, float y);
+        void onFragmentInteraction(String id, float x, float y);
     }
 }

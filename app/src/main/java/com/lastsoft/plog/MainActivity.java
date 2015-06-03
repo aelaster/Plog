@@ -44,6 +44,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
 
 
 public class MainActivity extends ActionBarActivity
@@ -65,7 +66,7 @@ public class MainActivity extends ActionBarActivity
     private AddGameFragment mAddGameFragment;
     private AddPlayFragment mAddPlayFragment;
     private AddGroupFragment mAddGroupFragment;
-    private ViewPlayFragment mViewPlayFragment;
+    public ViewPlayFragment mViewPlayFragment;
     PlaysFragment mPlaysFragment;
     PlayAdapter mPlayAdapter;
 
@@ -83,7 +84,7 @@ public class MainActivity extends ActionBarActivity
     protected void onCreate(Bundle savedInstanceState) {
         getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
         super.onCreate(savedInstanceState);
-        if (doesDatabaseExist(this, "SRX.db") == false) {
+        if (!doesDatabaseExist(this, "SRX.db")) {
             setContentView(R.layout.activity_main0);
             mTitle = "Welcome!";
             FragmentManager fragmentManager = getSupportFragmentManager();
@@ -131,8 +132,9 @@ public class MainActivity extends ActionBarActivity
         return dbFile.exists();
     }
 
-    public PlayAdapter initPlayAdapter(){
-        return new PlayAdapter(this, mPlaysFragment);
+    public PlayAdapter initPlayAdapter(String searchQuery){
+        mPlayAdapter = new PlayAdapter(this, mPlaysFragment, searchQuery);
+        return mPlayAdapter;
     }
 
     @Override
@@ -148,8 +150,8 @@ public class MainActivity extends ActionBarActivity
         }
         if (position == 2){
             mPlaysFragment = new PlaysFragment();
-            mPlayAdapter = initPlayAdapter();
-            initPlayAdapter();
+            mPlayAdapter = initPlayAdapter("");
+            //initPlayAdapter();
             fragmentManager.beginTransaction()
                     .replace(R.id.container, mPlaysFragment, "plays")
                     .commit();
@@ -199,15 +201,31 @@ public class MainActivity extends ActionBarActivity
             case 5:
                 mTitle = getString(R.string.title_section5);
                 break;
+            case 6:
+                restoreActionBar();
+                break;
+            case 7:
+                mTitle = getString(R.string.title_section7);
+                break;
         }
     }
 
     public void restoreActionBar() {
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-        actionBar.setDisplayShowTitleEnabled(true);
-        if(mTitle.equals(getString(R.string.title_section3))) actionBar.setDisplayShowCustomEnabled(true);
-        actionBar.setTitle(mTitle);
+        if (actionBar != null) {
+            if (mTitle.equals(getString(R.string.title_section4))) {
+                actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+            } else {
+                actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+            }
+            actionBar.setDisplayShowTitleEnabled(true);
+            if(mTitle.equals(getString(R.string.title_section3)) || mTitle.equals(getString(R.string.title_section1))) {
+                actionBar.setDisplayShowCustomEnabled(true);
+            }else{
+                actionBar.setDisplayShowCustomEnabled(false);
+            }
+            actionBar.setTitle(mTitle);
+        }
     }
 
 
@@ -292,7 +310,7 @@ public class MainActivity extends ActionBarActivity
 
             inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
                     InputMethodManager.HIDE_NOT_ALWAYS);
-        }catch (Exception e){}
+        }catch (Exception ignored){}
 
         //mFragment.setExitTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.slide_top));
 
@@ -303,7 +321,7 @@ public class MainActivity extends ActionBarActivity
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction ft = fragmentManager.beginTransaction();
         fragUp = true;
-        mAddPlayerFragment = AddPlayerFragment.newInstance((int) 0, (int) 0, true, playerID);
+        mAddPlayerFragment = AddPlayerFragment.newInstance( 0,  0, true, playerID);
         //mAddPlayFragment.setEnterTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.slide_bottom));
         //mAddPlayFragment.setExitTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.slide_top));
 
@@ -314,14 +332,14 @@ public class MainActivity extends ActionBarActivity
         fragmentManager.executePendingTransactions(); //Prevents the flashing.
     }
 
-    public void onPlayClicked(Play clickedPlay, Fragment mFragment, View view, View nameView, View dateView, int position){
+    public void onPlayClicked(Play clickedPlay, Fragment mFragment, final View view, final View nameView, final View dateView, int position){
         try{
             InputMethodManager inputManager = (InputMethodManager)
                     getSystemService(Context.INPUT_METHOD_SERVICE);
 
             inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
                     InputMethodManager.HIDE_NOT_ALWAYS);
-        }catch (Exception e){}
+        }catch (Exception ignored){}
 
         //mFragment.setSharedElementReturnTransition(TransitionInflater.from(this).inflateTransition(R.transition.change_image_transform));
         //mFragment.setExitTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.move));
@@ -329,30 +347,81 @@ public class MainActivity extends ActionBarActivity
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction ft = fragmentManager.beginTransaction();
 
-
-
-
         mViewPlayFragment = ViewPlayFragment.newInstance(clickedPlay.getId(),view.getTransitionName(), nameView.getTransitionName(), dateView.getTransitionName(), position);
-        ft.addSharedElement(view, view.getTransitionName());
-
         mViewPlayFragment.setSharedElementEnterTransition(TransitionInflater.from(this).inflateTransition(R.transition.change_image_transform));
         mViewPlayFragment.setEnterTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.slide_bottom));
         mViewPlayFragment.setEnterSharedElementCallback(new SharedElementCallback() {
-            @Override
-            public void onSharedElementStart(List<String> sharedElementNames,
-                                             List<View> sharedElements, List<View> sharedElementSnapshots) {
-                /*for (String elementName : sharedElementNames) {
-                    postponeEnterTransition();
-                    Log.d("V1", elementName);
-                }
-                for (View sharedElement : sharedElements) {
 
-                }*/
+            @Override
+            public void onMapSharedElements(List<String> names, Map<String, View> sharedElements) {
+                //super.onMapSharedElements(names, sharedElements);
+
+                //if (!view.getTransitionName().equals("imageTrans" + mViewPlayFragment.mPager.getCurrentItem())) {
+                    //we need to update this mapping.
+                    //Android won't let me change the ID taht was passed into the fragment manager, which is the ID that was clicked on inside the recyclerview
+                    //so, theoretically, i would need to change the one I want to go to to the one that was passed in and change the one that i came from to the one i want to go to
+
+                    //eg, clicking 0 sets the ID to imageTrans0
+                    //i swipe over to imageTrans1 and hit back
+                    //i'm in here because I know that I'm in a different one
+                    //change teh "new" views to 0 and the old view to 1
+                    /*
+                    ViewPlayFragment_Pages currentFragment = (ViewPlayFragment_Pages) mViewPlayFragment.mPager.getAdapter().instantiateItem(mViewPlayFragment.mPager, mViewPlayFragment.mPager.getCurrentItem());
+                    Log.d("V1", "current Fragment old image view id = " + currentFragment.playImage.getTransitionName());
+                    currentFragment.playImage.setTransitionName(view.getTransitionName());
+                    currentFragment.gameName.setTransitionName(nameView.getTransitionName());
+                    currentFragment.playDate.setTransitionName(dateView.getTransitionName());
+                    Log.d("V1", "current Fragment new image view id = " + currentFragment.playImage.getTransitionName());
+
+
+                    View newSharedView = mPlaysFragment.mRecyclerView.findViewWithTag("imageTrans" + mViewPlayFragment.mPager.getCurrentItem());
+                    View newSharedView2 = mPlaysFragment.mRecyclerView.findViewWithTag("nameTrans" + mViewPlayFragment.mPager.getCurrentItem());
+                    View newSharedView3 = mPlaysFragment.mRecyclerView.findViewWithTag("dateTrans" + mViewPlayFragment.mPager.getCurrentItem());
+
+                    View oldSharedView = mPlaysFragment.mRecyclerView.findViewWithTag(view.getTransitionName());
+                    View oldSharedView2 = mPlaysFragment.mRecyclerView.findViewWithTag(nameView.getTransitionName());
+                    View oldSharedView3 = mPlaysFragment.mRecyclerView.findViewWithTag(dateView.getTransitionName());
+
+                    Log.d("V1", "newSharedView old transition name = " + newSharedView.getTransitionName());
+                    newSharedView.setTransitionName(view.getTransitionName());
+                    Log.d("V1", "newSharedView new transition name = " + newSharedView.getTransitionName());
+                    newSharedView2.setTransitionName(nameView.getTransitionName());
+                    newSharedView3.setTransitionName(dateView.getTransitionName());
+
+                    Log.d("V1", "oldSharedView old transition name = " + oldSharedView.getTransitionName());
+                    oldSharedView.setTransitionName("imageTrans" + mViewPlayFragment.mPager.getCurrentItem());
+                    Log.d("V1", "oldSharedView new transition name = " + oldSharedView.getTransitionName());
+                    oldSharedView2.setTransitionName("nameTrans" + mViewPlayFragment.mPager.getCurrentItem());
+                    oldSharedView3.setTransitionName("dateTrans" + mViewPlayFragment.mPager.getCurrentItem());
+
+                    /*names.clear();
+                    names.add(newSharedView.getTransitionName());
+                    names.add(newSharedView2.getTransitionName());
+                    names.add(newSharedView3.getTransitionName());
+
+                    sharedElements.clear();
+                    sharedElements.put(newSharedView.getTransitionName(), newSharedView);
+                    sharedElements.put(newSharedView2.getTransitionName(), newSharedView2);
+                    sharedElements.put(newSharedView3.getTransitionName(), newSharedView3);
+
+                    for (String name : names) {
+                        Log.d("V1", "onMapSharedElements = " + name);
+                    }
+
+                    for (View view : sharedElements.values()){
+                        Log.d("V1", "onMapSharedElements = " + view.getTransitionName());
+                    }*/
+
+               // }
+                //super.onMapSharedElements(names, sharedElements);
             }
+
         });
+
 
         //Log.d("V1", "nameView.getTransitionName() = " + nameView.getTransitionName());
 
+        ft.addSharedElement(view, view.getTransitionName());
         ft.addSharedElement(nameView, nameView.getTransitionName());
         ft.addSharedElement(dateView, dateView.getTransitionName());
         ft.replace(R.id.container, mViewPlayFragment, "view_play");
@@ -370,7 +439,7 @@ public class MainActivity extends ActionBarActivity
 
             inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
                     InputMethodManager.HIDE_NOT_ALWAYS);
-        }catch (Exception e){}
+        }catch (Exception ignored){}
 
         //mFragment.setExitTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.slide_top));
 
@@ -379,7 +448,7 @@ public class MainActivity extends ActionBarActivity
 
         fragUp = true;
 
-        mAddPlayFragment = AddPlayFragment.newInstance((int) 0, (int) 0, true, game_name, playID);
+        mAddPlayFragment = AddPlayFragment.newInstance( 0,  0, true, game_name, playID);
         //mAddPlayFragment.setEnterTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.slide_bottom));
         //mAddPlayFragment.setExitTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.slide_top));
         ft.setCustomAnimations(R.anim.slide_in_bottom, R.anim.slide_out_top, R.anim.slide_in_top, R.anim.slide_out_bottom);
@@ -422,7 +491,7 @@ public class MainActivity extends ActionBarActivity
 
         //check if this game has been played
         //if so, can't delete
-        if (GamesPerPlay.hasGameBeenPlayed(deleteMe) == false){
+        if (!GamesPerPlay.hasGameBeenPlayed(deleteMe)){
             deleteMe.delete();
         }
 
@@ -491,10 +560,6 @@ public class MainActivity extends ActionBarActivity
         deleteMe.delete();
 
         onFragmentInteraction("refresh_plays");
-        if (backFlag){
-            //this was deleted via view
-            //onNavigationDrawerItemSelected(2);
-        }
     }
 
     @Override
@@ -551,7 +616,7 @@ public class MainActivity extends ActionBarActivity
 
     @Override
     public void onBackPressed(){
-        if (mNavigationDrawerFragment != null && mNavigationDrawerFragment.isDrawerOpen() == false) {
+        if (mNavigationDrawerFragment != null && !mNavigationDrawerFragment.isDrawerOpen()) {
             if (fragUp) {
                 if (mAddPlayerFragment != null) removeFragment(mAddPlayerFragment.getView());
                 if (mAddGameFragment != null) removeFragment(mAddGameFragment.getView());
@@ -561,7 +626,7 @@ public class MainActivity extends ActionBarActivity
                 //super.onBackPressed();
                 if (mViewPlayFragment != null){
                     if (mViewPlayFragment.isSwiping == ViewPager.SCROLL_STATE_IDLE) {
-                        mViewPlayFragment.setSharedElementReturnTransition(TransitionInflater.from(this).inflateTransition(R.transition.change_image_transform));
+                        //mViewPlayFragment.setSharedElementReturnTransition(TransitionInflater.from(this).inflateTransition(R.transition.change_image_transform));
                         //int holder = mViewPlayFragment.mPager.getCurrentItem();
                         super.onBackPressed();
                         mViewPlayFragment = null;
@@ -716,8 +781,8 @@ public class MainActivity extends ActionBarActivity
 
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
-            addedGroups = new ArrayList<GameGroup>();
-            List<String> gameGroupNames = new ArrayList<String>();
+            addedGroups = new ArrayList<>();
+            List<String> gameGroupNames = new ArrayList<>();
 
             final long gameId = getArguments().getLong("gameId");
             final Game theGame = Game.findById(Game.class, gameId);

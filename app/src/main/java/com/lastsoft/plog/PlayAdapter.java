@@ -103,10 +103,11 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
     }
     // END_INCLUDE(recyclerViewSampleViewHolder)
 
-    public PlayAdapter(Activity mActivity, Fragment mFragment) {
+    public PlayAdapter(Activity mActivity, Fragment mFragment, String mSearchQuery) {
         myActivity = mActivity;
         myFragment = mFragment;
-        plays = Play.listPlaysNewOld();
+        //plays = Play.listPlaysNewOld();
+        plays = Play.listPlaysNewOld(mSearchQuery);
         options = new DisplayImageOptions.Builder()
                 .cacheOnDisk(true)
                 .cacheInMemory(true)
@@ -142,8 +143,11 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
             viewHolder.getGameNameView().setText(GamesPerPlay.getBaseGame(plays.get(position)).gameName);
             viewHolder.getPlayDateView().setText(output_date);
             viewHolder.getImageView().setTransitionName("imageTrans" + position);
+            viewHolder.getImageView().setTag("imageTrans" + position);
             viewHolder.getGameNameView().setTransitionName("nameTrans" + position);
+            viewHolder.getGameNameView().setTag("nameTrans" + position);
             viewHolder.getPlayDateView().setTransitionName("dateTrans" + position);
+            viewHolder.getPlayDateView().setTag("dateTrans" + position);
             viewHolder.getClickLayout().setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -203,12 +207,12 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
 
     // Return the size of your dataset (invoked by the layout manager)
     public Bitmap resizeImageForImageView(Bitmap bitmap, int size) {
-        Bitmap resizedBitmap = null;
+        Bitmap resizedBitmap;
         int originalWidth = bitmap.getWidth();
         int originalHeight = bitmap.getHeight();
         int newWidth = -1;
         int newHeight = -1;
-        float multFactor = -1.0F;
+        float multFactor;
         if(originalHeight > originalWidth) {
             newHeight = size;
             multFactor = (float) originalWidth/(float) originalHeight;

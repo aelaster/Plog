@@ -31,12 +31,14 @@ public class StatsFragment_TenByTen extends Fragment {
     List<Player> groupPlayers;
     View statsView;
     private ViewGroup mContainerView_Players;
+    long gameGroup;
 
 
     // TODO: Rename and change types and number of parameters
-    public static StatsFragment_TenByTen newInstance() {
+    public static StatsFragment_TenByTen newInstance(long gameGroup) {
         StatsFragment_TenByTen fragment = new StatsFragment_TenByTen();
         Bundle args = new Bundle();
+        args.putLong("gameGroup", gameGroup);
         fragment.setArguments(args);
         return fragment;
     }
@@ -49,7 +51,7 @@ public class StatsFragment_TenByTen extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-
+            gameGroup = getArguments().getLong("gameGroup");
         }
     }
 
@@ -58,13 +60,15 @@ public class StatsFragment_TenByTen extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         statsView = inflater.inflate(R.layout.fragment_statistics, container, false);
-        groupPlayers = GameGroup.getGroupPlayers(GameGroup.findById(GameGroup.class, (long) 1));
-        mContainerView_Players = (ViewGroup) statsView.findViewById(R.id.container_players);
-        LoadStatsTask initStats = new LoadStatsTask(mActivity);
-        try {
-            initStats.execute((long)1);
-        } catch (Exception e) {
+        if (gameGroup > 0) {
+            groupPlayers = GameGroup.getGroupPlayers(GameGroup.findById(GameGroup.class, gameGroup));
+            mContainerView_Players = (ViewGroup) statsView.findViewById(R.id.container_players);
+            LoadStatsTask initStats = new LoadStatsTask(mActivity, gameGroup);
+            try {
+                initStats.execute();
+            } catch (Exception ignored) {
 
+            }
         }
         return statsView;
     }
@@ -92,12 +96,14 @@ public class StatsFragment_TenByTen extends Fragment {
         boolean sharedFlag = true;
         int sharedCounter = 0;
         int loserCounter = 0;
+        long theGroup;
 
 
         private final ProgressDialog mydialog = new ProgressDialog(mActivity);
 
-        public LoadStatsTask(Context context) {
+        public LoadStatsTask(Context context, long gameGroup) {
             this.theContext = context;
+            this.theGroup = gameGroup;
         }
 
         List<TenByTen> gamesToCheck;
@@ -105,12 +111,12 @@ public class StatsFragment_TenByTen extends Fragment {
         // can use UI thread here
         @Override
         protected void onPreExecute() {
-            gamesToCheck = TenByTen.tenByTens_Group(GameGroup.findById(GameGroup.class, (long) 1));
+            gamesToCheck = TenByTen.tenByTens_Group(GameGroup.findById(GameGroup.class, theGroup));
             mydialog.setMessage(getString(R.string.calculating));
             mydialog.setCancelable(false);
             try{
                 mydialog.show();
-            }catch (Exception e){}
+            }catch (Exception ignored){}
         }
 
         // automatically done on worker thread (separate from UI thread)
@@ -121,7 +127,7 @@ public class StatsFragment_TenByTen extends Fragment {
             try {
                 int gameCounter = 0;
                 for (TenByTen gameToCheck : gamesToCheck) {
-                    List<TenByTen_Stats> tenByTenOut = TenByTen_Stats.getUniquePlays_GameGroup(gameToCheck.game.gameName, GameGroup.findById(GameGroup.class, (long) 1));
+                    List<TenByTen_Stats> tenByTenOut = TenByTen_Stats.getUniquePlays_GameGroup(gameToCheck.game.gameName, GameGroup.findById(GameGroup.class, theGroup));
                     int scoreIndex = 0;
                     int gamePlays = 0;
                     long playCounter = -1;
@@ -155,9 +161,12 @@ public class StatsFragment_TenByTen extends Fragment {
                     }
                     if (scoreIndex == groupPlayers.size()) {
                         //this means we both played ths game, so it's part of our TenByTen, so log that shit
-                        String output_date = outputFormatter.format(currentStat.playDate); // Output : 01/20/2012
-                        if (output_date.endsWith(""+gameToCheck.year)) {
-                            gamePlays++;
+                        String output_date = null; // Output : 01/20/2012
+                        if (currentStat != null) {
+                            output_date = outputFormatter.format(currentStat.playDate);
+                            if (output_date.endsWith(""+gameToCheck.year)) {
+                                gamePlays++;
+                            }
                         }
                     }
                     output[gameCounter] = gamePlays;

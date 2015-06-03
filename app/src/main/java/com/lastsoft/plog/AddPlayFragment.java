@@ -132,16 +132,16 @@ public class AddPlayFragment extends Fragment implements
         colorSpinnerArrayAdapter = ArrayAdapter.createFromResource(mActivity, R.array.color_choices, android.R.layout.simple_spinner_item);
 
 
-        ActionBar actionBar = ((MainActivity)mActivity).getSupportActionBar();
-        actionBar.setDisplayShowCustomEnabled(false);
+        //ActionBar actionBar = ((MainActivity)mActivity).getSupportActionBar();
+        //actionBar.setDisplayShowCustomEnabled(false);
 
         //expansions = Game.findExpansionsFor(gameName);
         //checkedItems = new boolean[expansions.size()];
 
-        addedExpansions = new ArrayList<Game>();
+        addedExpansions = new ArrayList<>();
         List<Player> players = Player.listPlayersAZ();
-        playersName = new ArrayList<String>();
-        playersID = new ArrayList<Integer>();
+        playersName = new ArrayList<>();
+        playersID = new ArrayList<>();
         for(Player player:players){
             playersName.add(player.playerName);
             playersID.add(player.getId().intValue());
@@ -291,10 +291,10 @@ public class AddPlayFragment extends Fragment implements
             DateFormat outputFormatter = new SimpleDateFormat("MM/dd/yyyy");
             String output_date = outputFormatter.format(date1); // Output : 01/20/2012
             textViewDate.setText(output_date);
-        }catch (ParseException e) {}
+        }catch (ParseException ignored) {}
 
         // Construct the data source
-        arrayOfUsers = new ArrayList<AddPlayer>();
+        arrayOfUsers = new ArrayList<>();
         // Create the adapter to convert the array to views
         adapter = new AddPlayerAdapter(mActivity, arrayOfUsers);
         //expansionAdapter = new ExpansionsAdapter(mActivity, addedExpansions);
@@ -369,8 +369,6 @@ public class AddPlayFragment extends Fragment implements
         imageChooserManager.setImageChooserListener(this);
         try {
             String filePath = imageChooserManager.choose();
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -395,7 +393,7 @@ public class AddPlayFragment extends Fragment implements
         final ViewGroup newView = (ViewGroup) LayoutInflater.from(mActivity).inflate(
                 R.layout.play_addplayer_item, mContainerView_Players, false);
         Spinner player = (Spinner) newView.findViewById(R.id.player);
-        ArrayAdapter<String> playerSpinnerArrayAdapter = new ArrayAdapter<String>(mActivity, android.R.layout.simple_spinner_item, playersName);
+        ArrayAdapter<String> playerSpinnerArrayAdapter = new ArrayAdapter<>(mActivity, android.R.layout.simple_spinner_item, playersName);
         playerSpinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); // The drop down view
         player.setAdapter(playerSpinnerArrayAdapter);
         if (!addedPlayer.playerName.equals("")) {
@@ -507,12 +505,12 @@ public class AddPlayFragment extends Fragment implements
 
 
     public Bitmap resizeImageForImageView(Bitmap bitmap, int size) {
-        Bitmap resizedBitmap = null;
+        Bitmap resizedBitmap;
         int originalWidth = bitmap.getWidth();
         int originalHeight = bitmap.getHeight();
         int newWidth = -1;
         int newHeight = -1;
-        float multFactor = -1.0F;
+        float multFactor;
         if(originalHeight > originalWidth) {
             newHeight = size;
             multFactor = (float) originalWidth/(float) originalHeight;
@@ -555,7 +553,7 @@ public class AddPlayFragment extends Fragment implements
 
             inputManager.hideSoftInputFromWindow(mActivity.getCurrentFocus().getWindowToken(),
                     InputMethodManager.HIDE_NOT_ALWAYS);
-        }catch (Exception e){}
+        }catch (Exception ignored){}
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.add_play) {
@@ -636,12 +634,12 @@ public class AddPlayFragment extends Fragment implements
             }
 
             //removeYourself();
-            if (playID<0) {
-                ((MainActivity) mActivity).getSupportActionBar().setDisplayShowCustomEnabled(true);
-            }else{
+            /*if (playID<0) {
+                //((MainActivity) mActivity).getSupportActionBar().setDisplayShowCustomEnabled(true);
+            }else{*/
                 onButtonPressed("refresh_plays");
-            }
-            ((MainActivity) mActivity).onBackPressed();
+            //}
+            mActivity.onBackPressed();
             return true;
         }
 
@@ -710,7 +708,7 @@ public class AddPlayFragment extends Fragment implements
 
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        public void onFragmentInteraction(String string);
+        void onFragmentInteraction(String string);
     }
 
     public class DatePickerFragment extends DialogFragment
@@ -753,7 +751,7 @@ public class AddPlayFragment extends Fragment implements
                 DateFormat outputFormatter = new SimpleDateFormat("MM/dd/yyyy");
                 String output_date = outputFormatter.format(date1); // Output : 01/20/2012
                 textViewDate.setText(output_date);
-            }catch (ParseException e) {}
+            }catch (ParseException ignored) {}
         }
     }
 
@@ -763,15 +761,15 @@ public class AddPlayFragment extends Fragment implements
     public void removeYourself(){
         try {
             final AddPlayFragment mfragment = this;
-            if (playID < 0) {
-                ((MainActivity) mActivity).getSupportActionBar().setDisplayShowCustomEnabled(true);
+            /*if (playID < 0) {
+                //((MainActivity) mActivity).getSupportActionBar().setDisplayShowCustomEnabled(true);
             } else {
                 //onButtonPressed("refresh_plays");
-            }
+            }*/
             getFragmentManager().popBackStack();
             getFragmentManager().beginTransaction().remove(mfragment).commit();
             getFragmentManager().executePendingTransactions(); //Prevents the flashing.
-        }catch (Exception e){}
+        }catch (Exception ignored){}
     }
 
     public class AddPlayer {
@@ -852,8 +850,8 @@ public class AddPlayFragment extends Fragment implements
             if (playerSpinner.getSelectedItem().toString().equals(playerToUpdate.playerName)) {
                 //Log.d("V1", playerToUpdate.playerName);
                 String score = editable.toString().trim();
-                if (!score.toString().equals("")) {
-                    playerToUpdate.score = Integer.parseInt(score.toString());
+                if (!score.equals("")) {
+                    playerToUpdate.score = Integer.parseInt(score);
                 }
             }
         }
@@ -878,7 +876,7 @@ public class AddPlayFragment extends Fragment implements
             //final boolean[] checkedItems = getArguments().getBooleanArray("checkedItems");
             final String gameName = getArguments().getString("gameName");
 
-            List<String> expansionNames = new ArrayList<String>();
+            List<String> expansionNames = new ArrayList<>();
             for(Game expansion:expansions){
                 expansionNames.add(expansion.gameName);
             }

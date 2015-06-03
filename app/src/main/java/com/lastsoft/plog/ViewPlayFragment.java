@@ -7,8 +7,10 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.SharedElementCallback;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.transition.Transition;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -31,6 +33,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -86,6 +89,9 @@ public class ViewPlayFragment extends Fragment {
         Log.d("V1", "nameTransID=" + nameTransID);
         Log.d("V1", "dateTransID=" + dateTransID);
         */
+
+        ((MainActivity)mActivity).getSupportActionBar().setDisplayShowCustomEnabled(false);
+
         setHasOptionsMenu(true);
     }
 
@@ -117,6 +123,7 @@ public class ViewPlayFragment extends Fragment {
         mPagerAdapter = new ScreenSlidePagerAdapter(getChildFragmentManager());
         mPager.setAdapter(mPagerAdapter);
         mPager.setCurrentItem(adapterPosition);
+        //mPager.setOffscreenPageLimit(4);
         mPager.setPageTransformer(true, new DepthPageTransformer());
         mPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
@@ -185,6 +192,7 @@ public class ViewPlayFragment extends Fragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         mActivity = activity;
+        ((MainActivity) mActivity).onSectionAttached(7);
         try {
             mListener = (OnFragmentInteractionListener) activity;
         } catch (ClassCastException e) {
@@ -197,7 +205,11 @@ public class ViewPlayFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
-        mActivity = null;
+        if (mActivity != null) {
+            ((MainActivity) mActivity).onSectionAttached(3);
+            ((MainActivity) mActivity).getSupportActionBar().setDisplayShowCustomEnabled(true);
+            mActivity = null;
+        }
     }
 
     @Override
@@ -222,7 +234,7 @@ public class ViewPlayFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
 
-        public void onFragmentInteraction(String string);
+        void onFragmentInteraction(String string);
     }
 
 
@@ -251,9 +263,6 @@ public class ViewPlayFragment extends Fragment {
         public int getItemPosition(Object object) {
             return POSITION_NONE;
         }
-
-
-
     }
 
     public class DepthPageTransformer implements ViewPager.PageTransformer {

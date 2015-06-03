@@ -73,6 +73,8 @@ public class ViewPlayFragment_Pages extends Fragment {
 
 
     View viewPlayLayout;
+    TextView gameName;
+    TextView playDate;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -83,7 +85,7 @@ public class ViewPlayFragment_Pages extends Fragment {
         //Log.d("V1", "playID = " + playID);
         final Play thisPlay = Play.findById(Play.class, playID);
 
-    //    Log.d("V1", "nameTransID = " + nameTransID);
+        Log.d("V1", "imageTransID = " + imageTransID);
 
         DisplayImageOptions options = new DisplayImageOptions.Builder()
                 .cacheOnDisk(true)
@@ -95,9 +97,9 @@ public class ViewPlayFragment_Pages extends Fragment {
         mContainerView_Expansions = (ViewGroup) viewPlayLayout.findViewById(R.id.container_expansions);
 
         playImage = (ImageView) viewPlayLayout.findViewById(R.id.imageView1);
+        playImage.setTransitionName(imageTransID);
         if (thisPlay.playPhoto != null && !thisPlay.playPhoto.equals("")){
             ImageLoader.getInstance().displayImage(thisPlay.playPhoto, playImage, options);
-            playImage.setTransitionName(imageTransID);
             playImage.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -110,26 +112,25 @@ public class ViewPlayFragment_Pages extends Fragment {
         }else{
             if (GamesPerPlay.getBaseGame(thisPlay).gameThumb != null) {
                 ImageLoader.getInstance().displayImage("http:" + GamesPerPlay.getBaseGame(thisPlay).gameThumb, playImage, options);
-                playImage.setTransitionName(imageTransID);
             }else{
                 playImage.setImageDrawable(null);
-                playImage.setTransitionName(imageTransID);
             }
             playImage.setOnClickListener(null);
+
         }
 
         //get game for this play
         Game thisBaseGame = GamesPerPlay.getBaseGame(thisPlay);
 
         //add a textview with the game name
-        TextView gameName = (TextView) viewPlayLayout.findViewById(R.id.gameName);
+        gameName = (TextView) viewPlayLayout.findViewById(R.id.gameName);
         gameName.setText(thisBaseGame.gameName);
         gameName.setTransitionName(nameTransID);
 
 
 
         //date
-        TextView playDate = (TextView) viewPlayLayout.findViewById(R.id.gameDate);
+        playDate = (TextView) viewPlayLayout.findViewById(R.id.gameDate);
         DateFormat outputFormatter = new SimpleDateFormat("MM/dd/yyyy");
         String output = outputFormatter.format(thisPlay.playDate); // Output : 01/20/2010
         playDate.setText(output);

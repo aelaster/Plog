@@ -7,9 +7,6 @@ import com.orm.query.Select;
 
 import java.util.List;
 
-/**
- * Created by TheFlash on 5/22/2015.
- */
 public class PlayersPerGameGroup extends SugarRecord<PlayersPerGameGroup> {
 
     public Player player;
@@ -23,10 +20,22 @@ public class PlayersPerGameGroup extends SugarRecord<PlayersPerGameGroup> {
         this.gameGroup = gameGroup;
     }
 
-    public static List<PlayersPerGameGroup> getPlayer(Player player){
+    public static List getPlayer(Player player){
         Select getPlayers = Select.from(PlayersPerGameGroup.class);
         getPlayers.where(Condition.prop(StringUtil.toSQLName("player")).eq(player.getId()));
         return getPlayers.list();
+    }
+
+    public static List getPlayers(GameGroup group){
+        Select getPlayers = Select.from(PlayersPerGameGroup.class);
+        getPlayers.where(Condition.prop(StringUtil.toSQLName("gameGroup")).eq(group.getId()));
+        return getPlayers.list();
+    }
+
+    public static PlayersPerGameGroup getPlayer(Player player, GameGroup group){
+        Select getPlayers = Select.from(PlayersPerGameGroup.class);
+        getPlayers.where(Condition.prop(StringUtil.toSQLName("player")).eq(player.getId()), Condition.prop(StringUtil.toSQLName("gameGroup")).eq(group.getId()));
+        return (PlayersPerGameGroup) getPlayers.first();
     }
 
 }

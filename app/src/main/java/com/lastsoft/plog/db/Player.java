@@ -1,14 +1,13 @@
 package com.lastsoft.plog.db;
 
+import android.util.Log;
+
 import com.orm.StringUtil;
 import com.orm.SugarRecord;
 import com.orm.query.Select;
 
 import java.util.List;
 
-/**
- * Created by TheFlash on 5/22/2015.
- */
 public class Player extends SugarRecord<Player> {
 
     public String playerName;
@@ -42,7 +41,7 @@ public class Player extends SugarRecord<Player> {
         this.playerName = playerName;
     }
 
-    public static List<Player> listPlayersAZ(){
+    public static List listPlayersAZ(){
         Select alphaSort_AZ = Select.from(Player.class);
         alphaSort_AZ.orderBy(StringUtil.toSQLName("playerName") + " ASC");
 
@@ -50,11 +49,7 @@ public class Player extends SugarRecord<Player> {
     }
 
     public static boolean playerExists(String playerName){
-        if (Player.find(Player.class, StringUtil.toSQLName("playerName") + " = ?", playerName).size() > 0){
-            return true;
-        }else{
-            return false;
-        }
+        return (Player.find(Player.class, StringUtil.toSQLName("playerName") + " = ?", playerName).size() > 0);
     }
 
     public static long playerExists_ID(String playerName){
@@ -68,7 +63,7 @@ public class Player extends SugarRecord<Player> {
 
     public static boolean hasPlayerPlayedGame(Player player, Game game){
         List<GamesPerPlay> queery = GamesPerPlay.findWithQuery(GamesPerPlay.class,
-                "Select " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("play") +
+                /*"Select " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("play") +
                         " from " + StringUtil.toSQLName("PlayersPerPlay") +
                         ", " + StringUtil.toSQLName("GamesPerPlay") +
                         " where " + StringUtil.toSQLName("PlayersPerPlay") +
@@ -76,11 +71,14 @@ public class Player extends SugarRecord<Player> {
                         " = ? and " + StringUtil.toSQLName("PlayersPerPlay") +
                         "."  + StringUtil.toSQLName("play") + " =  "+ StringUtil.toSQLName("GamesPerPlay") +
                         "."  + StringUtil.toSQLName("play") + " and " + StringUtil.toSQLName("GamesPerPlay") +
-                        "."  + StringUtil.toSQLName("game") + " = ?" , player.getId().toString(), game.getId().toString());
-        if (queery.size() == 0){
-            return false;
-        }else {
-            return true;
-        }
+                        "."  + StringUtil.toSQLName("game") + " = ?" , player.getId().toString(), game.getId().toString());*/
+
+                " SELECT * " +
+                " FROM " + StringUtil.toSQLName("PlayersPerPlay") +
+                " INNER JOIN " + StringUtil.toSQLName("GamesPerPlay") +
+                " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("play") + " = " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("play") +
+                " and " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("player") + " = ? " +
+                " and " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("game") + " = ? ", game.getId().toString());
+        return (queery.size() == 0);
     }
 }

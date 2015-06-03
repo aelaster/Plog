@@ -7,7 +7,11 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
@@ -18,11 +22,18 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.lastsoft.plog.db.GameGroup;
 import com.lastsoft.plog.db.Player;
+import com.lastsoft.plog.db.PlayersPerGameGroup;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -40,7 +51,17 @@ public class AddPlayerFragment extends Fragment {
     Player editPlayer;
     SharedPreferences app_preferences;
     SharedPreferences.Editor editor;
-
+    EditText playerName;
+    EditText bggUsername;
+    Switch defaultSwitch;
+    Button deleteButton;
+    Spinner color;
+    TextView groupsLabel;
+    ViewGroup mContainerView_Groups;
+    ArrayList<AddGroup> arrayOfUsers;
+    ArrayList<AddGroup> buhleetMe;
+    AddGroupAdapter adapter;
+    List<PlayersPerGameGroup> groupers;
 
     // TODO: Rename and change types and number of parameters
     public static AddPlayerFragment newInstance(int centerX, int centerY, boolean doAccelerate, long playerID) {
@@ -64,6 +85,7 @@ public class AddPlayerFragment extends Fragment {
         if (getArguments() != null) {
             playerID = getArguments().getLong("playerID");
         }
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -96,25 +118,32 @@ public class AddPlayerFragment extends Fragment {
         app_preferences = PreferenceManager.getDefaultSharedPreferences(mActivity);
         editor = app_preferences.edit();
 
-        Button button = (Button) rootView.findViewById(R.id.button);
-        View deleteButton = rootView.findViewById(R.id.deleteButton);
-        final EditText playerName = (EditText) rootView.findViewById(R.id.playerName);
-        final EditText bggUsername = (EditText) rootView.findViewById(R.id.bggUsername);
-        final Switch defaultSwitch = (Switch) rootView.findViewById(R.id.defaultSwitch);
-        final Spinner color = (Spinner) rootView.findViewById(R.id.color);
+        deleteButton = (Button) rootView.findViewById(R.id.deleteButton);
+        playerName = (EditText) rootView.findViewById(R.id.playerName);
+        bggUsername = (EditText) rootView.findViewById(R.id.bggUsername);
+        defaultSwitch = (Switch) rootView.findViewById(R.id.defaultSwitch);
+        color = (Spinner) rootView.findViewById(R.id.color);
         ArrayAdapter<CharSequence> colorSpinnerArrayAdapter = ArrayAdapter.createFromResource(mActivity, R.array.color_choices, android.R.layout.simple_spinner_item);
         colorSpinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); // The drop down view
         color.setAdapter(colorSpinnerArrayAdapter);
 
+        mContainerView_Groups = (ViewGroup) rootView.findViewById(R.id.container_groups);
+        groupsLabel = (TextView) rootView.findViewById(R.id.groupsLabel);
         /*MySpinnerListener colorListener = new MySpinnerListener(addedPlayer, 1);
         color.setOnItemSelectedListener(colorListener);*/
+
+        // Construct the data source
+        buhleetMe = new ArrayList<>();
+        arrayOfUsers = new ArrayList<>();
+        // Create the adapter to convert the array to views
+        adapter = new AddGroupAdapter(mActivity, arrayOfUsers);
+
 
         if (playerID >= 0){
             //edit me
             editPlayer = Player.findById(Player.class, playerID);
             playerName.setText(editPlayer.playerName);
             bggUsername.setText(editPlayer.bggUsername);
-            button.setText(getString(R.string.edit_player));
             if (editPlayer.defaultColor != null && !editPlayer.defaultColor.equals("")){
                 int spinnerPostion = colorSpinnerArrayAdapter.getPosition(editPlayer.defaultColor);
                 color.setSelection(spinnerPostion);
@@ -122,6 +151,24 @@ public class AddPlayerFragment extends Fragment {
             if (app_preferences.getLong("defaultPlayer", -1) == playerID){
                 defaultSwitch.setChecked(true);
             }
+
+
+            //check to see if this player is a member of any groups
+            groupers = PlayersPerGameGroup.getPlayer(editPlayer);
+            if (groupers.size() > 0) {
+                //if there are groups, show them
+                for (PlayersPerGameGroup grouper : groupers) {
+                    AddGroup addedGroup = new AddGroup(grouper.gameGroup.getId(), grouper.gameGroup.groupName);
+                    addGroup(addedGroup);
+                    adapter.add(addedGroup);
+                }
+            }else{
+                //if not, hide the layout/label
+                groupsLabel.setVisibility(View.GONE);
+            }
+
+        }else{
+            groupsLabel.setVisibility(View.GONE);
         }
         deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -131,83 +178,162 @@ public class AddPlayerFragment extends Fragment {
             }
         });
 
-            // Set a listener to reveal the view when clicked.
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                view.setEnabled(false);
-                if (!playerName.getText().toString().isEmpty()) {
-                    //check to see if this name already exists
-                    //for now, toast them if it does.
-                    boolean nameTakenFlag = false;
 
-                    if (playerID >= 0){
-                        //edit
-                        if (editPlayer.playerName.equals(playerName.getText().toString())==false && Player.playerExists(playerName.getText().toString())){
-                            //if the edit player's name isn't equal to the input name AND the player name already exists
-                            nameTakenFlag = true;
-                        }
-                    }else{
-                        //if this new player's name already exists
-                        if (Player.playerExists(playerName.getText().toString())){
-                            nameTakenFlag = true;
-                        }
-                    }
-
-                    if (nameTakenFlag){
-                        Toast.makeText(mActivity, getString(R.string.name_taken), Toast.LENGTH_SHORT).show();
-                    }else {
-                        if (playerID >= 0) {
-                            editPlayer.bggUsername = bggUsername.getText().toString();
-                            editPlayer.playerName = playerName.getText().toString();
-                            editPlayer.defaultColor = color.getSelectedItem().toString();
-                            editPlayer.save();
-                        } else {
-                            Player player = new Player(playerName.getText().toString(), bggUsername.getText().toString());
-                            player.save();
-                            playerID = player.getId();
-                        }
-
-
-                        if (defaultSwitch.isChecked()) {
-                            //set app preference
-                            editor.putLong("defaultPlayer", playerID);
-                            editor.commit();
-                        } else {
-                            //check to see if the pref is this bggusername.  if so, clear it.
-                            long currentDefaultPlayer = app_preferences.getLong("defaultPlayer", -1);
-                            if (currentDefaultPlayer == playerID){
-                                editor.putLong("defaultPlayer", -1);
-                                editor.commit();
-                            }
-                        }
-                        onButtonPressed("refresh_players");
-                    }
-                }
-                removeYourself();
-            }
-        });
         return rootView;
     }
 
-    /*public class MySpinnerListener implements AdapterView.OnItemSelectedListener{
 
-        private String playerColor;
 
-        public MySpinnerListener(String color) {
-            this.playerColor = color;
+    private void addGroup(final AddGroup addedGroup) {
+        // Instantiate a new "row" view.
+        final ViewGroup newView = (ViewGroup) LayoutInflater.from(mActivity).inflate(
+                R.layout.player_addgroup_item, mContainerView_Groups, false);
+
+        TextView group = (TextView) newView.findViewById(R.id.group);
+        group.setText(addedGroup.groupName);
+
+        // Set a click listener for the "X" button in the row that will remove the row.
+        newView.findViewById(R.id.closeButton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Remove the row from its parent (the container view).
+                // Because mContainerView has android:animateLayoutChanges set to true,
+                // this removal is automatically animated.
+                buhleetMe.add(addedGroup);
+                adapter.remove(addedGroup);
+                mContainerView_Groups.removeView(newView);
+
+
+
+            }
+        });
+
+        // Because mContainerView has android:animateLayoutChanges set to true,
+        // adding this view is automatically animated.
+
+        mContainerView_Groups.addView(newView);
+    }
+
+    public class AddGroup {
+        public long groupID;
+        public String groupName;
+
+        public AddGroup(long groupID, String groupName) {
+            this.groupID = groupID;
+            this.groupName = groupName;
+        }
+    }
+
+    public class AddGroupAdapter extends ArrayAdapter<AddGroup> {
+        public AddGroupAdapter(Context context, ArrayList<AddGroup> users) {
+            super(context, 0, users);
+        }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        // TODO Add your menu entries here
+        super.onCreateOptionsMenu(menu, inflater);
+        if(playerID >= 0 ){
+            inflater.inflate(R.menu.edit_player, menu);
+        }else {
+            inflater.inflate(R.menu.add_player, menu);
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        try{
+            InputMethodManager inputManager = (InputMethodManager)
+                    mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
+
+            inputManager.hideSoftInputFromWindow(mActivity.getCurrentFocus().getWindowToken(),
+                    InputMethodManager.HIDE_NOT_ALWAYS);
+        }catch (Exception ignored){}
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.add_player) {
+            if (!playerName.getText().toString().isEmpty()) {
+                //check to see if this name already exists
+                //for now, toast them if it does.
+                boolean nameTakenFlag = false;
+
+                if (playerID >= 0){
+                    //edit
+                    if (!editPlayer.playerName.equals(playerName.getText().toString()) && Player.playerExists(playerName.getText().toString())){
+                        //if the edit player's name isn't equal to the input name AND the player name already exists
+                        nameTakenFlag = true;
+                    }
+                }else{
+                    //if this new player's name already exists
+                    if (Player.playerExists(playerName.getText().toString())){
+                        nameTakenFlag = true;
+                    }
+                }
+
+                if (nameTakenFlag){
+                    Toast.makeText(mActivity, getString(R.string.name_taken), Toast.LENGTH_SHORT).show();
+                }else {
+                    if (playerID >= 0) {
+                        editPlayer.bggUsername = bggUsername.getText().toString();
+                        editPlayer.playerName = playerName.getText().toString();
+                        editPlayer.defaultColor = color.getSelectedItem().toString();
+                        editPlayer.save();
+                    } else {
+                        Player player = new Player(playerName.getText().toString(), bggUsername.getText().toString());
+                        player.save();
+                        playerID = player.getId();
+                    }
+
+
+                    if (defaultSwitch.isChecked()) {
+                        //set app preference
+                        editor.putLong("defaultPlayer", playerID);
+                        editor.commit();
+                    } else {
+                        //check to see if the pref is this bggusername.  if so, clear it.
+                        long currentDefaultPlayer = app_preferences.getLong("defaultPlayer", -1);
+                        if (currentDefaultPlayer == playerID){
+                            editor.putLong("defaultPlayer", -1);
+                            editor.commit();
+                        }
+                    }
+
+                    if (buhleetMe != null) {
+                        for (AddGroup gone : buhleetMe) {
+                            GameGroup deleteMe = GameGroup.findById(GameGroup.class, gone.groupID);
+                            deleteGroupMember(deleteMe);
+                        }
+                    }
+
+                    onButtonPressed("refresh_players");
+                }
+            }
+            removeYourself();
+            return true;
         }
 
-        @Override
-        public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-            playerToUpdate.color = adapterView.getSelectedItem().toString();
-        }
+        return super.onOptionsItemSelected(item);
+    }
 
-        @Override
-        public void onNothingSelected(AdapterView<?> adapterView) {
+    public void deleteGroupMember(GameGroup group){
+        PlayersPerGameGroup deleteMe = PlayersPerGameGroup.getPlayer(Player.findById(Player.class, playerID), group);
+        deleteMe.delete();
 
+        List<PlayersPerGameGroup> players =  PlayersPerGameGroup.getPlayers(group);
+        if (players.size() <= 1){
+            //this group only has one person now, or none, so it needs to be buhleeted
+            for (PlayersPerGameGroup player : players) {
+                player.delete();
+            }
+            group.delete();
         }
-    }*/
+    }
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(String string) {
@@ -249,7 +375,7 @@ public class AddPlayerFragment extends Fragment {
      */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        public void onFragmentInteraction(String string);
+        void onFragmentInteraction(String string);
     }
 
     /*
@@ -262,7 +388,7 @@ public class AddPlayerFragment extends Fragment {
                 getFragmentManager().popBackStack();
                 getFragmentManager().beginTransaction().remove(mfragment).commit();
                 getFragmentManager().executePendingTransactions(); //Prevents the flashing.
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
         }else {
             Animator unreveal = mfragment.prepareUnrevealAnimator(cx, cy);
@@ -276,7 +402,7 @@ public class AddPlayerFragment extends Fragment {
 
                             inputManager.hideSoftInputFromWindow(mActivity.getCurrentFocus().getWindowToken(),
                                     InputMethodManager.HIDE_NOT_ALWAYS);
-                        } catch (Exception e) {
+                        } catch (Exception ignored) {
                         }
                     }
 
@@ -287,7 +413,7 @@ public class AddPlayerFragment extends Fragment {
                             getFragmentManager().popBackStack();
                             getFragmentManager().beginTransaction().remove(mfragment).commit();
                             getFragmentManager().executePendingTransactions(); //Prevents the flashing.
-                        } catch (Exception e) {
+                        } catch (Exception ignored) {
                         }
                     }
 
