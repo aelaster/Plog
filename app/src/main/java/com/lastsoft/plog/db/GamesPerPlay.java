@@ -78,14 +78,14 @@ public class GamesPerPlay extends SugarRecord<GamesPerPlay> {
         Select getExpansion = Select.from(GamesPerPlay.class);
         getExpansion.where(Condition.prop(StringUtil.toSQLName("play")).eq(play.getId()), Condition.prop(StringUtil.toSQLName("game")).eq(testExpansion.getId()));
         List tester = getExpansion.list();
-        return (tester.isEmpty());
+        return (!tester.isEmpty());
     }
 
     public static boolean hasGameBeenPlayed(Game game){
         Select hasGameBeenPlayed = Select.from(GamesPerPlay.class);
         hasGameBeenPlayed.where(Condition.prop(StringUtil.toSQLName("game")).eq(game.getId()));
         List tester = hasGameBeenPlayed.list();
-        return (tester.isEmpty());
+        return (!tester.isEmpty());
     }
 
 }

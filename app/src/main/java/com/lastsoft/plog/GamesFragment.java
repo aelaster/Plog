@@ -140,53 +140,54 @@ public class GamesFragment extends Fragment{
             }
         });
 
-        mSearch.addTextChangedListener(new TextWatcher() {
+        if (mSearch != null) {
+            mSearch.addTextChangedListener(new TextWatcher() {
 
-            @Override
-            public void onTextChanged(CharSequence cs, int arg1, int arg2, int arg3) {
-                // When user changed the Text
-                mSearchQuery = cs.toString();
-                //initDataset();
-                mAdapter = new GameAdapter(GamesFragment.this, mActivity,mSearchQuery);
-                // Set CustomAdapter as the adapter for RecyclerView.
-                mRecyclerView.setAdapter(mAdapter);
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
-
-            @Override
-            public void beforeTextChanged(CharSequence arg0, int arg1, int arg2,
-                                          int arg3) {
-                // TODO Auto-generated method stub
-
-            }
-        });
-
-
-
-        mCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (!mSearch.getText().toString().equals("")) {
-                    mSearchQuery = "";
-                    mSearch.setText(mSearchQuery);
-                    //mActivity.onBackPressed();
+                @Override
+                public void onTextChanged(CharSequence cs, int arg1, int arg2, int arg3) {
+                    // When user changed the Text
+                    mSearchQuery = cs.toString();
+                    //initDataset();
+                    mAdapter = new GameAdapter(GamesFragment.this, mActivity, mSearchQuery);
+                    // Set CustomAdapter as the adapter for RecyclerView.
+                    mRecyclerView.setAdapter(mAdapter);
                 }
 
-                InputMethodManager inputManager = (InputMethodManager)
-                        mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
+                @Override
+                public void afterTextChanged(Editable editable) {
 
-                inputManager.hideSoftInputFromWindow(mActivity.getCurrentFocus().getWindowToken(),
-                        InputMethodManager.HIDE_NOT_ALWAYS);
-                mSearch.clearFocus();
-                mRecyclerView.requestFocus();
+                }
 
-                initDataset();
-            }
-        });
+                @Override
+                public void beforeTextChanged(CharSequence arg0, int arg1, int arg2,
+                                              int arg3) {
+                    // TODO Auto-generated method stub
+
+                }
+            });
+
+
+            mCancel.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (!mSearch.getText().toString().equals("")) {
+                        mSearchQuery = "";
+                        mSearch.setText(mSearchQuery);
+                        //mActivity.onBackPressed();
+                    }
+
+                    InputMethodManager inputManager = (InputMethodManager)
+                            mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
+
+                    inputManager.hideSoftInputFromWindow(mActivity.getCurrentFocus().getWindowToken(),
+                            InputMethodManager.HIDE_NOT_ALWAYS);
+                    mSearch.clearFocus();
+                    mRecyclerView.requestFocus();
+
+                    initDataset();
+                }
+            });
+        }
 
         if (Game.findBaseGames("").size() == 0){
             initDataset();
@@ -275,12 +276,6 @@ public class GamesFragment extends Fragment{
         ((MainActivity)mActivity).unbindDrawables(mRecyclerView);
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
-        // Save currently selected layout manager.
-        savedInstanceState.putSerializable(KEY_LAYOUT_MANAGER, mCurrentLayoutManagerType);
-        super.onSaveInstanceState(savedInstanceState);
-    }
 
     /**
      * Generates Strings for RecyclerView's adapter. This data would usually come

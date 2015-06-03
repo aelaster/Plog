@@ -179,12 +179,6 @@ public class PlayersFragment extends Fragment{
         mRecyclerView.scrollToPosition(scrollPosition);
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
-        // Save currently selected layout manager.
-        savedInstanceState.putSerializable(KEY_LAYOUT_MANAGER, mCurrentLayoutManagerType);
-        super.onSaveInstanceState(savedInstanceState);
-    }
 
     /**
      * Generates Strings for RecyclerView's adapter. This data would usually come

@@ -27,7 +27,7 @@ public class TenByTen extends SugarRecord<TenByTen> {
     public static boolean isGroupAdded(GameGroup group, Game game){
         Select getPlayers = Select.from(TenByTen.class);
         getPlayers.where(Condition.prop(StringUtil.toSQLName("gameGroup")).eq(group.getId()), Condition.prop(StringUtil.toSQLName("game")).eq(game.getId()));
-        return (getPlayers.list().isEmpty());
+        return (!getPlayers.list().isEmpty());
 
     }
 

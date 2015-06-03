@@ -489,6 +489,7 @@ public class MainActivity extends ActionBarActivity
     public void deleteGame(long gameId){
         Game deleteMe = Game.findById(Game.class, gameId);
 
+        //Log.d("V1", "has game been played? = " + GamesPerPlay.hasGameBeenPlayed(deleteMe));
         //check if this game has been played
         //if so, can't delete
         if (!GamesPerPlay.hasGameBeenPlayed(deleteMe)){
@@ -545,15 +546,17 @@ public class MainActivity extends ActionBarActivity
 
         //delete play image
         Log.d("V1", "play image = " + deleteMe.playPhoto);
-        File deleteImage = new File(deleteMe.playPhoto.substring(7, deleteMe.playPhoto.length()));
-        if (deleteImage.exists()){
-            deleteImage.delete();
-        }
+        if(deleteMe.playPhoto != null && deleteMe.playPhoto.equals("")) {
+            File deleteImage = new File(deleteMe.playPhoto.substring(7, deleteMe.playPhoto.length()));
+            if (deleteImage.exists()) {
+                deleteImage.delete();
+            }
 
-        //delete play image thumb
-        File deleteImage_thumb = new File(deleteMe.playPhoto.substring(7, deleteMe.playPhoto.length()-4) + "_thumb.jpg");
-        if (deleteImage_thumb.exists()){
-            deleteImage_thumb.delete();
+            //delete play image thumb
+            File deleteImage_thumb = new File(deleteMe.playPhoto.substring(7, deleteMe.playPhoto.length() - 4) + "_thumb.jpg");
+            if (deleteImage_thumb.exists()) {
+                deleteImage_thumb.delete();
+            }
         }
 
         //delete play
