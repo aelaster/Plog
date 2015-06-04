@@ -101,4 +101,6 @@
         <item>Edit</item>
         <item>Delete</item>
     </string-array>
+    <string name="title_activity_add_play">AddPlayActivity</string>
+    <string name="hello_world">Hello world!</string>
 </resources>

@@ -93,6 +93,7 @@ public class AddPlayFragment extends Fragment implements
 
     // TODO: Rename and change types and number of parameters
     public static AddPlayFragment newInstance(int centerX, int centerY, boolean doAccelerate, String mGameName, long playID) {
+        Log.d("V1", "add play new instance");
         AddPlayFragment fragment = new AddPlayFragment();
         Bundle args = new Bundle();
         args.putInt("cx", centerX);
@@ -169,6 +170,27 @@ public class AddPlayFragment extends Fragment implements
         rootView = inflater.inflate(R.layout.fragment_add_play, container, false);
         rootView.setBackgroundColor(getResources().getColor(R.color.cardview_initial_background));
 
+
+
+        /*rootView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop,
+                                       int oldRight, int oldBottom) {
+                v.removeOnLayoutChangeListener(this);
+                cx = getArguments().getInt("cx");
+                cy = getArguments().getInt("cy");
+                // get the hypothenuse so the radius is from one corner to the other
+                int radius = (int) Math.hypot(right, bottom);
+
+                Animator reveal = ViewAnimationUtils.createCircularReveal(v, cx, cy, 0, radius);
+                if (getArguments().getBoolean("doAccelerate")) {
+                    reveal.setInterpolator(new DecelerateInterpolator(1.5f));
+                }
+                reveal.setDuration(700);
+                reveal.start();
+            }
+        });*/
+
         try {
             expansions = Game.findExpansionsFor(gameName);
         } catch (UnsupportedEncodingException e) {
@@ -205,7 +227,11 @@ public class AddPlayFragment extends Fragment implements
                 @Override
                 public void onClick(View view) {
                     CheckBoxAlertDialogFragment newFragment = new CheckBoxAlertDialogFragment().newInstance(checkedItems, gameName);
-                    newFragment.show(((MainActivity)mActivity).getSupportFragmentManager(), "datePicker");
+                    if (mActivity instanceof MainActivity) {
+                        newFragment.show(((MainActivity) mActivity).getSupportFragmentManager(), "datePicker");
+                    }else{
+                        newFragment.show(((ViewPlayActivity) mActivity).getSupportFragmentManager(), "datePicker");
+                    }
                 }
             });
         }
@@ -258,7 +284,11 @@ public class AddPlayFragment extends Fragment implements
             @Override
             public void onClick(View view) {
                 DatePickerFragment newFragment = new DatePickerFragment();
-                newFragment.show(((MainActivity)mActivity).getSupportFragmentManager(), "datePicker");
+                if (mActivity instanceof MainActivity) {
+                    newFragment.show(((MainActivity) mActivity).getSupportFragmentManager(), "datePicker");
+                }else{
+                    newFragment.show(((ViewPlayActivity) mActivity).getSupportFragmentManager(), "datePicker");
+                }
             }
         });
 
@@ -387,7 +417,7 @@ public class AddPlayFragment extends Fragment implements
         scoreValue.addTextChangedListener(new MyTextWatcher(player, addedPlayer));
         scoreValue.setSelectAllOnFocus(true);
         //if (addedPlayer.score != -9999999) {
-            scoreValue.setText(""+addedPlayer.score);
+        scoreValue.setText(""+addedPlayer.score);
         //}
 
 
@@ -477,7 +507,7 @@ public class AddPlayFragment extends Fragment implements
                 e.printStackTrace();
             }
 
-    }else if (resultCode == -1 && (requestCode == ChooserType.REQUEST_PICK_PICTURE || requestCode == ChooserType.REQUEST_CAPTURE_PICTURE)) {
+        }else if (resultCode == -1 && (requestCode == ChooserType.REQUEST_PICK_PICTURE || requestCode == ChooserType.REQUEST_CAPTURE_PICTURE)) {
             imageChooserManager.submit(requestCode, data);
         }
     }
@@ -580,8 +610,8 @@ public class AddPlayFragment extends Fragment implements
                     for (int i = 0; i < adapter.getCount(); i++) {
                         AddPlayer thisGuy = adapter.getItem(i);
                         //if (thisGuy.score != -9999999) {
-                            PlayersPerPlay newPlayer = new PlayersPerPlay(Player.findById(Player.class, thisGuy.playerID), thePlay, thisGuy.score, thisGuy.color, highScore);
-                            newPlayer.save();
+                        PlayersPerPlay newPlayer = new PlayersPerPlay(Player.findById(Player.class, thisGuy.playerID), thePlay, thisGuy.score, thisGuy.color, highScore);
+                        newPlayer.save();
                         //}
                     }
 
@@ -616,7 +646,7 @@ public class AddPlayFragment extends Fragment implements
             /*if (playID<0) {
                 //((MainActivity) mActivity).getSupportActionBar().setDisplayShowCustomEnabled(true);
             }else{*/
-                onButtonPressed("refresh_plays");
+            onButtonPressed("refresh_plays");
             //}
             mActivity.onBackPressed();
             return true;
@@ -649,7 +679,9 @@ public class AddPlayFragment extends Fragment implements
     public void onStart() {
         super.onStart();
         if (mActivity != null) {
-            ((MainActivity) mActivity).setUpActionBar(3);
+            if (mActivity instanceof MainActivity) {
+                ((MainActivity) mActivity).setUpActionBar(3);
+            }
         }
     }
 
@@ -658,10 +690,12 @@ public class AddPlayFragment extends Fragment implements
         super.onDetach();
         mListener = null;
         if (mActivity != null) {
-            if (((MainActivity)mActivity).mViewPlayFragment != null) {
-                ((MainActivity) mActivity).setUpActionBar(8);
-            }else{
-                ((MainActivity) mActivity).setUpActionBar(4);
+            if (mActivity instanceof MainActivity) {
+                if (((MainActivity) mActivity).mViewPlayFragment != null) {
+                    ((MainActivity) mActivity).setUpActionBar(8);
+                } else {
+                    ((MainActivity) mActivity).setUpActionBar(4);
+                }
             }
             mActivity = null;
         }
@@ -671,7 +705,9 @@ public class AddPlayFragment extends Fragment implements
     public void onDestroy() {
         // TODO Auto-generated method stub
         super.onDestroy();
-        ((MainActivity)mActivity).unbindDrawables(rootView);
+        if (mActivity instanceof MainActivity) {
+            ((MainActivity) mActivity).unbindDrawables(rootView);
+        }
     }
 
     @Override
@@ -759,7 +795,8 @@ public class AddPlayFragment extends Fragment implements
             } else {
                 //onButtonPressed("refresh_plays");
             }*/
-            ((MainActivity) mActivity).getSupportActionBar().setDisplayShowCustomEnabled(false);
+
+
             getFragmentManager().popBackStack();
             getFragmentManager().beginTransaction().remove(mfragment).commit();
             getFragmentManager().executePendingTransactions(); //Prevents the flashing.
@@ -804,7 +841,7 @@ public class AddPlayFragment extends Fragment implements
                 playerToUpdate.playerID = playersID.get(i);
                 playerToUpdate.playerName = playersName.get(i);
                 Player colorCheck = Player.findById(Player.class, playerToUpdate.playerID);
-                if (colorCheck.defaultColor != null && !colorCheck.defaultColor.equals("") && playID <= 0){
+                if (colorCheck.defaultColor != null &&  !colorCheck.defaultColor.equals("")){
                     int spinnerPostion = colorSpinnerArrayAdapter.getPosition(colorCheck.defaultColor);
                     colorSpinner.setSelection(spinnerPostion);
                     playerToUpdate.color = colorSpinner.getSelectedItem().toString();
@@ -878,44 +915,44 @@ public class AddPlayFragment extends Fragment implements
             AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
             // Set the dialog title
             builder.setTitle(R.string.choose_expansions)
-                // Specify the list array, the items to be selected by default (null for none),
-                // and the listener through which to receive callbacks when items are selected
-                .setMultiChoiceItems(expansionNames.toArray(new CharSequence[expansionNames.size()]), checkedItems,
-                        new DialogInterface.OnMultiChoiceClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which,
-                                                boolean isChecked) {
-                                checkedItems[which] = isChecked;
-                                Game checked = expansions.get(which);
-                                if (isChecked){
-                                    addedExpansions.add(checked);
-                                }else{
-                                    addedExpansions.remove(checked);
+                    // Specify the list array, the items to be selected by default (null for none),
+                    // and the listener through which to receive callbacks when items are selected
+                    .setMultiChoiceItems(expansionNames.toArray(new CharSequence[expansionNames.size()]), checkedItems,
+                            new DialogInterface.OnMultiChoiceClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which,
+                                                    boolean isChecked) {
+                                    checkedItems[which] = isChecked;
+                                    Game checked = expansions.get(which);
+                                    if (isChecked){
+                                        addedExpansions.add(checked);
+                                    }else{
+                                        addedExpansions.remove(checked);
+                                    }
+                                    //Log.d("V1", checked.gameName);
+                                    //Log.d("V1", "isChecked="+isChecked);
                                 }
-                                //Log.d("V1", checked.gameName);
-                                //Log.d("V1", "isChecked="+isChecked);
+                            })
+                            // Set the action buttons
+                    .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int id) {
+                            clearGames();
+                            // User clicked OK, so save the checkedItems results somewhere
+                            // or return them to the component that opened the dialog
+                            //Log.d("V1", "addedExpansions size = " + addedExpansions.size());
+                            for (int i = 0; i < addedExpansions.size(); i++){
+                                Game addMe = addedExpansions.get(i);
+                                addGame(addMe);
                             }
-                        })
-                        // Set the action buttons
-                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int id) {
-                                clearGames();
-                                // User clicked OK, so save the checkedItems results somewhere
-                                // or return them to the component that opened the dialog
-                                //Log.d("V1", "addedExpansions size = " + addedExpansions.size());
-                                for (int i = 0; i < addedExpansions.size(); i++){
-                                    Game addMe = addedExpansions.get(i);
-                                    addGame(addMe);
-                                }
-                            }
-                        })
-                        .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int id) {
+                        }
+                    })
+                    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int id) {
 
-                            }
-                        });
+                        }
+                    });
 
             return builder.create();
         }

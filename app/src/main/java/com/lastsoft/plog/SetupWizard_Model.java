@@ -18,9 +18,9 @@ public class SetupWizard_Model extends AbstractWizardModel {
         @Override
         protected PageList onNewRootPageList() {
                 return new PageList(
-                        new CustomerInfoPage(this, "Enter your name and your default color.  You will be the first player entered.  You can enter more by visiting \"Players\" in the swipe menu.")
+                        new CustomerInfoPage(this, "Enter your name.  You will be the first player entered.")
                                 .setRequired(true), //on click we will import bgg stuff
-                        new CustomerInfoPage(this, "Enter your BGG username.  Your game collection will be synced with BGG and you'll be able to log any of your plays.")
+                        new CustomerInfoPage(this, "Enter your BGG username.  Your game collection will be imported.")
                                 .setRequired(true) //on click we will import bgg stuff
                 );
         }
