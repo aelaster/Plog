@@ -121,10 +121,17 @@ public class StatsFragment extends Fragment {
         mActivity = activity;
         try {
             mListener = (OnFragmentInteractionListener) activity;
-            ((MainActivity) mActivity).onSectionAttached(4);
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (mActivity != null) {
+            ((MainActivity) mActivity).setUpActionBar(7);
         }
     }
 

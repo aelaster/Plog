@@ -69,6 +69,7 @@ public class MainActivity extends ActionBarActivity
     public ViewPlayFragment mViewPlayFragment;
     PlaysFragment mPlaysFragment;
     PlayAdapter mPlayAdapter;
+    protected PostMortemReportExceptionHandler mDamageReport = new PostMortemReportExceptionHandler(this);
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -84,6 +85,9 @@ public class MainActivity extends ActionBarActivity
     protected void onCreate(Bundle savedInstanceState) {
         getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
         super.onCreate(savedInstanceState);
+
+        mDamageReport.initialize();
+
         if (!doesDatabaseExist(this, "SRX.db")) {
             setContentView(R.layout.activity_main0);
             mTitle = "Welcome!";
@@ -124,6 +128,15 @@ public class MainActivity extends ActionBarActivity
             } catch (Exception e) {
 
             }*/
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mDamageReport != null) {
+            mDamageReport.restoreOriginalHandler();
+            mDamageReport = null;
         }
     }
 
@@ -219,15 +232,79 @@ public class MainActivity extends ActionBarActivity
                 actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
             }
             actionBar.setDisplayShowTitleEnabled(true);
-            if(mTitle.equals(getString(R.string.title_section3)) || mTitle.equals(getString(R.string.title_section1))) {
-                actionBar.setDisplayShowCustomEnabled(true);
+            /*if(mTitle.equals(getString(R.string.title_section3)) || mTitle.equals(getString(R.string.title_section1))) {
+                //actionBar.setDisplayShowCustomEnabled(true);
             }else{
                 actionBar.setDisplayShowCustomEnabled(false);
-            }
-            actionBar.setTitle(mTitle);
+            }*/
+            //actionBar.setTitle(mTitle);
         }
     }
 
+    public int currentFragmentCode = 4;
+    public void setUpActionBar(int fragmentCode){
+        currentFragmentCode = fragmentCode;
+
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            if (fragmentCode == 0) {
+                //addgame
+                actionBar.setDisplayShowCustomEnabled(false);
+                actionBar.setDisplayShowTitleEnabled(true);
+                onSectionAttached(1);
+            } else if (fragmentCode == 1) {
+                //addgroup
+                actionBar.setDisplayShowCustomEnabled(false);
+                actionBar.setDisplayShowTitleEnabled(true);
+                actionBar.setTitle(getString(R.string.groups));
+            } else if (fragmentCode == 2) {
+                //addplayer
+                actionBar.setDisplayShowCustomEnabled(false);
+                actionBar.setDisplayShowTitleEnabled(true);
+                onSectionAttached(2);
+            } else if (fragmentCode == 3) {
+                //addplay
+                actionBar.setDisplayShowCustomEnabled(false);
+                actionBar.setDisplayShowTitleEnabled(true);
+                actionBar.setTitle(mTitle);
+            } else if (fragmentCode == 4) {
+                //games
+                actionBar.setDisplayShowCustomEnabled(true);
+                actionBar.setDisplayShowTitleEnabled(false);
+                onSectionAttached(1);
+                actionBar.setTitle(mTitle);
+            } else if (fragmentCode == 5) {
+                //players
+                actionBar.setDisplayShowCustomEnabled(false);
+                actionBar.setDisplayShowTitleEnabled(true);
+                onSectionAttached(2);
+                actionBar.setTitle(mTitle);
+            } else if (fragmentCode == 6) {
+                //plays
+                actionBar.setDisplayShowCustomEnabled(true);
+                actionBar.setDisplayShowTitleEnabled(false);
+                onSectionAttached(3);
+                actionBar.setTitle(mTitle);
+            } else if (fragmentCode == 7) {
+                //stats
+                actionBar.setDisplayShowCustomEnabled(false);
+                actionBar.setDisplayShowTitleEnabled(true);
+                onSectionAttached(4);
+                actionBar.setTitle(mTitle);
+            } else if (fragmentCode == 8) {
+                //viewplay
+                actionBar.setDisplayShowCustomEnabled(false);
+                actionBar.setDisplayShowTitleEnabled(true);
+                onSectionAttached(3);
+            } else if (fragmentCode == 9) {
+                //set up
+                actionBar.setDisplayShowCustomEnabled(false);
+                actionBar.setDisplayShowTitleEnabled(true);
+                onSectionAttached(5);
+                actionBar.setTitle("Set Up");
+            }
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -236,7 +313,8 @@ public class MainActivity extends ActionBarActivity
             // if the drawer is not showing. Otherwise, let the drawer
             // decide what to show in the action bar.
 
-            restoreActionBar();
+            //restoreActionBar();
+            setUpActionBar(currentFragmentCode);
             return true;
         }
         return super.onCreateOptionsMenu(menu);
@@ -270,14 +348,12 @@ public class MainActivity extends ActionBarActivity
                     getSupportFragmentManager().findFragmentByTag("games");
             if (collectionFrag != null) {
                 collectionFrag.refreshDataset(false);
-                onSectionAttached(1);
             }
         }else if (id.contains("update_games")){
             GamesFragment collectionFrag = (GamesFragment)
                     getSupportFragmentManager().findFragmentByTag("games");
             if (collectionFrag != null) {
                 collectionFrag.updateDataset();
-                onSectionAttached(1);
             }
         }else if (id.contains("refresh_plays")){
             PlaysFragment playsFrag = (PlaysFragment)
@@ -432,6 +508,7 @@ public class MainActivity extends ActionBarActivity
 
     public void openAddPlay(Fragment mFragment, String game_name, long playID){
 
+        mTitle = game_name;
 
         try{
             InputMethodManager inputManager = (InputMethodManager)
@@ -456,7 +533,7 @@ public class MainActivity extends ActionBarActivity
         ft.addToBackStack("add_play");
         ft.commit();
 
-        mTitle = game_name;
+
 
 
         /*Handler handler = new Handler();
@@ -676,21 +753,6 @@ public class MainActivity extends ActionBarActivity
         if (mAddPlayFragment != null){
             mAddPlayFragment.removeYourself();
             mAddPlayFragment = null;
-            GamesFragment collectionFrag = (GamesFragment)
-                    getSupportFragmentManager().findFragmentByTag("games");
-            if (collectionFrag != null) {
-                onSectionAttached(1);
-            }
-            ViewPlayFragment viewPlayFrag = (ViewPlayFragment)
-                    getSupportFragmentManager().findFragmentByTag("view_play");
-            if (viewPlayFrag != null) {
-                onSectionAttached(3);
-            }
-            PlaysFragment playsFrag = (PlaysFragment)
-                    getSupportFragmentManager().findFragmentByTag("plays");
-            if (playsFrag != null) {
-                onSectionAttached(3);
-            }
         }
         if (mAddGroupFragment != null){
             mAddGroupFragment.removeYourself();

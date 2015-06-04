@@ -193,15 +193,17 @@ public class StatsFragment_TenByTen extends Fragment {
 
     private void addStat(String statType, String statValue) {
         // Instantiate a new "row" view.
-        final ViewGroup newView = (ViewGroup) LayoutInflater.from(mActivity).inflate(
-                R.layout.stats_viewstat_item, mContainerView_Players, false);
+        try {
+            final ViewGroup newView = (ViewGroup) LayoutInflater.from(mActivity).inflate(
+                    R.layout.stats_viewstat_item, mContainerView_Players, false);
 
-        TextView statTypeView = (TextView) newView.findViewById(R.id.statType);
-        TextView statValueView = (TextView) newView.findViewById(R.id.statValue);
-        statTypeView.setText(statType);
-        statValueView.setText(statValue);
-        statTypeView.setTextSize(16);
-        statValueView.setTextSize(16);
-        mContainerView_Players.addView(newView);
+            TextView statTypeView = (TextView) newView.findViewById(R.id.statType);
+            TextView statValueView = (TextView) newView.findViewById(R.id.statValue);
+            statTypeView.setText(statType);
+            statValueView.setText(statValue);
+            statTypeView.setTextSize(16);
+            statValueView.setTextSize(16);
+            mContainerView_Players.addView(newView);
+        }catch (Exception ignored){}
     }
 }

@@ -26,6 +26,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -75,7 +76,7 @@ public class GamesFragment extends Fragment{
         super.onCreate(savedInstanceState);
         try {
             ActionBar actionBar = ((MainActivity) mActivity).getSupportActionBar();
-            actionBar.setDisplayShowCustomEnabled(true);
+            //actionBar.setDisplayShowCustomEnabled(true);
             actionBar.setCustomView(R.layout.search_bar);
             mSearch = (EditText) actionBar.getCustomView()
                     .findViewById(R.id.etSearch);
@@ -215,13 +216,27 @@ public class GamesFragment extends Fragment{
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         mActivity = activity;
-        ((MainActivity) mActivity).onSectionAttached(1);
         try {
             mListener = (OnFragmentInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
         }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (mActivity != null) {
+            ((MainActivity) mActivity).setUpActionBar(4);
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        // Save currently selected layout manager.
+        savedInstanceState.putSerializable(KEY_LAYOUT_MANAGER, mCurrentLayoutManagerType);
+        super.onSaveInstanceState(savedInstanceState);
     }
 
     @Override
@@ -236,7 +251,7 @@ public class GamesFragment extends Fragment{
                     InputMethodManager.HIDE_NOT_ALWAYS);
         }catch (Exception e){}
         if (mActivity != null) {
-            ((MainActivity) mActivity).getSupportActionBar().setDisplayShowCustomEnabled(false);
+            //((MainActivity) mActivity).getSupportActionBar().setDisplayShowCustomEnabled(false);
             mActivity = null;
         }
     }

@@ -128,19 +128,31 @@ public class PlayersFragment extends Fragment{
         return rootView;
     }
 
-
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        // Save currently selected layout manager.
+        savedInstanceState.putSerializable(KEY_LAYOUT_MANAGER, mCurrentLayoutManagerType);
+        super.onSaveInstanceState(savedInstanceState);
+    }
 
     Activity mActivity;
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         mActivity = activity;
-        ((MainActivity) mActivity).onSectionAttached(2);
         try {
             mListener = (OnFragmentInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (mActivity != null) {
+            ((MainActivity) mActivity).setUpActionBar(5);
         }
     }
 

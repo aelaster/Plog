@@ -169,27 +169,6 @@ public class AddPlayFragment extends Fragment implements
         rootView = inflater.inflate(R.layout.fragment_add_play, container, false);
         rootView.setBackgroundColor(getResources().getColor(R.color.cardview_initial_background));
 
-
-
-        /*rootView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-            @Override
-            public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop,
-                                       int oldRight, int oldBottom) {
-                v.removeOnLayoutChangeListener(this);
-                cx = getArguments().getInt("cx");
-                cy = getArguments().getInt("cy");
-                // get the hypothenuse so the radius is from one corner to the other
-                int radius = (int) Math.hypot(right, bottom);
-
-                Animator reveal = ViewAnimationUtils.createCircularReveal(v, cx, cy, 0, radius);
-                if (getArguments().getBoolean("doAccelerate")) {
-                    reveal.setInterpolator(new DecelerateInterpolator(1.5f));
-                }
-                reveal.setDuration(700);
-                reveal.start();
-            }
-        });*/
-
         try {
             expansions = Game.findExpansionsFor(gameName);
         } catch (UnsupportedEncodingException e) {
@@ -659,7 +638,6 @@ public class AddPlayFragment extends Fragment implements
         super.onAttach(activity);
         mActivity = activity;
         try {
-            ((MainActivity) mActivity).onSectionAttached(6);
             mListener = (OnFragmentInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
@@ -668,10 +646,25 @@ public class AddPlayFragment extends Fragment implements
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        if (mActivity != null) {
+            ((MainActivity) mActivity).setUpActionBar(3);
+        }
+    }
+
+    @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
-        mActivity = null;
+        if (mActivity != null) {
+            if (((MainActivity)mActivity).mViewPlayFragment != null) {
+                ((MainActivity) mActivity).setUpActionBar(8);
+            }else{
+                ((MainActivity) mActivity).setUpActionBar(4);
+            }
+            mActivity = null;
+        }
     }
 
     @Override
@@ -766,6 +759,7 @@ public class AddPlayFragment extends Fragment implements
             } else {
                 //onButtonPressed("refresh_plays");
             }*/
+            ((MainActivity) mActivity).getSupportActionBar().setDisplayShowCustomEnabled(false);
             getFragmentManager().popBackStack();
             getFragmentManager().beginTransaction().remove(mfragment).commit();
             getFragmentManager().executePendingTransactions(); //Prevents the flashing.
@@ -810,7 +804,7 @@ public class AddPlayFragment extends Fragment implements
                 playerToUpdate.playerID = playersID.get(i);
                 playerToUpdate.playerName = playersName.get(i);
                 Player colorCheck = Player.findById(Player.class, playerToUpdate.playerID);
-                if (colorCheck.defaultColor != null &&  !colorCheck.defaultColor.equals("")){
+                if (colorCheck.defaultColor != null && !colorCheck.defaultColor.equals("") && playID <= 0){
                     int spinnerPostion = colorSpinnerArrayAdapter.getPosition(colorCheck.defaultColor);
                     colorSpinner.setSelection(spinnerPostion);
                     playerToUpdate.color = colorSpinner.getSelectedItem().toString();

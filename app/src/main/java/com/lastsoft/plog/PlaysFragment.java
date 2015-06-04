@@ -80,7 +80,7 @@ public class PlaysFragment extends Fragment{
         try {
             ActionBar actionBar = ((MainActivity) mActivity).getSupportActionBar();
             if (actionBar != null) {
-                actionBar.setDisplayShowCustomEnabled(true);
+                //actionBar.setDisplayShowCustomEnabled(true);
                 actionBar.setCustomView(R.layout.search_bar_plays);
                 mSearch = (EditText) actionBar.getCustomView()
                         .findViewById(R.id.etSearch);
@@ -119,55 +119,57 @@ public class PlaysFragment extends Fragment{
         mRecyclerView.setAdapter(mAdapter);
         // END_INCLUDE(initializeRecyclerView)
 
-        mSearch.addTextChangedListener(new TextWatcher() {
 
-            @Override
-            public void onTextChanged(CharSequence cs, int arg1, int arg2, int arg3) {
-                // When user changed the Text
-                mSearchQuery = cs.toString();
-                //initDataset();
-                //mAdapter = new GameAdapter(PlaysFragment.this, mActivity,mSearchQuery);
-                mAdapter = ((MainActivity)mActivity).initPlayAdapter(mSearchQuery);
-                // Set CustomAdapter as the adapter for RecyclerView.
-                mRecyclerView.setAdapter(mAdapter);
-            }
+        if (mSearch != null) {
+            mSearch.addTextChangedListener(new TextWatcher() {
 
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
-
-            @Override
-            public void beforeTextChanged(CharSequence arg0, int arg1, int arg2,
-                                          int arg3) {
-                // TODO Auto-generated method stub
-
-            }
-        });
-
-
-
-        mCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (!mSearch.getText().toString().equals("")) {
-                    mSearchQuery = "";
-                    ((MainActivity)mActivity).initPlayAdapter(mSearchQuery);
-                    mSearch.setText(mSearchQuery);
-                    //mActivity.onBackPressed();
+                @Override
+                public void onTextChanged(CharSequence cs, int arg1, int arg2, int arg3) {
+                    // When user changed the Text
+                    mSearchQuery = cs.toString();
+                    //initDataset();
+                    //mAdapter = new GameAdapter(PlaysFragment.this, mActivity,mSearchQuery);
+                    mAdapter = ((MainActivity) mActivity).initPlayAdapter(mSearchQuery);
+                    // Set CustomAdapter as the adapter for RecyclerView.
+                    mRecyclerView.setAdapter(mAdapter);
                 }
 
-                InputMethodManager inputManager = (InputMethodManager)
-                        mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
+                @Override
+                public void afterTextChanged(Editable editable) {
 
-                inputManager.hideSoftInputFromWindow(mActivity.getCurrentFocus().getWindowToken(),
-                        InputMethodManager.HIDE_NOT_ALWAYS);
-                mSearch.clearFocus();
-                mRecyclerView.requestFocus();
+                }
 
-                refreshDataset();
-            }
-        });
+                @Override
+                public void beforeTextChanged(CharSequence arg0, int arg1, int arg2,
+                                              int arg3) {
+                    // TODO Auto-generated method stub
+
+                }
+            });
+
+
+            mCancel.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (!mSearch.getText().toString().equals("")) {
+                        mSearchQuery = "";
+                        ((MainActivity) mActivity).initPlayAdapter(mSearchQuery);
+                        mSearch.setText(mSearchQuery);
+                        //mActivity.onBackPressed();
+                    }
+
+                    InputMethodManager inputManager = (InputMethodManager)
+                            mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
+
+                    inputManager.hideSoftInputFromWindow(mActivity.getCurrentFocus().getWindowToken(),
+                            InputMethodManager.HIDE_NOT_ALWAYS);
+                    mSearch.clearFocus();
+                    mRecyclerView.requestFocus();
+
+                    refreshDataset();
+                }
+            });
+        }
 
         return rootView;
     }
@@ -177,7 +179,6 @@ public class PlaysFragment extends Fragment{
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         mActivity = activity;
-        ((MainActivity) mActivity).onSectionAttached(3);
         try {
             mListener = (OnFragmentInteractionListener) activity;
         } catch (ClassCastException e) {
@@ -187,11 +188,19 @@ public class PlaysFragment extends Fragment{
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        if (mActivity != null) {
+            ((MainActivity) mActivity).setUpActionBar(6);
+        }
+    }
+
+    @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
         if (mActivity != null) {
-            ((MainActivity) mActivity).getSupportActionBar().setDisplayShowCustomEnabled(false);
+            //((MainActivity) mActivity).getSupportActionBar().setDisplayShowCustomEnabled(false);
             mActivity = null;
         }
     }
@@ -224,6 +233,12 @@ public class PlaysFragment extends Fragment{
         //mRecyclerView.scrollToPosition(scrollPosition);
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        // Save currently selected layout manager.
+        savedInstanceState.putSerializable(KEY_LAYOUT_MANAGER, mCurrentLayoutManagerType);
+        super.onSaveInstanceState(savedInstanceState);
+    }
 
     @Override
     public void onDestroy() {

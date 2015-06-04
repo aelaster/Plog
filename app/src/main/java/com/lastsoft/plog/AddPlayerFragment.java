@@ -348,7 +348,6 @@ public class AddPlayerFragment extends Fragment {
         super.onAttach(activity);
         mActivity = activity;
         try {
-            ((MainActivity) mActivity).onSectionAttached(6);
             mListener = (OnFragmentInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
@@ -357,10 +356,21 @@ public class AddPlayerFragment extends Fragment {
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        if (mActivity != null) {
+            ((MainActivity) mActivity).setUpActionBar(2);
+        }
+    }
+
+    @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
-        mActivity = null;
+        if (mActivity != null) {
+            ((MainActivity) mActivity).setUpActionBar(5);
+            mActivity = null;
+        }
     }
 
     /**

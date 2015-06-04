@@ -125,7 +125,6 @@ public class AddGameFragment extends Fragment {
         super.onAttach(activity);
         mActivity = activity;
         try {
-            ((MainActivity) mActivity).onSectionAttached(6);
             mListener = (OnFragmentInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
@@ -134,10 +133,21 @@ public class AddGameFragment extends Fragment {
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        if (mActivity != null) {
+            ((MainActivity) mActivity).setUpActionBar(0);
+        }
+    }
+
+    @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
-        mActivity = null;
+        if (mActivity != null) {
+            ((MainActivity) mActivity).setUpActionBar(4);
+            mActivity = null;
+        }
     }
 
     /**

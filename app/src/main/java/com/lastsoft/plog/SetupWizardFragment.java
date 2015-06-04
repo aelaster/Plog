@@ -151,7 +151,7 @@ public class SetupWizardFragment extends Fragment implements
                 super.onAttach(activity);
                 mActivity = activity;
                 try {
-                        ((MainActivity) mActivity).onSectionAttached(5);
+                    ((MainActivity) mActivity).setUpActionBar(9);
                 } catch (ClassCastException e) {
                         throw new ClassCastException(activity.toString()
                                 + " must implement OnFragmentInteractionListener");
