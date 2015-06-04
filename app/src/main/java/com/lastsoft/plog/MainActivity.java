@@ -1,12 +1,13 @@
 package com.lastsoft.plog;
 
 import android.app.Activity;
+import android.app.ActivityOptions;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -18,13 +19,14 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
-import android.transition.TransitionInflater;
 import android.util.Log;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
@@ -60,6 +62,8 @@ public class MainActivity extends ActionBarActivity
         StatsFragment.OnFragmentInteractionListener,
         View.OnClickListener {
 
+    static final String EXTRA_CURRENT_ITEM_POSITION = "extra_current_item_position";
+    static final String EXTRA_OLD_ITEM_POSITION = "extra_old_item_position";
 
     private Boolean fragUp = false;
     private AddPlayerFragment mAddPlayerFragment;
@@ -80,12 +84,80 @@ public class MainActivity extends ActionBarActivity
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
      */
     private CharSequence mTitle;
+    private Bundle mTmpState;
+    private boolean mIsReentering;
+
+    private final SharedElementCallback mCallback = new SharedElementCallback() {
+        @Override
+        public void onMapSharedElements(List<String> names, Map<String, View> sharedElements) {
+            if (mIsReentering) {
+                int oldPosition = mTmpState.getInt(EXTRA_OLD_ITEM_POSITION);
+                int currentPosition = mTmpState.getInt(EXTRA_CURRENT_ITEM_POSITION);
+
+                if (currentPosition != oldPosition) {
+                    // If currentPosition != oldPosition the user must have swiped to a different
+                    // page in the DetailsActivity. We must update the shared element so that the
+                    // correct one falls into place.
+                    String newImageTransitionName = "imageTrans" + currentPosition;
+                    String newNameTransitionName = "nameTrans" + currentPosition;
+                    String newDateTransitionName = "dateTrans" + currentPosition;
+                    View newImageSharedView = mPlaysFragment.mRecyclerView.findViewWithTag(newImageTransitionName);
+                    //View newNameSharedView = mPlaysFragment.mRecyclerView.findViewWithTag(newNameTransitionName);
+                    //View newDateSharedView = mPlaysFragment.mRecyclerView.findViewWithTag(newDateTransitionName);
+                    if (newImageSharedView != null) {
+                        names.clear();
+                        names.add(newImageTransitionName);
+                        //names.add(newNameTransitionName);
+                        //names.add(newDateTransitionName);
+                        sharedElements.clear();
+                        sharedElements.put(newImageTransitionName, newImageSharedView);
+                        //sharedElements.put(newNameTransitionName, newNameSharedView);
+                        //sharedElements.put(newDateTransitionName, newDateSharedView);
+                    }
+                    //if (newNameSharedView == null ){ Log.d("V1", "newNameSharedView is null");}
+                    //if (newDateSharedView == null ){ Log.d("V1", "newDateSharedView is null");}
+                }
+                mTmpState = null;
+            }
+            /*
+            if (!mIsReentering) {
+                View navigationBar = findViewById(android.R.id.navigationBarBackground);
+                View statusBar = findViewById(android.R.id.statusBarBackground);
+                int actionBarId = getResources().getIdentifier("action_bar_container", "id", "android");
+                View actionBar = findViewById(actionBarId);
+
+                if (navigationBar != null) {
+                    names.add(navigationBar.getTransitionName());
+                    sharedElements.put(navigationBar.getTransitionName(), navigationBar);
+                }
+                if (statusBar != null) {
+                    names.add(statusBar.getTransitionName());
+                    sharedElements.put(statusBar.getTransitionName(), statusBar);
+                }
+                if (actionBar != null) {
+                    actionBar.setTransitionName("actionBar");
+                    names.add(actionBar.getTransitionName());
+                    sharedElements.put(actionBar.getTransitionName(), actionBar);
+                }
+            } else {
+                names.remove(Window.NAVIGATION_BAR_BACKGROUND_TRANSITION_NAME);
+                sharedElements.remove(Window.NAVIGATION_BAR_BACKGROUND_TRANSITION_NAME);
+                names.remove(Window.STATUS_BAR_BACKGROUND_TRANSITION_NAME);
+                sharedElements.remove(Window.STATUS_BAR_BACKGROUND_TRANSITION_NAME);
+                names.remove("actionBar");
+                sharedElements.remove("actionBar");
+            }
+            */
+        }
+
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
         super.onCreate(savedInstanceState);
 
+        setExitSharedElementCallback(mCallback);
         mDamageReport.initialize();
 
         if (!doesDatabaseExist(this, "SRX.db")) {
@@ -145,7 +217,9 @@ public class MainActivity extends ActionBarActivity
         return dbFile.exists();
     }
 
+    private String mSearchQuery;
     public PlayAdapter initPlayAdapter(String searchQuery){
+        mSearchQuery = searchQuery;
         mPlayAdapter = new PlayAdapter(this, mPlaysFragment, searchQuery);
         return mPlayAdapter;
     }
@@ -251,21 +325,25 @@ public class MainActivity extends ActionBarActivity
                 //addgame
                 actionBar.setDisplayShowCustomEnabled(false);
                 actionBar.setDisplayShowTitleEnabled(true);
+                actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
                 onSectionAttached(1);
             } else if (fragmentCode == 1) {
                 //addgroup
                 actionBar.setDisplayShowCustomEnabled(false);
                 actionBar.setDisplayShowTitleEnabled(true);
                 actionBar.setTitle(getString(R.string.groups));
+                actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
             } else if (fragmentCode == 2) {
                 //addplayer
                 actionBar.setDisplayShowCustomEnabled(false);
                 actionBar.setDisplayShowTitleEnabled(true);
+                actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
                 onSectionAttached(2);
             } else if (fragmentCode == 3) {
                 //addplay
                 actionBar.setDisplayShowCustomEnabled(false);
                 actionBar.setDisplayShowTitleEnabled(true);
+                actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
                 actionBar.setTitle(mTitle);
             } else if (fragmentCode == 4) {
                 //games
@@ -277,29 +355,34 @@ public class MainActivity extends ActionBarActivity
                 //players
                 actionBar.setDisplayShowCustomEnabled(false);
                 actionBar.setDisplayShowTitleEnabled(true);
+                actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
                 onSectionAttached(2);
                 actionBar.setTitle(mTitle);
             } else if (fragmentCode == 6) {
                 //plays
                 actionBar.setDisplayShowCustomEnabled(true);
                 actionBar.setDisplayShowTitleEnabled(false);
+                actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
                 onSectionAttached(3);
                 actionBar.setTitle(mTitle);
             } else if (fragmentCode == 7) {
                 //stats
                 actionBar.setDisplayShowCustomEnabled(false);
                 actionBar.setDisplayShowTitleEnabled(true);
+                actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
                 onSectionAttached(4);
                 actionBar.setTitle(mTitle);
             } else if (fragmentCode == 8) {
                 //viewplay
                 actionBar.setDisplayShowCustomEnabled(false);
                 actionBar.setDisplayShowTitleEnabled(true);
+                actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
                 onSectionAttached(3);
             } else if (fragmentCode == 9) {
                 //set up
                 actionBar.setDisplayShowCustomEnabled(false);
                 actionBar.setDisplayShowTitleEnabled(true);
+                actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
                 onSectionAttached(5);
                 actionBar.setTitle("Set Up");
             }
@@ -420,79 +503,13 @@ public class MainActivity extends ActionBarActivity
         //mFragment.setSharedElementReturnTransition(TransitionInflater.from(this).inflateTransition(R.transition.change_image_transform));
         //mFragment.setExitTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.move));
 
-        FragmentManager fragmentManager = getSupportFragmentManager();
+        /*FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction ft = fragmentManager.beginTransaction();
 
         mViewPlayFragment = ViewPlayFragment.newInstance(clickedPlay.getId(),view.getTransitionName(), nameView.getTransitionName(), dateView.getTransitionName(), position);
         mViewPlayFragment.setSharedElementEnterTransition(TransitionInflater.from(this).inflateTransition(R.transition.change_image_transform));
         mViewPlayFragment.setEnterTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.slide_bottom));
-        mViewPlayFragment.setEnterSharedElementCallback(new SharedElementCallback() {
 
-            @Override
-            public void onMapSharedElements(List<String> names, Map<String, View> sharedElements) {
-                //super.onMapSharedElements(names, sharedElements);
-
-                //if (!view.getTransitionName().equals("imageTrans" + mViewPlayFragment.mPager.getCurrentItem())) {
-                    //we need to update this mapping.
-                    //Android won't let me change the ID taht was passed into the fragment manager, which is the ID that was clicked on inside the recyclerview
-                    //so, theoretically, i would need to change the one I want to go to to the one that was passed in and change the one that i came from to the one i want to go to
-
-                    //eg, clicking 0 sets the ID to imageTrans0
-                    //i swipe over to imageTrans1 and hit back
-                    //i'm in here because I know that I'm in a different one
-                    //change teh "new" views to 0 and the old view to 1
-                    /*
-                    ViewPlayFragment_Pages currentFragment = (ViewPlayFragment_Pages) mViewPlayFragment.mPager.getAdapter().instantiateItem(mViewPlayFragment.mPager, mViewPlayFragment.mPager.getCurrentItem());
-                    Log.d("V1", "current Fragment old image view id = " + currentFragment.playImage.getTransitionName());
-                    currentFragment.playImage.setTransitionName(view.getTransitionName());
-                    currentFragment.gameName.setTransitionName(nameView.getTransitionName());
-                    currentFragment.playDate.setTransitionName(dateView.getTransitionName());
-                    Log.d("V1", "current Fragment new image view id = " + currentFragment.playImage.getTransitionName());
-
-
-                    View newSharedView = mPlaysFragment.mRecyclerView.findViewWithTag("imageTrans" + mViewPlayFragment.mPager.getCurrentItem());
-                    View newSharedView2 = mPlaysFragment.mRecyclerView.findViewWithTag("nameTrans" + mViewPlayFragment.mPager.getCurrentItem());
-                    View newSharedView3 = mPlaysFragment.mRecyclerView.findViewWithTag("dateTrans" + mViewPlayFragment.mPager.getCurrentItem());
-
-                    View oldSharedView = mPlaysFragment.mRecyclerView.findViewWithTag(view.getTransitionName());
-                    View oldSharedView2 = mPlaysFragment.mRecyclerView.findViewWithTag(nameView.getTransitionName());
-                    View oldSharedView3 = mPlaysFragment.mRecyclerView.findViewWithTag(dateView.getTransitionName());
-
-                    Log.d("V1", "newSharedView old transition name = " + newSharedView.getTransitionName());
-                    newSharedView.setTransitionName(view.getTransitionName());
-                    Log.d("V1", "newSharedView new transition name = " + newSharedView.getTransitionName());
-                    newSharedView2.setTransitionName(nameView.getTransitionName());
-                    newSharedView3.setTransitionName(dateView.getTransitionName());
-
-                    Log.d("V1", "oldSharedView old transition name = " + oldSharedView.getTransitionName());
-                    oldSharedView.setTransitionName("imageTrans" + mViewPlayFragment.mPager.getCurrentItem());
-                    Log.d("V1", "oldSharedView new transition name = " + oldSharedView.getTransitionName());
-                    oldSharedView2.setTransitionName("nameTrans" + mViewPlayFragment.mPager.getCurrentItem());
-                    oldSharedView3.setTransitionName("dateTrans" + mViewPlayFragment.mPager.getCurrentItem());
-
-                    /*names.clear();
-                    names.add(newSharedView.getTransitionName());
-                    names.add(newSharedView2.getTransitionName());
-                    names.add(newSharedView3.getTransitionName());
-
-                    sharedElements.clear();
-                    sharedElements.put(newSharedView.getTransitionName(), newSharedView);
-                    sharedElements.put(newSharedView2.getTransitionName(), newSharedView2);
-                    sharedElements.put(newSharedView3.getTransitionName(), newSharedView3);
-
-                    for (String name : names) {
-                        Log.d("V1", "onMapSharedElements = " + name);
-                    }
-
-                    for (View view : sharedElements.values()){
-                        Log.d("V1", "onMapSharedElements = " + view.getTransitionName());
-                    }*/
-
-               // }
-                //super.onMapSharedElements(names, sharedElements);
-            }
-
-        });
 
 
         //Log.d("V1", "nameView.getTransitionName() = " + nameView.getTransitionName());
@@ -503,7 +520,48 @@ public class MainActivity extends ActionBarActivity
         ft.replace(R.id.container, mViewPlayFragment, "view_play");
         ft.addToBackStack(null);
         ft.commit();
-        fragmentManager.executePendingTransactions(); //Prevents the flashing.
+        fragmentManager.executePendingTransactions(); //Prevents the flashing.*/
+        mIsReentering = false;
+
+
+
+        Intent intent = new Intent(MainActivity.this, ViewPlayActivity.class);
+        intent.putExtra("searchQuery", mSearchQuery);
+        intent.putExtra("playID", clickedPlay.getId());
+        intent.putExtra("imageTransID", view.getTransitionName());
+        intent.putExtra("nameTransID", nameView.getTransitionName());
+        intent.putExtra("dateTransID", dateView.getTransitionName());
+        intent.putExtra("adapterPosition", position);
+
+        ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(this,
+                Pair.create(view, view.getTransitionName()));
+                //Pair.create(nameView,  nameView.getTransitionName()),
+                //Pair.create(dateView,  dateView.getTransitionName()));
+
+        startActivity(intent, options.toBundle());
+    }
+
+    @Override
+    public void onActivityReenter(int requestCode, Intent data) {
+        super.onActivityReenter(requestCode, data);
+        mIsReentering = true;
+        mTmpState = new Bundle(data.getExtras());
+        int oldPosition = mTmpState.getInt(EXTRA_OLD_ITEM_POSITION);
+        int currentPosition = mTmpState.getInt(EXTRA_CURRENT_ITEM_POSITION);
+        if (oldPosition != currentPosition) {
+            mPlaysFragment.mRecyclerView.scrollToPosition(currentPosition);
+        }
+        postponeEnterTransition();
+        mPlaysFragment.mRecyclerView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+            @Override
+            public boolean onPreDraw() {
+                mPlaysFragment.mRecyclerView.getViewTreeObserver().removeOnPreDrawListener(this);
+                // TODO: hack! not sure why, but requesting a layout pass is necessary in order to fix re-mapping + scrolling glitches!
+                mPlaysFragment.mRecyclerView.requestLayout();
+                startPostponedEnterTransition();
+                return true;
+            }
+        });
     }
 
     public void openAddPlay(Fragment mFragment, String game_name, long playID){

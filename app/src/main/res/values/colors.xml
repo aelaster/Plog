@@ -37,4 +37,7 @@
     <color name="review_green">#ff669900</color>
 
     <color name="text_light">#66000000</color>
+
+    <color name="background_photo_tint">#4f808080</color>
+    <color name="main_photo_tint">#2f505050</color>
 </resources>

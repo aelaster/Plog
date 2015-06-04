@@ -89,9 +89,6 @@ public class ViewPlayFragment extends Fragment {
         Log.d("V1", "nameTransID=" + nameTransID);
         Log.d("V1", "dateTransID=" + dateTransID);
         */
-
-        //((MainActivity)mActivity).getSupportActionBar().setDisplayShowCustomEnabled(false);
-
         setHasOptionsMenu(true);
     }
 
@@ -192,6 +189,7 @@ public class ViewPlayFragment extends Fragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         mActivity = activity;
+        ((MainActivity) mActivity).onSectionAttached(7);
         try {
             mListener = (OnFragmentInteractionListener) activity;
         } catch (ClassCastException e) {
@@ -201,19 +199,12 @@ public class ViewPlayFragment extends Fragment {
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        if (mActivity != null) {
-            ((MainActivity) mActivity).setUpActionBar(8);
-        }
-    }
-
-    @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
         if (mActivity != null) {
-            ((MainActivity) mActivity).setUpActionBar(6);
+            ((MainActivity) mActivity).onSectionAttached(3);
+            ((MainActivity) mActivity).getSupportActionBar().setDisplayShowCustomEnabled(true);
             mActivity = null;
         }
     }
@@ -258,7 +249,7 @@ public class ViewPlayFragment extends Fragment {
 
         @Override
         public int getCount() {
-            if (mActivity != null && ((MainActivity) mActivity).mPlayAdapter != null) {
+            if (mActivity != null) {
                 return ((MainActivity) mActivity).mPlayAdapter.plays.size();
             }else{
                 return 0;

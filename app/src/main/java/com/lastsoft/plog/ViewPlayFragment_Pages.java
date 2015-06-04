@@ -2,10 +2,13 @@ package com.lastsoft.plog;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -13,6 +16,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -79,13 +83,13 @@ public class ViewPlayFragment_Pages extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        viewPlayLayout = inflater.inflate(R.layout.fragment_view_play, container, false);
+        viewPlayLayout = inflater.inflate(R.layout.fragment_view_play2, container, false);
         viewPlayLayout.setBackgroundColor(getResources().getColor(R.color.cardview_initial_background));
         LinearLayout linLayout = (LinearLayout) viewPlayLayout.findViewById(R.id.linearLayout);
         //Log.d("V1", "playID = " + playID);
         final Play thisPlay = Play.findById(Play.class, playID);
 
-        Log.d("V1", "imageTransID = " + imageTransID);
+        //Log.d("V1", "imageTransID = " + imageTransID);
 
         DisplayImageOptions options = new DisplayImageOptions.Builder()
                 .cacheOnDisk(true)
@@ -162,6 +166,15 @@ public class ViewPlayFragment_Pages extends Fragment {
         }else{
             showNote.setVisibility(View.GONE);
         }
+
+        viewPlayLayout.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+            @Override
+            public boolean onPreDraw() {
+                viewPlayLayout.getViewTreeObserver().removeOnPreDrawListener(this);
+                getActivity().startPostponedEnterTransition();
+                return true;
+            }
+        });
         return viewPlayLayout;
     }
 
@@ -216,8 +229,39 @@ public class ViewPlayFragment_Pages extends Fragment {
     public void onDestroy() {
         // TODO Auto-generated method stub
         super.onDestroy();
-        ((MainActivity)mActivity).unbindDrawables(viewPlayLayout);
+        //((MainActivity)mActivity).unbindDrawables(viewPlayLayout);
     }
 
+    @Nullable
+    public View getSharedImageElement() {
+        View view = getView().findViewById(R.id.imageView1);
+        //if (isViewInBounds(getView().findViewById(R.id.scroll_view), view)) {
+            return view;
+        //}
+        //return null;
+    }
 
+    @Nullable
+    public View getSharedNameElement() {
+        View view = getView().findViewById(R.id.gameName);
+        //if (isViewInBounds(getView().findViewById(R.id.scroll_view), view)) {
+        return view;
+        //}
+        //return null;
+    }
+
+    @Nullable
+    public View getSharedDateElement() {
+        View view = getView().findViewById(R.id.gameDate);
+        //if (isViewInBounds(getView().findViewById(R.id.scroll_view), view)) {
+        return view;
+        //}
+        //return null;
+    }
+
+    public static boolean isViewInBounds(@NonNull View container, @NonNull View view) {
+        Rect containerBounds = new Rect();
+        container.getHitRect(containerBounds);
+        return view.getLocalVisibleRect(containerBounds);
+    }
 }
