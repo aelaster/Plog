@@ -106,7 +106,7 @@ public class NavigationDrawerFragment extends Fragment {
                         getString(R.string.title_section1),
                         getString(R.string.title_section2),
                         getString(R.string.title_section4),
-                        getString(R.string.title_section5),
+//                        getString(R.string.title_section5),
                         getString(R.string.title_section6)
                 }));
         mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
@@ -200,21 +200,23 @@ public class NavigationDrawerFragment extends Fragment {
     }
 
     private void selectItem(int position) {
-        mCurrentSelectedPosition = position;
-        if (mDrawerLayout != null) {
-            mDrawerLayout.closeDrawer(mFragmentContainerView);
-        }
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (mDrawerListView != null) {
-                    mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
-                }
-                if (mCallbacks != null) {
-                    mCallbacks.onNavigationDrawerItemSelected(mCurrentSelectedPosition);
-                }
+        try {
+            mCurrentSelectedPosition = position;
+            if (mDrawerLayout != null) {
+                mDrawerLayout.closeDrawer(mFragmentContainerView);
             }
-        }, 300);
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (mDrawerListView != null) {
+                        mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
+                    }
+                    if (mCallbacks != null) {
+                        mCallbacks.onNavigationDrawerItemSelected(mCurrentSelectedPosition);
+                    }
+                }
+            }, 300);
+        }catch (Exception ignored){}
     }
 
     @Override

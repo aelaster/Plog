@@ -193,13 +193,6 @@ public class MainActivity extends ActionBarActivity
             ActionBarDrawerToggle mDrawerToggle = new ActionBarDrawerToggle(
                     this, mDrawerLayout, R.string.navigation_drawer_open, R.string.navigation_drawer_close
             );
-
-            /*LoadGamesTask initDb = new LoadGamesTask(this);
-            try {
-                initDb.execute();
-            } catch (Exception e) {
-
-            }*/
         }
     }
 
@@ -254,13 +247,14 @@ public class MainActivity extends ActionBarActivity
             fragmentManager.beginTransaction()
                     .replace(R.id.container, new StatsFragment(), "stats")
                     .commit();
-        }else if (position == 4){
-            /*fragmentManager.beginTransaction()
-                    .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
-                    .commit();*/
+        /*}else if (position == 4){
+
             fragmentManager.beginTransaction()
                     .replace(R.id.container, new SetupWizardFragment(), "wizard")
-                    .commit();
+                    .commit()
+                                /*fragmentManager.beginTransaction()
+                    .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
+                    .commit();*/
         }else{
             super.onBackPressed();
             //android.os.Process.killProcess(android.os.Process.myPid());
@@ -285,9 +279,9 @@ public class MainActivity extends ActionBarActivity
             case 4:
                 mTitle = getString(R.string.title_section4);
                 break;
-            case 5:
+            /*case 5:
                 mTitle = getString(R.string.title_section5);
-                break;
+                break;*/
             case 6:
                 restoreActionBar();
                 break;

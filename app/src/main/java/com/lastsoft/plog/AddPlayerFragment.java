@@ -174,7 +174,11 @@ public class AddPlayerFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 view.setEnabled(false);
-                ((MainActivity)mActivity).deletePlayer(playerID);
+                if (playerID >= 0) {
+                    ((MainActivity) mActivity).deletePlayer(playerID);
+                }else{
+                    mActivity.onBackPressed();
+                }
             }
         });
 

@@ -69,20 +69,20 @@
     <string name="default_color">Default Color:</string>
     <string name="choose_groups">Choose Groups</string>
     <string name="contacting_the_geek">Contacting the Geek...</string>
+    <string name="setting_up">Setting up...</string>
     <string name="next">Next</string>
     <string name="prev">Previous</string>
-    <string name="finish">Submit order</string>
+    <string name="finish">Get Started</string>
     <string name="review">Review</string>
     <string name="loading_text">Loading...</string>
-
+    <string name="setup_info">Enter your name.  You will be the first player entered.  Your BGG Name will be used to pull your collection.</string>
     <string name="label_your_name">Name</string>
-    <string name="label_your_email">Email</string>
+    <string name="label_your_email">BGG Username</string>
     <string name="hint_your_name">e.g. Adam</string>
     <string name="hint_your_email">Optional</string>
 
-    <string name="submit_confirm_message">Place the order with the deli? You will receive an email
-        confirmation.</string>
-    <string name="submit_confirm_button">Place order</string>
+    <string name="submit_confirm_message">Start adding players and games, creating groups, and plogging!</string>
+    <string name="submit_confirm_button">Go!</string>
 
     <string-array name="color_choices">
         <item>Blue</item>

@@ -695,17 +695,19 @@ public class AddPlayFragment extends Fragment implements
 
         if (!savedThis && playID < 0){
             //Log.d("V1", "we're gonna try and delete these pictures");
-            String fixedPath = mCurrentPhotoPath.substring(6, mCurrentPhotoPath.length());
-            String thumbPath = fixedPath.substring(0, fixedPath.length() - 4) + "_thumb.jpg";
+            if (mCurrentPhotoPath.length() > 0) {
+                String fixedPath = mCurrentPhotoPath.substring(6, mCurrentPhotoPath.length());
+                String thumbPath = fixedPath.substring(0, fixedPath.length() - 4) + "_thumb.jpg";
 
-            File deleteImage = new File(fixedPath);
-            if (deleteImage.exists()) {
-                deleteImage.delete();
-            }
+                File deleteImage = new File(fixedPath);
+                if (deleteImage.exists()) {
+                    deleteImage.delete();
+                }
 
-            File deleteImage_thumb = new File(thumbPath);
-            if (deleteImage_thumb.exists()) {
-                deleteImage_thumb.delete();
+                File deleteImage_thumb = new File(thumbPath);
+                if (deleteImage_thumb.exists()) {
+                    deleteImage_thumb.delete();
+                }
             }
         }/*else{
             Log.d("V1", "we're NOOOOOOOTTTTTTT gonna try and delete these pictures");

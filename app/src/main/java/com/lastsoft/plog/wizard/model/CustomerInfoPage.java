@@ -42,7 +42,7 @@ public class CustomerInfoPage extends Page {
     @Override
     public void getReviewItems(ArrayList<ReviewItem> dest) {
         dest.add(new ReviewItem("Your name", mData.getString(NAME_DATA_KEY), getKey(), -1));
-        dest.add(new ReviewItem("Your email", mData.getString(EMAIL_DATA_KEY), getKey(), -1));
+        dest.add(new ReviewItem("Your BGG Username", mData.getString(EMAIL_DATA_KEY), getKey(), -1));
     }
 
     @Override

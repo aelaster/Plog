@@ -109,11 +109,13 @@ public class ViewPlayFragment_Pages extends Fragment {
             playImage.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    progressContainer.setVisibility(View.VISIBLE);
-                    Intent intent = new Intent();
-                    intent.setAction(Intent.ACTION_VIEW);
-                    intent.setDataAndType(Uri.parse(thisPlay.playPhoto), "image/*");
-                    startActivity(intent);
+                    if (progressContainer.getVisibility() != View.VISIBLE) {
+                        progressContainer.setVisibility(View.VISIBLE);
+                        Intent intent = new Intent();
+                        intent.setAction(Intent.ACTION_VIEW);
+                        intent.setDataAndType(Uri.parse(thisPlay.playPhoto), "image/*");
+                        startActivity(intent);
+                    }
                 }
             });
         }else{

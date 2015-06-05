@@ -2,23 +2,34 @@ package com.lastsoft.plog;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 
+import com.lastsoft.plog.db.GameGroup;
+import com.lastsoft.plog.db.Player;
 import com.lastsoft.plog.wizard.model.AbstractWizardModel;
+import com.lastsoft.plog.wizard.model.CustomerInfoPage;
 import com.lastsoft.plog.wizard.model.ModelCallbacks;
 import com.lastsoft.plog.wizard.model.Page;
+import com.lastsoft.plog.wizard.model.ReviewItem;
 import com.lastsoft.plog.wizard.ui.PageFragmentCallbacks;
 import com.lastsoft.plog.wizard.ui.ReviewFragment;
 import com.lastsoft.plog.wizard.ui.StepPagerStrip;
@@ -114,10 +125,45 @@ public class SetupWizardFragment extends Fragment implements
                                 @Override
                                 public Dialog onCreateDialog(Bundle savedInstanceState) {
                                     return new AlertDialog.Builder(getActivity())
-                                            .setMessage(R.string.submit_confirm_message)
-                                            .setPositiveButton(R.string.submit_confirm_button, null)
-                                            .setNegativeButton(android.R.string.cancel, null)
-                                            .create();
+                                    .setMessage(R.string.submit_confirm_message)
+                                    .setPositiveButton(R.string.submit_confirm_button, new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            String userName = mWizardModel.findByKey("Enter your name.  You will be the first player entered.  Your BGG Name will be used to pull your collection.").getData().getString(CustomerInfoPage.NAME_DATA_KEY);
+                                            if (userName != null) {
+                                                //add theis player
+                                                String bggInfo = mWizardModel.findByKey("Enter your name.  You will be the first player entered.  Your BGG Name will be used to pull your collection.").getData().getString(CustomerInfoPage.EMAIL_DATA_KEY);
+                                                boolean nameTakenFlag = false;
+                                                //if this new player's name already exists
+                                                if (Player.playerExists(userName)) {
+                                                    nameTakenFlag = true;
+                                                }
+                                                if (nameTakenFlag) {
+                                                    Toast.makeText(mActivity, getString(R.string.name_taken), Toast.LENGTH_SHORT).show();
+                                                } else {
+                                                    Player player = new Player(userName, bggInfo);
+                                                    player.save();
+                                                    if (bggInfo != null) {
+                                                        //set app preference
+                                                        SharedPreferences app_preferences;
+                                                        SharedPreferences.Editor editor;
+                                                        app_preferences = PreferenceManager.getDefaultSharedPreferences(mActivity);
+                                                        editor = app_preferences.edit();
+                                                        editor.putLong("defaultPlayer", player.getId());
+                                                        editor.commit();
+                                                    }
+                                                    GamesLoader initDb = new GamesLoader(getActivity());
+                                                    try {
+                                                        initDb.execute();
+                                                    } catch (Exception e) {
+
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    })
+                                    .setNegativeButton(android.R.string.cancel, null)
+                                    .create();
                                 }
                             };
                             dg.show(((MainActivity)mActivity).getSupportFragmentManager(), "place_order_dialog");
@@ -308,6 +354,33 @@ public class SetupWizardFragment extends Fragment implements
 
         public int getCutOffPage() {
             return mCutOffPage;
+        }
+    }
+
+    public class GamesLoader extends LoadGamesTask {
+        private final ProgressDialog mydialog;
+        public GamesLoader(Context context) {
+            super(context);
+            mydialog = new ProgressDialog(theContext);
+        }
+
+        // can use UI thread here
+        @Override
+        protected void onPreExecute() {
+
+            mydialog.setMessage(theContext.getString(R.string.setting_up));
+            mydialog.setCancelable(false);
+            try{
+                mydialog.show();
+            }catch (Exception e){}
+        }
+
+
+        @Override
+        protected void onPostExecute(final String result) {
+            mydialog.dismiss();
+            getActivity().finish();
+            startActivity(getActivity().getIntent());
         }
     }
 
