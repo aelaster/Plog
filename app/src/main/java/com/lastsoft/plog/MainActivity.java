@@ -917,7 +917,7 @@ public class MainActivity extends ActionBarActivity
 
             AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
             // Set the dialog title
-            builder.setTitle(R.string.choose_expansions)
+            builder.setTitle(R.string.choose_groups)
                     // Specify the list array, the items to be selected by default (null for none),
                     // and the listener through which to receive callbacks when items are selected
                     .setMultiChoiceItems(gameGroupNames.toArray(new CharSequence[gameGroupNames.size()]), checkedItems,

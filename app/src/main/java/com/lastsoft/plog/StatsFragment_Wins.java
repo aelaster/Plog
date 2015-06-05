@@ -293,16 +293,37 @@ public class StatsFragment_Wins extends Fragment {
             addStat("Unique Games: ", totalUnique + "");
             for(int x = 0; x < groupPlayers.size(); x++) {
                 int arrayBounds = 2 + (x * 2);
-                addStat(groupPlayers.get(x).playerName + " Total Wins:", result[arrayBounds]+"");
-                addStat(groupPlayers.get(x).playerName + " Asterisk Wins:", result[arrayBounds+1]+"");
+                long result_out, result_out2;
+                if (result[arrayBounds] == null){
+                    result_out = 0;
+                }else{
+                    result_out = result[arrayBounds];
+                }
+                if (result[arrayBounds + 1] == null) {
+                    result_out2 = 0;
+                } else {
+                    result_out2 = result[arrayBounds+1];
+                }
+                addStat(groupPlayers.get(x).playerName + " Total Wins:", result_out+"");
+                addStat(groupPlayers.get(x).playerName + " Asterisk Wins:", result_out2+"");
             }
             addStat("Shared Wins: ", sharedCounter + "");
             addStat("Total Losses: ", loserCounter + "");
-
             for(int x = 0; x < groupPlayers.size(); x++) {
                 int arrayBounds = 2 + (x * 2);
-                addStat(groupPlayers.get(x).playerName + " Total Wins Percentage:", ((int) (result[arrayBounds] * 100.0 / totalPlays + 0.5)) + "%");
-                addStat(groupPlayers.get(x).playerName + " Asterisk Wins Percentage:", ((int) (result[arrayBounds+1] * 100.0 / totalPlays + 0.5)) + "%");
+                long result_out, result_out2;
+                if (result[arrayBounds] == null){
+                    result_out = 0;
+                }else{
+                    result_out = result[arrayBounds];
+                }
+                if (result[arrayBounds+1] == null){
+                    result_out2 = 0;
+                }else{
+                    result_out2 = result[arrayBounds+1];
+                }
+                addStat(groupPlayers.get(x).playerName + " Total Wins Percentage:", ((int) (result_out * 100.0 / totalPlays + 0.5)) + "%");
+                addStat(groupPlayers.get(x).playerName + " Asterisk Wins Percentage:", ((int) (result_out2 * 100.0 / totalPlays + 0.5)) + "%");
             }
             addStat("Shared Wins Percentage: ", ((int) (sharedCounter * 100.0 / totalPlays + 0.5)) + "%");
             addStat("Total Losses Percentage: ", ((int) (loserCounter * 100.0 / totalPlays + 0.5)) + "%");
