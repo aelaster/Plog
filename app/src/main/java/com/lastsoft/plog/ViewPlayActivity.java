@@ -214,6 +214,7 @@ public class ViewPlayActivity extends FragmentActivity {
         }
 
         setContentView(R.layout.fragment_view_play_swipe);
+
         postponeEnterTransition();
 
 
@@ -221,6 +222,7 @@ public class ViewPlayActivity extends FragmentActivity {
         mPlayAdapter = new PlayAdapter(this, null, searchQuery);
         // Instantiate a ViewPager and a PagerAdapter.
         mPager = (ViewPager) findViewById(R.id.pager);
+       //mPager.setBackgroundColor(getResources().getColor(R.color.cardview_initial_background));
         mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         mPager.setAdapter(mPagerAdapter);
         mPager.setCurrentItem(mCurrentPosition);

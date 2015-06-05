@@ -73,6 +73,7 @@
     <string name="prev">Previous</string>
     <string name="finish">Submit order</string>
     <string name="review">Review</string>
+    <string name="loading_text">Loading...</string>
 
     <string name="label_your_name">Name</string>
     <string name="label_your_email">Email</string>

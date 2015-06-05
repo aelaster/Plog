@@ -46,6 +46,7 @@ public class ViewPlayFragment_Pages extends Fragment {
     ImageView playImage;
     public static final String ARG_PAGE = "page";
     private int mPageNumber;
+    LinearLayout progressContainer;
 
     public static ViewPlayFragment_Pages newInstance(long playID, String transID, String transID2, String transID3) {
         ViewPlayFragment_Pages fragment = new ViewPlayFragment_Pages();
@@ -85,6 +86,7 @@ public class ViewPlayFragment_Pages extends Fragment {
         // Inflate the layout for this fragment
         viewPlayLayout = inflater.inflate(R.layout.fragment_view_play2, container, false);
         viewPlayLayout.setBackgroundColor(getResources().getColor(R.color.cardview_initial_background));
+        progressContainer = (LinearLayout) viewPlayLayout.findViewById(R.id.progressContainer);
         LinearLayout linLayout = (LinearLayout) viewPlayLayout.findViewById(R.id.linearLayout);
         //Log.d("V1", "playID = " + playID);
         final Play thisPlay = Play.findById(Play.class, playID);
@@ -107,6 +109,7 @@ public class ViewPlayFragment_Pages extends Fragment {
             playImage.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    progressContainer.setVisibility(View.VISIBLE);
                     Intent intent = new Intent();
                     intent.setAction(Intent.ACTION_VIEW);
                     intent.setDataAndType(Uri.parse(thisPlay.playPhoto), "image/*");
@@ -210,7 +213,11 @@ public class ViewPlayFragment_Pages extends Fragment {
     }
 
 
-
+    @Override
+    public void onResume() {
+        super.onResume();
+        progressContainer.setVisibility(View.GONE);
+    }
 
     Activity mActivity;
     @Override

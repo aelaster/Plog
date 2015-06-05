@@ -50,6 +50,7 @@ import com.lastsoft.plog.db.Player;
 import com.lastsoft.plog.db.PlayersPerPlay;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -121,6 +122,7 @@ public class AddPlayFragment extends Fragment implements
     File photoFile;
     ImageChooserManager imageChooserManager;
     ArrayAdapter<CharSequence> colorSpinnerArrayAdapter;
+    boolean savedThis = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -345,7 +347,7 @@ public class AddPlayFragment extends Fragment implements
             gameDate = inputUser.format(editPlay.playDate);
 
             //photo
-            DisplayImageOptions options = new DisplayImageOptions.Builder()
+            final DisplayImageOptions options = new DisplayImageOptions.Builder()
                     .cacheOnDisk(true)
                     .cacheInMemory(true)
                     .considerExifParams(true)
@@ -637,6 +639,8 @@ public class AddPlayFragment extends Fragment implements
                         newExpansion.save();
                         //Log.d("V1", "Added Expansions = " + addedExpansion.gameName);
                     }
+
+                    savedThis = true;
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
@@ -688,6 +692,25 @@ public class AddPlayFragment extends Fragment implements
     @Override
     public void onDetach() {
         super.onDetach();
+
+        if (!savedThis && playID < 0){
+            //Log.d("V1", "we're gonna try and delete these pictures");
+            String fixedPath = mCurrentPhotoPath.substring(6, mCurrentPhotoPath.length());
+            String thumbPath = fixedPath.substring(0, fixedPath.length() - 4) + "_thumb.jpg";
+
+            File deleteImage = new File(fixedPath);
+            if (deleteImage.exists()) {
+                deleteImage.delete();
+            }
+
+            File deleteImage_thumb = new File(thumbPath);
+            if (deleteImage_thumb.exists()) {
+                deleteImage_thumb.delete();
+            }
+        }/*else{
+            Log.d("V1", "we're NOOOOOOOTTTTTTT gonna try and delete these pictures");
+        }*/
+
         mListener = null;
         if (mActivity != null) {
             if (mActivity instanceof MainActivity) {

@@ -235,14 +235,14 @@ public class MainActivity extends ActionBarActivity
             //fragmentManager.popBackStack(fragmentManager.getBackStackEntryAt(0).getId(), FragmentManager.POP_BACK_STACK_INCLUSIVE);
             fragUp = false;
         }
-        if (position == 2){
+        if (position == 1){
             mPlaysFragment = new PlaysFragment();
             mPlayAdapter = initPlayAdapter("");
             //initPlayAdapter();
             fragmentManager.beginTransaction()
                     .replace(R.id.container, mPlaysFragment, "plays")
                     .commit();
-        }else if (position == 1){
+        }else if (position == 2){
             fragmentManager.beginTransaction()
                     .replace(R.id.container, new PlayersFragment(), "players")
                     .commit();
@@ -277,10 +277,10 @@ public class MainActivity extends ActionBarActivity
                 mTitle = getString(R.string.title_section3);
                 break;
             case 2:
-                mTitle = getString(R.string.title_section2);
+                mTitle = getString(R.string.title_section1);
                 break;
             case 3:
-                mTitle = getString(R.string.title_section1);
+                mTitle = getString(R.string.title_section2);
                 break;
             case 4:
                 mTitle = getString(R.string.title_section4);
@@ -338,7 +338,7 @@ public class MainActivity extends ActionBarActivity
                 actionBar.setDisplayShowCustomEnabled(false);
                 actionBar.setDisplayShowTitleEnabled(true);
                 actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-                onSectionAttached(2);
+                onSectionAttached(3);
             } else if (fragmentCode == 3) {
                 //addplay
                 actionBar.setDisplayShowCustomEnabled(false);
@@ -356,14 +356,14 @@ public class MainActivity extends ActionBarActivity
                 actionBar.setDisplayShowCustomEnabled(false);
                 actionBar.setDisplayShowTitleEnabled(true);
                 actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-                onSectionAttached(2);
+                onSectionAttached(3);
                 actionBar.setTitle(mTitle);
             } else if (fragmentCode == 6) {
                 //plays
                 actionBar.setDisplayShowCustomEnabled(true);
                 actionBar.setDisplayShowTitleEnabled(false);
                 actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-                onSectionAttached(3);
+                onSectionAttached(2);
                 actionBar.setTitle(mTitle);
             } else if (fragmentCode == 7) {
                 //stats
@@ -377,7 +377,7 @@ public class MainActivity extends ActionBarActivity
                 actionBar.setDisplayShowCustomEnabled(false);
                 actionBar.setDisplayShowTitleEnabled(true);
                 actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-                onSectionAttached(3);
+                onSectionAttached(2);
             } else if (fragmentCode == 9) {
                 //set up
                 actionBar.setDisplayShowCustomEnabled(false);
