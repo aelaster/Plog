@@ -55,6 +55,7 @@ public class GamesPerPlay extends SugarRecord<GamesPerPlay> {
     }
 
     public static Game getBaseGame(Play play){
+        Log.d("V1", "playID = " + play.getId());
         Select getBaseGame = Select.from(GamesPerPlay.class);
         getBaseGame.where(Condition.prop(StringUtil.toSQLName("play")).eq(play.getId()), Condition.prop(StringUtil.toSQLName("expansionFlag")).eq("0"));
 

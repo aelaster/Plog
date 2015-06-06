@@ -3,6 +3,7 @@ package com.lastsoft.plog;
 import android.app.Activity;
 import android.app.ActivityOptions;
 import android.app.Dialog;
+import android.app.backup.BackupManager;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.DialogInterface;
@@ -159,6 +160,9 @@ public class MainActivity extends ActionBarActivity
 
         setExitSharedElementCallback(mCallback);
         mDamageReport.initialize();
+
+        BackupManager bm = new BackupManager(this);
+        bm.dataChanged();
 
         if (!doesDatabaseExist(this, "SRX.db")) {
             setContentView(R.layout.activity_main0);
@@ -675,7 +679,7 @@ public class MainActivity extends ActionBarActivity
 
         //delete play image
         Log.d("V1", "play image = " + deleteMe.playPhoto);
-        if(deleteMe.playPhoto != null && deleteMe.playPhoto.equals("")) {
+        if(deleteMe.playPhoto != null && !deleteMe.playPhoto.equals("")) {
             File deleteImage = new File(deleteMe.playPhoto.substring(7, deleteMe.playPhoto.length()));
             if (deleteImage.exists()) {
                 deleteImage.delete();
