@@ -361,7 +361,7 @@ public class AddPlayFragment extends Fragment implements
             for(PlayersPerPlay player:players){
                 Player thisPlayer = player.player;
                 //Log.d("V1", "score = " + player.score);
-                AddPlayer addedPlayer = new AddPlayer(thisPlayer.getId(),thisPlayer.playerName,player.color, player.score); //id, name, color, score
+                AddPlayer addedPlayer = new AddPlayer(thisPlayer.getId(),thisPlayer.playerName, player.color, player.score); //id, name, color, score
                 addPlayer(addedPlayer);
                 adapter.add(addedPlayer);
             }
@@ -428,16 +428,22 @@ public class AddPlayFragment extends Fragment implements
 
         colorSpinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); // The drop down view
         color.setAdapter(colorSpinnerArrayAdapter);
+
+        boolean overwriteFlag = true;
         if (!addedPlayer.color.equals("")) {
             int spinnerPostion = colorSpinnerArrayAdapter.getPosition(addedPlayer.color);
             color.setSelection(spinnerPostion);
+            overwriteFlag = false;
         }
+
         //the player spinner needs to pass reference to the color spinner
-        MySpinnerListener playerListener = new MySpinnerListener(addedPlayer, color);
+        MySpinnerListener playerListener = new MySpinnerListener(addedPlayer, color, overwriteFlag);
         player.setOnItemSelectedListener(playerListener);
         //the color spinner does not
-        MySpinnerListener colorListener = new MySpinnerListener(addedPlayer, null);
+        MySpinnerListener colorListener = new MySpinnerListener(addedPlayer, null, overwriteFlag);
         color.setOnItemSelectedListener(colorListener);
+
+
 
         // Set a click listener for the "X" button in the row that will remove the row.
         newView.findViewById(R.id.closeButton).setOnClickListener(new View.OnClickListener() {
@@ -855,10 +861,12 @@ public class AddPlayFragment extends Fragment implements
 
         private AddPlayer playerToUpdate;
         private Spinner colorSpinner;
+        private boolean overwriteFlag;
 
-        public MySpinnerListener(AddPlayer thePlayer, Spinner spinner) {
+        public MySpinnerListener(AddPlayer thePlayer, Spinner spinner, boolean overwriteFlag) {
             this.playerToUpdate = thePlayer;
             this.colorSpinner = spinner;
+            this.overwriteFlag = overwriteFlag;
         }
 
         @Override
@@ -868,12 +876,14 @@ public class AddPlayFragment extends Fragment implements
             }else {//player
                 playerToUpdate.playerID = playersID.get(i);
                 playerToUpdate.playerName = playersName.get(i);
-                Player colorCheck = Player.findById(Player.class, playerToUpdate.playerID);
-                if (colorCheck.defaultColor != null &&  !colorCheck.defaultColor.equals("")){
-                    int spinnerPostion = colorSpinnerArrayAdapter.getPosition(colorCheck.defaultColor);
-                    colorSpinner.setSelection(spinnerPostion);
-                    playerToUpdate.color = colorSpinner.getSelectedItem().toString();
-                    //playerToUpdate.color.setSelection(spinnerPostion);
+                if (overwriteFlag) {
+                    Player colorCheck = Player.findById(Player.class, playerToUpdate.playerID);
+                    if (colorCheck.defaultColor != null && !colorCheck.defaultColor.equals("")) {
+                        int spinnerPostion = colorSpinnerArrayAdapter.getPosition(colorCheck.defaultColor);
+                        colorSpinner.setSelection(spinnerPostion);
+                        playerToUpdate.color = colorSpinner.getSelectedItem().toString();
+                        //playerToUpdate.color.setSelection(spinnerPostion);
+                    }
                 }
             }
         }
