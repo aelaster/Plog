@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.widget.PopupMenu;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -80,6 +81,10 @@ public class ViewPlayFragment_Pages extends Fragment {
     View viewPlayLayout;
     TextView gameName;
     TextView playDate;
+    ImageView closeButton;
+    ImageView menuButton;
+    Play thisPlay;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -89,7 +94,50 @@ public class ViewPlayFragment_Pages extends Fragment {
         progressContainer = (LinearLayout) viewPlayLayout.findViewById(R.id.progressContainer);
         LinearLayout linLayout = (LinearLayout) viewPlayLayout.findViewById(R.id.linearLayout);
         //Log.d("V1", "playID = " + playID);
-        final Play thisPlay = Play.findById(Play.class, playID);
+
+        drawLayout();
+
+        viewPlayLayout.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+            @Override
+            public boolean onPreDraw() {
+                viewPlayLayout.getViewTreeObserver().removeOnPreDrawListener(this);
+                getActivity().startPostponedEnterTransition();
+                return true;
+            }
+        });
+        return viewPlayLayout;
+    }
+
+    private void addPlayer(String playerName, String score, boolean winnerFlag) {
+        // Instantiate a new "row" view.
+        final ViewGroup newView = (ViewGroup) LayoutInflater.from(mActivity).inflate(
+                R.layout.play_viewplayer_item, mContainerView_Players, false);
+
+        TextView playerView = (TextView) newView.findViewById(R.id.player);
+        TextView scoreView = (TextView) newView.findViewById(R.id.score);
+        playerView.setText(playerName);
+        scoreView.setText(score);
+        if (winnerFlag){
+            playerView.setTextSize(20);
+            scoreView.setTextSize(20);
+            playerView.setTypeface(null, Typeface.BOLD);
+            scoreView.setTypeface(null, Typeface.BOLD);
+        }else{
+            playerView.setTextSize(16);
+            scoreView.setTextSize(16);
+        }
+
+        mContainerView_Players.addView(newView);
+    }
+
+    public void redrawLayout(){
+        mContainerView_Players.removeAllViews();
+        mContainerView_Expansions.removeAllViews();
+        drawLayout();
+    }
+
+    public void drawLayout(){
+        thisPlay = Play.findById(Play.class, playID);
 
         //Log.d("V1", "imageTransID = " + imageTransID);
 
@@ -165,45 +213,16 @@ public class ViewPlayFragment_Pages extends Fragment {
         //output note
         TextView showNote = (TextView) viewPlayLayout.findViewById(R.id.notesText);
         if (!thisPlay.playNotes.equals("")) {
+            showNote.setVisibility(View.VISIBLE);
             showNote.setText("\"" + thisPlay.playNotes + "\"");
             showNote.setTextSize(24);
             showNote.setTypeface(null, Typeface.ITALIC);
         }else{
             showNote.setVisibility(View.GONE);
         }
-
-        viewPlayLayout.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-            @Override
-            public boolean onPreDraw() {
-                viewPlayLayout.getViewTreeObserver().removeOnPreDrawListener(this);
-                getActivity().startPostponedEnterTransition();
-                return true;
-            }
-        });
-        return viewPlayLayout;
     }
 
-    private void addPlayer(String playerName, String score, boolean winnerFlag) {
-        // Instantiate a new "row" view.
-        final ViewGroup newView = (ViewGroup) LayoutInflater.from(mActivity).inflate(
-                R.layout.play_viewplayer_item, mContainerView_Players, false);
 
-        TextView playerView = (TextView) newView.findViewById(R.id.player);
-        TextView scoreView = (TextView) newView.findViewById(R.id.score);
-        playerView.setText(playerName);
-        scoreView.setText(score);
-        if (winnerFlag){
-            playerView.setTextSize(20);
-            scoreView.setTextSize(20);
-            playerView.setTypeface(null, Typeface.BOLD);
-            scoreView.setTypeface(null, Typeface.BOLD);
-        }else{
-            playerView.setTextSize(16);
-            scoreView.setTextSize(16);
-        }
-
-        mContainerView_Players.addView(newView);
-    }
 
     private void addGame(Game game){
         final ViewGroup newView = (ViewGroup) LayoutInflater.from(mActivity).inflate(
@@ -232,6 +251,12 @@ public class ViewPlayFragment_Pages extends Fragment {
     public void onDetach() {
         super.onDetach();
         mActivity = null;
+    }
+
+    int myContainer;
+    public int getContainer(){
+        myContainer = R.id.container;
+        return myContainer;
     }
 
     @Override

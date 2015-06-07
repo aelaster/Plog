@@ -3,24 +3,21 @@ package com.lastsoft.plog;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
-import android.content.ContentUris;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.ThumbnailUtils;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBar;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -50,11 +47,9 @@ import com.lastsoft.plog.db.Player;
 import com.lastsoft.plog.db.PlayersPerPlay;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -172,6 +167,12 @@ public class AddPlayFragment extends Fragment implements
         rootView = inflater.inflate(R.layout.fragment_add_play, container, false);
         rootView.setBackgroundColor(getResources().getColor(R.color.cardview_initial_background));
 
+        if (mActivity instanceof ViewPlayActivity) {
+            Toolbar toolbar = (Toolbar)rootView.findViewById(R.id.toolbar);
+            toolbar.setVisibility(View.VISIBLE);
+            toolbar.setTitle(gameName);
+            ((ViewPlayActivity)mActivity).setSupportActionBar(toolbar);
+        }
 
 
         /*rootView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
@@ -650,7 +651,9 @@ public class AddPlayFragment extends Fragment implements
             /*if (playID<0) {
                 //((MainActivity) mActivity).getSupportActionBar().setDisplayShowCustomEnabled(true);
             }else{*/
-            onButtonPressed("refresh_plays");
+            if (mActivity instanceof MainActivity) {
+                onButtonPressed("refresh_plays");
+            }
             //}
             mActivity.onBackPressed();
             return true;
@@ -823,7 +826,7 @@ public class AddPlayFragment extends Fragment implements
 
 
             getFragmentManager().popBackStack();
-            getFragmentManager().beginTransaction().remove(mfragment).commit();
+            getFragmentManager().beginTransaction().remove(mfragment).commitAllowingStateLoss();
             getFragmentManager().executePendingTransactions(); //Prevents the flashing.
         }catch (Exception ignored){}
     }

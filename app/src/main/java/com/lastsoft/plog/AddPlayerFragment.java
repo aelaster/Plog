@@ -400,7 +400,7 @@ public class AddPlayerFragment extends Fragment {
         if (playerID >= 0){
             try {
                 getFragmentManager().popBackStack();
-                getFragmentManager().beginTransaction().remove(mfragment).commit();
+                getFragmentManager().beginTransaction().remove(mfragment).commitAllowingStateLoss();
                 getFragmentManager().executePendingTransactions(); //Prevents the flashing.
             } catch (Exception ignored) {
             }
@@ -425,7 +425,7 @@ public class AddPlayerFragment extends Fragment {
                         // removeFragment the fragment only when the animation finishes
                         try {
                             getFragmentManager().popBackStack();
-                            getFragmentManager().beginTransaction().remove(mfragment).commit();
+                            getFragmentManager().beginTransaction().remove(mfragment).commitAllowingStateLoss();
                             getFragmentManager().executePendingTransactions(); //Prevents the flashing.
                         } catch (Exception ignored) {
                         }

@@ -1,6 +1,6 @@
 package com.lastsoft.plog;
 
-import android.app.Activity;
+import android.app.ActionBar;
 import android.app.SharedElementCallback;
 import android.content.Context;
 import android.content.Intent;
@@ -8,29 +8,39 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.view.PagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
-import android.transition.ChangeBounds;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.transition.Fade;
 import android.transition.Slide;
 import android.transition.Transition;
 import android.transition.TransitionSet;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.lastsoft.plog.db.GamesPerPlay;
+import com.lastsoft.plog.db.Play;
+import com.lastsoft.plog.db.PlayersPerPlay;
+
+import java.io.File;
 import java.util.List;
 import java.util.Map;
+
 import static com.lastsoft.plog.MainActivity.EXTRA_CURRENT_ITEM_POSITION;
 import static com.lastsoft.plog.MainActivity.EXTRA_OLD_ITEM_POSITION;
 
-public class ViewPlayActivity extends FragmentActivity {
+public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragment.OnFragmentInteractionListener {
     // TODO: Rename and change types of parameters
     private long playID;
     String imageTransID;
@@ -41,7 +51,7 @@ public class ViewPlayActivity extends FragmentActivity {
     private ViewGroup mContainerView_Expansions;
     ImageView playImage;
     PlayAdapter mPlayAdapter;
-    String searchQuery;
+    String searchQuery = "";
 
     private static final String STATE_CURRENT_POSITION = "state_current_position";
     private static final String STATE_OLD_POSITION = "state_old_position";
@@ -186,16 +196,17 @@ public class ViewPlayActivity extends FragmentActivity {
         textSize.addTarget(mPagerAdapter.getCurrentDetailsFragment().getSharedNameElement());
         textSize.addTarget(mPagerAdapter.getCurrentDetailsFragment().getSharedDateElement());
         returnTransition.addTransition(textSize);*/
-
-        // Slide the cards off the bottom of the screen.
-        Transition cardSlide = new Slide(Gravity.BOTTOM);
-        cardSlide.addTarget(rootView.findViewById(R.id.container));
-        returnTransition.addTransition(cardSlide);
-
+        try {
+            // Slide the cards off the bottom of the screen.
+            Transition cardSlide = new Slide(Gravity.BOTTOM);
+            cardSlide.addTarget(rootView.findViewById(R.id.container));
+            returnTransition.addTransition(cardSlide);
+        }catch (Exception ignored){}
         returnTransition.setDuration(getResources().getInteger(R.integer.transition_duration_millis));
         return returnTransition;
     }
 
+    Toolbar toolbar;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         // TODO THE MENU STUFF, OR NOT...MAYBE JUST A VIEWER?
@@ -211,9 +222,38 @@ public class ViewPlayActivity extends FragmentActivity {
         } else {
             mCurrentPosition = savedInstanceState.getInt(STATE_CURRENT_POSITION);
             mOriginalPosition = savedInstanceState.getInt(STATE_OLD_POSITION);
+            searchQuery = savedInstanceState.getString("searchQuery");
         }
 
         setContentView(R.layout.fragment_view_play_swipe);
+
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setVisibility(View.VISIBLE);
+        toolbar.setTitle("");
+        toolbar.setNavigationIcon(R.drawable.ic_action_cancel);
+        toolbar.inflateMenu(R.menu.view_play); // this does nothing at all
+        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                int id = item.getItemId();
+                long menuPlayId = mPlayAdapter.plays.get(mPager.getCurrentItem()).getId();
+                if (id == R.id.edit_play) {
+                    toolbar.setVisibility(View.GONE);
+                    openAddPlay(GamesPerPlay.getBaseGame(Play.findById(Play.class, menuPlayId)).gameName, menuPlayId);
+                    return true;
+                } else if (id == R.id.delete_play) {
+                    deletePlay(menuPlayId, true);
+                    return true;
+                }
+                return false;
+            }
+        });
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
 
         postponeEnterTransition();
 
@@ -221,7 +261,7 @@ public class ViewPlayActivity extends FragmentActivity {
         //setBackgroundColor(getResources().getColor(R.color.cardview_initial_background));
         mPlayAdapter = new PlayAdapter(this, null, searchQuery);
         // Instantiate a ViewPager and a PagerAdapter.
-        mPager = (ViewPager) findViewById(R.id.pager);
+        mPager = (CustomViewPager) findViewById(R.id.pager);
        //mPager.setBackgroundColor(getResources().getColor(R.color.cardview_initial_background));
         mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         mPager.setAdapter(mPagerAdapter);
@@ -250,14 +290,31 @@ public class ViewPlayActivity extends FragmentActivity {
     }
 
     @Override
+    public void onBackPressed(){
+        if (mAddPlayFragment != null){
+            toolbar.setVisibility(View.VISIBLE);
+            mAddPlayFragment.removeYourself();
+            mAddPlayFragment = null;
+            mPager.setPagingEnabled(true);
+            //mPagerAdapter.notifyDataSetChanged();
+            mPagerAdapter.updateCurrentFragment();
+        }else{
+            toolbar.setVisibility(View.GONE);
+            super.onBackPressed();
+        }
+    }
+
+    @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(STATE_CURRENT_POSITION, mCurrentPosition);
         outState.putInt(STATE_OLD_POSITION, mOriginalPosition);
+        outState.putString("searchQuery", searchQuery);
     }
 
     @Override
     public void finishAfterTransition() {
+        Log.d("V1" ,"in here");
         mIsReturning = true;
         getWindow().setReturnTransition(makeReturnTransition());
         Intent data = new Intent();
@@ -272,7 +329,7 @@ public class ViewPlayActivity extends FragmentActivity {
      * The pager widget, which handles animation and allows swiping horizontally to access previous
      * and next wizard steps.
      */
-    public ViewPager mPager;
+    public CustomViewPager mPager;
 
     /**
      * The pager adapter, which provides the pages to the view pager widget.
@@ -287,6 +344,14 @@ public class ViewPlayActivity extends FragmentActivity {
         // TODO Auto-generated method stub
         //Log.d("V1", "on destroy");
         super.onDestroy();
+    }
+
+    @Override
+    public void onFragmentInteraction(String string) {
+        mPager.setPagingEnabled(true);
+        //mPagerAdapter.notifyDataSetChanged();
+        mPagerAdapter.getCurrentDetailsFragment().redrawLayout();
+        // in here we should recreate the frag
     }
 
     /**
@@ -305,9 +370,77 @@ public class ViewPlayActivity extends FragmentActivity {
         void onFragmentInteraction(String string);
     }
 
+    AddPlayFragment mAddPlayFragment;
+    public void openAddPlay(String game_name, long playID){
+
+        mPager.setPagingEnabled(false);
+        //mTitle = game_name;
+
+        try{
+            InputMethodManager inputManager = (InputMethodManager)
+                    getSystemService(Context.INPUT_METHOD_SERVICE);
+
+            inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
+                    InputMethodManager.HIDE_NOT_ALWAYS);
+        }catch (Exception ignored){}
+
+        //mFragment.setExitTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.slide_top));
+
+
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction ft = fragmentManager.beginTransaction();
+
+        mAddPlayFragment = AddPlayFragment.newInstance(0, 0, true, game_name, playID);
+        //mAddPlayFragment.setEnterTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.slide_bottom));
+        //mAddPlayFragment.setExitTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.slide_top));
+        ft.setCustomAnimations(R.anim.slide_in_bottom, R.anim.slide_out_top, R.anim.slide_in_top, R.anim.slide_out_bottom);
+        ft.add(R.id.swipeholder, mAddPlayFragment, "add_play");
+        ft.addToBackStack("add_play");
+        ft.commitAllowingStateLoss();
+    }
+
+
+    public void deletePlay(long playID, boolean backFlag){
+        Play deleteMe = Play.findById(Play.class, playID);
+
+        //delete PlayersPerPlay
+        List<PlayersPerPlay> players = PlayersPerPlay.getPlayers(deleteMe);
+        for(PlayersPerPlay player:players){
+            player.delete();
+        }
+        //delete GamesPerPay
+        List<GamesPerPlay> games = GamesPerPlay.getGames(deleteMe);
+        for(GamesPerPlay game:games){
+            game.delete();
+        }
+
+        //delete play image
+        Log.d("V1", "play image = " + deleteMe.playPhoto);
+        if(deleteMe.playPhoto != null && !deleteMe.playPhoto.equals("")) {
+            File deleteImage = new File(deleteMe.playPhoto.substring(7, deleteMe.playPhoto.length()));
+            if (deleteImage.exists()) {
+                deleteImage.delete();
+            }
+
+            //delete play image thumb
+            File deleteImage_thumb = new File(deleteMe.playPhoto.substring(7, deleteMe.playPhoto.length() - 4) + "_thumb.jpg");
+            if (deleteImage_thumb.exists()) {
+                deleteImage_thumb.delete();
+            }
+        }
+
+        //delete play
+        deleteMe.delete();
+
+        mPlayAdapter = new PlayAdapter(this, null, searchQuery);
+        mPagerAdapter.notifyDataSetChanged();
+    }
+
 
     private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
         ViewPlayFragment_Pages mCurrentFragment;
+        ViewGroup mCurrentContainer;
         public ScreenSlidePagerAdapter(FragmentManager fm) {
             super(fm);
         }
@@ -331,6 +464,11 @@ public class ViewPlayActivity extends FragmentActivity {
         public void setPrimaryItem(ViewGroup container, int position, Object object) {
             super.setPrimaryItem(container, position, object);
             mCurrentFragment = (ViewPlayFragment_Pages) object;
+            mCurrentContainer = container;
+        }
+
+        public void updateCurrentFragment(){
+            mCurrentFragment.redrawLayout();
         }
 
         public ViewPlayFragment_Pages getCurrentDetailsFragment() {

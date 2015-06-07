@@ -325,7 +325,7 @@ public class AddGroupFragment extends Fragment {
                     // removeFragment the fragment only when the animation finishes
                     try {
                         getFragmentManager().popBackStack();
-                        getFragmentManager().beginTransaction().remove(mfragment).commit();
+                        getFragmentManager().beginTransaction().remove(mfragment).commitAllowingStateLoss();
                         getFragmentManager().executePendingTransactions(); //Prevents the flashing.
                     }catch (Exception e){}
                 }

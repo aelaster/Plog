@@ -17,9 +17,9 @@ import android.support.v4.app.SharedElementCallback;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
@@ -50,7 +50,7 @@ import java.util.List;
 import java.util.Map;
 
 
-public class MainActivity extends ActionBarActivity
+public class MainActivity extends AppCompatActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks,
         AddGroupFragment.OnFragmentInteractionListener,
         AddPlayFragment.OnFragmentInteractionListener,
@@ -170,7 +170,7 @@ public class MainActivity extends ActionBarActivity
             FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction()
                     .replace(R.id.container, new SetupWizardFragment(), "wizard")
-                    .commit();
+                    .commitAllowingStateLoss();
             restoreActionBar();
         }else{
             setContentView(R.layout.activity_main);
@@ -225,43 +225,47 @@ public class MainActivity extends ActionBarActivity
     public void onNavigationDrawerItemSelected(int position) {
         // update the main content by replacing fragments
         //Log.d("V1", ""+position);
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        if (fragmentManager.getBackStackEntryCount() > 0){
-            //int backStackCount = manager.getBackStackEntryCount();
-            fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-            //fragmentManager.popBackStack(fragmentManager.getBackStackEntryAt(0).getId(), FragmentManager.POP_BACK_STACK_INCLUSIVE);
-            fragUp = false;
-        }
-        if (position == 1){
-            mPlaysFragment = new PlaysFragment();
-            mPlayAdapter = initPlayAdapter("");
-            //initPlayAdapter();
-            fragmentManager.beginTransaction()
-                    .replace(R.id.container, mPlaysFragment, "plays")
-                    .commit();
-        }else if (position == 2){
-            fragmentManager.beginTransaction()
-                    .replace(R.id.container, new PlayersFragment(), "players")
-                    .commit();
-        }else if (position == 0){
-            fragmentManager.beginTransaction()
-                    .replace(R.id.container, new GamesFragment(), "games")
-                    .commit();
-        }else if (position == 3){
-            fragmentManager.beginTransaction()
-                    .replace(R.id.container, new StatsFragment(), "stats")
-                    .commit();
+        try {
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            if (fragmentManager.getBackStackEntryCount() > 0) {
+                //int backStackCount = manager.getBackStackEntryCount();
+                fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                //fragmentManager.popBackStack(fragmentManager.getBackStackEntryAt(0).getId(), FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                fragUp = false;
+            }
+            if (position == 1) {
+                mPlaysFragment = new PlaysFragment();
+                mPlayAdapter = initPlayAdapter("");
+                //initPlayAdapter();
+                fragmentManager.beginTransaction()
+                        .replace(R.id.container, mPlaysFragment, "plays")
+                        .commitAllowingStateLoss();
+            } else if (position == 2) {
+                fragmentManager.beginTransaction()
+                        .replace(R.id.container, new PlayersFragment(), "players")
+                        .commitAllowingStateLoss();
+            } else if (position == 0) {
+                fragmentManager.beginTransaction()
+                        .replace(R.id.container, new GamesFragment(), "games")
+                        .commitAllowingStateLoss();
+            } else if (position == 3) {
+                fragmentManager.beginTransaction()
+                        .replace(R.id.container, new StatsFragment(), "stats")
+                        .commitAllowingStateLoss();
         /*}else if (position == 4){
 
             fragmentManager.beginTransaction()
                     .replace(R.id.container, new SetupWizardFragment(), "wizard")
-                    .commit()
+                    .commitAllowingStateLoss()
                                 /*fragmentManager.beginTransaction()
                     .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
-                    .commit();*/
-        }else{
-            super.onBackPressed();
-            //android.os.Process.killProcess(android.os.Process.myPid());
+                    .commitAllowingStateLoss();*/
+            } else {
+                super.onBackPressed();
+                //android.os.Process.killProcess(android.os.Process.myPid());
+            }
+        }catch (Exception e){
+            e.printStackTrace();
         }
     }
 
@@ -485,7 +489,7 @@ public class MainActivity extends ActionBarActivity
         ft.setCustomAnimations(R.anim.slide_in_bottom, R.anim.slide_out_top, R.anim.slide_in_top, R.anim.slide_out_bottom);
         ft.replace(R.id.container, mAddPlayerFragment, "add_player");
         ft.addToBackStack("add_play");
-        ft.commit();
+        ft.commitAllowingStateLoss();
         fragmentManager.executePendingTransactions(); //Prevents the flashing.
     }
 
@@ -517,7 +521,7 @@ public class MainActivity extends ActionBarActivity
         ft.addSharedElement(dateView, dateView.getTransitionName());
         ft.replace(R.id.container, mViewPlayFragment, "view_play");
         ft.addToBackStack(null);
-        ft.commit();
+        ft.commitAllowingStateLoss();
         fragmentManager.executePendingTransactions(); //Prevents the flashing.*/
         mIsReentering = false;
 
@@ -546,20 +550,24 @@ public class MainActivity extends ActionBarActivity
         mTmpState = new Bundle(data.getExtras());
         int oldPosition = mTmpState.getInt(EXTRA_OLD_ITEM_POSITION);
         int currentPosition = mTmpState.getInt(EXTRA_CURRENT_ITEM_POSITION);
-        if (oldPosition != currentPosition) {
-            mPlaysFragment.mRecyclerView.scrollToPosition(currentPosition);
-        }
-        postponeEnterTransition();
-        mPlaysFragment.mRecyclerView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-            @Override
-            public boolean onPreDraw() {
-                mPlaysFragment.mRecyclerView.getViewTreeObserver().removeOnPreDrawListener(this);
-                // TODO: hack! not sure why, but requesting a layout pass is necessary in order to fix re-mapping + scrolling glitches!
-                mPlaysFragment.mRecyclerView.requestLayout();
-                startPostponedEnterTransition();
-                return true;
+        if (mPlaysFragment != null) {
+            mPlaysFragment.refreshDataset();
+            if (oldPosition != currentPosition) {
+                mPlaysFragment.mRecyclerView.scrollToPosition(currentPosition);
             }
-        });
+            postponeEnterTransition();
+
+            mPlaysFragment.mRecyclerView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+                @Override
+                public boolean onPreDraw() {
+                    mPlaysFragment.mRecyclerView.getViewTreeObserver().removeOnPreDrawListener(this);
+                    // TODO: hack! not sure why, but requesting a layout pass is necessary in order to fix re-mapping + scrolling glitches!
+                    mPlaysFragment.mRecyclerView.requestLayout();
+                    startPostponedEnterTransition();
+                    return true;
+                }
+            });
+        }
     }
 
     public void openAddPlay(Fragment mFragment, String game_name, long playID){
@@ -587,7 +595,7 @@ public class MainActivity extends ActionBarActivity
         ft.setCustomAnimations(R.anim.slide_in_bottom, R.anim.slide_out_top, R.anim.slide_in_top, R.anim.slide_out_bottom);
         ft.add(R.id.container, mAddPlayFragment, "add_play");
         ft.addToBackStack("add_play");
-        ft.commit();
+        ft.commitAllowingStateLoss();
 
 
 
@@ -709,7 +717,7 @@ public class MainActivity extends ActionBarActivity
             mAddPlayerFragment = AddPlayerFragment.newInstance((int) x, (int) y, true, -1);
             ft.add(R.id.container, mAddPlayerFragment, id);
             ft.addToBackStack(id);
-            ft.commit();
+            ft.commitAllowingStateLoss();
             //mTitle = getString(R.string.add_player);
             //restoreActionBar();
         }else if (id.equals("add_play")) {
@@ -718,7 +726,7 @@ public class MainActivity extends ActionBarActivity
             mAddPlayFragment = AddPlayFragment.newInstance((int) x, (int) y, true, "", -1);
             ft.add(R.id.container, mAddPlayFragment, id);
             ft.addToBackStack(id);
-            ft.commit();
+            ft.commitAllowingStateLoss();
             //mTitle = getString(R.string.add_player);
             //restoreActionBar();*/
         }else if (id.equals("add_group")) {
@@ -726,7 +734,7 @@ public class MainActivity extends ActionBarActivity
             mAddGroupFragment = AddGroupFragment.newInstance((int) x, (int) y, true);
             ft.add(R.id.container, mAddGroupFragment, id);
             ft.addToBackStack(id);
-            ft.commit();
+            ft.commitAllowingStateLoss();
             //mTitle = getString(R.string.add_player);
             //restoreActionBar();
         }else if (id.equals("add_game")) {
@@ -734,7 +742,7 @@ public class MainActivity extends ActionBarActivity
             mAddGameFragment = AddGameFragment.newInstance((int) x, (int) y, true);
             ft.add(R.id.container, mAddGameFragment, id);
             ft.addToBackStack(id);
-            ft.commit();
+            ft.commitAllowingStateLoss();
             //mTitle = getString(R.string.add_player);
             //restoreActionBar();
         }

@@ -31,14 +31,18 @@
         <item name="actionBarStyle">@style/MyActionBar</item>
     </style>
 
-    <style name="AppTheme.NoActionBar" parent="android:Theme.Material.Light.NoActionBar">
+
+    <style name="AppTheme.NoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowContentTransitions">true</item>
         <item name="android:windowSharedElementEnterTransition">@android:transition/move</item>
         <item name="android:windowSharedElementExitTransition">@android:transition/move</item>
+        <item name="android:colorPrimaryDark">@color/darker_logo_blue</item>
+        <item name="colorPrimaryDark">@color/darker_logo_blue</item>
         <!--<item name="android:windowSharedElementReenterTransition">@null</item>-->
         <!--<item name="android:windowAllowEnterTransitionOverlap">true</item>-->
         <!--<item name="android:windowAllowReturnTransitionOverlap">true</item>-->
-        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentStatus">false</item>
+
         <!--<item name="android:windowSharedElementsUseOverlay">false</item>-->
     </style>
 
