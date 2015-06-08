@@ -87,14 +87,6 @@ public class Game extends SugarRecord<Game> {
         }
     }
 
-    public static List<Game> findExpansions(){
-        //return Game.find(Game.class, StringUtil.toSQLName("expansionFlag") + " = 1");
-        Select findExpansions = Select.from(Game.class);
-        findExpansions.where(Condition.prop(StringUtil.toSQLName("expansionFlag")).eq("1"));
-        findExpansions.orderBy(StringUtil.toSQLName("gameName") + " ASC");
-        return findExpansions.list();
-    }
-
     public static List<Game> findBaseGames(String mSearchQuery){
         //return Game.find(Game.class, StringUtil.toSQLName("expansionFlag") + " = 0");
         if (mSearchQuery.contains("'")) {
@@ -114,10 +106,23 @@ public class Game extends SugarRecord<Game> {
         if (name.contains("'")) {
             name = name.replaceAll("'", "''");
         }
-        //Log.d("V1", name);
         Select expansionsFor = Select.from(Game.class);
         expansionsFor.where(Condition.prop(StringUtil.toSQLName("gameName")).like("%" + name + "%"), Condition.prop(StringUtil.toSQLName("expansionFlag")).eq("1"));
         expansionsFor.orderBy(StringUtil.toSQLName("gameName") + " ASC");
         return expansionsFor.list();
+    }
+
+
+    public static List<Game> getUniqueGames_GameGroup(GameGroup group){
+        return Game.findWithQuery(Game.class,
+                " SELECT "+ StringUtil.toSQLName("Game") + ".*" +
+                        " FROM " + StringUtil.toSQLName("Game") +
+                        " INNER JOIN " + StringUtil.toSQLName("GamesPerPlay") +
+                        " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("game") + " = " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("id") +
+                        " INNER JOIN " + StringUtil.toSQLName("Play") +
+                        " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("play") + " = " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") +
+                        " INNER JOIN " + StringUtil.toSQLName("PlaysPerGameGroup") +
+                        " ON " + StringUtil.toSQLName("PlaysPerGameGroup") + "." + StringUtil.toSQLName("play") + " = " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") +
+                        " and " + StringUtil.toSQLName("GameGroup") + " = ? group by " + StringUtil.toSQLName("game"), group.getId().toString());
     }
 }

@@ -32,6 +32,7 @@ import android.widget.TextView;
 import com.lastsoft.plog.db.GamesPerPlay;
 import com.lastsoft.plog.db.Play;
 import com.lastsoft.plog.db.PlayersPerPlay;
+import com.lastsoft.plog.db.PlaysPerGameGroup;
 
 import java.io.File;
 import java.util.List;
@@ -413,6 +414,12 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
         List<GamesPerPlay> games = GamesPerPlay.getGames(deleteMe);
         for(GamesPerPlay game:games){
             game.delete();
+        }
+
+        //delete plays_per_game_group
+        List<PlaysPerGameGroup> plays = PlaysPerGameGroup.getPlays(deleteMe);
+        for(PlaysPerGameGroup play:plays){
+            play.delete();
         }
 
         //delete play image

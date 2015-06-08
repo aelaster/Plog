@@ -24,35 +24,6 @@ public class GamesPerPlay extends SugarRecord<GamesPerPlay> {
         this.expansionFlag = expansionFlag;
     }
 
-    public static int getUniquePlays_GameGroup(GameGroup group){
-        Log.d("V1", "Select * " +
-                " from " + StringUtil.toSQLName("GamesPerPlay") +
-                " where " + StringUtil.toSQLName("expansionFlag") + " = 0 and " + StringUtil.toSQLName("play") +
-                " in (Select " + StringUtil.toSQLName("play") +
-                " from " + StringUtil.toSQLName("PlayersPerPlay") +
-                " where " + StringUtil.toSQLName("player") +
-                " in (Select " + StringUtil.toSQLName("player") +
-                " from " + StringUtil.toSQLName("PlayersPerGameGroup") +
-                " where " + StringUtil.toSQLName("GameGroup") + " = ?))" +
-                " group by " + StringUtil.toSQLName("game"));
-        List<GamesPerPlay> queery = GamesPerPlay.findWithQuery(GamesPerPlay.class,
-                "Select * " +
-                " from " + StringUtil.toSQLName("GamesPerPlay") +
-                " where " + StringUtil.toSQLName("expansionFlag") + " = 0 and " + StringUtil.toSQLName("play") +
-                " in (Select " + StringUtil.toSQLName("play") +
-                " from " + StringUtil.toSQLName("PlayersPerPlay") +
-                " where " + StringUtil.toSQLName("player") +
-                " in (Select " + StringUtil.toSQLName("player") +
-                " from " + StringUtil.toSQLName("PlayersPerGameGroup") +
-                " where " + StringUtil.toSQLName("GameGroup") + " = ?))" +
-                " group by " + StringUtil.toSQLName("game"), group.getId().toString());
-        return queery.size();
-    }
-
-    public static int getUniquePlays(){
-        List<GamesPerPlay> queery = GamesPerPlay.findWithQuery(GamesPerPlay.class, "Select * from " + StringUtil.toSQLName("GamesPerPlay") + " where " + StringUtil.toSQLName("expansionFlag") + " = 0 order by " + StringUtil.toSQLName("game"));
-        return queery.size();
-    }
 
     public static Game getBaseGame(Play play){
         //Log.d("V1", "playID = " + play.getId());

@@ -61,24 +61,29 @@ public class Player extends SugarRecord<Player> {
         }
     }
 
-    public static boolean hasPlayerPlayedGame(Player player, Game game){
-        List<GamesPerPlay> queery = GamesPerPlay.findWithQuery(GamesPerPlay.class,
-                /*"Select " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("play") +
-                        " from " + StringUtil.toSQLName("PlayersPerPlay") +
-                        ", " + StringUtil.toSQLName("GamesPerPlay") +
-                        " where " + StringUtil.toSQLName("PlayersPerPlay") +
-                        "." + StringUtil.toSQLName("player") +
-                        " = ? and " + StringUtil.toSQLName("PlayersPerPlay") +
-                        "."  + StringUtil.toSQLName("play") + " =  "+ StringUtil.toSQLName("GamesPerPlay") +
-                        "."  + StringUtil.toSQLName("play") + " and " + StringUtil.toSQLName("GamesPerPlay") +
-                        "."  + StringUtil.toSQLName("game") + " = ?" , player.getId().toString(), game.getId().toString());*/
-
-                " SELECT * " +
-                " FROM " + StringUtil.toSQLName("PlayersPerPlay") +
-                " INNER JOIN " + StringUtil.toSQLName("GamesPerPlay") +
-                " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("play") + " = " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("play") +
-                " and " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("player") + " = ? " +
-                " and " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("game") + " = ? ", game.getId().toString());
-        return (queery.size() != 0);
+    public static List<Player> getPlayersIDs(Play play){
+        return Player.findWithQuery(Player.class,
+                " SELECT " + StringUtil.toSQLName("Player") + ".* " +
+                        " FROM " + StringUtil.toSQLName("Player") +
+                        " INNER JOIN " + StringUtil.toSQLName("PlayersPerPlay") +
+                        " ON " + StringUtil.toSQLName("Player") + "." + StringUtil.toSQLName("id") + " = " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("player") +
+                        " and " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("play") + " = ? ", play.getId().toString());
     }
+
+
+    @Override
+    public boolean equals(Object obj) {
+
+        if (obj == this) {
+            return true;
+        }
+
+        if (!(obj instanceof Player)) {
+            return false;
+        }
+
+        Player other = (Player) obj;
+        return getId() == other.getId();
+    }
+
 }

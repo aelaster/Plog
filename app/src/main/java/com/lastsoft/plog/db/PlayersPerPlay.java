@@ -1,5 +1,7 @@
 package com.lastsoft.plog.db;
 
+import android.util.Log;
+
 import com.orm.StringUtil;
 import com.orm.SugarRecord;
 import com.orm.query.Condition;
@@ -38,8 +40,28 @@ public class PlayersPerPlay extends SugarRecord<PlayersPerPlay> {
         this.playHighScore = playHighScore;
     }
 
-    public static List<PlayersPerPlay> totalPlays_GameGroup(GameGroup group){
-        return PlayersPerPlay.findWithQuery(PlayersPerPlay.class, "Select * from " + StringUtil.toSQLName("PlayersPerPlay") + " where " + StringUtil.toSQLName("player") + " in (Select " + StringUtil.toSQLName("player") + " from " + StringUtil.toSQLName("PlayersPerGameGroup") + " where " + StringUtil.toSQLName("GameGroup") + " = ?) ORDER BY PLAY, PLAYER", group.getId().toString());
+    public static List<PlayersPerPlay> totalPlays_GameGroup(GameGroup group) {
+        /*Log.d("V1", " SELECT "+ StringUtil.toSQLName("PlayersPerPlay") +".* " +
+                " FROM " + StringUtil.toSQLName("PlayersPerPlay") +
+                " INNER JOIN " + StringUtil.toSQLName("PlaysPerGameGroup") +
+                " ON " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("play") + " = " + StringUtil.toSQLName("PlaysPerGameGroup") + "." + StringUtil.toSQLName("play") +
+                " AND " + StringUtil.toSQLName("GameGroup") + " = ?" +
+                " AND "+ StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("player") + " IN " +
+                " (SELECT " + StringUtil.toSQLName("Player") +
+                " FROM " + StringUtil.toSQLName("PlayersPerGameGroup") +
+                " WHERE " + StringUtil.toSQLName("GameGroup") + " = ?)" +
+                " ORDER BY PLAY, PLAYER");*/
+        return PlayersPerPlay.findWithQuery(PlayersPerPlay.class,
+                " SELECT "+ StringUtil.toSQLName("PlayersPerPlay") +".* " +
+                        " FROM " + StringUtil.toSQLName("PlayersPerPlay") +
+                        " INNER JOIN " + StringUtil.toSQLName("PlaysPerGameGroup") +
+                        " ON " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("play") + " = " + StringUtil.toSQLName("PlaysPerGameGroup") + "." + StringUtil.toSQLName("play") +
+                        " AND " + StringUtil.toSQLName("GameGroup") + " = ?" +
+                        " AND "+ StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("player") + " IN " +
+                        " (SELECT " + StringUtil.toSQLName("Player") +
+                        " FROM " + StringUtil.toSQLName("PlayersPerGameGroup") +
+                        " WHERE " + StringUtil.toSQLName("GameGroup") + " = ?)" +
+                        " ORDER BY PLAY, PLAYER", group.getId().toString(), group.getId().toString());
     }
 
     public static List<PlayersPerPlay> getPlayers(Play play){
@@ -54,20 +76,6 @@ public class PlayersPerPlay extends SugarRecord<PlayersPerPlay> {
         return getPlayers.list();
     }
 
-    public static List<PlayersPerPlay> totalPlays(Player player){
-        Select getPlayers = Select.from(PlayersPerPlay.class);
-        getPlayers.where(Condition.prop(StringUtil.toSQLName("player")).eq(player.getId()));
-        return getPlayers.list();
-    }
-
-    public static int getScoreByPlayer(Player player, Play play){
-        Select getPlayers = Select.from(PlayersPerPlay.class);
-        getPlayers.where(Condition.prop(StringUtil.toSQLName("player")).eq(player.getId()), Condition.prop(StringUtil.toSQLName("play")).eq(play.getId()));
-        List<PlayersPerPlay> output =  getPlayers.list();
-        return output.get(0).score;
-    }
-
-
     public static List<PlayersPerPlay> getPlayers_Winners(Play play){
         Select getPlayers = Select.from(PlayersPerPlay.class);
         getPlayers.where(Condition.prop(StringUtil.toSQLName("play")).eq(play.getId()));
@@ -81,6 +89,19 @@ public class PlayersPerPlay extends SugarRecord<PlayersPerPlay> {
     }
     public static List<PlayersPerPlay> getWinners(Play play){
         return PlayersPerPlay.findWithQuery(PlayersPerPlay.class, "Select * from " + StringUtil.toSQLName("PlayersPerPlay") + " where " + StringUtil.toSQLName("play") + " = ? and " + StringUtil.toSQLName("score") + " = (Select Max(" + StringUtil.toSQLName("score") + ") from " + StringUtil.toSQLName("PlayersPerPlay") + " where " + StringUtil.toSQLName("play") + " = ?)", play.getId().toString(), play.getId().toString());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+
+        if (!(obj instanceof Long)) {
+            return false;
+        }
+        Long other = (Long) obj;
+        return this.player.getId() == other;
     }
 
 }

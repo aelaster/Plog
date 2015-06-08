@@ -31,6 +31,7 @@ import android.widget.Toast;
 import com.lastsoft.plog.db.GameGroup;
 import com.lastsoft.plog.db.Player;
 import com.lastsoft.plog.db.PlayersPerGameGroup;
+import com.lastsoft.plog.db.PlaysPerGameGroup;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -332,9 +333,17 @@ public class AddPlayerFragment extends Fragment {
         List<PlayersPerGameGroup> players =  PlayersPerGameGroup.getPlayers(group);
         if (players.size() <= 1){
             //this group only has one person now, or none, so it needs to be buhleeted
+            //delete the players
             for (PlayersPerGameGroup player : players) {
                 player.delete();
             }
+
+            //delete the plays
+            List<PlaysPerGameGroup> plays = PlaysPerGameGroup.getPlays(group);
+            for(PlaysPerGameGroup play:plays){
+                play.delete();
+            }
+
             group.delete();
         }
     }

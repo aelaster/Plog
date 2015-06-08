@@ -39,6 +39,7 @@ import com.lastsoft.plog.db.Play;
 import com.lastsoft.plog.db.Player;
 import com.lastsoft.plog.db.PlayersPerGameGroup;
 import com.lastsoft.plog.db.PlayersPerPlay;
+import com.lastsoft.plog.db.PlaysPerGameGroup;
 import com.lastsoft.plog.db.TenByTen;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
@@ -263,6 +264,32 @@ public class MainActivity extends AppCompatActivity
             } else {
                 super.onBackPressed();
                 //android.os.Process.killProcess(android.os.Process.myPid());
+
+                //gonna use this to set up the groups for data collection
+                /*List<GameGroup> gameGroups = GameGroup.listAll(GameGroup.class);
+                for (GameGroup groupie:gameGroups) {
+                    List<Player> groupPlayers =  GameGroup.getGroupPlayers(groupie);
+                    List<Play> plays = Play.listPlaysNewOld("");
+                    for (Play play : plays) {
+                        List<Player> players = Player.getPlayersIDs(play);
+                        boolean included = true;
+
+                        for (Player addedUser : groupPlayers) {
+                            if (!players.contains(addedUser)) {
+                                //the players of this game does not contain one of the added users
+                                included = false;
+                                break;
+                            }
+                        }
+
+                        if (included) {
+                            //add this to PlaysPerGameGroup
+                            PlaysPerGameGroup newGroupPlay = new PlaysPerGameGroup(play, groupie);
+                            newGroupPlay.save();
+                        }
+                    }
+                }
+                Log.d("V1", "FIN");*/
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -308,12 +335,6 @@ public class MainActivity extends AppCompatActivity
                 actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
             }
             actionBar.setDisplayShowTitleEnabled(true);
-            /*if(mTitle.equals(getString(R.string.title_section3)) || mTitle.equals(getString(R.string.title_section1))) {
-                //actionBar.setDisplayShowCustomEnabled(true);
-            }else{
-                actionBar.setDisplayShowCustomEnabled(false);
-            }*/
-            //actionBar.setTitle(mTitle);
         }
     }
 
@@ -473,18 +494,10 @@ public class MainActivity extends AppCompatActivity
                     InputMethodManager.HIDE_NOT_ALWAYS);
         }catch (Exception ignored){}
 
-        //mFragment.setExitTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.slide_top));
-
-        //mFragment.setSharedElementReturnTransition(null);
-        //mFragment.setExitTransition(null);
-
-
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction ft = fragmentManager.beginTransaction();
         fragUp = true;
         mAddPlayerFragment = AddPlayerFragment.newInstance( 0,  0, true, playerID);
-        //mAddPlayFragment.setEnterTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.slide_bottom));
-        //mAddPlayFragment.setExitTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.slide_top));
 
         ft.setCustomAnimations(R.anim.slide_in_bottom, R.anim.slide_out_top, R.anim.slide_in_top, R.anim.slide_out_bottom);
         ft.replace(R.id.container, mAddPlayerFragment, "add_player");
@@ -502,27 +515,6 @@ public class MainActivity extends AppCompatActivity
                     InputMethodManager.HIDE_NOT_ALWAYS);
         }catch (Exception ignored){}
 
-        //mFragment.setSharedElementReturnTransition(TransitionInflater.from(this).inflateTransition(R.transition.change_image_transform));
-        //mFragment.setExitTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.move));
-
-        /*FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction ft = fragmentManager.beginTransaction();
-
-        mViewPlayFragment = ViewPlayFragment.newInstance(clickedPlay.getId(),view.getTransitionName(), nameView.getTransitionName(), dateView.getTransitionName(), position);
-        mViewPlayFragment.setSharedElementEnterTransition(TransitionInflater.from(this).inflateTransition(R.transition.change_image_transform));
-        mViewPlayFragment.setEnterTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.slide_bottom));
-
-
-
-        //Log.d("V1", "nameView.getTransitionName() = " + nameView.getTransitionName());
-
-        ft.addSharedElement(view, view.getTransitionName());
-        ft.addSharedElement(nameView, nameView.getTransitionName());
-        ft.addSharedElement(dateView, dateView.getTransitionName());
-        ft.replace(R.id.container, mViewPlayFragment, "view_play");
-        ft.addToBackStack(null);
-        ft.commitAllowingStateLoss();
-        fragmentManager.executePendingTransactions(); //Prevents the flashing.*/
         mIsReentering = false;
 
 
@@ -596,26 +588,6 @@ public class MainActivity extends AppCompatActivity
         ft.add(R.id.container, mAddPlayFragment, "add_play");
         ft.addToBackStack("add_play");
         ft.commitAllowingStateLoss();
-
-
-
-
-        /*Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                //System.gc();
-                //Log.d("V1", "background status allocated=" + Long.toString(Debug.getNativeHeapAllocatedSize()));
-                //Log.d("V1", "background status free=" + Long.toString(Debug.getNativeHeapFreeSize()));
-                GamesFragment collectionFrag = (GamesFragment)
-                        getSupportFragmentManager().findFragmentByTag("games");
-                if (collectionFrag != null && !collectionFrag.getQuery().equals("")) {
-                    collectionFrag.clearQuery();
-                    collectionFrag.refreshDataset(false);
-                }
-            }
-        }, 1000);*/
-
     }
 
     public void addToTenXTen(long gameId){
@@ -683,6 +655,12 @@ public class MainActivity extends AppCompatActivity
         List<GamesPerPlay> games = GamesPerPlay.getGames(deleteMe);
         for(GamesPerPlay game:games){
             game.delete();
+        }
+
+        //delete plays_per_game_group
+        List<PlaysPerGameGroup> plays = PlaysPerGameGroup.getPlays(deleteMe);
+        for(PlaysPerGameGroup play:plays){
+            play.delete();
         }
 
         //delete play image
@@ -844,44 +822,6 @@ public class MainActivity extends AppCompatActivity
         System.gc();
     }
 
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        private static final String ARG_SECTION_NUMBER = "section_number";
-
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
-        public static PlaceholderFragment newInstance(int sectionNumber) {
-            PlaceholderFragment fragment = new PlaceholderFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            fragment.setArguments(args);
-            return fragment;
-        }
-
-        public PlaceholderFragment() {
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            return inflater.inflate(R.layout.fragment_main, container, false);
-        }
-
-        @Override
-        public void onAttach(Activity activity) {
-            super.onAttach(activity);
-            ((MainActivity) activity).onSectionAttached(
-                    getArguments().getInt(ARG_SECTION_NUMBER));
-        }
-    }
 
     public class GameUpdater extends UpdateBGGTask {
         public GameUpdater(Context context) {

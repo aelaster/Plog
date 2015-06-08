@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.lastsoft.plog.db.Game;
 import com.lastsoft.plog.db.GameGroup;
 import com.lastsoft.plog.db.GamesPerPlay;
+import com.lastsoft.plog.db.Play;
 import com.lastsoft.plog.db.Player;
 import com.lastsoft.plog.db.PlayersPerPlay;
 
@@ -125,7 +126,8 @@ public class StatsFragment_Wins extends Fragment {
             try {
 
                 List<PlayersPerPlay> groupTotalPlays = PlayersPerPlay.totalPlays_GameGroup(GameGroup.findById(GameGroup.class, theGroup));
-                long uniquePlays  = GamesPerPlay.getUniquePlays_GameGroup(GameGroup.findById(GameGroup.class, theGroup));
+                //long uniquePlays  = GamesPerPlay.getUniquePlays_GameGroup(GameGroup.findById(GameGroup.class, theGroup));
+                long uniquePlays = Game.getUniqueGames_GameGroup(GameGroup.findById(GameGroup.class, theGroup)).size();
                 //Log.d("V1", "groupTotalPlays = " + groupTotalPlays.size());
 
                 output[0] = ((long)groupTotalPlays.size()/(long)groupPlayers.size());
@@ -145,7 +147,9 @@ public class StatsFragment_Wins extends Fragment {
                     }else if (eachPlay.play.getId() != playCounter){
                         //we've moved on to the next play
                         //calculate winner from past playCounter play
+                        //Log.d("V1", "game  = " + GamesPerPlay.getBaseGame(Play.findById(Play.class, eachPlay.play.getId())).gameName);
                         //Log.d("V1", "scoreIndex = " + scoreIndex);
+                        //Log.d("V1", "groupPlayers.size() = " + groupPlayers.size());
                         if (scoreIndex == groupPlayers.size()) {
                             //only included if all of the group has been scored
                             int max = playerScoreHolder[0];
@@ -187,20 +191,7 @@ public class StatsFragment_Wins extends Fragment {
                             }
                         }else{
                             filteredPlays++;
-                            //ths is filtred.  is this a unique game being filtered?
-                            Game getGame = GamesPerPlay.getBaseGame(eachPlay.play);
-                            if (!filteredGames.contains(getGame.gameName)) {
-                                boolean uniqueFlag;
-                                for (Player eachPlayer : groupPlayers) {
-                                    if (!Player.hasPlayerPlayedGame(eachPlayer, GamesPerPlay.getBaseGame(eachPlay.play))) {
-                                        //nope, one of us hasn't played, so it's not a unique game for us
-                                        uniqueFilter++;
-                                        filteredGames.add(getGame.gameName);
-                                        break;
-                                    }
-                                }
-                            }
-                        }
+                       }
 
 
                         loserFlag = true;
@@ -217,12 +208,15 @@ public class StatsFragment_Wins extends Fragment {
                     }
 
                     for(Player eachPlayer:groupPlayers){
+                        //Log.d("V1", "player name = " + eachPlayer.playerName);
                         if (eachPlay.player.getId() == eachPlayer.getId()){
+                            //Log.d("V1", "MATCHED!");
                             playerScoreHolder[scoreIndex] = eachPlay.score;
                             scoreIndex++;
                             break;
                         }
                     }
+                    //Log.d("V1", "not matched");
                 }
                 //Log.d("V1", "scoreIndex = " + scoreIndex);
                 if (scoreIndex == groupPlayers.size()) {
@@ -264,19 +258,6 @@ public class StatsFragment_Wins extends Fragment {
                     }
                 }else{
                     filteredPlays++;
-                    Game getGame = null;
-                    if (playHolder != null) {
-                        getGame = GamesPerPlay.getBaseGame(playHolder.play);
-                        if (!filteredGames.contains(getGame.gameName)) {
-                            boolean uniqueFlag;
-                            for (Player eachPlayer : groupPlayers) {
-                                if (!Player.hasPlayerPlayedGame(eachPlayer, getGame)) {
-                                    uniqueFilter++;
-                                    break;
-                                }
-                            }
-                        }
-                    }
                 }
 
             } catch (Exception e) {
@@ -287,8 +268,9 @@ public class StatsFragment_Wins extends Fragment {
 
         @Override
         protected void onPostExecute ( final Long[] result){
-            long totalPlays = (result[0] - (filteredPlays/groupPlayers.size()));
-            long totalUnique = (result[1] - (uniqueFilter));
+            long totalPlays = result[0];
+            Log.d("V1", "filteredPlays=" + filteredPlays );
+            long totalUnique = result[1];
             addStat("Total Plays: ", totalPlays + "");
             addStat("Unique Games: ", totalUnique + "");
             for(int x = 0; x < groupPlayers.size(); x++) {

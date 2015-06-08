@@ -44,24 +44,16 @@ public class Play extends SugarRecord<Play> {
         return dateSort_NewOld.list();
     }
 
+
+
     public static List<Play> listPlaysNewOld(String mSearchQuery){
-        //return Game.find(Game.class, StringUtil.toSQLName("expansionFlag") + " = 0");
         if (mSearchQuery.contains("'")) {
             mSearchQuery = mSearchQuery.replaceAll("'", "''");
         }
         if (mSearchQuery.equals("")) {
             return listPlaysNewOld();
         }else {
-            Log.d("V1", " SELECT "+ StringUtil.toSQLName("Play") +".* " +
-                    " FROM " + StringUtil.toSQLName("Play") +
-                    " INNER JOIN " + StringUtil.toSQLName("GamesPerPlay") +
-                    " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("play") + " = " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") +
-                    " INNER JOIN " + StringUtil.toSQLName("Game") +
-                    " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("game") + " = " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("id") +
-                    " and " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("expansionFlag") + " = 0 " +
-                    " and " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " LIKE '%" + mSearchQuery + "%'" +
-                    " order by " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("playDate") + " DESC, "  + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " DESC");
-            return Play.findWithQuery(Play.class,
+           return Play.findWithQuery(Play.class,
                     " SELECT "+ StringUtil.toSQLName("Play") +".* " +
                     " FROM " + StringUtil.toSQLName("Play") +
                     " INNER JOIN " + StringUtil.toSQLName("GamesPerPlay") +

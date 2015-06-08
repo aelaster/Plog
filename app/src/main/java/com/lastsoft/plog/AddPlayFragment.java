@@ -41,10 +41,13 @@ import com.kbeanie.imagechooser.api.ChosenImage;
 import com.kbeanie.imagechooser.api.ImageChooserListener;
 import com.kbeanie.imagechooser.api.ImageChooserManager;
 import com.lastsoft.plog.db.Game;
+import com.lastsoft.plog.db.GameGroup;
 import com.lastsoft.plog.db.GamesPerPlay;
 import com.lastsoft.plog.db.Play;
 import com.lastsoft.plog.db.Player;
+import com.lastsoft.plog.db.PlayersPerGameGroup;
 import com.lastsoft.plog.db.PlayersPerPlay;
+import com.lastsoft.plog.db.PlaysPerGameGroup;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
@@ -76,6 +79,7 @@ public class AddPlayFragment extends Fragment implements
     private OnFragmentInteractionListener mListener;
     int cx, cy;
     File f;
+    ArrayList<Long> addedUsers;
     ArrayList<AddPlayer> arrayOfUsers;
     AddPlayerAdapter adapter;
     String gameName;
@@ -135,7 +139,7 @@ public class AddPlayFragment extends Fragment implements
 
         //expansions = Game.findExpansionsFor(gameName);
         //checkedItems = new boolean[expansions.size()];
-
+        addedUsers = new ArrayList<>();
         addedExpansions = new ArrayList<>();
         List<Player> players = Player.listPlayersAZ();
         playersName = new ArrayList<>();
@@ -363,6 +367,7 @@ public class AddPlayFragment extends Fragment implements
                 //Log.d("V1", "score = " + player.score);
                 AddPlayer addedPlayer = new AddPlayer(thisPlayer.getId(),thisPlayer.playerName, player.color, player.score); //id, name, color, score
                 addPlayer(addedPlayer);
+                addedUsers.add(thisPlayer.getId());
                 adapter.add(addedPlayer);
             }
             adapter.notifyDataSetChanged();
@@ -453,6 +458,7 @@ public class AddPlayFragment extends Fragment implements
                 // Because mContainerView has android:animateLayoutChanges set to true,
                 // this removal is automatically animated.
                 adapter.remove(addedPlayer);
+                addedUsers.remove(addedPlayer.playerID);
                 mContainerView_Players.removeView(newView);
 
                 // If there are no rows remaining, show the empty view.
@@ -638,13 +644,40 @@ public class AddPlayFragment extends Fragment implements
                         GamesPerPlay newBaseGame = new GamesPerPlay(thePlay, Game.findGameByName(gameName), false);
                         newBaseGame.save();
                     }
-                    //Log.d("V1", "game name= " + gameName);
 
                     for (int i = 0; i < addedExpansions.size(); i++) {
                         Game addedExpansion = addedExpansions.get(i);
                         GamesPerPlay newExpansion = new GamesPerPlay(thePlay, addedExpansion, true);
                         newExpansion.save();
                         //Log.d("V1", "Added Expansions = " + addedExpansion.gameName);
+                    }
+
+                    //lastly, check existing groups
+                    //if a group has played this game, add it to PlaysPerGameGroup
+                    if (playID>=0) {
+                        //delete the existing plays_per_game_group
+                        //delete plays_per_game_group
+                        List<PlaysPerGameGroup> plays = PlaysPerGameGroup.getPlays(Play.findById(Play.class, playID));
+                        for(PlaysPerGameGroup play:plays){
+                            play.delete();
+                        }
+                    }
+
+                    List<GameGroup> gameGroups = GameGroup.listAll(GameGroup.class);
+                    for (GameGroup thisGroup:gameGroups){
+                        List<Player> players =  GameGroup.getGroupPlayers(thisGroup);
+                        boolean included = true;
+                        for (Player playa:players){
+                            if (!addedUsers.contains(playa.getId())){
+                                included = false;
+                                break;
+                            }
+                        }
+                        if (included){
+                            //add this to PlaysPerGameGroup
+                            PlaysPerGameGroup newGroupPlay = new PlaysPerGameGroup(thePlay, thisGroup);
+                            newGroupPlay.save();
+                        }
                     }
 
                     savedThis = true;
@@ -874,8 +907,10 @@ public class AddPlayFragment extends Fragment implements
             if(colorSpinner == null) {//color
                 playerToUpdate.color = adapterView.getSelectedItem().toString();
             }else {//player
+                addedUsers.remove(playerToUpdate.playerID);
                 playerToUpdate.playerID = playersID.get(i);
                 playerToUpdate.playerName = playersName.get(i);
+                addedUsers.add(playerToUpdate.playerID);
                 if (overwriteFlag) {
                     Player colorCheck = Player.findById(Player.class, playerToUpdate.playerID);
                     if (colorCheck.defaultColor != null && !colorCheck.defaultColor.equals("")) {
@@ -883,6 +918,7 @@ public class AddPlayFragment extends Fragment implements
                         colorSpinner.setSelection(spinnerPostion);
                         playerToUpdate.color = colorSpinner.getSelectedItem().toString();
                         //playerToUpdate.color.setSelection(spinnerPostion);
+
                     }
                 }
             }

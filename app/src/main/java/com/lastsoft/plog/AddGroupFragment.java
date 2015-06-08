@@ -2,9 +2,12 @@ package com.lastsoft.plog;
 
 import android.animation.Animator;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,9 +23,14 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 
+import com.lastsoft.plog.db.Game;
 import com.lastsoft.plog.db.GameGroup;
+import com.lastsoft.plog.db.GamesPerPlay;
+import com.lastsoft.plog.db.Play;
 import com.lastsoft.plog.db.Player;
 import com.lastsoft.plog.db.PlayersPerGameGroup;
+import com.lastsoft.plog.db.PlayersPerPlay;
+import com.lastsoft.plog.db.PlaysPerGameGroup;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +50,7 @@ public class AddGroupFragment extends Fragment {
     private ViewGroup mContainerView_Players;
     int cx, cy;
     ArrayList<AddPlayer> arrayOfUsers;
+    ArrayList<Player> addedUsers;
     AddPlayerAdapter adapter;
     ArrayList<Integer> playersID;
     ArrayList<String> playersName;
@@ -69,6 +78,7 @@ public class AddGroupFragment extends Fragment {
 
         }
         List<Player> players = Player.listPlayersAZ();
+        addedUsers = new ArrayList<>();
         playersName = new ArrayList<String>();
         playersID = new ArrayList<Integer>();
         for(Player player:players){
@@ -162,17 +172,87 @@ public class AddGroupFragment extends Fragment {
                     //then add the players to the group
                     for (int i = 0; i < adapter.getCount(); i++) {
                         AddPlayer thisGuy = adapter.getItem(i);
+                        addedUsers.add(Player.findById(Player.class,thisGuy.playerID));
                         PlayersPerGameGroup newPlayer = new PlayersPerGameGroup(Player.findById(Player.class, thisGuy.playerID), newGroup);
                         newPlayer.save();
                     }
+
+                    //now go through existing plays and determine if this group should have plays logged in the plays per game group table
+                    AddGroupTask initGroup = new AddGroupTask(mActivity, newGroup);
+                    try {
+                        initGroup.execute();
+                    } catch (Exception ignored) {
+
+                    }
+                }else{
+                    mActivity.onBackPressed();
                 }
+            }else{
+                mActivity.onBackPressed();
             }
-            ((MainActivity) mActivity).onBackPressed();
+
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
+
+
+    public class AddGroupTask extends AsyncTask<Long, Void, Long[]> {
+
+        Context theContext;
+        GameGroup theGroup;
+
+        private final ProgressDialog mydialog = new ProgressDialog(mActivity);
+
+        public AddGroupTask(Context context, GameGroup gameGroup) {
+            this.theGroup = gameGroup;
+            this.theContext = context;
+        }
+
+        // can use UI thread here
+        @Override
+        protected void onPreExecute() {
+            mydialog.setMessage(getString(R.string.initGroup));
+            mydialog.setCancelable(false);
+            try{
+                mydialog.show();
+            }catch (Exception ignored){}
+        }
+
+        // automatically done on worker thread (separate from UI thread)
+        @Override
+        protected Long[] doInBackground(final Long... args) {
+
+            List<Play> plays = Play.listPlaysNewOld("");
+            for (Play play:plays){
+                List<Player> players = Player.getPlayersIDs(play);
+                boolean included = true;
+
+                for (Player addedUser:addedUsers){
+                    if (!players.contains(addedUser)){
+                        //the players of this game does not contain one of the added users
+                        included = false;
+                        break;
+                    }
+                }
+
+                if (included){
+                    //add this to PlaysPerGameGroup
+                    PlaysPerGameGroup newGroupPlay = new PlaysPerGameGroup(play, theGroup);
+                    newGroupPlay.save();
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute ( final Long[] result){
+            mydialog.dismiss();
+            mActivity.onBackPressed();
+        }
+    }
+
 
     private void addPlayer(final AddPlayer addedPlayer) {
         // Instantiate a new "row" view.
