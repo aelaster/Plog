@@ -267,7 +267,7 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
         mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         mPager.setAdapter(mPagerAdapter);
         mPager.setCurrentItem(mCurrentPosition);
-        //mPager.setOffscreenPageLimit(4);
+        mPager.setOffscreenPageLimit(3);
         mPager.setPageTransformer(true, new DepthPageTransformer());
         mPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override

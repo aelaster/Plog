@@ -20,6 +20,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
@@ -505,7 +506,7 @@ public class MainActivity extends AppCompatActivity
         ft.commitAllowingStateLoss();
         fragmentManager.executePendingTransactions(); //Prevents the flashing.
     }
-
+    int firstVisible, lastVisible;
     public void onPlayClicked(Play clickedPlay, Fragment mFragment, final View view, final View nameView, final View dateView, int position){
         try{
             InputMethodManager inputManager = (InputMethodManager)
@@ -517,7 +518,10 @@ public class MainActivity extends AppCompatActivity
 
         mIsReentering = false;
 
-
+        firstVisible = ((LinearLayoutManager) mPlaysFragment.mRecyclerView.getLayoutManager())
+                .findFirstCompletelyVisibleItemPosition();
+        lastVisible = ((LinearLayoutManager) mPlaysFragment.mRecyclerView.getLayoutManager())
+                .findLastCompletelyVisibleItemPosition();
 
         Intent intent = new Intent(MainActivity.this, ViewPlayActivity.class);
         intent.putExtra("searchQuery", mSearchQuery);
@@ -545,7 +549,13 @@ public class MainActivity extends AppCompatActivity
         if (mPlaysFragment != null) {
             mPlaysFragment.refreshDataset();
             if (oldPosition != currentPosition) {
-                mPlaysFragment.mRecyclerView.scrollToPosition(currentPosition);
+                Log.d("V1", "firstVisible = " + firstVisible);
+                Log.d("V1", "lastVisible = " + lastVisible);
+                Log.d("V1", "oldPosition = " + oldPosition);
+                Log.d("V1", "currentPosition = " + currentPosition);
+                if (!(firstVisible <= currentPosition && currentPosition <= lastVisible)) {
+                    mPlaysFragment.mRecyclerView.scrollToPosition(currentPosition);
+                }
             }
             postponeEnterTransition();
 

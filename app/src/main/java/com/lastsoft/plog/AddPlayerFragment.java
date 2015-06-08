@@ -2,8 +2,10 @@ package com.lastsoft.plog;
 
 import android.animation.Animator;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -29,6 +31,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.lastsoft.plog.db.GameGroup;
+import com.lastsoft.plog.db.Play;
 import com.lastsoft.plog.db.Player;
 import com.lastsoft.plog.db.PlayersPerGameGroup;
 import com.lastsoft.plog.db.PlaysPerGameGroup;
@@ -315,17 +318,20 @@ public class AddPlayerFragment extends Fragment {
                             deleteGroupMember(deleteMe);
                         }
                     }
-
-                    onButtonPressed("refresh_players");
+                    if (!removingGroup) {
+                        onButtonPressed("refresh_players");
+                    }
                 }
             }
-            removeYourself();
+            if (!removingGroup) {
+                removeYourself();
+            }
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
-
+    boolean removingGroup = false;
     public void deleteGroupMember(GameGroup group){
         PlayersPerGameGroup deleteMe = PlayersPerGameGroup.getPlayer(Player.findById(Player.class, playerID), group);
         deleteMe.delete();
@@ -334,17 +340,63 @@ public class AddPlayerFragment extends Fragment {
         if (players.size() <= 1){
             //this group only has one person now, or none, so it needs to be buhleeted
             //delete the players
+            removingGroup = true;
+            RemoveGroupTask removeGroup = new RemoveGroupTask(mActivity, group);
+            try {
+                removeGroup.execute();
+            } catch (Exception ignored) {
+
+            }
+        }
+    }
+
+    public class RemoveGroupTask extends AsyncTask<Long, Void, Long[]> {
+
+        Context theContext;
+        GameGroup theGroup;
+
+        private final ProgressDialog mydialog = new ProgressDialog(mActivity);
+
+        public RemoveGroupTask(Context context, GameGroup gameGroup) {
+            this.theGroup = gameGroup;
+            this.theContext = context;
+        }
+
+        // can use UI thread here
+        @Override
+        protected void onPreExecute() {
+            mydialog.setMessage(getString(R.string.removeGroup) + theGroup.groupName);
+            mydialog.setCancelable(false);
+            try{
+                mydialog.show();
+            }catch (Exception ignored){}
+        }
+
+        // automatically done on worker thread (separate from UI thread)
+        @Override
+        protected Long[] doInBackground(final Long... args) {
+
+            List<PlayersPerGameGroup> players =  PlayersPerGameGroup.getPlayers(theGroup);
             for (PlayersPerGameGroup player : players) {
                 player.delete();
             }
 
             //delete the plays
-            List<PlaysPerGameGroup> plays = PlaysPerGameGroup.getPlays(group);
+            List<PlaysPerGameGroup> plays = PlaysPerGameGroup.getPlays(theGroup);
             for(PlaysPerGameGroup play:plays){
                 play.delete();
             }
 
-            group.delete();
+            theGroup.delete();
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute ( final Long[] result){
+            mydialog.dismiss();
+            onButtonPressed("refresh_players");
+            removeYourself();
         }
     }
 

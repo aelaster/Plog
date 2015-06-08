@@ -87,8 +87,6 @@ public class StatsFragment_Wins extends Fragment {
 
         ArrayList<String> filteredGames;
         Context theContext;
-        int filteredPlays = 0;
-        int uniqueFilter = 0;
         boolean loserFlag = true;
         boolean sharedFlag = true;
         int sharedCounter = 0;
@@ -189,9 +187,7 @@ public class StatsFragment_Wins extends Fragment {
                             if (loserFlag){
                                 loserCounter++;
                             }
-                        }else{
-                            filteredPlays++;
-                       }
+                        }
 
 
                         loserFlag = true;
@@ -256,8 +252,6 @@ public class StatsFragment_Wins extends Fragment {
                     if (loserFlag){
                         loserCounter++;
                     }
-                }else{
-                    filteredPlays++;
                 }
 
             } catch (Exception e) {
@@ -269,7 +263,6 @@ public class StatsFragment_Wins extends Fragment {
         @Override
         protected void onPostExecute ( final Long[] result){
             long totalPlays = result[0];
-            Log.d("V1", "filteredPlays=" + filteredPlays );
             long totalUnique = result[1];
             addStat("Total Plays: ", totalPlays + "");
             addStat("Unique Games: ", totalUnique + "");
