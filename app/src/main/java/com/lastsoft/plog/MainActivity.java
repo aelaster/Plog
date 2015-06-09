@@ -331,6 +331,15 @@ public class MainActivity extends AppCompatActivity
 
     public int currentFragmentCode = 4;
     public void setUpActionBar(int fragmentCode){
+
+        try{
+            InputMethodManager inputManager = (InputMethodManager)
+                    getSystemService(Context.INPUT_METHOD_SERVICE);
+
+            inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
+                    InputMethodManager.HIDE_NOT_ALWAYS);
+        }catch (Exception ignored){}
+
         currentFragmentCode = fragmentCode;
 
         ActionBar actionBar = getSupportActionBar();
@@ -509,13 +518,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void openAddPlayer(Fragment mFragment, long playerID){
-        try{
-            InputMethodManager inputManager = (InputMethodManager)
-                    getSystemService(Context.INPUT_METHOD_SERVICE);
-
-            inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
-                    InputMethodManager.HIDE_NOT_ALWAYS);
-        }catch (Exception ignored){}
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction ft = fragmentManager.beginTransaction();
@@ -530,13 +532,6 @@ public class MainActivity extends AppCompatActivity
     }
     int firstVisible, lastVisible;
     public void onPlayClicked(Play clickedPlay, Fragment mFragment, final View view, final View nameView, final View dateView, int position, boolean fromDrawer){
-        try{
-            InputMethodManager inputManager = (InputMethodManager)
-                    getSystemService(Context.INPUT_METHOD_SERVICE);
-
-            inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
-                    InputMethodManager.HIDE_NOT_ALWAYS);
-        }catch (Exception ignored){}
 
         mIsReentering = false;
 
@@ -598,14 +593,6 @@ public class MainActivity extends AppCompatActivity
         mTitle = game_name;
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(mTitle);
-
-        try{
-            InputMethodManager inputManager = (InputMethodManager)
-                    getSystemService(Context.INPUT_METHOD_SERVICE);
-
-            inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
-                    InputMethodManager.HIDE_NOT_ALWAYS);
-        }catch (Exception ignored){}
 
         //mFragment.setExitTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.slide_top));
 
