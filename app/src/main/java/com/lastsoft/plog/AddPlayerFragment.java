@@ -238,6 +238,7 @@ public class AddPlayerFragment extends Fragment {
         }
     }
 
+    Menu mMenu;
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         // TODO Add your menu entries here
@@ -247,6 +248,7 @@ public class AddPlayerFragment extends Fragment {
         }else {
             inflater.inflate(R.menu.add_player, menu);
         }
+        mMenu = menu;
     }
 
     @Override
@@ -263,6 +265,8 @@ public class AddPlayerFragment extends Fragment {
             inputManager.hideSoftInputFromWindow(mActivity.getCurrentFocus().getWindowToken(),
                     InputMethodManager.HIDE_NOT_ALWAYS);
         }catch (Exception ignored){}
+
+
 
         //noinspection SimplifiableIfStatement
         switch (item.getItemId()) {
@@ -463,6 +467,7 @@ public class AddPlayerFragment extends Fragment {
      */
     public void removeYourself(){
         final AddPlayerFragment mfragment = this;
+        mMenu.clear();
         if (playerID >= 0){
             try {
                 getFragmentManager().popBackStack();

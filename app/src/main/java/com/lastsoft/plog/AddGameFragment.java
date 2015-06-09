@@ -6,6 +6,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
@@ -15,6 +16,9 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
 import com.lastsoft.plog.db.Game;
+import com.lastsoft.plog.db.GameGroup;
+import com.lastsoft.plog.db.Player;
+import com.lastsoft.plog.db.PlayersPerGameGroup;
 
 
 /**
@@ -151,6 +155,32 @@ public class AddGameFragment extends Fragment {
             ((MainActivity) mActivity).setUpActionBar(4);
             mActivity = null;
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        try{
+            InputMethodManager inputManager = (InputMethodManager)
+                    mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
+
+            inputManager.hideSoftInputFromWindow(mActivity.getCurrentFocus().getWindowToken(),
+                    InputMethodManager.HIDE_NOT_ALWAYS);
+        }catch (Exception e){}
+
+        //noinspection SimplifiableIfStatement
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                //called when the up affordance/carat in actionbar is pressed
+                mActivity.onBackPressed();
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     /**

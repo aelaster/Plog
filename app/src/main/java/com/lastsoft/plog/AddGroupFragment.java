@@ -137,11 +137,13 @@ public class AddGroupFragment extends Fragment {
         return rootView;
     }
 
+    Menu mMenu;
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         // TODO Add your menu entries here
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.add_group, menu);
+        mMenu = menu;
     }
 
     @Override
@@ -158,6 +160,8 @@ public class AddGroupFragment extends Fragment {
             inputManager.hideSoftInputFromWindow(mActivity.getCurrentFocus().getWindowToken(),
                     InputMethodManager.HIDE_NOT_ALWAYS);
         }catch (Exception e){}
+
+
 
         //noinspection SimplifiableIfStatement
         switch (item.getItemId()) {
@@ -390,6 +394,7 @@ public class AddGroupFragment extends Fragment {
     Executes fragment removal animation and removes the fragment from view.
      */
     public void removeYourself(){
+        mMenu.clear();
         final AddGroupFragment mfragment = this;
         Animator unreveal = mfragment.prepareUnrevealAnimator(cx, cy);
         if(unreveal != null) {

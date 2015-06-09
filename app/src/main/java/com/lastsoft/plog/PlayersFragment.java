@@ -86,6 +86,7 @@ public class PlayersFragment extends Fragment{
         addPlayer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                fabMenu.toggle();
                 int viewXY[] = new int[2];
                 v.getLocationOnScreen(viewXY);
 
@@ -99,6 +100,7 @@ public class PlayersFragment extends Fragment{
         addGroup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                fabMenu.toggle();
                 int viewXY[] = new int[2];
                 v.getLocationOnScreen(viewXY);
                 if (mListener != null) {
