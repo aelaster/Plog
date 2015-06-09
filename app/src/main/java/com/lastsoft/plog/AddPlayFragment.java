@@ -93,7 +93,6 @@ public class AddPlayFragment extends Fragment implements
 
     // TODO: Rename and change types and number of parameters
     public static AddPlayFragment newInstance(int centerX, int centerY, boolean doAccelerate, String mGameName, long playID) {
-        Log.d("V1", "add play new instance");
         AddPlayFragment fragment = new AddPlayFragment();
         Bundle args = new Bundle();
         args.putInt("cx", centerX);
@@ -175,6 +174,7 @@ public class AddPlayFragment extends Fragment implements
             Toolbar toolbar = (Toolbar)rootView.findViewById(R.id.toolbar);
             toolbar.setVisibility(View.VISIBLE);
             toolbar.setTitle(gameName);
+            toolbar.setNavigationIcon(R.drawable.ic_action_back);
             ((ViewPlayActivity)mActivity).setSupportActionBar(toolbar);
         }
 
@@ -580,122 +580,127 @@ public class AddPlayFragment extends Fragment implements
         }catch (Exception ignored){}
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.add_play) {
-            adapter.notifyDataSetChanged();
-            if (adapter.getCount()>0) {
-                //first, add the play
-                try {
-                    Play thePlay;
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                //called when the up affordance/carat in actionbar is pressed
+                mActivity.onBackPressed();
+                return true;
+            case R.id.add_play:
+                adapter.notifyDataSetChanged();
+                if (adapter.getCount()>0) {
+                    //first, add the play
+                    try {
+                        Play thePlay;
 
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                    Date date1 = dateFormat.parse(gameDate);
-                    if (playID>=0) {
-                        Play savePlay = Play.findById(Play.class, playID);
-                        savePlay.playDate = date1;
-                        savePlay.playNotes = notesText.getText().toString();
-                        savePlay.playPhoto = mCurrentPhotoPath;
-                        savePlay.save();
-                        thePlay = savePlay;
-                    }else{
-                        Play newPlay = new Play(date1, notesText.getText().toString(), mCurrentPhotoPath);
-                        newPlay.save();
-                        thePlay = newPlay;
-                    }
-                    //Log.d("V1","game date=" + gameDate);
-                    //Log.d("V1", "game notes=" + notesText.getText().toString());
-
-                    //then add the players to the play
-                    if (playID>=0) {
-                        //delete old playaz before adding the new ones
-                        List<PlayersPerPlay> playaz = PlayersPerPlay.getPlayers(thePlay);
-                        for(PlayersPerPlay player:playaz){
-                            player.delete();
+                        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                        Date date1 = dateFormat.parse(gameDate);
+                        if (playID>=0) {
+                            Play savePlay = Play.findById(Play.class, playID);
+                            savePlay.playDate = date1;
+                            savePlay.playNotes = notesText.getText().toString();
+                            savePlay.playPhoto = mCurrentPhotoPath;
+                            savePlay.save();
+                            thePlay = savePlay;
+                        }else{
+                            Play newPlay = new Play(date1, notesText.getText().toString(), mCurrentPhotoPath);
+                            newPlay.save();
+                            thePlay = newPlay;
                         }
-                    }
+                        //Log.d("V1","game date=" + gameDate);
+                        //Log.d("V1", "game notes=" + notesText.getText().toString());
 
-                    int highScore = -99999;
-                    for (int i = 0; i < adapter.getCount(); i++) {
-                        AddPlayer thisGuy = adapter.getItem(i);
-                        if (thisGuy.score > highScore){
-                            highScore = thisGuy.score;
-                        }
-
-                    }
-
-                    for (int i = 0; i < adapter.getCount(); i++) {
-                        AddPlayer thisGuy = adapter.getItem(i);
-                        //if (thisGuy.score != -9999999) {
-                        PlayersPerPlay newPlayer = new PlayersPerPlay(Player.findById(Player.class, thisGuy.playerID), thePlay, thisGuy.score, thisGuy.color, highScore);
-                        newPlayer.save();
-                        //}
-                    }
-
-
-
-                    //then add the games to the play
-                    if (playID>=0) {
-                        //otherwise, delete the old expansions
-                        List<GamesPerPlay> gamez = GamesPerPlay.getExpansions(thePlay);
-                        for(GamesPerPlay game:gamez){
-                            game.delete();
-                        }
-                    }else{//not a play yet, add the base game
-                        //Log.d("V1", "game name= " + gameName);
-                        GamesPerPlay newBaseGame = new GamesPerPlay(thePlay, Game.findGameByName(gameName), false);
-                        newBaseGame.save();
-                    }
-
-                    for (int i = 0; i < addedExpansions.size(); i++) {
-                        Game addedExpansion = addedExpansions.get(i);
-                        GamesPerPlay newExpansion = new GamesPerPlay(thePlay, addedExpansion, true);
-                        newExpansion.save();
-                        //Log.d("V1", "Added Expansions = " + addedExpansion.gameName);
-                    }
-
-                    //lastly, check existing groups
-                    //if a group has played this game, add it to PlaysPerGameGroup
-                    if (playID>=0) {
-                        //delete the existing plays_per_game_group
-                        //delete plays_per_game_group
-                        List<PlaysPerGameGroup> plays = PlaysPerGameGroup.getPlays(Play.findById(Play.class, playID));
-                        for(PlaysPerGameGroup play:plays){
-                            play.delete();
-                        }
-                    }
-
-                    List<GameGroup> gameGroups = GameGroup.listAll(GameGroup.class);
-                    for (GameGroup thisGroup:gameGroups){
-                        List<Player> players =  GameGroup.getGroupPlayers(thisGroup);
-                        boolean included = true;
-                        for (Player playa:players){
-                            if (!addedUsers.contains(playa.getId())){
-                                included = false;
-                                break;
+                        //then add the players to the play
+                        if (playID>=0) {
+                            //delete old playaz before adding the new ones
+                            List<PlayersPerPlay> playaz = PlayersPerPlay.getPlayers(thePlay);
+                            for(PlayersPerPlay player:playaz){
+                                player.delete();
                             }
                         }
-                        if (included){
-                            //add this to PlaysPerGameGroup
-                            PlaysPerGameGroup newGroupPlay = new PlaysPerGameGroup(thePlay, thisGroup);
-                            newGroupPlay.save();
+
+                        int highScore = -99999;
+                        for (int i = 0; i < adapter.getCount(); i++) {
+                            AddPlayer thisGuy = adapter.getItem(i);
+                            if (thisGuy.score > highScore){
+                                highScore = thisGuy.score;
+                            }
+
                         }
+
+                        for (int i = 0; i < adapter.getCount(); i++) {
+                            AddPlayer thisGuy = adapter.getItem(i);
+                            //if (thisGuy.score != -9999999) {
+                            PlayersPerPlay newPlayer = new PlayersPerPlay(Player.findById(Player.class, thisGuy.playerID), thePlay, thisGuy.score, thisGuy.color, highScore);
+                            newPlayer.save();
+                            //}
+                        }
+
+
+
+                        //then add the games to the play
+                        if (playID>=0) {
+                            //otherwise, delete the old expansions
+                            List<GamesPerPlay> gamez = GamesPerPlay.getExpansions(thePlay);
+                            for(GamesPerPlay game:gamez){
+                                game.delete();
+                            }
+                        }else{//not a play yet, add the base game
+                            //Log.d("V1", "game name= " + gameName);
+                            GamesPerPlay newBaseGame = new GamesPerPlay(thePlay, Game.findGameByName(gameName), false);
+                            newBaseGame.save();
+                        }
+
+                        for (int i = 0; i < addedExpansions.size(); i++) {
+                            Game addedExpansion = addedExpansions.get(i);
+                            GamesPerPlay newExpansion = new GamesPerPlay(thePlay, addedExpansion, true);
+                            newExpansion.save();
+                            //Log.d("V1", "Added Expansions = " + addedExpansion.gameName);
+                        }
+
+                        //lastly, check existing groups
+                        //if a group has played this game, add it to PlaysPerGameGroup
+                        if (playID>=0) {
+                            //delete the existing plays_per_game_group
+                            //delete plays_per_game_group
+                            List<PlaysPerGameGroup> plays = PlaysPerGameGroup.getPlays(Play.findById(Play.class, playID));
+                            for(PlaysPerGameGroup play:plays){
+                                play.delete();
+                            }
+                        }
+
+                        List<GameGroup> gameGroups = GameGroup.listAll(GameGroup.class);
+                        for (GameGroup thisGroup:gameGroups){
+                            List<Player> players =  GameGroup.getGroupPlayers(thisGroup);
+                            boolean included = true;
+                            for (Player playa:players){
+                                if (!addedUsers.contains(playa.getId())){
+                                    included = false;
+                                    break;
+                                }
+                            }
+                            if (included){
+                                //add this to PlaysPerGameGroup
+                                PlaysPerGameGroup newGroupPlay = new PlaysPerGameGroup(thePlay, thisGroup);
+                                newGroupPlay.save();
+                            }
+                        }
+
+                        savedThis = true;
+                    } catch (ParseException e) {
+                        e.printStackTrace();
                     }
-
-                    savedThis = true;
-                } catch (ParseException e) {
-                    e.printStackTrace();
                 }
-            }
 
-            //removeYourself();
-            /*if (playID<0) {
-                //((MainActivity) mActivity).getSupportActionBar().setDisplayShowCustomEnabled(true);
-            }else{*/
-            if (mActivity instanceof MainActivity) {
-                onButtonPressed("refresh_plays");
-            }
-            //}
-            mActivity.onBackPressed();
-            return true;
+                //removeYourself();
+                /*if (playID<0) {
+                    //((MainActivity) mActivity).getSupportActionBar().setDisplayShowCustomEnabled(true);
+                }else{*/
+                if (mActivity instanceof MainActivity) {
+                    onButtonPressed("refresh_plays");
+                }
+                //}
+                mActivity.onBackPressed();
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -758,8 +763,12 @@ public class AddPlayFragment extends Fragment implements
         mListener = null;
         if (mActivity != null) {
             if (mActivity instanceof MainActivity) {
-                if (((MainActivity) mActivity).mViewPlayFragment != null) {
-                    ((MainActivity) mActivity).setUpActionBar(8);
+                if (((MainActivity) mActivity).mPlaysFragment != null) {
+                    if (((MainActivity) mActivity).forceBack) {
+                        ((MainActivity) mActivity).setUpActionBar(10);
+                    }else{
+                        ((MainActivity) mActivity).setUpActionBar(6);
+                    }
                 } else {
                     ((MainActivity) mActivity).setUpActionBar(4);
                 }

@@ -5,6 +5,8 @@
         app:showAsAction="withText|ifRoom" />
     <item android:id="@+id/add_tenbyten" android:title="@string/add_tenbyten"
         app:showAsAction="withText|ifRoom" />
+    <item android:id="@+id/view_plays" android:title="@string/view_plays"
+        app:showAsAction="withText|ifRoom" />
     <!--<item android:id="@+id/action_settings" android:title="@string/action_settings"
         android:orderInCategory="100" app:showAsAction="never" />-->
 </menu>

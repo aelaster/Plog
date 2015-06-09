@@ -160,7 +160,9 @@ public class PlayersFragment extends Fragment{
     public void onDetach() {
         super.onDetach();
         mListener = null;
-        mActivity = null;
+        if (mActivity != null) {
+            ((MainActivity) mActivity).setUpActionBar(6);
+        }
     }
 
     /**

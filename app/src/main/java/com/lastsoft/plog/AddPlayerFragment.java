@@ -265,68 +265,73 @@ public class AddPlayerFragment extends Fragment {
         }catch (Exception ignored){}
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.add_player) {
-            if (!playerName.getText().toString().isEmpty()) {
-                //check to see if this name already exists
-                //for now, toast them if it does.
-                boolean nameTakenFlag = false;
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                //called when the up affordance/carat in actionbar is pressed
+                mActivity.onBackPressed();
+                return true;
+            case R.id.add_player:
+                if (!playerName.getText().toString().isEmpty()) {
+                    //check to see if this name already exists
+                    //for now, toast them if it does.
+                    boolean nameTakenFlag = false;
 
-                if (playerID >= 0){
-                    //edit
-                    if (!editPlayer.playerName.equals(playerName.getText().toString()) && Player.playerExists(playerName.getText().toString())){
-                        //if the edit player's name isn't equal to the input name AND the player name already exists
-                        nameTakenFlag = true;
-                    }
-                }else{
-                    //if this new player's name already exists
-                    if (Player.playerExists(playerName.getText().toString())){
-                        nameTakenFlag = true;
-                    }
-                }
-
-                if (nameTakenFlag){
-                    Toast.makeText(mActivity, getString(R.string.name_taken), Toast.LENGTH_SHORT).show();
-                }else {
-                    if (playerID >= 0) {
-                        editPlayer.bggUsername = bggUsername.getText().toString();
-                        editPlayer.playerName = playerName.getText().toString();
-                        editPlayer.defaultColor = color.getSelectedItem().toString();
-                        editPlayer.save();
-                    } else {
-                        Player player = new Player(playerName.getText().toString(), bggUsername.getText().toString());
-                        player.save();
-                        playerID = player.getId();
+                    if (playerID >= 0){
+                        //edit
+                        if (!editPlayer.playerName.equals(playerName.getText().toString()) && Player.playerExists(playerName.getText().toString())){
+                            //if the edit player's name isn't equal to the input name AND the player name already exists
+                            nameTakenFlag = true;
+                        }
+                    }else{
+                        //if this new player's name already exists
+                        if (Player.playerExists(playerName.getText().toString())){
+                            nameTakenFlag = true;
+                        }
                     }
 
+                    if (nameTakenFlag){
+                        Toast.makeText(mActivity, getString(R.string.name_taken), Toast.LENGTH_SHORT).show();
+                    }else {
+                        if (playerID >= 0) {
+                            editPlayer.bggUsername = bggUsername.getText().toString();
+                            editPlayer.playerName = playerName.getText().toString();
+                            editPlayer.defaultColor = color.getSelectedItem().toString();
+                            editPlayer.save();
+                        } else {
+                            Player player = new Player(playerName.getText().toString(), bggUsername.getText().toString());
+                            player.save();
+                            playerID = player.getId();
+                        }
 
-                    if (defaultSwitch.isChecked()) {
-                        //set app preference
-                        editor.putLong("defaultPlayer", playerID);
-                        editor.commit();
-                    } else {
-                        //check to see if the pref is this bggusername.  if so, clear it.
-                        long currentDefaultPlayer = app_preferences.getLong("defaultPlayer", -1);
-                        if (currentDefaultPlayer == playerID){
-                            editor.putLong("defaultPlayer", -1);
+
+                        if (defaultSwitch.isChecked()) {
+                            //set app preference
+                            editor.putLong("defaultPlayer", playerID);
                             editor.commit();
+                        } else {
+                            //check to see if the pref is this bggusername.  if so, clear it.
+                            long currentDefaultPlayer = app_preferences.getLong("defaultPlayer", -1);
+                            if (currentDefaultPlayer == playerID){
+                                editor.putLong("defaultPlayer", -1);
+                                editor.commit();
+                            }
                         }
-                    }
 
-                    if (buhleetMe != null) {
-                        for (AddGroup gone : buhleetMe) {
-                            GameGroup deleteMe = GameGroup.findById(GameGroup.class, gone.groupID);
-                            deleteGroupMember(deleteMe);
+                        if (buhleetMe != null) {
+                            for (AddGroup gone : buhleetMe) {
+                                GameGroup deleteMe = GameGroup.findById(GameGroup.class, gone.groupID);
+                                deleteGroupMember(deleteMe);
+                            }
                         }
-                    }
-                    if (!removingGroup) {
-                        onButtonPressed("refresh_players");
+                        if (!removingGroup) {
+                            onButtonPressed("refresh_players");
+                        }
                     }
                 }
-            }
-            if (!removingGroup) {
-                removeYourself();
-            }
-            return true;
+                if (!removingGroup) {
+                    removeYourself();
+                }
+                return true;
         }
 
         return super.onOptionsItemSelected(item);

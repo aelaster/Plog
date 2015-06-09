@@ -83,6 +83,7 @@ public class GamesFragment extends Fragment{
             mCancel = (ImageView) actionBar.getCustomView()
                     .findViewById(R.id.closeButton);
         }catch (Exception e){}
+
     }
 
 
@@ -227,6 +228,7 @@ public class GamesFragment extends Fragment{
     @Override
     public void onStart() {
         super.onStart();
+
         if (mActivity != null) {
             ((MainActivity) mActivity).setUpActionBar(4);
         }

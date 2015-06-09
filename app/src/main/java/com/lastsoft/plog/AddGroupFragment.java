@@ -160,38 +160,43 @@ public class AddGroupFragment extends Fragment {
         }catch (Exception e){}
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.add_group) {
-            adapter.notifyDataSetChanged();
-            if (adapter.getCount()>0) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                //called when the up affordance/carat in actionbar is pressed
+                mActivity.onBackPressed();
+                return true;
 
-                if (!groupName.getText().toString().isEmpty()) {
-                    //first, add the group
-                    GameGroup newGroup = new GameGroup(groupName.getText().toString());
-                    newGroup.save();
+            case R.id.add_group:
+                adapter.notifyDataSetChanged();
+                if (adapter.getCount()>0) {
 
-                    //then add the players to the group
-                    for (int i = 0; i < adapter.getCount(); i++) {
-                        AddPlayer thisGuy = adapter.getItem(i);
-                        addedUsers.add(Player.findById(Player.class,thisGuy.playerID));
-                        PlayersPerGameGroup newPlayer = new PlayersPerGameGroup(Player.findById(Player.class, thisGuy.playerID), newGroup);
-                        newPlayer.save();
-                    }
+                    if (!groupName.getText().toString().isEmpty()) {
+                        //first, add the group
+                        GameGroup newGroup = new GameGroup(groupName.getText().toString());
+                        newGroup.save();
 
-                    //now go through existing plays and determine if this group should have plays logged in the plays per game group table
-                    AddGroupTask initGroup = new AddGroupTask(mActivity, newGroup);
-                    try {
-                        initGroup.execute();
-                    } catch (Exception ignored) {
+                        //then add the players to the group
+                        for (int i = 0; i < adapter.getCount(); i++) {
+                            AddPlayer thisGuy = adapter.getItem(i);
+                            addedUsers.add(Player.findById(Player.class,thisGuy.playerID));
+                            PlayersPerGameGroup newPlayer = new PlayersPerGameGroup(Player.findById(Player.class, thisGuy.playerID), newGroup);
+                            newPlayer.save();
+                        }
 
+                        //now go through existing plays and determine if this group should have plays logged in the plays per game group table
+                        AddGroupTask initGroup = new AddGroupTask(mActivity, newGroup);
+                        try {
+                            initGroup.execute();
+                        } catch (Exception ignored) {
+
+                        }
+                    }else{
+                        mActivity.onBackPressed();
                     }
                 }else{
                     mActivity.onBackPressed();
                 }
-            }else{
-                mActivity.onBackPressed();
-            }
-
-            return true;
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -224,7 +229,7 @@ public class AddGroupFragment extends Fragment {
         @Override
         protected Long[] doInBackground(final Long... args) {
 
-            List<Play> plays = Play.listPlaysNewOld("");
+            List<Play> plays = Play.listPlaysNewOld("", true);
             for (Play play:plays){
                 List<Player> players = Player.getPlayersIDs(play);
                 boolean included = true;

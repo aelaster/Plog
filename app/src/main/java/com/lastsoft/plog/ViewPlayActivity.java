@@ -53,6 +53,7 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
     ImageView playImage;
     PlayAdapter mPlayAdapter;
     String searchQuery = "";
+    private boolean fromDrawer;
 
     private static final String STATE_CURRENT_POSITION = "state_current_position";
     private static final String STATE_OLD_POSITION = "state_old_position";
@@ -219,6 +220,7 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
             nameTransID =  getIntent().getExtras().getString("nameTransID");
             dateTransID =  getIntent().getExtras().getString("dateTransID");
             mCurrentPosition =  getIntent().getExtras().getInt("adapterPosition");
+            fromDrawer =  getIntent().getExtras().getBoolean("fromDrawer");
             mOriginalPosition = mCurrentPosition;
         } else {
             mCurrentPosition = savedInstanceState.getInt(STATE_CURRENT_POSITION);
@@ -260,7 +262,7 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
 
 
         //setBackgroundColor(getResources().getColor(R.color.cardview_initial_background));
-        mPlayAdapter = new PlayAdapter(this, null, searchQuery);
+        mPlayAdapter = new PlayAdapter(this, null, searchQuery, fromDrawer);
         // Instantiate a ViewPager and a PagerAdapter.
         mPager = (CustomViewPager) findViewById(R.id.pager);
        //mPager.setBackgroundColor(getResources().getColor(R.color.cardview_initial_background));
@@ -315,12 +317,12 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
 
     @Override
     public void finishAfterTransition() {
-        Log.d("V1" ,"in here");
         mIsReturning = true;
         getWindow().setReturnTransition(makeReturnTransition());
         Intent data = new Intent();
         data.putExtra(EXTRA_OLD_ITEM_POSITION, getIntent().getExtras().getInt("adapterPosition"));
         data.putExtra(EXTRA_CURRENT_ITEM_POSITION, mCurrentPosition);
+        data.putExtra("mSearchQuery", searchQuery);
         setResult(RESULT_OK, data);
         super.finishAfterTransition();
     }
@@ -440,7 +442,7 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
         //delete play
         deleteMe.delete();
 
-        mPlayAdapter = new PlayAdapter(this, null, searchQuery);
+        mPlayAdapter = new PlayAdapter(this, null, searchQuery, fromDrawer);
         mPagerAdapter.notifyDataSetChanged();
     }
 

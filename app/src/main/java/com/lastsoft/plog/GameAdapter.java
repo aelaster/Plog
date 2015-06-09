@@ -99,7 +99,6 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
         myFragment = mFragment;
         myActivity = mActivity;
 
-
         //games = Game.find(Game.class, null, null, null, StringUtil.toSQLName("gameName")+" ASC");
         //searchQuery = mSearchQuery;
         games = Game.findBaseGames(mSearchQuery);
@@ -182,6 +181,11 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
                         //delete the play
                         //refresh play list
                         ((MainActivity) myActivity).addToTenXTen(games.get(position).getId());
+                        return true;
+                    case R.id.view_plays:
+                        //delete the play
+                        //refresh play list
+                        ((MainActivity) myActivity).openPlays(games.get(position).gameName, false);
                         return true;
                     case R.id.update_bgg:
                         //delete the play

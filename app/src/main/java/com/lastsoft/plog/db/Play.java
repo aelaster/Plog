@@ -46,23 +46,28 @@ public class Play extends SugarRecord<Play> {
 
 
 
-    public static List<Play> listPlaysNewOld(String mSearchQuery){
+    public static List<Play> listPlaysNewOld(String mSearchQuery, boolean allowLike){
+        String query;
         if (mSearchQuery.contains("'")) {
             mSearchQuery = mSearchQuery.replaceAll("'", "''");
         }
         if (mSearchQuery.equals("")) {
-            return listPlaysNewOld();
+           return listPlaysNewOld();
         }else {
-           return Play.findWithQuery(Play.class,
-                    " SELECT "+ StringUtil.toSQLName("Play") +".* " +
+           query = " SELECT "+ StringUtil.toSQLName("Play") +".* " +
                     " FROM " + StringUtil.toSQLName("Play") +
                     " INNER JOIN " + StringUtil.toSQLName("GamesPerPlay") +
                     " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("play") + " = " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") +
                     " INNER JOIN " + StringUtil.toSQLName("Game") +
                     " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("game") + " = " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("id") +
-                    " and " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("expansionFlag") + " = 0 " +
-                    " and " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " LIKE '%" + mSearchQuery + "%'" +
-                    " order by " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("playDate") + " DESC, "  + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " DESC");
+                    " and " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("expansionFlag") + " = 0 ";
+           if(allowLike){
+               query = query + " and " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " LIKE '%" + mSearchQuery + "%'";
+           }else {
+               query = query + " and " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " = '" + mSearchQuery + "'";
+           }
+           query = query + " order by " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("playDate") + " DESC, "  + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " DESC";
+           return Play.findWithQuery(Play.class,query);
         }
     }
 }

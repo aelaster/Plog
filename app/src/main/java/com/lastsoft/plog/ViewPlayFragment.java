@@ -189,7 +189,6 @@ public class ViewPlayFragment extends Fragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         mActivity = activity;
-        ((MainActivity) mActivity).onSectionAttached(7);
         try {
             mListener = (OnFragmentInteractionListener) activity;
         } catch (ClassCastException e) {
@@ -203,7 +202,6 @@ public class ViewPlayFragment extends Fragment {
         super.onDetach();
         mListener = null;
         if (mActivity != null) {
-            ((MainActivity) mActivity).onSectionAttached(3);
             ((MainActivity) mActivity).getSupportActionBar().setDisplayShowCustomEnabled(true);
             mActivity = null;
         }

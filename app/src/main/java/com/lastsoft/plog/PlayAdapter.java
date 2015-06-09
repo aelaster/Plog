@@ -57,6 +57,7 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
     private String searchQuery;
     private Activity myActivity;
     private Fragment myFragment;
+    private boolean fromDrawer;
     int mPosition;
 
     // BEGIN_INCLUDE(recyclerViewSampleViewHolder)
@@ -103,11 +104,12 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
     }
     // END_INCLUDE(recyclerViewSampleViewHolder)
 
-    public PlayAdapter(Activity mActivity, Fragment mFragment, String mSearchQuery) {
+    public PlayAdapter(Activity mActivity, Fragment mFragment, String mSearchQuery, boolean fromDrawer) {
         myActivity = mActivity;
         myFragment = mFragment;
+        fromDrawer = fromDrawer;
         //plays = Play.listPlaysNewOld();
-        plays = Play.listPlaysNewOld(mSearchQuery);
+        plays = Play.listPlaysNewOld(mSearchQuery, fromDrawer);
         options = new DisplayImageOptions.Builder()
                 .cacheOnDisk(true)
                 .cacheInMemory(true)
@@ -151,7 +153,7 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
             viewHolder.getClickLayout().setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ((MainActivity) myActivity).onPlayClicked(plays.get(position), myFragment, viewHolder.getImageView(), viewHolder.getGameNameView(), viewHolder.getPlayDateView(), position);
+                    ((MainActivity) myActivity).onPlayClicked(plays.get(position), myFragment, viewHolder.getImageView(), viewHolder.getGameNameView(), viewHolder.getPlayDateView(), position, fromDrawer);
                 }
             });
             viewHolder.getOverflowView().setOnClickListener(new View.OnClickListener() {

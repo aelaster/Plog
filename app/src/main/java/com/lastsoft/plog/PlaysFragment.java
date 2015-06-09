@@ -30,6 +30,7 @@ import android.text.TextWatcher;
 import android.transition.TransitionInflater;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -63,31 +64,51 @@ public class PlaysFragment extends Fragment{
     private ImageView mCancel;
     private EditText mSearch;
     String mSearchQuery = "";
+    private boolean fromDrawer;
+
 
     private OnFragmentInteractionListener mListener;
 
+    public static PlaysFragment newInstance(boolean fromDrawer, String searchQuery) {
+        PlaysFragment fragment = new PlaysFragment();
+        Bundle args = new Bundle();
+        args.putBoolean("fromDrawer", fromDrawer);
+        args.putString("searchQuery", searchQuery);
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            fromDrawer = getArguments().getBoolean("fromDrawer");
+            mSearchQuery = getArguments().getString("searchQuery");
+        }
+        ActionBar actionBar = ((MainActivity) mActivity).getSupportActionBar();
+        if (fromDrawer) {
+            try {
 
+                if (actionBar != null) {
+                    //actionBar.setDisplayShowCustomEnabled(true);
+                    actionBar.setCustomView(R.layout.search_bar_plays);
+                    mSearch = (EditText) actionBar.getCustomView()
+                            .findViewById(R.id.etSearch);
+                    mCancel = (ImageView) actionBar.getCustomView()
+                            .findViewById(R.id.closeButton);
+                }
+            } catch (Exception ignored) {
+            }
+        }else{
+            setHasOptionsMenu(true);
+        }
         // Initialize dataset, this data would usually come from a local content provider or
         // remote server.
 
         //String currentDBPath = currentDB.toString();
         //Log.d("V1", "database directory=" + currentDBPath);
         //Log.d("V1", "file directory=" + V1GolfLib.this.getFilesDir().toString());
-        try {
-            ActionBar actionBar = ((MainActivity) mActivity).getSupportActionBar();
-            if (actionBar != null) {
-                //actionBar.setDisplayShowCustomEnabled(true);
-                actionBar.setCustomView(R.layout.search_bar_plays);
-                mSearch = (EditText) actionBar.getCustomView()
-                        .findViewById(R.id.etSearch);
-                mCancel = (ImageView) actionBar.getCustomView()
-                        .findViewById(R.id.closeButton);
-            }
-        }catch (Exception ignored){}
+
     }
 
     @Override
@@ -129,7 +150,8 @@ public class PlaysFragment extends Fragment{
                     mSearchQuery = cs.toString();
                     //initDataset();
                     //mAdapter = new GameAdapter(PlaysFragment.this, mActivity,mSearchQuery);
-                    mAdapter = ((MainActivity) mActivity).initPlayAdapter(mSearchQuery);
+
+                    mAdapter = ((MainActivity) mActivity).initPlayAdapter(mSearchQuery, fromDrawer);
                     // Set CustomAdapter as the adapter for RecyclerView.
                     mRecyclerView.setAdapter(mAdapter);
                 }
@@ -153,7 +175,7 @@ public class PlaysFragment extends Fragment{
                 public void onClick(View view) {
                     if (!mSearch.getText().toString().equals("")) {
                         mSearchQuery = "";
-                        ((MainActivity) mActivity).initPlayAdapter(mSearchQuery);
+                        ((MainActivity) mActivity).initPlayAdapter(mSearchQuery, fromDrawer);
                         mSearch.setText(mSearchQuery);
                         //mActivity.onBackPressed();
                     }
@@ -174,6 +196,18 @@ public class PlaysFragment extends Fragment{
         return rootView;
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Get item selected and deal with it
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                //called when the up affordance/carat in actionbar is pressed
+                mActivity.onBackPressed();
+                return true;
+        }
+        return false;
+    }
+
     Activity mActivity;
     @Override
     public void onAttach(Activity activity) {
@@ -190,8 +224,15 @@ public class PlaysFragment extends Fragment{
     @Override
     public void onStart() {
         super.onStart();
-        if (mActivity != null) {
-            ((MainActivity) mActivity).setUpActionBar(6);
+        if (fromDrawer) {
+            if (mActivity != null) {
+                ((MainActivity) mActivity).setUpActionBar(6);
+
+            }
+        }else {
+            if (mActivity != null) {
+                ((MainActivity) mActivity).setUpActionBar(10);
+            }
         }
     }
 
@@ -200,7 +241,6 @@ public class PlaysFragment extends Fragment{
         super.onDetach();
         mListener = null;
         if (mActivity != null) {
-            //((MainActivity) mActivity).getSupportActionBar().setDisplayShowCustomEnabled(false);
             mActivity = null;
         }
     }
@@ -253,7 +293,7 @@ public class PlaysFragment extends Fragment{
                 .findFirstCompletelyVisibleItemPosition();
         //int current = ((PlayAdapter)mRecyclerView.getAdapter()).mPosition;
 
-        mAdapter = ((MainActivity)mActivity).initPlayAdapter(mSearchQuery);
+        mAdapter = ((MainActivity)mActivity).initPlayAdapter(mSearchQuery, fromDrawer);
 
         // Set CustomAdapter as the adapter for RecyclerView.
         mRecyclerView.setAdapter(mAdapter);

@@ -1,6 +1,5 @@
 package com.lastsoft.plog;
 
-import android.app.Activity;
 import android.app.ActivityOptions;
 import android.app.Dialog;
 import android.app.backup.BackupManager;
@@ -23,7 +22,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 import android.util.Pair;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -217,9 +215,9 @@ public class MainActivity extends AppCompatActivity
     }
 
     private String mSearchQuery;
-    public PlayAdapter initPlayAdapter(String searchQuery){
+    public PlayAdapter initPlayAdapter(String searchQuery, boolean fromDrawer){
         mSearchQuery = searchQuery;
-        mPlayAdapter = new PlayAdapter(this, mPlaysFragment, searchQuery);
+        mPlayAdapter = new PlayAdapter(this, mPlaysFragment, searchQuery, fromDrawer);
         return mPlayAdapter;
     }
 
@@ -227,6 +225,7 @@ public class MainActivity extends AppCompatActivity
     public void onNavigationDrawerItemSelected(int position) {
         // update the main content by replacing fragments
         //Log.d("V1", ""+position);
+        forceBack = false;
         try {
             FragmentManager fragmentManager = getSupportFragmentManager();
             if (fragmentManager.getBackStackEntryCount() > 0) {
@@ -236,12 +235,14 @@ public class MainActivity extends AppCompatActivity
                 fragUp = false;
             }
             if (position == 1) {
-                mPlaysFragment = new PlaysFragment();
+                /*mPlaysFragment = new PlaysFragment();
                 mPlayAdapter = initPlayAdapter("");
                 //initPlayAdapter();
                 fragmentManager.beginTransaction()
                         .replace(R.id.container, mPlaysFragment, "plays")
-                        .commitAllowingStateLoss();
+                        .commitAllowingStateLoss();*/
+
+                openPlays("", true);
             } else if (position == 2) {
                 fragmentManager.beginTransaction()
                         .replace(R.id.container, new PlayersFragment(), "players")
@@ -297,40 +298,29 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-
-
-
-
-    public void onSectionAttached(int number) {
-        switch (number) {
-            case 1:
-                mTitle = getString(R.string.title_section3);
-                break;
-            case 2:
-                mTitle = getString(R.string.title_section1);
-                break;
-            case 3:
-                mTitle = getString(R.string.title_section2);
-                break;
-            case 4:
-                mTitle = getString(R.string.title_section4);
-                break;
-            /*case 5:
-                mTitle = getString(R.string.title_section5);
-                break;*/
-            case 6:
-                restoreActionBar();
-                break;
-            case 7:
-                mTitle = getString(R.string.title_section7);
-                break;
+    public void openPlays(String searchQuery, boolean fromDrawer){
+        if(!fromDrawer){
+            mNavigationDrawerFragment.mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+            mNavigationDrawerFragment.mDrawerToggle.setDrawerIndicatorEnabled(false);
         }
+        forceBack = !fromDrawer;
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        mPlaysFragment = PlaysFragment.newInstance( fromDrawer, searchQuery );
+        mPlayAdapter = initPlayAdapter(searchQuery, fromDrawer);
+        //initPlayAdapter();
+        FragmentTransaction ft = fragmentManager.beginTransaction();
+        if (!fromDrawer){
+            ft.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right);
+            ft.addToBackStack("plays");
+        }
+        ft.replace(R.id.container, mPlaysFragment, "plays");
+        ft.commitAllowingStateLoss();
     }
 
     public void restoreActionBar() {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
-            if (mTitle.equals(getString(R.string.title_section4))) {
+            if (mTitle.equals(getString(R.string.title_statistics))) {
                 actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
             } else {
                 actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
@@ -344,71 +334,103 @@ public class MainActivity extends AppCompatActivity
         currentFragmentCode = fragmentCode;
 
         ActionBar actionBar = getSupportActionBar();
+
         if (actionBar != null) {
             if (fragmentCode == 0) {
                 //addgame
+                mNavigationDrawerFragment.mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+                mNavigationDrawerFragment.mDrawerToggle.setDrawerIndicatorEnabled(false);
                 actionBar.setDisplayShowCustomEnabled(false);
                 actionBar.setDisplayShowTitleEnabled(true);
                 actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-                onSectionAttached(1);
+                mTitle = getString(R.string.title_games);
+                actionBar.setTitle(mTitle);
             } else if (fragmentCode == 1) {
                 //addgroup
+                mNavigationDrawerFragment.mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+                mNavigationDrawerFragment.mDrawerToggle.setDrawerIndicatorEnabled(false);
                 actionBar.setDisplayShowCustomEnabled(false);
                 actionBar.setDisplayShowTitleEnabled(true);
                 actionBar.setTitle(getString(R.string.groups));
                 actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
             } else if (fragmentCode == 2) {
                 //addplayer
+                mNavigationDrawerFragment.mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+                mNavigationDrawerFragment.mDrawerToggle.setDrawerIndicatorEnabled(false);
                 actionBar.setDisplayShowCustomEnabled(false);
                 actionBar.setDisplayShowTitleEnabled(true);
                 actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-                onSectionAttached(3);
+                mTitle = getString(R.string.title_players);
+                actionBar.setTitle(mTitle);
             } else if (fragmentCode == 3) {
                 //addplay
+                mNavigationDrawerFragment.mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+                mNavigationDrawerFragment.mDrawerToggle.setDrawerIndicatorEnabled(false);
                 actionBar.setDisplayShowCustomEnabled(false);
                 actionBar.setDisplayShowTitleEnabled(true);
                 actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-                actionBar.setTitle(mTitle);
             } else if (fragmentCode == 4) {
                 //games
+                mNavigationDrawerFragment.mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+                mNavigationDrawerFragment.mDrawerToggle.setDrawerIndicatorEnabled(true);
                 actionBar.setDisplayShowCustomEnabled(true);
                 actionBar.setDisplayShowTitleEnabled(false);
-                onSectionAttached(1);
+                actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+                mTitle = getString(R.string.title_games);
                 actionBar.setTitle(mTitle);
             } else if (fragmentCode == 5) {
                 //players
+                mNavigationDrawerFragment.mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+                mNavigationDrawerFragment.mDrawerToggle.setDrawerIndicatorEnabled(true);
                 actionBar.setDisplayShowCustomEnabled(false);
                 actionBar.setDisplayShowTitleEnabled(true);
                 actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-                onSectionAttached(3);
+                mTitle = getString(R.string.title_players);
                 actionBar.setTitle(mTitle);
             } else if (fragmentCode == 6) {
                 //plays
+                mNavigationDrawerFragment.mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+                mNavigationDrawerFragment.mDrawerToggle.setDrawerIndicatorEnabled(true);
                 actionBar.setDisplayShowCustomEnabled(true);
                 actionBar.setDisplayShowTitleEnabled(false);
                 actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-                onSectionAttached(2);
+                mTitle = getString(R.string.title_plays);
                 actionBar.setTitle(mTitle);
             } else if (fragmentCode == 7) {
                 //stats
+                mNavigationDrawerFragment.mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+                mNavigationDrawerFragment.mDrawerToggle.setDrawerIndicatorEnabled(true);
                 actionBar.setDisplayShowCustomEnabled(false);
                 actionBar.setDisplayShowTitleEnabled(true);
                 actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-                onSectionAttached(4);
+                mTitle = getString(R.string.title_statistics);
                 actionBar.setTitle(mTitle);
             } else if (fragmentCode == 8) {
                 //viewplay
+                mNavigationDrawerFragment.mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+                mNavigationDrawerFragment.mDrawerToggle.setDrawerIndicatorEnabled(true);
                 actionBar.setDisplayShowCustomEnabled(false);
                 actionBar.setDisplayShowTitleEnabled(true);
                 actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-                onSectionAttached(2);
+                mTitle = getString(R.string.title_plays);
             } else if (fragmentCode == 9) {
                 //set up
+                mNavigationDrawerFragment.mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+                mNavigationDrawerFragment.mDrawerToggle.setDrawerIndicatorEnabled(true);
                 actionBar.setDisplayShowCustomEnabled(false);
                 actionBar.setDisplayShowTitleEnabled(true);
                 actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-                onSectionAttached(5);
+                mTitle = getString(R.string.title_settings);
                 actionBar.setTitle("Set Up");
+            } else if (fragmentCode == 10) {
+                //plays, filtered by games
+                mNavigationDrawerFragment.mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+                mNavigationDrawerFragment.mDrawerToggle.setDrawerIndicatorEnabled(false);
+                actionBar.setDisplayShowCustomEnabled(false);
+                actionBar.setDisplayShowTitleEnabled(true);
+                actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+                mTitle = getString(R.string.title_plays);
+                actionBar.setTitle(mTitle);
             }
         }
     }
@@ -507,7 +529,7 @@ public class MainActivity extends AppCompatActivity
         fragmentManager.executePendingTransactions(); //Prevents the flashing.
     }
     int firstVisible, lastVisible;
-    public void onPlayClicked(Play clickedPlay, Fragment mFragment, final View view, final View nameView, final View dateView, int position){
+    public void onPlayClicked(Play clickedPlay, Fragment mFragment, final View view, final View nameView, final View dateView, int position, boolean fromDrawer){
         try{
             InputMethodManager inputManager = (InputMethodManager)
                     getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -517,6 +539,7 @@ public class MainActivity extends AppCompatActivity
         }catch (Exception ignored){}
 
         mIsReentering = false;
+
 
         firstVisible = ((LinearLayoutManager) mPlaysFragment.mRecyclerView.getLayoutManager())
                 .findFirstCompletelyVisibleItemPosition();
@@ -530,6 +553,7 @@ public class MainActivity extends AppCompatActivity
         intent.putExtra("nameTransID", nameView.getTransitionName());
         intent.putExtra("dateTransID", dateView.getTransitionName());
         intent.putExtra("adapterPosition", position);
+        intent.putExtra("fromDrawer", fromDrawer);
 
         ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(this,
                 Pair.create(view, view.getTransitionName()));
@@ -538,6 +562,7 @@ public class MainActivity extends AppCompatActivity
 
         startActivity(intent, options.toBundle());
     }
+
 
     @Override
     public void onActivityReenter(int requestCode, Intent data) {
@@ -549,10 +574,6 @@ public class MainActivity extends AppCompatActivity
         if (mPlaysFragment != null) {
             mPlaysFragment.refreshDataset();
             if (oldPosition != currentPosition) {
-                Log.d("V1", "firstVisible = " + firstVisible);
-                Log.d("V1", "lastVisible = " + lastVisible);
-                Log.d("V1", "oldPosition = " + oldPosition);
-                Log.d("V1", "currentPosition = " + currentPosition);
                 if (!(firstVisible <= currentPosition && currentPosition <= lastVisible)) {
                     mPlaysFragment.mRecyclerView.scrollToPosition(currentPosition);
                 }
@@ -575,6 +596,8 @@ public class MainActivity extends AppCompatActivity
     public void openAddPlay(Fragment mFragment, String game_name, long playID){
 
         mTitle = game_name;
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle(mTitle);
 
         try{
             InputMethodManager inputManager = (InputMethodManager)
@@ -746,8 +769,13 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    public boolean forceBack = false;
     @Override
     public void onBackPressed(){
+        mNavigationDrawerFragment.mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+        mNavigationDrawerFragment.mDrawerToggle.setDrawerIndicatorEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         if (mNavigationDrawerFragment != null && !mNavigationDrawerFragment.isDrawerOpen()) {
             if (fragUp) {
                 if (mAddPlayerFragment != null) removeFragment(mAddPlayerFragment.getView());
@@ -755,38 +783,33 @@ public class MainActivity extends AppCompatActivity
                 if (mAddPlayFragment != null) removeFragment(mAddPlayFragment.getView());
                 if (mAddGroupFragment != null) removeFragment(mAddGroupFragment.getView());
             } else {
-                //super.onBackPressed();
-                if (mViewPlayFragment != null){
-                    if (mViewPlayFragment.isSwiping == ViewPager.SCROLL_STATE_IDLE) {
-                        //mViewPlayFragment.setSharedElementReturnTransition(TransitionInflater.from(this).inflateTransition(R.transition.change_image_transform));
-                        //int holder = mViewPlayFragment.mPager.getCurrentItem();
-                        super.onBackPressed();
-                        mViewPlayFragment = null;
-                    }else{
-                        mViewPlayFragment.pendingBack = true;
-                    }
-                    //mPlaysFragment.mRecyclerView.scrollToPosition(holder);
+                if (forceBack){
+                    forceBack = false;
+                    super.onBackPressed();
                 }else {
+                    //super.onBackPressed();
                     PlayersFragment playersFrag = (PlayersFragment)
                             getSupportFragmentManager().findFragmentByTag("players");
-                    if (playersFrag != null){
-                        if (playersFrag.fabMenu.isExpanded()){
+                    if (playersFrag != null) {
+                        if (playersFrag.fabMenu.isExpanded()) {
                             playersFrag.fabMenu.collapse();
-                        }else{
+                        } else {
                             mNavigationDrawerFragment.openDrawer();
                         }
-                    }else {
+                    } else {
                         mNavigationDrawerFragment.openDrawer();
                     }
                 }
+
             }
-        }else{
+        } else {
             if (mNavigationDrawerFragment != null) {
                 mNavigationDrawerFragment.closeDrawer();
-            }else{
+            } else {
                 super.onBackPressed();
             }
         }
+
     }
 
     /*

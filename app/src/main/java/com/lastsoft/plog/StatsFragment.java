@@ -69,6 +69,7 @@ public class StatsFragment extends Fragment {
         List<String> gameGroupNames = new ArrayList<>();
         final List<GameGroup> gameGroups = GameGroup.listAll(GameGroup.class);
         int i = 0;
+        gameGroupNames.add(getString(R.string.select_group));
         for(GameGroup group:gameGroups){
             gameGroupNames.add(group.groupName);
             i++;
@@ -78,17 +79,20 @@ public class StatsFragment extends Fragment {
         if (mActionBar != null) {
             mSpinnerAdapter = new ArrayAdapter<>(mActionBar.getThemedContext(), android.R.layout.simple_list_item_1, gameGroupNames);
         }
-        mActionBar.setListNavigationCallbacks(mSpinnerAdapter, new ActionBar.OnNavigationListener() {
-            @Override
-            public boolean onNavigationItemSelected(int position, long itemId) {
-                GameGroup checker = gameGroups.get(position);
-                groupToPoll = checker.getId();
-                Log.d("V1", "group to poll = " + groupToPoll);
-                mPagerAdapter = new ScreenSlidePagerAdapter(getChildFragmentManager(), groupToPoll);
-                mPager.setAdapter(mPagerAdapter);
-                return true;
-            }
-        });
+        if (mActionBar != null) {
+            mActionBar.setListNavigationCallbacks(mSpinnerAdapter, new ActionBar.OnNavigationListener() {
+                @Override
+                public boolean onNavigationItemSelected(int position, long itemId) {
+                    if (position > 0) {
+                        GameGroup checker = gameGroups.get(position-1);
+                        groupToPoll = checker.getId();
+                        mPagerAdapter = new ScreenSlidePagerAdapter(getChildFragmentManager(), groupToPoll);
+                        mPager.setAdapter(mPagerAdapter);
+                    }
+                    return true;
+                }
+            });
+        }
 
         // Instantiate a ViewPager and a PagerAdapter.
         mPager = (ViewPager) viewPlayLayout.findViewById(R.id.pager);
