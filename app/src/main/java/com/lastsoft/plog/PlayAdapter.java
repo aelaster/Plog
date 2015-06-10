@@ -19,12 +19,9 @@ package com.lastsoft.plog;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
-import android.media.ThumbnailUtils;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -189,8 +186,7 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
                         if (b != null) {
                             try {
                                 b.compress(Bitmap.CompressFormat.JPEG,100, new FileOutputStream(new File(thumbPath2)));
-                            } catch (Exception e) {
-                                // TODO Auto-generated catch block
+                            } catch (Exception ignored) {
                             }
                             b = null;
                         }
@@ -254,7 +250,7 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
                     case R.id.delete_play:
                         //delete the play
                         //refresh play list
-                        ((MainActivity) myActivity).deletePlay(plays.get(position).getId(), false);
+                        ((MainActivity) myActivity).deletePlay(plays.get(position).getId());
                         return true;
                     default:
                         return false;

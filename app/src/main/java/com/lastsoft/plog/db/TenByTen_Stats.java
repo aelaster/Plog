@@ -1,16 +1,12 @@
 package com.lastsoft.plog.db;
 
-import android.util.Log;
-
 import com.orm.StringUtil;
 import com.orm.SugarRecord;
-import com.orm.SugarTransactionHelper;
 
 import java.util.Date;
 import java.util.List;
 
 public class TenByTen_Stats extends SugarRecord<TenByTen_Stats> {
-
     public Play play;
     public Player player;
     public Date playDate;

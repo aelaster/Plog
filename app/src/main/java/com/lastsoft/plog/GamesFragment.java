@@ -26,7 +26,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -137,13 +136,17 @@ public class GamesFragment extends Fragment{
 
             @Override
             public void onRefresh() {
-                // TODO Auto-generated method stub
                 initDataset();
             }
         });
 
         if (mSearch != null) {
             mSearch.addTextChangedListener(new TextWatcher() {
+
+                @Override
+                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                }
 
                 @Override
                 public void onTextChanged(CharSequence cs, int arg1, int arg2, int arg3) {
@@ -160,12 +163,6 @@ public class GamesFragment extends Fragment{
 
                 }
 
-                @Override
-                public void beforeTextChanged(CharSequence arg0, int arg1, int arg2,
-                                              int arg3) {
-                    // TODO Auto-generated method stub
-
-                }
             });
 
 
@@ -288,7 +285,6 @@ public class GamesFragment extends Fragment{
 
     @Override
     public void onDestroy() {
-        // TODO Auto-generated method stub
         super.onDestroy();
         ((MainActivity)mActivity).unbindDrawables(mRecyclerView);
     }
@@ -337,8 +333,7 @@ public class GamesFragment extends Fragment{
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        public void onFragmentInteraction(String id, float x, float y);
+        void onFragmentInteraction(String id, float x, float y);
     }
 
     public class GamesLoader extends LoadGamesTask {

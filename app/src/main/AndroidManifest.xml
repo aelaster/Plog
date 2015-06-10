@@ -17,6 +17,7 @@
         android:theme="@style/AppTheme"
         android:backupAgent="MyBackupAgent">
 
+        <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
         <meta-data android:name="com.google.android.backup.api_key" android:value="AEdPqrEAAAAIj6Vs1XjV0vDezxy_G7CCbrUPfEnfQ92HOAM1Ig" />
 
         <meta-data
@@ -36,7 +37,7 @@
             android:name=".MainActivity"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
             android:label="@string/app_name"
-            android:windowSoftInputMode="adjustPan|stateHidden" >
+            android:windowSoftInputMode="adjustResize|stateHidden" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -47,7 +48,16 @@
             android:name=".ViewPlayActivity"
             android:label="@string/app_name"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
+            android:windowSoftInputMode="adjustResize|stateHidden"
             android:theme="@style/AppTheme.NoActionBar"/>
+        <activity android:name="com.facebook.FacebookActivity"
+            android:configChanges=
+                "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:label="@string/app_name" />
+        <provider android:authorities="com.facebook.app.FacebookContentProvider388771481319946"
+            android:name="com.facebook.FacebookContentProvider"
+            android:exported="true" />
 
     </application>
 

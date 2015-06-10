@@ -14,7 +14,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,14 +21,11 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
-
-import com.lastsoft.plog.db.GameGroup;
 import com.lastsoft.plog.db.Player;
 import com.lastsoft.plog.wizard.model.AbstractWizardModel;
 import com.lastsoft.plog.wizard.model.CustomerInfoPage;
 import com.lastsoft.plog.wizard.model.ModelCallbacks;
 import com.lastsoft.plog.wizard.model.Page;
-import com.lastsoft.plog.wizard.model.ReviewItem;
 import com.lastsoft.plog.wizard.ui.PageFragmentCallbacks;
 import com.lastsoft.plog.wizard.ui.ReviewFragment;
 import com.lastsoft.plog.wizard.ui.StepPagerStrip;
@@ -57,7 +53,6 @@ public class SetupWizardFragment extends Fragment implements
 
     private List<Page> mCurrentPageSequence;
     private StepPagerStrip mStepPagerStrip;
-        // TODO: Rename and change types and number of parameters
         public static SetupWizardFragment newInstance() {
                 SetupWizardFragment fragment = new SetupWizardFragment();
                 Bundle args = new Bundle();
@@ -322,7 +317,6 @@ public class SetupWizardFragment extends Fragment implements
 
         @Override
         public int getItemPosition(Object object) {
-            // TODO: be smarter about this
             if (object == mPrimaryItem) {
                 // Re-use the current fragment (its position never changes)
                 return POSITION_UNCHANGED;

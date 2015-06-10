@@ -21,11 +21,6 @@ public class CircularReveal extends Visibility {
        setStartView(view);
     }
 
-    /**
-     * Used to explicitly set the start of the circular reveal.
-     *
-     * TODO: can this be less hacky?
-     */
     public void setStartView(View v) {
         v.getLocationInWindow(mTmpLoc);
         mStartBounds.set(mTmpLoc[0], mTmpLoc[1], mTmpLoc[0] + v.getWidth(), mTmpLoc[1] + v.getHeight());

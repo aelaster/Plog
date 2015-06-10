@@ -7,7 +7,6 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -23,13 +22,10 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 
-import com.lastsoft.plog.db.Game;
 import com.lastsoft.plog.db.GameGroup;
-import com.lastsoft.plog.db.GamesPerPlay;
 import com.lastsoft.plog.db.Play;
 import com.lastsoft.plog.db.Player;
 import com.lastsoft.plog.db.PlayersPerGameGroup;
-import com.lastsoft.plog.db.PlayersPerPlay;
 import com.lastsoft.plog.db.PlaysPerGameGroup;
 
 import java.util.ArrayList;
@@ -56,7 +52,6 @@ public class AddGroupFragment extends Fragment {
     ArrayList<String> playersName;
     EditText groupName;
 
-    // TODO: Rename and change types and number of parameters
     public static AddGroupFragment newInstance(int centerX, int centerY, boolean doAccelerate) {
         AddGroupFragment fragment = new AddGroupFragment();
         Bundle args = new Bundle();
@@ -140,7 +135,6 @@ public class AddGroupFragment extends Fragment {
     Menu mMenu;
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        // TODO Add your menu entries here
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.add_group, menu);
         mMenu = menu;
@@ -337,12 +331,6 @@ public class AddGroupFragment extends Fragment {
         }
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(String string) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(string);
-        }
-    }
 
     Activity mActivity;
     @Override
@@ -386,8 +374,7 @@ public class AddGroupFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        public void onFragmentInteraction(String string);
+        void onFragmentInteraction(String string);
     }
 
     /*

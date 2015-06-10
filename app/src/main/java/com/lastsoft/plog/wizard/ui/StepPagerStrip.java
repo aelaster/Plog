@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.lastsoft.plog.wizard.ui;;
+package com.lastsoft.plog.wizard.ui;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -28,6 +28,8 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import com.lastsoft.plog.R;
+
+;
 
 public class StepPagerStrip extends View {
     private static final int[] ATTRS = new int[]{
@@ -226,11 +228,10 @@ public class StepPagerStrip extends View {
         invalidate();
         scrollCurrentPageIntoView();
 
-        // TODO: Set content description appropriately
     }
 
     private void scrollCurrentPageIntoView() {
-        // TODO: only works with left gravity for now
+
 //
 //        float widthToActive = getPaddingLeft() + (mCurrentPage + 1) * (mTabWidth + mTabSpacing)
 //                - mTabSpacing;
@@ -251,8 +252,6 @@ public class StepPagerStrip extends View {
     public void setPageCount(int count) {
         mPageCount = count;
         invalidate();
-
-        // TODO: Set content description appropriately
     }
 
     public static interface OnPageSelectedListener {

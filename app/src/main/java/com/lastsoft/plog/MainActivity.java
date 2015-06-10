@@ -13,7 +13,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.SharedElementCallback;
-import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -31,6 +30,12 @@ import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.FacebookSdk;
+import com.facebook.share.Sharer;
+import com.facebook.share.widget.ShareDialog;
 import com.lastsoft.plog.db.Game;
 import com.lastsoft.plog.db.GameGroup;
 import com.lastsoft.plog.db.GamesPerPlay;
@@ -56,10 +61,8 @@ public class MainActivity extends AppCompatActivity
         AddPlayFragment.OnFragmentInteractionListener,
         AddPlayerFragment.OnFragmentInteractionListener,
         AddGameFragment.OnFragmentInteractionListener,
-        PlaysFragment.OnFragmentInteractionListener,
         PlayersFragment.OnFragmentInteractionListener,
         GamesFragment.OnFragmentInteractionListener,
-        ViewPlayFragment.OnFragmentInteractionListener,
         StatsFragment.OnFragmentInteractionListener,
         View.OnClickListener {
 
@@ -71,10 +74,11 @@ public class MainActivity extends AppCompatActivity
     private AddGameFragment mAddGameFragment;
     private AddPlayFragment mAddPlayFragment;
     private AddGroupFragment mAddGroupFragment;
-    public ViewPlayFragment mViewPlayFragment;
     PlaysFragment mPlaysFragment;
     PlayAdapter mPlayAdapter;
     protected PostMortemReportExceptionHandler mDamageReport = new PostMortemReportExceptionHandler(this);
+    CallbackManager callbackManager;
+    ShareDialog shareDialog;
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -120,35 +124,6 @@ public class MainActivity extends AppCompatActivity
                 }
                 mTmpState = null;
             }
-            /*
-            if (!mIsReentering) {
-                View navigationBar = findViewById(android.R.id.navigationBarBackground);
-                View statusBar = findViewById(android.R.id.statusBarBackground);
-                int actionBarId = getResources().getIdentifier("action_bar_container", "id", "android");
-                View actionBar = findViewById(actionBarId);
-
-                if (navigationBar != null) {
-                    names.add(navigationBar.getTransitionName());
-                    sharedElements.put(navigationBar.getTransitionName(), navigationBar);
-                }
-                if (statusBar != null) {
-                    names.add(statusBar.getTransitionName());
-                    sharedElements.put(statusBar.getTransitionName(), statusBar);
-                }
-                if (actionBar != null) {
-                    actionBar.setTransitionName("actionBar");
-                    names.add(actionBar.getTransitionName());
-                    sharedElements.put(actionBar.getTransitionName(), actionBar);
-                }
-            } else {
-                names.remove(Window.NAVIGATION_BAR_BACKGROUND_TRANSITION_NAME);
-                sharedElements.remove(Window.NAVIGATION_BAR_BACKGROUND_TRANSITION_NAME);
-                names.remove(Window.STATUS_BAR_BACKGROUND_TRANSITION_NAME);
-                sharedElements.remove(Window.STATUS_BAR_BACKGROUND_TRANSITION_NAME);
-                names.remove("actionBar");
-                sharedElements.remove("actionBar");
-            }
-            */
         }
 
     };
@@ -160,6 +135,27 @@ public class MainActivity extends AppCompatActivity
 
         setExitSharedElementCallback(mCallback);
         mDamageReport.initialize();
+
+        FacebookSdk.sdkInitialize(getApplicationContext());
+        callbackManager = CallbackManager.Factory.create();
+        shareDialog = new ShareDialog(this);
+        // this part is optional
+        shareDialog.registerCallback(callbackManager, new FacebookCallback<Sharer.Result>() {
+            @Override
+            public void onSuccess(Sharer.Result result) {
+
+            }
+
+            @Override
+            public void onCancel() {
+
+            }
+
+            @Override
+            public void onError(FacebookException e) {
+
+            }
+        });
 
         BackupManager bm = new BackupManager(this);
         bm.dataChanged();
@@ -499,12 +495,6 @@ public class MainActivity extends AppCompatActivity
             if (playsFrag != null) {
                 playsFrag.refreshDataset();
             }
-
-            ViewPlayFragment viewPlaysFrag = (ViewPlayFragment)
-                    getSupportFragmentManager().findFragmentByTag("view_play");
-            if (viewPlaysFrag != null) {
-                viewPlaysFrag.refreshPager();
-            }
         }
     }
 
@@ -579,7 +569,6 @@ public class MainActivity extends AppCompatActivity
                 @Override
                 public boolean onPreDraw() {
                     mPlaysFragment.mRecyclerView.getViewTreeObserver().removeOnPreDrawListener(this);
-                    // TODO: hack! not sure why, but requesting a layout pass is necessary in order to fix re-mapping + scrolling glitches!
                     mPlaysFragment.mRecyclerView.requestLayout();
                     startPostponedEnterTransition();
                     return true;
@@ -620,17 +609,51 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void deleteGame(long gameId){
-        Game deleteMe = Game.findById(Game.class, gameId);
+        DeleteGameFragment newFragment = new DeleteGameFragment().newInstance(gameId);
+        newFragment.show(getSupportFragmentManager(), "deleteGame");
+    }
 
-        //Log.d("V1", "has game been played? = " + GamesPerPlay.hasGameBeenPlayed(deleteMe));
-        //check if this game has been played
-        //if so, can't delete
-        if (!GamesPerPlay.hasGameBeenPlayed(deleteMe)){
-            deleteMe.delete();
+    public class DeleteGameFragment extends DialogFragment {
+        public DeleteGameFragment newInstance(long gameId) {
+            DeleteGameFragment frag = new DeleteGameFragment();
+            Bundle args = new Bundle();
+            args.putLong("gameId", gameId);
+            frag.setArguments(args);
+            return frag;
         }
 
-        onFragmentInteraction("refresh_games");
-        //onBackPressed();
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // Use the Builder class for convenient dialog construction
+            final long gameId = getArguments().getLong("gameId");
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setTitle(R.string.delete);
+            builder.setMessage(R.string.confirm_delete_game)
+                    .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            Game deleteMe = Game.findById(Game.class, gameId);
+
+                            //Log.d("V1", "has game been played? = " + GamesPerPlay.hasGameBeenPlayed(deleteMe));
+                            //check if this game has been played
+                            //if so, can't delete
+                            if (!GamesPerPlay.hasGameBeenPlayed(deleteMe)){
+                                deleteMe.delete();
+                            }
+
+                            onFragmentInteraction("refresh_games");
+                            //onBackPressed();
+                            dismiss();
+                        }
+                    })
+                    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dismiss();
+                        }
+                    });
+            // Create the AlertDialog object and return it
+            return builder.create();
+        }
     }
 
     GameUpdater gameUpdate;
@@ -644,65 +667,135 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void deletePlayer(long playerID){
-        Player deleteMe = Player.findById(Player.class, playerID);
+        DeletePlayerFragment newFragment = new DeletePlayerFragment().newInstance(playerID);
+        newFragment.show(getSupportFragmentManager(), "deletePlayer");
 
-        //delete PlayersPerPlay
-        List<PlayersPerPlay> players = PlayersPerPlay.getPlayer(deleteMe);
-        for(PlayersPerPlay player:players){
-            player.delete();
-        }
-        //delete PlayersPerGameGroup
-        List<PlayersPerGameGroup> groupers = PlayersPerGameGroup.getPlayer(deleteMe);
-        for(PlayersPerGameGroup grouper:groupers){
-            grouper.delete();
-        }
-
-        //delete player
-        deleteMe.delete();
-        onFragmentInteraction("refresh_players");
-        onBackPressed();
     }
 
-    public void deletePlay(long playID, boolean backFlag){
-        Play deleteMe = Play.findById(Play.class, playID);
-
-        //delete PlayersPerPlay
-        List<PlayersPerPlay> players = PlayersPerPlay.getPlayers(deleteMe);
-        for(PlayersPerPlay player:players){
-            player.delete();
-        }
-        //delete GamesPerPay
-        List<GamesPerPlay> games = GamesPerPlay.getGames(deleteMe);
-        for(GamesPerPlay game:games){
-            game.delete();
+    public class DeletePlayerFragment extends DialogFragment {
+        public DeletePlayerFragment newInstance(long playerID2) {
+            DeletePlayerFragment frag = new DeletePlayerFragment();
+            Bundle args = new Bundle();
+            args.putLong("playerID", playerID2);
+            frag.setArguments(args);
+            return frag;
         }
 
-        //delete plays_per_game_group
-        List<PlaysPerGameGroup> plays = PlaysPerGameGroup.getPlays(deleteMe);
-        for(PlaysPerGameGroup play:plays){
-            play.delete();
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // Use the Builder class for convenient dialog construction
+            final long playerID2 = getArguments().getLong("playerID");
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setTitle(R.string.delete);
+            builder.setMessage(R.string.confirm_delete_player)
+                    .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            Player deleteMe = Player.findById(Player.class, playerID2);
+
+                            //delete PlayersPerPlay
+                            List<PlayersPerPlay> players = PlayersPerPlay.getPlayer(deleteMe);
+                            for(PlayersPerPlay player:players){
+                                player.delete();
+                            }
+                            //delete PlayersPerGameGroup
+                            List<PlayersPerGameGroup> groupers = PlayersPerGameGroup.getPlayer(deleteMe);
+                            for(PlayersPerGameGroup grouper:groupers){
+                                grouper.delete();
+                            }
+
+                            //delete player
+                            deleteMe.delete();
+                            onFragmentInteraction("refresh_players");
+                            onBackPressed();
+                            dismiss();
+                        }
+                    })
+                    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dismiss();
+                        }
+                    });
+            // Create the AlertDialog object and return it
+            return builder.create();
         }
-
-        //delete play image
-        Log.d("V1", "play image = " + deleteMe.playPhoto);
-        if(deleteMe.playPhoto != null && !deleteMe.playPhoto.equals("")) {
-            File deleteImage = new File(deleteMe.playPhoto.substring(7, deleteMe.playPhoto.length()));
-            if (deleteImage.exists()) {
-                deleteImage.delete();
-            }
-
-            //delete play image thumb
-            File deleteImage_thumb = new File(deleteMe.playPhoto.substring(7, deleteMe.playPhoto.length() - 4) + "_thumb.jpg");
-            if (deleteImage_thumb.exists()) {
-                deleteImage_thumb.delete();
-            }
-        }
-
-        //delete play
-        deleteMe.delete();
-
-        onFragmentInteraction("refresh_plays");
     }
+
+    public void deletePlay(long playID){
+        DeletePlayFragment newFragment = new DeletePlayFragment().newInstance(playID);
+        newFragment.show(getSupportFragmentManager(), "deletePlay");
+    }
+
+
+    public class DeletePlayFragment extends DialogFragment {
+        public DeletePlayFragment newInstance(long playID) {
+            DeletePlayFragment frag = new DeletePlayFragment();
+            Bundle args = new Bundle();
+            args.putLong("playID", playID);
+            frag.setArguments(args);
+            return frag;
+        }
+
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // Use the Builder class for convenient dialog construction
+            final long playID2 = getArguments().getLong("playID");
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setTitle(R.string.delete);
+            builder.setMessage(R.string.confirm_delete_play)
+                    .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            Play deleteMe = Play.findById(Play.class, playID2);
+
+                            //delete PlayersPerPlay
+                            List<PlayersPerPlay> players = PlayersPerPlay.getPlayers(deleteMe);
+                            for(PlayersPerPlay player:players){
+                                player.delete();
+                            }
+                            //delete GamesPerPay
+                            List<GamesPerPlay> games = GamesPerPlay.getGames(deleteMe);
+                            for(GamesPerPlay game:games){
+                                game.delete();
+                            }
+
+                            //delete plays_per_game_group
+                            List<PlaysPerGameGroup> plays = PlaysPerGameGroup.getPlays(deleteMe);
+                            for(PlaysPerGameGroup play:plays){
+                                play.delete();
+                            }
+
+                            //delete play image
+                            if(deleteMe.playPhoto != null && !deleteMe.playPhoto.equals("")) {
+                                File deleteImage = new File(deleteMe.playPhoto.substring(7, deleteMe.playPhoto.length()));
+                                if (deleteImage.exists()) {
+                                    deleteImage.delete();
+                                }
+
+                                //delete play image thumb
+                                File deleteImage_thumb = new File(deleteMe.playPhoto.substring(7, deleteMe.playPhoto.length() - 4) + "_thumb.jpg");
+                                if (deleteImage_thumb.exists()) {
+                                    deleteImage_thumb.delete();
+                                }
+                            }
+
+                            //delete play
+                            deleteMe.delete();
+
+                            onFragmentInteraction("refresh_plays");
+                            dismiss();
+                        }
+                    })
+                    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dismiss();
+                        }
+                    });
+            // Create the AlertDialog object and return it
+            return builder.create();
+        }
+    }
+
 
     @Override
     public void onFragmentInteraction(String id, float x, float y) {

@@ -14,13 +14,10 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -45,7 +42,6 @@ import com.lastsoft.plog.db.GameGroup;
 import com.lastsoft.plog.db.GamesPerPlay;
 import com.lastsoft.plog.db.Play;
 import com.lastsoft.plog.db.Player;
-import com.lastsoft.plog.db.PlayersPerGameGroup;
 import com.lastsoft.plog.db.PlayersPerPlay;
 import com.lastsoft.plog.db.PlaysPerGameGroup;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -91,7 +87,6 @@ public class AddPlayFragment extends Fragment implements
 
     List<Game> expansions;
 
-    // TODO: Rename and change types and number of parameters
     public static AddPlayFragment newInstance(int centerX, int centerY, boolean doAccelerate, String mGameName, long playID) {
         AddPlayFragment fragment = new AddPlayFragment();
         Bundle args = new Bundle();
@@ -513,10 +508,8 @@ public class AddPlayFragment extends Fragment implements
                 if (b != null) {
                     try {
                         b.compress(Bitmap.CompressFormat.JPEG, 100, new FileOutputStream(new File(thumbPath)));
-                    } catch (Exception e) {
-                        // TODO Auto-generated catch block
+                    } catch (Exception ignored) {
                     }
-                    b = null;
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -554,7 +547,6 @@ public class AddPlayFragment extends Fragment implements
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        // TODO Add your menu entries here
         super.onCreateOptionsMenu(menu, inflater);
         menu.clear();
         if(playID >= 0 ){
@@ -706,7 +698,6 @@ public class AddPlayFragment extends Fragment implements
         return super.onOptionsItemSelected(item);
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(String string) {
         if (mListener != null) {
             mListener.onFragmentInteraction(string);
@@ -779,7 +770,6 @@ public class AddPlayFragment extends Fragment implements
 
     @Override
     public void onDestroy() {
-        // TODO Auto-generated method stub
         super.onDestroy();
         if (mActivity instanceof MainActivity) {
             ((MainActivity) mActivity).unbindDrawables(rootView);
@@ -812,7 +802,6 @@ public class AddPlayFragment extends Fragment implements
     }
 
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onFragmentInteraction(String string);
     }
 

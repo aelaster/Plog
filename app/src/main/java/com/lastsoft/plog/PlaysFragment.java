@@ -20,15 +20,12 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.SharedElementCallback;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.transition.TransitionInflater;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -36,9 +33,6 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
-
-import java.util.List;
-import java.util.Map;
 
 public class PlaysFragment extends Fragment{
 
@@ -65,9 +59,6 @@ public class PlaysFragment extends Fragment{
     private EditText mSearch;
     String mSearchQuery = "";
     private boolean fromDrawer;
-
-
-    private OnFragmentInteractionListener mListener;
 
     public static PlaysFragment newInstance(boolean fromDrawer, String searchQuery) {
         PlaysFragment fragment = new PlaysFragment();
@@ -157,16 +148,11 @@ public class PlaysFragment extends Fragment{
                 }
 
                 @Override
-                public void afterTextChanged(Editable editable) {
-
-                }
+                public void afterTextChanged(Editable editable) {}
 
                 @Override
                 public void beforeTextChanged(CharSequence arg0, int arg1, int arg2,
-                                              int arg3) {
-                    // TODO Auto-generated method stub
-
-                }
+                                              int arg3) {}
             });
 
 
@@ -213,12 +199,6 @@ public class PlaysFragment extends Fragment{
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         mActivity = activity;
-        try {
-            mListener = (OnFragmentInteractionListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
     }
 
     @Override
@@ -239,7 +219,6 @@ public class PlaysFragment extends Fragment{
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
         if (mActivity != null) {
             mActivity = null;
         }
@@ -282,7 +261,6 @@ public class PlaysFragment extends Fragment{
 
     @Override
     public void onDestroy() {
-        // TODO Auto-generated method stub
         super.onDestroy();
         ((MainActivity)mActivity).unbindDrawables(mRecyclerView);
     }
@@ -300,18 +278,4 @@ public class PlaysFragment extends Fragment{
         mRecyclerView.scrollToPosition(firstVisible);
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(String id, float x, float y);
-    }
 }

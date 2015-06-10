@@ -16,9 +16,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
 import com.lastsoft.plog.db.Game;
-import com.lastsoft.plog.db.GameGroup;
-import com.lastsoft.plog.db.Player;
-import com.lastsoft.plog.db.PlayersPerGameGroup;
 
 
 /**
@@ -30,20 +27,10 @@ import com.lastsoft.plog.db.PlayersPerGameGroup;
  * create an instance of this fragment.
  */
 public class AddGameFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
     private OnFragmentInteractionListener mListener;
 
     int cx, cy;
 
-    // TODO: Rename and change types and number of parameters
     public static AddGameFragment newInstance(int centerX, int centerY, boolean doAccelerate) {
         AddGameFragment fragment = new AddGameFragment();
         Bundle args = new Bundle();
@@ -61,10 +48,6 @@ public class AddGameFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
         setHasOptionsMenu(true);
     }
 
@@ -119,7 +102,6 @@ public class AddGameFragment extends Fragment {
         return rootView;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(String string) {
         if (mListener != null) {
             mListener.onFragmentInteraction(string);
@@ -194,8 +176,7 @@ public class AddGameFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        public void onFragmentInteraction(String string);
+        void onFragmentInteraction(String string);
     }
 
     /*

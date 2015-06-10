@@ -8,15 +8,12 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.SpinnerAdapter;
 
 import com.lastsoft.plog.db.GameGroup;
-import com.lastsoft.plog.db.TenByTen;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -111,12 +108,6 @@ public class StatsFragment extends Fragment {
         return viewPlayLayout;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(String string) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(string);
-        }
-    }
 
     Activity mActivity;
     @Override
@@ -147,7 +138,6 @@ public class StatsFragment extends Fragment {
     }
 
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onFragmentInteraction(String string);
     }
 

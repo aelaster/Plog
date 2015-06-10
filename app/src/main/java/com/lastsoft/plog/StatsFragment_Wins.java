@@ -6,7 +6,6 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,8 +13,6 @@ import android.widget.TextView;
 
 import com.lastsoft.plog.db.Game;
 import com.lastsoft.plog.db.GameGroup;
-import com.lastsoft.plog.db.GamesPerPlay;
-import com.lastsoft.plog.db.Play;
 import com.lastsoft.plog.db.Player;
 import com.lastsoft.plog.db.PlayersPerPlay;
 
@@ -29,8 +26,6 @@ public class StatsFragment_Wins extends Fragment {
     private ViewGroup mContainerView_Players;
     long gameGroup;
 
-
-    // TODO: Rename and change types and number of parameters
     public static StatsFragment_Wins newInstance(long gameGroup) {
         StatsFragment_Wins fragment = new StatsFragment_Wins();
         Bundle args = new Bundle();

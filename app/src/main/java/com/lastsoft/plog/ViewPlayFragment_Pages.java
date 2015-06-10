@@ -2,19 +2,12 @@ package com.lastsoft.plog;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.widget.PopupMenu;
-import android.util.Log;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -37,7 +30,6 @@ import java.util.List;
 
 
 public class ViewPlayFragment_Pages extends Fragment {
-    // TODO: Rename and change types of parameters
     private long playID;
     String imageTransID;
     String nameTransID;
@@ -89,7 +81,7 @@ public class ViewPlayFragment_Pages extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        viewPlayLayout = inflater.inflate(R.layout.fragment_view_play2, container, false);
+        viewPlayLayout = inflater.inflate(R.layout.fragment_view_play, container, false);
         viewPlayLayout.setBackgroundColor(getResources().getColor(R.color.cardview_initial_background));
         progressContainer = (LinearLayout) viewPlayLayout.findViewById(R.id.progressContainer);
         LinearLayout linLayout = (LinearLayout) viewPlayLayout.findViewById(R.id.linearLayout);
@@ -261,7 +253,6 @@ public class ViewPlayFragment_Pages extends Fragment {
 
     @Override
     public void onDestroy() {
-        // TODO Auto-generated method stub
         super.onDestroy();
         //((MainActivity)mActivity).unbindDrawables(viewPlayLayout);
     }
@@ -291,11 +282,5 @@ public class ViewPlayFragment_Pages extends Fragment {
         return view;
         //}
         //return null;
-    }
-
-    public static boolean isViewInBounds(@NonNull View container, @NonNull View view) {
-        Rect containerBounds = new Rect();
-        container.getHitRect(containerBounds);
-        return view.getLocalVisibleRect(containerBounds);
     }
 }

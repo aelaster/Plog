@@ -6,24 +6,19 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.lastsoft.plog.db.Game;
 import com.lastsoft.plog.db.GameGroup;
-import com.lastsoft.plog.db.GamesPerPlay;
 import com.lastsoft.plog.db.Player;
-import com.lastsoft.plog.db.PlayersPerPlay;
 import com.lastsoft.plog.db.TenByTen;
 import com.lastsoft.plog.db.TenByTen_Stats;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class StatsFragment_TenByTen extends Fragment {
@@ -34,7 +29,6 @@ public class StatsFragment_TenByTen extends Fragment {
     long gameGroup;
 
 
-    // TODO: Rename and change types and number of parameters
     public static StatsFragment_TenByTen newInstance(long gameGroup) {
         StatsFragment_TenByTen fragment = new StatsFragment_TenByTen();
         Bundle args = new Bundle();
@@ -184,7 +178,9 @@ public class StatsFragment_TenByTen extends Fragment {
             for(int x = 0; x < result.length; x++) {
                 //addStat(gamesToCheck.get(x).game.gameName + " Plays:", result[x]+"");
                 addStat(gamesToCheck.get(x).game.gameName + ":", result[x]+"");
-                totalPlayed = totalPlayed + result[x];
+                if (result[x] != null) {
+                    totalPlayed = totalPlayed + result[x];
+                }
             }
             addStat("Percent Completed:", ((int) (totalPlayed * 100.0 / 100 + 0.5)) + "%");
             mydialog.dismiss();

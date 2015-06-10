@@ -9,7 +9,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,18 +19,15 @@ import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.lastsoft.plog.db.GameGroup;
-import com.lastsoft.plog.db.Play;
 import com.lastsoft.plog.db.Player;
 import com.lastsoft.plog.db.PlayersPerGameGroup;
 import com.lastsoft.plog.db.PlaysPerGameGroup;
@@ -67,7 +63,6 @@ public class AddPlayerFragment extends Fragment {
     AddGroupAdapter adapter;
     List<PlayersPerGameGroup> groupers;
 
-    // TODO: Rename and change types and number of parameters
     public static AddPlayerFragment newInstance(int centerX, int centerY, boolean doAccelerate, long playerID) {
         AddPlayerFragment fragment = new AddPlayerFragment();
         Bundle args = new Bundle();
@@ -241,7 +236,6 @@ public class AddPlayerFragment extends Fragment {
     Menu mMenu;
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        // TODO Add your menu entries here
         super.onCreateOptionsMenu(menu, inflater);
         if(playerID >= 0 ){
             inflater.inflate(R.menu.edit_player, menu);
@@ -324,7 +318,7 @@ public class AddPlayerFragment extends Fragment {
                         if (buhleetMe != null) {
                             for (AddGroup gone : buhleetMe) {
                                 GameGroup deleteMe = GameGroup.findById(GameGroup.class, gone.groupID);
-                                deleteGroupMember(deleteMe);
+                                deleteGroupMember(deleteMe.getId());
                             }
                         }
                         if (!removingGroup) {
@@ -341,16 +335,17 @@ public class AddPlayerFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
     boolean removingGroup = false;
-    public void deleteGroupMember(GameGroup group){
-        PlayersPerGameGroup deleteMe = PlayersPerGameGroup.getPlayer(Player.findById(Player.class, playerID), group);
+    public void deleteGroupMember(long groupID){
+        GameGroup theGroup = GameGroup.findById(GameGroup.class, groupID);
+        PlayersPerGameGroup deleteMe = PlayersPerGameGroup.getPlayer(Player.findById(Player.class, playerID), theGroup);
         deleteMe.delete();
 
-        List<PlayersPerGameGroup> players =  PlayersPerGameGroup.getPlayers(group);
+        List<PlayersPerGameGroup> players =  PlayersPerGameGroup.getPlayers(theGroup);
         if (players.size() <= 1){
             //this group only has one person now, or none, so it needs to be buhleeted
             //delete the players
             removingGroup = true;
-            RemoveGroupTask removeGroup = new RemoveGroupTask(mActivity, group);
+            RemoveGroupTask removeGroup = new RemoveGroupTask(mActivity, theGroup);
             try {
                 removeGroup.execute();
             } catch (Exception ignored) {
@@ -409,7 +404,6 @@ public class AddPlayerFragment extends Fragment {
         }
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(String string) {
         if (mListener != null) {
             mListener.onFragmentInteraction(string);
@@ -458,7 +452,6 @@ public class AddPlayerFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onFragmentInteraction(String string);
     }
 
