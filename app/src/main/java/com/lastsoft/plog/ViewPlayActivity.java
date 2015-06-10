@@ -317,6 +317,7 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
         mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         mPager.setAdapter(mPagerAdapter);
         mPager.setCurrentItem(mCurrentPosition);
+        toggleMenuShare();
         mPager.setOffscreenPageLimit(3);
         mPager.setPageTransformer(true, new DepthPageTransformer());
         mPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
@@ -324,6 +325,7 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
             public void onPageSelected(int position) {
                 invalidateOptionsMenu();
                 mCurrentPosition = position;
+                toggleMenuShare();
             }
 
             @Override
@@ -338,6 +340,16 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
 
         getWindow().getSharedElementEnterTransition().setDuration(getResources().getInteger(R.integer.transition_duration_millis));
         setEnterSharedElementCallback(mCallback);
+    }
+
+    private void toggleMenuShare(){
+        long menuPlayId = mPlayAdapter.plays.get(mCurrentPosition).getId();
+        String photo = Play.findById(Play.class, menuPlayId).playPhoto;
+        if (photo == null || photo.equals("")){
+            toolbar.getMenu().getItem(0).setVisible(false);
+        }else{
+            toolbar.getMenu().getItem(0).setVisible(true);
+        }
     }
 
     @Override
