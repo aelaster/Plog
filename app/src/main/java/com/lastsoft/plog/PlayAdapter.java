@@ -56,6 +56,7 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
     private Fragment myFragment;
     private boolean fromDrawer;
     int mPosition;
+    int playListType;
 
     // BEGIN_INCLUDE(recyclerViewSampleViewHolder)
     /**
@@ -101,12 +102,29 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
     }
     // END_INCLUDE(recyclerViewSampleViewHolder)
 
-    public PlayAdapter(Activity mActivity, Fragment mFragment, String mSearchQuery, boolean fromDrawer) {
+    public PlayAdapter(Activity mActivity, Fragment mFragment, String mSearchQuery, boolean mFromDrawer, int mPlayListType) {
         myActivity = mActivity;
         myFragment = mFragment;
-        fromDrawer = fromDrawer;
+        playListType = mPlayListType;
+        //fromDrawer = mFromDrawer;
         //plays = Play.listPlaysNewOld();
-        plays = Play.listPlaysNewOld(mSearchQuery, fromDrawer);
+
+        /*
+        playListType:
+        0 - listPlaysNewOld
+        1 - list total plays for groupID, which is passed in via mSearchQuery
+         */
+        switch (playListType) {
+            case 0:
+                plays = Play.listPlaysNewOld(mSearchQuery, fromDrawer);
+                break;
+            case 1:
+                plays = Play.listPlaysNewOld_GameGroup(mSearchQuery);
+                break;
+            default:
+                plays = Play.listPlaysNewOld(mSearchQuery, fromDrawer);
+        }
+
         options = new DisplayImageOptions.Builder()
                 .cacheOnDisk(true)
                 .cacheInMemory(true)
@@ -150,7 +168,7 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
             viewHolder.getClickLayout().setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ((MainActivity) myActivity).onPlayClicked(plays.get(position), myFragment, viewHolder.getImageView(), viewHolder.getGameNameView(), viewHolder.getPlayDateView(), position, fromDrawer);
+                    ((MainActivity) myActivity).onPlayClicked(plays.get(position), myFragment, viewHolder.getImageView(), viewHolder.getGameNameView(), viewHolder.getPlayDateView(), position, fromDrawer, playListType);
                 }
             });
             viewHolder.getOverflowView().setOnClickListener(new View.OnClickListener() {
@@ -160,7 +178,8 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
                 }
             });
             if(plays.get(position).playPhoto != null && plays.get(position).playPhoto.equals("")) {
-                if (GamesPerPlay.getBaseGame(plays.get(position)).gameThumb != null) {
+                String gameThumb = GamesPerPlay.getBaseGame(plays.get(position)).gameThumb;
+                if (gameThumb != null && !gameThumb.equals("")) {
                     ImageLoader.getInstance().displayImage("http:" + GamesPerPlay.getBaseGame(plays.get(position)).gameThumb, viewHolder.getImageView(), options);
                     ImageLoader.getInstance().loadImage("http:" + GamesPerPlay.getBaseGame(plays.get(position)).gameThumb, options, null);
                 }else{

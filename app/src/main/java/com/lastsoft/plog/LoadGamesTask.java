@@ -19,6 +19,7 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
@@ -31,6 +32,41 @@ public class LoadGamesTask extends AsyncTask<String, Void, String> {
     Context theContext;
     public LoadGamesTask(Context context){
         this.theContext = context;
+    }
+
+    private String getGamesCollection(String bggUsername){
+        try {
+            URL url = null;
+            URLConnection ucon = null;
+            url = new URL("https://www.boardgamegeek.com/xmlapi2/collection?username=" + bggUsername);
+            ucon = url.openConnection();
+            ucon.setConnectTimeout(3000);
+            ucon.setReadTimeout(30000);
+                     /* Define InputStreams to read
+                        * from the URLConnection. */
+            InputStream is = ucon.getInputStream();
+            BufferedInputStream bis = new BufferedInputStream(is, 1024);
+
+                       /* Read bytes to the Buffer until
+                        * there is nothing more to read(-1). */
+            ByteArrayBuffer baf = new ByteArrayBuffer(1024);
+            int current = 0;
+            while ((current = bis.read()) != -1) {
+                baf.append((byte) current);
+            }
+
+            String myString = new String(baf.toByteArray());
+            bis.close();
+            is.close();
+
+            return myString;
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+            return null;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     // automatically done on worker thread (separate from UI thread)
@@ -58,27 +94,11 @@ public class LoadGamesTask extends AsyncTask<String, Void, String> {
                 Player defaultPlayer = Player.findById(Player.class, currentDefaultPlayer);
                 if (defaultPlayer != null) {
                     //Log.d("V1", "https://www.boardgamegeek.com/xmlapi2/collection?username=" + defaultPlayer.bggUsername);
-                    url = new URL("https://www.boardgamegeek.com/xmlapi2/collection?username=" + defaultPlayer.bggUsername);
-                    URLConnection ucon = url.openConnection();
-                    ucon.setConnectTimeout(3000);
-                    ucon.setReadTimeout(30000);
-                     /* Define InputStreams to read
-                        * from the URLConnection. */
-                    InputStream is = ucon.getInputStream();
-                    BufferedInputStream bis = new BufferedInputStream(is, 1024);
-
-                       /* Read bytes to the Buffer until
-                        * there is nothing more to read(-1). */
-                    ByteArrayBuffer baf = new ByteArrayBuffer(1024);
-                    int current = 0;
-                    while ((current = bis.read()) != -1) {
-                        baf.append((byte) current);
+                    myString = getGamesCollection(defaultPlayer.bggUsername);
+                    if (myString != null && myString.contains("will be processed")){
+                        //do it again
+                        myString = getGamesCollection(defaultPlayer.bggUsername);
                     }
-
-                    myString = new String(baf.toByteArray());
-
-                    bis.close();
-                    is.close();
 
                     XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
                     factory.setNamespaceAware(true);
@@ -114,18 +134,18 @@ public class LoadGamesTask extends AsyncTask<String, Void, String> {
 
                     // then we go through and flag every expansion in my collection
                     url = new URL("https://www.boardgamegeek.com/xmlapi2/collection?username=" + defaultPlayer.bggUsername + "&subtype=boardgameexpansion");
-                    ucon = url.openConnection();
+                    URLConnection ucon = url.openConnection();
                     ucon.setConnectTimeout(3000);
                     ucon.setReadTimeout(30000);
                      /* Define InputStreams to read
                         * from the URLConnection. */
-                    is = ucon.getInputStream();
-                    bis = new BufferedInputStream(is, 1024);
+                    InputStream is = ucon.getInputStream();
+                    BufferedInputStream bis = new BufferedInputStream(is, 1024);
 
                        /* Read bytes to the Buffer until
                         * there is nothing more to read(-1). */
-                    baf = new ByteArrayBuffer(1024);
-                    current = 0;
+                    ByteArrayBuffer baf = new ByteArrayBuffer(1024);
+                    int current = 0;
                     while ((current = bis.read()) != -1) {
                         baf.append((byte) current);
                     }

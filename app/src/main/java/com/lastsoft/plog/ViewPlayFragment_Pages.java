@@ -159,7 +159,8 @@ public class ViewPlayFragment_Pages extends Fragment {
                 }
             });
         }else{
-            if (GamesPerPlay.getBaseGame(thisPlay).gameThumb != null) {
+            String gameThumb = GamesPerPlay.getBaseGame(thisPlay).gameThumb;
+            if (gameThumb != null && !gameThumb.equals("")) {
                 ImageLoader.getInstance().displayImage("http:" + GamesPerPlay.getBaseGame(thisPlay).gameThumb, playImage, options);
             }else{
                 playImage.setImageDrawable(null);

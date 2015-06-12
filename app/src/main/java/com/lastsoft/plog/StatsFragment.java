@@ -81,7 +81,7 @@ public class StatsFragment extends Fragment {
                 @Override
                 public boolean onNavigationItemSelected(int position, long itemId) {
                     if (position > 0) {
-                        GameGroup checker = gameGroups.get(position-1);
+                        GameGroup checker = gameGroups.get(position - 1);
                         groupToPoll = checker.getId();
                         mPagerAdapter = new ScreenSlidePagerAdapter(getChildFragmentManager(), groupToPoll);
                         mPager.setAdapter(mPagerAdapter);

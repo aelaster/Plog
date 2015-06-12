@@ -185,7 +185,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
                     case R.id.view_plays:
                         //delete the play
                         //refresh play list
-                        ((MainActivity) myActivity).openPlays(games.get(position).gameName, false);
+                        ((MainActivity) myActivity).openPlays(games.get(position).gameName, false, 0);
                         return true;
                     case R.id.update_bgg:
                         //delete the play

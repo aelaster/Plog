@@ -160,6 +160,8 @@ public class MainActivity extends AppCompatActivity
         BackupManager bm = new BackupManager(this);
         bm.dataChanged();
 
+        List<PlayersPerPlay> winses = PlayersPerPlay.totalAsteriskWins_GameGroup_Player(GameGroup.findById(GameGroup.class, (long)1), Player.findById(Player.class, (long)1));
+        Log.d("V1", "asterisk winses count = " + winses.size());
         if (!doesDatabaseExist(this, "SRX.db")) {
             setContentView(R.layout.activity_main0);
             mTitle = "Welcome!";
@@ -211,9 +213,9 @@ public class MainActivity extends AppCompatActivity
     }
 
     private String mSearchQuery;
-    public PlayAdapter initPlayAdapter(String searchQuery, boolean fromDrawer){
+    public PlayAdapter initPlayAdapter(String searchQuery, boolean fromDrawer, int playListType){
         mSearchQuery = searchQuery;
-        mPlayAdapter = new PlayAdapter(this, mPlaysFragment, searchQuery, fromDrawer);
+        mPlayAdapter = new PlayAdapter(this, mPlaysFragment, searchQuery, fromDrawer, playListType);
         return mPlayAdapter;
     }
 
@@ -238,7 +240,7 @@ public class MainActivity extends AppCompatActivity
                         .replace(R.id.container, mPlaysFragment, "plays")
                         .commitAllowingStateLoss();*/
 
-                openPlays("", true);
+                openPlays("", true, 0);
             } else if (position == 2) {
                 fragmentManager.beginTransaction()
                         .replace(R.id.container, new PlayersFragment(), "players")
@@ -294,21 +296,22 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public void openPlays(String searchQuery, boolean fromDrawer){
+    public void openPlays(String searchQuery, boolean fromDrawer, int playListType){
         if(!fromDrawer){
             mNavigationDrawerFragment.mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
             mNavigationDrawerFragment.mDrawerToggle.setDrawerIndicatorEnabled(false);
         }
         forceBack = !fromDrawer;
         FragmentManager fragmentManager = getSupportFragmentManager();
-        mPlaysFragment = PlaysFragment.newInstance( fromDrawer, searchQuery );
-        mPlayAdapter = initPlayAdapter(searchQuery, fromDrawer);
+        mPlaysFragment = PlaysFragment.newInstance(fromDrawer, searchQuery, playListType);
+        mPlayAdapter = initPlayAdapter(searchQuery, fromDrawer, playListType);
         //initPlayAdapter();
         FragmentTransaction ft = fragmentManager.beginTransaction();
         if (!fromDrawer){
             ft.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right);
             ft.addToBackStack("plays");
         }
+        //ft.add(R.id.container, mPlaysFragment, "plays");
         ft.replace(R.id.container, mPlaysFragment, "plays");
         ft.commitAllowingStateLoss();
     }
@@ -521,7 +524,7 @@ public class MainActivity extends AppCompatActivity
         fragmentManager.executePendingTransactions(); //Prevents the flashing.
     }
     int firstVisible, lastVisible;
-    public void onPlayClicked(Play clickedPlay, Fragment mFragment, final View view, final View nameView, final View dateView, int position, boolean fromDrawer){
+    public void onPlayClicked(Play clickedPlay, Fragment mFragment, final View view, final View nameView, final View dateView, int position, boolean fromDrawer, int playListType){
 
         mIsReentering = false;
 
@@ -539,6 +542,7 @@ public class MainActivity extends AppCompatActivity
         intent.putExtra("dateTransID", dateView.getTransitionName());
         intent.putExtra("adapterPosition", position);
         intent.putExtra("fromDrawer", fromDrawer);
+        intent.putExtra("playListType", playListType);
 
         ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(this,
                 Pair.create(view, view.getTransitionName()));

@@ -57,14 +57,16 @@ public class PlaysFragment extends Fragment{
     private SwipeRefreshLayout pullToRefreshView;
     private ImageView mCancel;
     private EditText mSearch;
-    String mSearchQuery = "";
+    private String mSearchQuery = "";
+    private int playListType = 0;
     private boolean fromDrawer;
 
-    public static PlaysFragment newInstance(boolean fromDrawer, String searchQuery) {
+    public static PlaysFragment newInstance(boolean fromDrawer, String searchQuery, int playListType) {
         PlaysFragment fragment = new PlaysFragment();
         Bundle args = new Bundle();
         args.putBoolean("fromDrawer", fromDrawer);
         args.putString("searchQuery", searchQuery);
+        args.putInt("playListType", playListType);
         fragment.setArguments(args);
         return fragment;
     }
@@ -75,6 +77,7 @@ public class PlaysFragment extends Fragment{
         if (getArguments() != null) {
             fromDrawer = getArguments().getBoolean("fromDrawer");
             mSearchQuery = getArguments().getString("searchQuery");
+            playListType = getArguments().getInt("playListType");
         }
         ActionBar actionBar = ((MainActivity) mActivity).getSupportActionBar();
         if (fromDrawer) {
@@ -142,7 +145,7 @@ public class PlaysFragment extends Fragment{
                     //initDataset();
                     //mAdapter = new GameAdapter(PlaysFragment.this, mActivity,mSearchQuery);
 
-                    mAdapter = ((MainActivity) mActivity).initPlayAdapter(mSearchQuery, fromDrawer);
+                    mAdapter = ((MainActivity) mActivity).initPlayAdapter(mSearchQuery, fromDrawer, playListType);
                     // Set CustomAdapter as the adapter for RecyclerView.
                     mRecyclerView.setAdapter(mAdapter);
                 }
@@ -161,7 +164,7 @@ public class PlaysFragment extends Fragment{
                 public void onClick(View view) {
                     if (!mSearch.getText().toString().equals("")) {
                         mSearchQuery = "";
-                        ((MainActivity) mActivity).initPlayAdapter(mSearchQuery, fromDrawer);
+                        ((MainActivity) mActivity).initPlayAdapter(mSearchQuery, fromDrawer, playListType);
                         mSearch.setText(mSearchQuery);
                         //mActivity.onBackPressed();
                     }
@@ -271,7 +274,7 @@ public class PlaysFragment extends Fragment{
                 .findFirstCompletelyVisibleItemPosition();
         //int current = ((PlayAdapter)mRecyclerView.getAdapter()).mPosition;
 
-        mAdapter = ((MainActivity)mActivity).initPlayAdapter(mSearchQuery, fromDrawer);
+        mAdapter = ((MainActivity)mActivity).initPlayAdapter(mSearchQuery, fromDrawer, playListType);
 
         // Set CustomAdapter as the adapter for RecyclerView.
         mRecyclerView.setAdapter(mAdapter);

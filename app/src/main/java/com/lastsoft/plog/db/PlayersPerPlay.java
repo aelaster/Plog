@@ -1,7 +1,5 @@
 package com.lastsoft.plog.db;
 
-import android.util.Log;
-
 import com.orm.StringUtil;
 import com.orm.SugarRecord;
 import com.orm.query.Condition;
@@ -41,16 +39,6 @@ public class PlayersPerPlay extends SugarRecord<PlayersPerPlay> {
     }
 
     public static List<PlayersPerPlay> totalPlays_GameGroup(GameGroup group) {
-        /*Log.d("V1", " SELECT "+ StringUtil.toSQLName("PlayersPerPlay") +".* " +
-                " FROM " + StringUtil.toSQLName("PlayersPerPlay") +
-                " INNER JOIN " + StringUtil.toSQLName("PlaysPerGameGroup") +
-                " ON " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("play") + " = " + StringUtil.toSQLName("PlaysPerGameGroup") + "." + StringUtil.toSQLName("play") +
-                " AND " + StringUtil.toSQLName("GameGroup") + " = ?" +
-                " AND "+ StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("player") + " IN " +
-                " (SELECT " + StringUtil.toSQLName("Player") +
-                " FROM " + StringUtil.toSQLName("PlayersPerGameGroup") +
-                " WHERE " + StringUtil.toSQLName("GameGroup") + " = ?)" +
-                " ORDER BY PLAY, PLAYER");*/
         return PlayersPerPlay.findWithQuery(PlayersPerPlay.class,
                 " SELECT "+ StringUtil.toSQLName("PlayersPerPlay") +".* " +
                         " FROM " + StringUtil.toSQLName("PlayersPerPlay") +
@@ -62,6 +50,115 @@ public class PlayersPerPlay extends SugarRecord<PlayersPerPlay> {
                         " FROM " + StringUtil.toSQLName("PlayersPerGameGroup") +
                         " WHERE " + StringUtil.toSQLName("GameGroup") + " = ?)" +
                         " ORDER BY PLAY, PLAYER", group.getId().toString(), group.getId().toString());
+    }
+
+    public static List<PlayersPerPlay> totalWins_GameGroup_Player(GameGroup group, Player player) {
+        return PlayersPerPlay.findWithQuery(PlayersPerPlay.class,
+                " SELECT "+ StringUtil.toSQLName("PlayersPerPlay") +".* " +
+                        " FROM " + StringUtil.toSQLName("PlayersPerPlay") +
+                        " INNER JOIN " + StringUtil.toSQLName("PlaysPerGameGroup") +
+                        " ON " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("play") + " = " + StringUtil.toSQLName("PlaysPerGameGroup") + "." + StringUtil.toSQLName("play") +
+                        " AND " + StringUtil.toSQLName("GameGroup") + " = ?" +
+                        " AND "+ StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("player") + " = ? " +
+                        " AND "+ StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("score") + " >= " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("playHighScore") +
+                        " ORDER BY PLAY, PLAYER", group.getId().toString(), player.getId().toString());
+    }
+
+    public static List<PlayersPerPlay> totalAsteriskWins_GameGroup_Player(GameGroup group, Player player) {
+        return PlayersPerPlay.findWithQuery(PlayersPerPlay.class,
+                " SELECT P.* " +
+                        " FROM " + StringUtil.toSQLName("PlayersPerPlay") + " P " +
+                        " WHERE P." + StringUtil.toSQLName("player") + " = ? " +
+                        " AND P." + StringUtil.toSQLName("score") + " < P." + StringUtil.toSQLName("playHighScore") +
+                        " AND P." + StringUtil.toSQLName("score") + " > 0 " +
+                        " AND P." + StringUtil.toSQLName("score") + " = " +
+                        " (SELECT MAX(A." + StringUtil.toSQLName("score") + ") " +
+                        " FROM " + StringUtil.toSQLName("PlayersPerPlay") + " A " +
+                        " INNER JOIN " + StringUtil.toSQLName("PlaysPerGameGroup") + " B " +
+                        " ON A." + StringUtil.toSQLName("play") + " = B." + StringUtil.toSQLName("play") +
+                        " WHERE B." + StringUtil.toSQLName("GameGroup") + " = ?" +
+                        " AND A." + StringUtil.toSQLName("play") + " = P." + StringUtil.toSQLName("play") +
+                        " AND A." + StringUtil.toSQLName("player") + " in " +
+                        " (SELECT " + StringUtil.toSQLName("player") +
+                        "  FROM " + StringUtil.toSQLName("PlayersPerGameGroup") +
+                        "  WHERE " + StringUtil.toSQLName("GameGroup") + " = ?)" +
+                        " )" +
+                        " GROUP BY P." + StringUtil.toSQLName("play") +
+                        " HAVING " +
+                        " (SELECT COUNT(Q." + StringUtil.toSQLName("score") + ") " +
+                        "  FROM " + StringUtil.toSQLName("PlayersPerPlay") + " Q " +
+                        " INNER JOIN " + StringUtil.toSQLName("PlaysPerGameGroup") + " R " +
+                        " ON Q." + StringUtil.toSQLName("play") + " = R." + StringUtil.toSQLName("play") +
+                        " WHERE R." + StringUtil.toSQLName("GameGroup") + " = ?" +
+                        " AND Q." + StringUtil.toSQLName("play") + " = P." + StringUtil.toSQLName("play") +
+                        " AND Q." + StringUtil.toSQLName("score") + " = P." + StringUtil.toSQLName("score") +
+                        ") = 1", player.getId().toString(), group.getId().toString(), group.getId().toString(), group.getId().toString());
+    }
+
+    public static List<PlayersPerPlay> totalGroupLosses(GameGroup group) {
+        return PlayersPerPlay.findWithQuery(PlayersPerPlay.class,
+                " SELECT P.* " +
+                        " FROM " + StringUtil.toSQLName("PlayersPerPlay") + " P " +
+                        " WHERE P." + StringUtil.toSQLName("score") + " < P." + StringUtil.toSQLName("playHighScore") +
+                        " AND P." + StringUtil.toSQLName("score") + " = " +
+                        " (SELECT MIN(A." + StringUtil.toSQLName("score") + ") " +
+                        " FROM " + StringUtil.toSQLName("PlayersPerPlay") + " A " +
+                        " WHERE A." + StringUtil.toSQLName("play") + " = P." + StringUtil.toSQLName("play") + " ) " +
+                        " AND P." + StringUtil.toSQLName("player") + " in " +
+                        " (SELECT " + StringUtil.toSQLName("player") +
+                        "  FROM " + StringUtil.toSQLName("PlayersPerGameGroup") +
+                        "  WHERE " + StringUtil.toSQLName("GameGroup") + " = ?)" +
+                        " GROUP BY P." + StringUtil.toSQLName("play") +
+                        " HAVING " +
+                        " (SELECT COUNT(*) " +
+                        " FROM " +
+                            " (SELECT COUNT(Q." + StringUtil.toSQLName("score") + ") " +
+                            "  FROM " + StringUtil.toSQLName("PlayersPerPlay") + " Q " +
+                            " INNER JOIN " + StringUtil.toSQLName("PlaysPerGameGroup") + " R " +
+                            " ON Q." + StringUtil.toSQLName("play") + " = R." + StringUtil.toSQLName("play") +
+                            " INNER JOIN " + StringUtil.toSQLName("PlayersPerGameGroup") + " S " +
+                            " ON Q." + StringUtil.toSQLName("player") + " = S." + StringUtil.toSQLName("player") +
+                            " WHERE S." + StringUtil.toSQLName("GameGroup") + " = ?" +
+                            " AND Q." + StringUtil.toSQLName("play") + " = P." + StringUtil.toSQLName("play") +
+                            " AND Q." + StringUtil.toSQLName("score") + " = P." + StringUtil.toSQLName("score") +
+                            " GROUP BY Q." + StringUtil.toSQLName("player") + ") AS Z " +
+                        ") = " +
+                        " (SELECT COUNT(" + StringUtil.toSQLName("player") + ")" +
+                        "  FROM " + StringUtil.toSQLName("PlayersPerGameGroup") +
+                        "  WHERE " + StringUtil.toSQLName("GameGroup") + " = ?)", group.getId().toString(), group.getId().toString(), group.getId().toString());
+    }
+
+    public static List<PlayersPerPlay> totalSharedWins(GameGroup group) {
+        return PlayersPerPlay.findWithQuery(PlayersPerPlay.class,
+                " SELECT P.* " +
+                        " FROM " + StringUtil.toSQLName("PlayersPerPlay") + " P " +
+                        " WHERE P." + StringUtil.toSQLName("score") + " != 0" +
+                        " AND P." + StringUtil.toSQLName("score") + " = " +
+                        " (SELECT MAX(A." + StringUtil.toSQLName("score") + ") " +
+                        " FROM " + StringUtil.toSQLName("PlayersPerPlay") + " A " +
+                        " WHERE A." + StringUtil.toSQLName("play") + " = P." + StringUtil.toSQLName("play") + " ) " +
+                        " AND P." + StringUtil.toSQLName("player") + " in " +
+                        " (SELECT " + StringUtil.toSQLName("player") +
+                        "  FROM " + StringUtil.toSQLName("PlayersPerGameGroup") +
+                        "  WHERE " + StringUtil.toSQLName("GameGroup") + " = ?)" +
+                        " GROUP BY P." + StringUtil.toSQLName("play") +
+                        " HAVING " +
+                        " (SELECT COUNT(*) " +
+                        " FROM " +
+                        " (SELECT COUNT(Q." + StringUtil.toSQLName("score") + ") " +
+                        "  FROM " + StringUtil.toSQLName("PlayersPerPlay") + " Q " +
+                        " INNER JOIN " + StringUtil.toSQLName("PlaysPerGameGroup") + " R " +
+                        " ON Q." + StringUtil.toSQLName("play") + " = R." + StringUtil.toSQLName("play") +
+                        " INNER JOIN " + StringUtil.toSQLName("PlayersPerGameGroup") + " S " +
+                        " ON Q." + StringUtil.toSQLName("player") + " = S." + StringUtil.toSQLName("player") +
+                        " WHERE S." + StringUtil.toSQLName("GameGroup") + " = ?" +
+                        " AND Q." + StringUtil.toSQLName("play") + " = P." + StringUtil.toSQLName("play") +
+                        " AND Q." + StringUtil.toSQLName("score") + " = P." + StringUtil.toSQLName("score") +
+                        " GROUP BY Q." + StringUtil.toSQLName("player") + ") AS Z " +
+                        ") = " +
+                        " (SELECT COUNT(" + StringUtil.toSQLName("player") + ")" +
+                        "  FROM " + StringUtil.toSQLName("PlayersPerGameGroup") +
+                        "  WHERE " + StringUtil.toSQLName("GameGroup") + " = ?)", group.getId().toString(), group.getId().toString(), group.getId().toString());
     }
 
     public static List<PlayersPerPlay> getPlayers(Play play){

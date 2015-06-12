@@ -1,0 +1,1 @@
+alter table GAME add GAME_BOX_IMAGE TEXT;

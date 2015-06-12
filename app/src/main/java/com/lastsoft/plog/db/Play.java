@@ -1,10 +1,7 @@
 package com.lastsoft.plog.db;
 
-import android.util.Log;
-
 import com.orm.StringUtil;
 import com.orm.SugarRecord;
-import com.orm.query.Condition;
 import com.orm.query.Select;
 
 import java.util.Date;
@@ -69,5 +66,22 @@ public class Play extends SugarRecord<Play> {
            query = query + " order by " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("playDate") + " DESC, "  + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " DESC";
            return Play.findWithQuery(Play.class,query);
         }
+    }
+
+    public static List<Play> listPlaysNewOld_GameGroup(String gameGroup){
+        String query;
+        query = " SELECT "+ StringUtil.toSQLName("Play") +".* " +
+                " FROM " + StringUtil.toSQLName("Play") +
+                " INNER JOIN " + StringUtil.toSQLName("GamesPerPlay") +
+                " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("play") + " = " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") +
+                " INNER JOIN " + StringUtil.toSQLName("Game") +
+                " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("game") + " = " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("id") +
+                " and " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("expansionFlag") + " = 0 " +
+                " INNER JOIN " + StringUtil.toSQLName("PlaysPerGameGroup") +
+                " ON " + StringUtil.toSQLName("PlaysPerGameGroup") + "." + StringUtil.toSQLName("play") + " = " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") +
+                " and " + StringUtil.toSQLName("PlaysPerGameGroup") + "." + StringUtil.toSQLName("gameGroup") + " = ?";
+        query = query + " order by " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("playDate") + " DESC, "  + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " DESC";
+        return Play.findWithQuery(Play.class,query, gameGroup);
+
     }
 }

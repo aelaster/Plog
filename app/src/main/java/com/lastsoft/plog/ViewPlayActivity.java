@@ -59,6 +59,7 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
     String dateTransID;
     PlayAdapter mPlayAdapter;
     String searchQuery = "";
+    private int playListType = 0;
     private boolean fromDrawer;
 
     CallbackManager callbackManager;
@@ -231,11 +232,13 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
             dateTransID =  getIntent().getExtras().getString("dateTransID");
             mCurrentPosition =  getIntent().getExtras().getInt("adapterPosition");
             fromDrawer =  getIntent().getExtras().getBoolean("fromDrawer");
+            playListType =  getIntent().getExtras().getInt("playListType");
             mOriginalPosition = mCurrentPosition;
         } else {
             mCurrentPosition = savedInstanceState.getInt(STATE_CURRENT_POSITION);
             mOriginalPosition = savedInstanceState.getInt(STATE_OLD_POSITION);
             searchQuery = savedInstanceState.getString("searchQuery");
+            playListType = savedInstanceState.getInt("playListType");
         }
 
         setContentView(R.layout.fragment_view_play_swipe);
@@ -310,7 +313,7 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
 
 
         //setBackgroundColor(getResources().getColor(R.color.cardview_initial_background));
-        mPlayAdapter = new PlayAdapter(this, null, searchQuery, fromDrawer);
+        mPlayAdapter = new PlayAdapter(this, null, searchQuery, fromDrawer, playListType);
         // Instantiate a ViewPager and a PagerAdapter.
         mPager = (CustomViewPager) findViewById(R.id.pager);
        //mPager.setBackgroundColor(getResources().getColor(R.color.cardview_initial_background));
@@ -373,6 +376,7 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
         outState.putInt(STATE_CURRENT_POSITION, mCurrentPosition);
         outState.putInt(STATE_OLD_POSITION, mOriginalPosition);
         outState.putString("searchQuery", searchQuery);
+        outState.putInt("playListType", playListType);
     }
 
     @Override
@@ -383,6 +387,7 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
         data.putExtra(EXTRA_OLD_ITEM_POSITION, getIntent().getExtras().getInt("adapterPosition"));
         data.putExtra(EXTRA_CURRENT_ITEM_POSITION, mCurrentPosition);
         data.putExtra("mSearchQuery", searchQuery);
+        data.putExtra("playListType", playListType);
         setResult(RESULT_OK, data);
         super.finishAfterTransition();
     }
@@ -508,7 +513,7 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
                             //delete play
                             deleteMe.delete();
 
-                            mPlayAdapter = new PlayAdapter(getActivity(), null, searchQuery, fromDrawer);
+                            mPlayAdapter = new PlayAdapter(getActivity(), null, searchQuery, fromDrawer, playListType);
                             mPagerAdapter.notifyDataSetChanged();
 
                             dismiss();
