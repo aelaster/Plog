@@ -3,6 +3,7 @@ package com.lastsoft.plog;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -11,12 +12,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.github.mikephil.charting.animation.Easing;
+import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.utils.ColorTemplate;
+import com.github.mikephil.charting.utils.ValueFormatter;
 import com.lastsoft.plog.db.Game;
 import com.lastsoft.plog.db.GameGroup;
 import com.lastsoft.plog.db.Play;
 import com.lastsoft.plog.db.Player;
 import com.lastsoft.plog.db.PlayersPerPlay;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -161,6 +171,7 @@ public class StatsFragment_Wins extends Fragment {
                 addStat(2, groupPlayers.get(x).playerName + " Regular Wins:", result_out+"", groupPlayers.get(x).getId()+"");
                 addStat(3, groupPlayers.get(x).playerName + " Asterisk Wins:", (result_out2-result_out)+"", groupPlayers.get(x).getId()+"");
                 addStat(4, groupPlayers.get(x).playerName + " Total Wins:", result_out2+"", groupPlayers.get(x).getId()+"");
+                addPieChart(groupPlayers.get(x).playerName, result_out, (result_out2-result_out));
             }
             //addStat(4, "Shared Wins: ", sharedCounter + "");totalSharedWins
             sharedCounter = Play.totalSharedWins(GameGroup.findById(GameGroup.class, theGroup)).size();
@@ -189,6 +200,100 @@ public class StatsFragment_Wins extends Fragment {
             addStat(-1, "Total Losses Percentage: ", ((int) (loserCounter * 100.0 / totalPlays + 0.5)) + "%", "");
             mydialog.dismiss();
             }
+    }
+
+    private void addPieChart(String centerLabel, long regular, long asterisk){
+        try {
+            final ViewGroup newView = (ViewGroup) LayoutInflater.from(mActivity).inflate(
+                    R.layout.stats_viewpie_item, mContainerView_Players, false);
+            PieChart mChart = (PieChart) newView.findViewById(R.id.mmmPie);
+
+            mChart.setUsePercentValues(false);
+            mChart.setDescription("");
+
+            mChart.setDragDecelerationFrictionCoef(0.95f);
+
+            //tf = Typeface.createFromAsset(getAssets(), "OpenSans-Regular.ttf");
+
+            //mChart.setCenterTextTypeface(Typeface.createFromAsset(getAssets(), "OpenSans-Light.ttf"));
+            mChart.setDrawSliceText(false);
+            mChart.setDrawHoleEnabled(true);
+            mChart.setHoleColorTransparent(true);
+
+            mChart.setTransparentCircleColor(Color.WHITE);
+
+            mChart.setHoleRadius(58f);
+            mChart.setTransparentCircleRadius(61f);
+
+            mChart.setDrawCenterText(true);
+
+            mChart.setRotationAngle(0);
+            // enable rotation of the chart by touch
+            mChart.setRotationEnabled(true);
+
+            // add a selection listener
+            //mChart.setOnChartValueSelectedListener(this);
+
+            mChart.setCenterText(centerLabel);
+
+            ArrayList<Entry> percent = new ArrayList<Entry>();
+            percent.add(0, new Entry((long) regular, 0));
+            percent.add(1, new Entry((long) asterisk, 1));
+            ArrayList<String> types = new ArrayList<String>();
+            types.add(0, "Regular Wins");
+            types.add(1, "Asterisk Wins");
+
+            setData(mChart, percent, types);
+
+            Legend l = mChart.getLegend();
+            l.setPosition(Legend.LegendPosition.RIGHT_OF_CHART);
+
+            mChart.animateY(1500, Easing.EasingOption.EaseInOutQuad);
+
+            mContainerView_Players.addView(newView);
+        }catch (Exception ignored){}
+
+    }
+    private void setData(PieChart mChart, ArrayList<Entry> percent, ArrayList<String> types) {
+
+
+
+        PieDataSet dataSet = new PieDataSet(percent, "");
+        dataSet.setSliceSpace(3f);
+        dataSet.setSelectionShift(5f);
+
+        // add a lot of colors
+
+        ArrayList<Integer> colors = new ArrayList<Integer>();
+        for (int c : ColorTemplate.COLORFUL_COLORS)
+            colors.add(c);
+        colors.add(ColorTemplate.getHoloBlue());
+        dataSet.setColors(colors);
+
+        PieData data = new PieData(types, dataSet);
+        data.setValueFormatter(new MyValueFormatter());
+        data.setValueTextSize(11f);
+        data.setValueTextColor(Color.WHITE);
+        mChart.setData(data);
+
+        // undo all highlights
+        mChart.highlightValues(null);
+
+        mChart.invalidate();
+    }
+
+    public class MyValueFormatter implements ValueFormatter {
+
+        private DecimalFormat mFormat;
+
+        public MyValueFormatter() {
+            mFormat = new DecimalFormat("###,###,##0"); // use one decimal
+        }
+
+        @Override
+        public String getFormattedValue(float value) {
+            return mFormat.format(value);
+        }
     }
 
     private void addStat(final int statType, String statHeader, String statValue, final String playerValue) {
