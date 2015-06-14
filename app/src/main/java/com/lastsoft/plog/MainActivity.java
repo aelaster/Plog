@@ -160,8 +160,8 @@ public class MainActivity extends AppCompatActivity
         BackupManager bm = new BackupManager(this);
         bm.dataChanged();
 
-        List<PlayersPerPlay> winses = PlayersPerPlay.totalAsteriskWins_GameGroup_Player(GameGroup.findById(GameGroup.class, (long)1), Player.findById(Player.class, (long)1));
-        Log.d("V1", "asterisk winses count = " + winses.size());
+        //List<Play> winses = Play.totalWins_GameGroup_Player(GameGroup.findById(GameGroup.class, (long)1), Player.findById(Player.class, (long)1));
+        //Log.d("V1", "wins count = " + winses.size());
         if (!doesDatabaseExist(this, "SRX.db")) {
             setContentView(R.layout.activity_main0);
             mTitle = "Welcome!";
@@ -233,13 +233,6 @@ public class MainActivity extends AppCompatActivity
                 fragUp = false;
             }
             if (position == 1) {
-                /*mPlaysFragment = new PlaysFragment();
-                mPlayAdapter = initPlayAdapter("");
-                //initPlayAdapter();
-                fragmentManager.beginTransaction()
-                        .replace(R.id.container, mPlaysFragment, "plays")
-                        .commitAllowingStateLoss();*/
-
                 openPlays("", true, 0);
             } else if (position == 2) {
                 fragmentManager.beginTransaction()
@@ -263,33 +256,6 @@ public class MainActivity extends AppCompatActivity
                     .commitAllowingStateLoss();*/
             } else {
                 super.onBackPressed();
-                //android.os.Process.killProcess(android.os.Process.myPid());
-
-                //gonna use this to set up the groups for data collection
-                /*List<GameGroup> gameGroups = GameGroup.listAll(GameGroup.class);
-                for (GameGroup groupie:gameGroups) {
-                    List<Player> groupPlayers =  GameGroup.getGroupPlayers(groupie);
-                    List<Play> plays = Play.listPlaysNewOld("");
-                    for (Play play : plays) {
-                        List<Player> players = Player.getPlayersIDs(play);
-                        boolean included = true;
-
-                        for (Player addedUser : groupPlayers) {
-                            if (!players.contains(addedUser)) {
-                                //the players of this game does not contain one of the added users
-                                included = false;
-                                break;
-                            }
-                        }
-
-                        if (included) {
-                            //add this to PlaysPerGameGroup
-                            PlaysPerGameGroup newGroupPlay = new PlaysPerGameGroup(play, groupie);
-                            newGroupPlay.save();
-                        }
-                    }
-                }
-                Log.d("V1", "FIN");*/
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -311,9 +277,16 @@ public class MainActivity extends AppCompatActivity
             ft.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right);
             ft.addToBackStack("plays");
         }
-        //ft.add(R.id.container, mPlaysFragment, "plays");
-        ft.replace(R.id.container, mPlaysFragment, "plays");
+        StatsFragment statsFrag = (StatsFragment)
+                getSupportFragmentManager().findFragmentByTag("stats");
+        if (statsFrag != null) {
+            ft.hide(statsFrag);
+            ft.add(R.id.container, mPlaysFragment, "plays");
+        }else {
+            ft.replace(R.id.container, mPlaysFragment, "plays");
+        }
         ft.commitAllowingStateLoss();
+        fragmentManager.executePendingTransactions();
     }
 
     public void restoreActionBar() {

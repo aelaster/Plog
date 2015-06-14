@@ -9,7 +9,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -84,10 +83,7 @@ public class FastScroller extends LinearLayout {
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         super.onLayout(changed, l, t, r, b);
         if(changed) {
-            Log.d("V1", "changed");
             setUpCalculator();
-        }else{
-            Log.d("V1", "not changed");
         }
 
     }

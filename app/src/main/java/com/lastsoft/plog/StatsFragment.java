@@ -44,6 +44,16 @@ public class StatsFragment extends Fragment {
     };
 
 
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if (!hidden){
+            if (mActivity != null) {
+                ((MainActivity) mActivity).setUpActionBar(7);
+            }
+        }
+    }
+
     public ViewPager mPager;
 
 

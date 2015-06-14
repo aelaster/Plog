@@ -31,8 +31,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.lastsoft.plog.db.GameGroup;
 import com.lastsoft.plog.db.GamesPerPlay;
 import com.lastsoft.plog.db.Play;
+import com.lastsoft.plog.db.Player;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
@@ -41,6 +43,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -113,13 +117,44 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
         playListType:
         0 - listPlaysNewOld
         1 - list total plays for groupID, which is passed in via mSearchQuery
+        2 - a players total regular wins, passed in the search query.  it is group and then player id, split with a dollar sign
+        3 - a players total asterisk wins, passed in the search query.  it is group and then player id, split with a dollar sign
+        4 - a players total wins, passed in the search query.  it is group and then player id, split with a dollar sign
+        5 - total group shared wins
+        6 - total group losses
          */
+
         switch (playListType) {
             case 0:
                 plays = Play.listPlaysNewOld(mSearchQuery, fromDrawer);
                 break;
             case 1:
                 plays = Play.listPlaysNewOld_GameGroup(mSearchQuery);
+                break;
+            case 2:
+                String[] query = mSearchQuery.split("\\$");
+                plays = Play.totalWins_GameGroup_Player(GameGroup.findById(GameGroup.class, Long.parseLong(query[0])), Player.findById(Player.class, Long.parseLong(query[1])));
+                break;
+            case 3:
+                String[] query2 = mSearchQuery.split("\\$");
+                plays = Play.totalAsteriskWins_GameGroup_Player(GameGroup.findById(GameGroup.class, Long.parseLong(query2[0])), Player.findById(Player.class, Long.parseLong(query2[1])));
+                break;
+            case 4:
+                String[] query3 = mSearchQuery.split("\\$");
+                List<Play> wins = Play.totalWins_GameGroup_Player(GameGroup.findById(GameGroup.class, Long.parseLong(query3[0])), Player.findById(Player.class, Long.parseLong(query3[1])));
+                plays = Play.totalAsteriskWins_GameGroup_Player(GameGroup.findById(GameGroup.class, Long.parseLong(query3[0])), Player.findById(Player.class, Long.parseLong(query3[1])));
+                plays.addAll(wins);
+                Collections.sort(plays, new Comparator<Play>() {
+                    public int compare(Play left, Play right)  {
+                        return right.playDate.compareTo(left.playDate); // The order depends on the direction of sorting.
+                    }
+                });
+                break;
+            case 5:
+                plays = Play.totalSharedWins(GameGroup.findById(GameGroup.class, Long.parseLong(mSearchQuery)));
+                break;
+            case 6:
+                plays = Play.totalGroupLosses(GameGroup.findById(GameGroup.class, Long.parseLong(mSearchQuery)));
                 break;
             default:
                 plays = Play.listPlaysNewOld(mSearchQuery, fromDrawer);

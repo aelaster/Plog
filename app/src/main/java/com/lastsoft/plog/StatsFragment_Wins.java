@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.lastsoft.plog.db.Game;
 import com.lastsoft.plog.db.GameGroup;
+import com.lastsoft.plog.db.Play;
 import com.lastsoft.plog.db.Player;
 import com.lastsoft.plog.db.PlayersPerPlay;
 
@@ -119,165 +120,19 @@ public class StatsFragment_Wins extends Fragment {
             try {
 
                 List<PlayersPerPlay> groupTotalPlays = PlayersPerPlay.totalPlays_GameGroup(GameGroup.findById(GameGroup.class, theGroup));
-                //long uniquePlays  = GamesPerPlay.getUniquePlays_GameGroup(GameGroup.findById(GameGroup.class, theGroup));
                 long uniquePlays = Game.getUniqueGames_GameGroup(GameGroup.findById(GameGroup.class, theGroup)).size();
-
-                //Log.d("V1", "groupTotalPlays = " + groupTotalPlays.size());
-
                 output[0] = ((long)groupTotalPlays.size()/(long)groupPlayers.size());
                 output[1] = uniquePlays;
 
                 for (int i = 0; i < groupPlayers.size(); i++){
                     int arrayBounds = 2 + (i * 2);
                     //regular wins
-                    int regularWins = PlayersPerPlay.totalWins_GameGroup_Player(GameGroup.findById(GameGroup.class, theGroup), Player.findById(Player.class, groupPlayers.get(i).getId())).size();
+                    int regularWins = Play.totalWins_GameGroup_Player(GameGroup.findById(GameGroup.class, theGroup), Player.findById(Player.class, groupPlayers.get(i).getId())).size();
                     output[arrayBounds] = (long)regularWins;
                     //asterisk wins
-                    int asteriskWins = PlayersPerPlay.totalAsteriskWins_GameGroup_Player(GameGroup.findById(GameGroup.class, theGroup), Player.findById(Player.class, groupPlayers.get(i).getId())).size();
+                    int asteriskWins = Play.totalAsteriskWins_GameGroup_Player(GameGroup.findById(GameGroup.class, theGroup), Player.findById(Player.class, groupPlayers.get(i).getId())).size();
                     output[arrayBounds+1] = (long)(regularWins + asteriskWins);
                 }
-
-                /*
-
-                long playCounter = -1;
-                PlayersPerPlay playHolder = null;
-                int highScore = 0;
-                int scoreIndex = 0;
-                String gameName="";
-                for(PlayersPerPlay eachPlay:groupTotalPlays){
-                    playHolder = eachPlay;
-                    if (playCounter == -1){
-                        //first time in
-                        //set play counter to current play
-                        playCounter = eachPlay.play.getId();
-                        //set high score for play
-                        highScore = eachPlay.playHighScore;
-
-                        gameName = GamesPerPlay.getBaseGame(Play.findById(Play.class, eachPlay.play.getId())).gameName;
-                    }else if (eachPlay.play.getId() != playCounter){
-                        //we've moved on to the next play
-                        //calculate winner from past playCounter play
-                        //Log.d("V1", "game  = " + GamesPerPlay.getBaseGame(Play.findById(Play.class, eachPlay.play.getId())).gameName);
-                        //Log.d("V1", "scoreIndex = " + scoreIndex);
-                        //Log.d("V1", "groupPlayers.size() = " + groupPlayers.size());
-                        if (scoreIndex == groupPlayers.size()) {
-                            //only included if all of the group has been scored
-                            int max = playerScoreHolder[0];
-                            int maxFrequency = 0;
-                            for (int aPlayerScoreHolder : playerScoreHolder) {
-                                if (aPlayerScoreHolder > max) {
-                                    max = aPlayerScoreHolder;
-                                    maxFrequency = 1;
-                                }else if (aPlayerScoreHolder == max){
-                                    maxFrequency++;
-                                }
-                            }
-
-                            for (int x = 0; x < playerScoreHolder.length; x++) {
-                                int arrayBounds = 2 + (x * 2);
-                                //Log.d("V1", "arrayBounds = " + arrayBounds);
-                                if (playerScoreHolder[x] != 0 && playerScoreHolder[x] == highScore) {
-                                    if (output[(arrayBounds)] == null) {
-                                        output[(arrayBounds)] = (long) 1;
-                                    } else {
-                                        output[arrayBounds] = output[arrayBounds] + (long) 1;
-                                    }
-                                    loserFlag = false;
-                                }else{
-                                    sharedFlag = false;
-                                }
-
-                                if (playerScoreHolder[x] != 0 && (playerScoreHolder[x] == highScore  || (playerScoreHolder[x] >= max && maxFrequency == 1))) {
-                                    if (output[(arrayBounds + 1)] == null) {
-                                        output[(arrayBounds + 1)] = (long) 1;
-                                    } else {
-                                        output[(arrayBounds + 1)] = output[(arrayBounds + 1)] + (long) 1;
-                                    }
-                                    loserFlag = false;
-                                }
-
-                            }
-                            if (sharedFlag){
-                                sharedCounter++;
-                            }
-                            if (loserFlag){
-                                loserCounter++;
-                            }
-                        }
-
-
-                        loserFlag = true;
-                        sharedFlag = true;
-
-
-                        //set playCounter to new play
-                        playCounter = eachPlay.play.getId();
-                        //set high score for new play
-                        highScore = eachPlay.playHighScore;
-                        //zero out scores
-                        playerScoreHolder = new int[groupPlayers.size()];
-                        scoreIndex = 0;
-                        gameName = GamesPerPlay.getBaseGame(Play.findById(Play.class, eachPlay.play.getId())).gameName;
-                    }
-
-                    for(Player eachPlayer:groupPlayers){
-                        if (eachPlay.player.getId() == eachPlayer.getId()){
-                            playerScoreHolder[scoreIndex] = eachPlay.score;
-                            scoreIndex++;
-                            break;
-                        }
-                    }
-                    //Log.d("V1", "not matched");
-                }
-                //Log.d("V1", "scoreIndex = " + scoreIndex);
-                if (scoreIndex == groupPlayers.size()) {
-                    //calculate the last winner
-                    int max = playerScoreHolder[0];
-                    int maxFrequency = 0;
-                    for (int aPlayerScoreHolder : playerScoreHolder) {
-                        if (aPlayerScoreHolder > max) {
-                            max = aPlayerScoreHolder;
-                            maxFrequency = 1;
-                        }else if (aPlayerScoreHolder == max){
-                            maxFrequency++;
-                        }
-                    }
-
-                    for (int aPlayerScoreHolder : playerScoreHolder) {
-                        if (aPlayerScoreHolder > max) {
-                            max = aPlayerScoreHolder;
-                        }
-                    }
-
-                    for (int x = 0; x < playerScoreHolder.length; x++) {
-                        int arrayBounds = 2 + (x * 2);
-                        if (playerScoreHolder[x] != 0 && playerScoreHolder[x] == highScore) {
-                            if (output[(arrayBounds)] == null) {
-                                output[(arrayBounds)] = (long) 1;
-                            } else {
-                                output[arrayBounds] = output[arrayBounds] + (long) 1;
-                            }
-                            loserFlag = false;
-                        }else{
-                            sharedFlag = false;
-                        }
-                        if (playerScoreHolder[x] != 0 && (playerScoreHolder[x] == highScore  || (playerScoreHolder[x] >= max && maxFrequency == 1))){
-                            if (output[(arrayBounds + 1)] == null) {
-                                output[(arrayBounds + 1)] = (long) 1;
-                            } else {
-                                output[(arrayBounds + 1)] = output[(arrayBounds + 1)] + (long) 1;
-                            }
-                            loserFlag = false;
-                        }
-                    }
-                    if (sharedFlag){
-                        sharedCounter++;
-                    }
-                    if (loserFlag){
-                        loserCounter++;
-                    }
-                }*/
-
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -288,8 +143,8 @@ public class StatsFragment_Wins extends Fragment {
         protected void onPostExecute ( final Long[] result){
             long totalPlays = result[0];
             long totalUnique = result[1];
-            addStat(0, "Total Plays: ", totalPlays + "");
-            addStat(1, "Unique Games: ", totalUnique + "");
+            addStat(0, "Total Plays: ", totalPlays + "", "");
+            addStat(1, "Unique Games: ", totalUnique + "", "");
             for(int x = 0; x < groupPlayers.size(); x++) {
                 int arrayBounds = 2 + (x * 2);
                 long result_out, result_out2;
@@ -303,13 +158,16 @@ public class StatsFragment_Wins extends Fragment {
                 } else {
                     result_out2 = result[arrayBounds+1];
                 }
-                addStat(2, groupPlayers.get(x).playerName + " Total Wins:", result_out+"");
-                addStat(3, groupPlayers.get(x).playerName + " Asterisk Wins:", result_out2+"");
+                addStat(2, groupPlayers.get(x).playerName + " Regular Wins:", result_out+"", groupPlayers.get(x).getId()+"");
+                addStat(3, groupPlayers.get(x).playerName + " Asterisk Wins:", (result_out2-result_out)+"", groupPlayers.get(x).getId()+"");
+                addStat(4, groupPlayers.get(x).playerName + " Total Wins:", result_out2+"", groupPlayers.get(x).getId()+"");
             }
             //addStat(4, "Shared Wins: ", sharedCounter + "");totalSharedWins
-            addStat(4, "Shared Wins: ", PlayersPerPlay.totalSharedWins(GameGroup.findById(GameGroup.class, theGroup)).size() + "");
+            sharedCounter = Play.totalSharedWins(GameGroup.findById(GameGroup.class, theGroup)).size();
+            addStat(5, "Shared Wins: ", sharedCounter + "", "");
             //addStat(5, "Total Losses: ", loserCounter + "");
-            addStat(5, "Total Losses: ", PlayersPerPlay.totalGroupLosses(GameGroup.findById(GameGroup.class, theGroup)).size() + "");
+            loserCounter = Play.totalGroupLosses(GameGroup.findById(GameGroup.class, theGroup)).size();
+            addStat(6, "Total Losses: ", loserCounter + "", "");
             for(int x = 0; x < groupPlayers.size(); x++) {
                 int arrayBounds = 2 + (x * 2);
                 long result_out, result_out2;
@@ -323,16 +181,17 @@ public class StatsFragment_Wins extends Fragment {
                 }else{
                     result_out2 = result[arrayBounds+1];
                 }
-                addStat(-1, groupPlayers.get(x).playerName + " Total Wins Percentage:", ((int) (result_out * 100.0 / totalPlays + 0.5)) + "%");
-                addStat(-1, groupPlayers.get(x).playerName + " Asterisk Wins Percentage:", ((int) (result_out2 * 100.0 / totalPlays + 0.5)) + "%");
+                addStat(-1, groupPlayers.get(x).playerName + " Regular Wins Percentage:", ((int) (result_out * 100.0 / totalPlays + 0.5)) + "%", groupPlayers.get(x).getId()+"");
+                addStat(-1, groupPlayers.get(x).playerName + " Asterisk Wins Percentage:", ((int) ((result_out2-result_out) * 100.0 / totalPlays + 0.5)) + "%", groupPlayers.get(x).getId()+"");
+                addStat(-1, groupPlayers.get(x).playerName + " Total Wins Percentage:", ((int) (result_out2 * 100.0 / totalPlays + 0.5)) + "%", groupPlayers.get(x).getId()+"");
             }
-            addStat(-1, "Shared Wins Percentage: ", ((int) (sharedCounter * 100.0 / totalPlays + 0.5)) + "%");
-            addStat(-1, "Total Losses Percentage: ", ((int) (loserCounter * 100.0 / totalPlays + 0.5)) + "%");
+            addStat(-1, "Shared Wins Percentage: ", ((int) (sharedCounter * 100.0 / totalPlays + 0.5)) + "%", "");
+            addStat(-1, "Total Losses Percentage: ", ((int) (loserCounter * 100.0 / totalPlays + 0.5)) + "%", "");
             mydialog.dismiss();
             }
     }
 
-    private void addStat(final int statType, String statHeader, String statValue) {
+    private void addStat(final int statType, String statHeader, String statValue, final String playerValue) {
         // Instantiate a new "row" view.
         try {
             final ViewGroup newView = (ViewGroup) LayoutInflater.from(mActivity).inflate(
@@ -355,7 +214,27 @@ public class StatsFragment_Wins extends Fragment {
                                 break;
                             case 1:
                                 //((MainActivity) mActivity).openPlays(games.get(position).gameName, false);
-                                ((MainActivity) mActivity).openPlays(gameGroup+"", false, 2);
+                                //((MainActivity) mActivity).openPlays(gameGroup+"", false, 1);
+                                break;
+                            case 2:
+                                //((MainActivity) mActivity).openPlays(games.get(position).gameName, false);
+                                ((MainActivity) mActivity).openPlays(gameGroup+"$"+playerValue, false, 2);
+                                break;
+                            case 3:
+                                //((MainActivity) mActivity).openPlays(games.get(position).gameName, false);
+                                ((MainActivity) mActivity).openPlays(gameGroup+"$"+playerValue, false, 3);
+                                break;
+                            case 4:
+                                //((MainActivity) mActivity).openPlays(games.get(position).gameName, false);
+                                ((MainActivity) mActivity).openPlays(gameGroup+"$"+playerValue, false, 4);
+                                break;
+                            case 5:
+                                //((MainActivity) mActivity).openPlays(games.get(position).gameName, false);
+                                ((MainActivity) mActivity).openPlays(gameGroup+"", false, 5);
+                                break;
+                            case 6:
+                                //((MainActivity) mActivity).openPlays(games.get(position).gameName, false);
+                                ((MainActivity) mActivity).openPlays(gameGroup+"", false, 6);
                                 break;
                         }
                     }
