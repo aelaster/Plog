@@ -113,6 +113,8 @@ public class PlaysFragment extends Fragment{
 
         // BEGIN_INCLUDE(initializeRecyclerView)
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerView);
+        FastScroller fastScroller = (FastScroller) rootView.findViewById(R.id.fastscroller);
+        fastScroller.setRecyclerView(mRecyclerView, null);
 
         // LinearLayoutManager is used here, this will layout the elements in a similar fashion
         // to the way ListView would layout elements. The RecyclerView.LayoutManager defines how
@@ -253,6 +255,9 @@ public class PlaysFragment extends Fragment{
 
         mRecyclerView.setLayoutManager(mLayoutManager);
         //mRecyclerView.scrollToPosition(scrollPosition);
+
+        //int duration = getResources().getInteger(R.integer.scroll_duration);
+        //mRecyclerView.setLayoutManager(new ScrollingLinearLayoutManager(mActivity, LinearLayoutManager.VERTICAL, false, duration));
     }
 
     @Override

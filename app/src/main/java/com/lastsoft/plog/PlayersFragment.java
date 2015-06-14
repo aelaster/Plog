@@ -79,6 +79,8 @@ public class PlayersFragment extends Fragment{
 
         // BEGIN_INCLUDE(initializeRecyclerView)
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerView);
+        FastScroller fastScroller = (FastScroller) rootView.findViewById(R.id.fastscroller);
+        fastScroller.setRecyclerView(mRecyclerView, null);
 
         fabMenu = (FloatingActionsMenu) rootView.findViewById(R.id.multiple_actions);
 

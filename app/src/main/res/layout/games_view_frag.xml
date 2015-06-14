@@ -45,13 +45,24 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         >
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/recyclerView"
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="gone"/>
-
+            android:orientation="vertical">
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone"
+                />
+            <com.lastsoft.plog.FastScroller
+                android:id="@+id/fastscroller"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignTop="@id/recyclerView"
+                android:layout_alignBottom="@id/recyclerView"
+                android:layout_alignParentEnd="true" />
+        </RelativeLayout>
     </android.support.v4.widget.SwipeRefreshLayout>
     <net.i2p.android.ext.floatingactionbutton.AddFloatingActionButton
         android:id="@+id/add_game"
@@ -66,4 +77,5 @@
         android:layout_marginBottom="16dp"
         android:layout_marginRight="16dp"
         android:layout_marginEnd="16dp"/>
+
 </RelativeLayout>

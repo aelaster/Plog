@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.lastsoft.plog.db.Game;
 import com.lastsoft.plog.db.Player;
@@ -74,8 +75,7 @@ public class LoadGamesTask extends AsyncTask<String, Void, String> {
     protected String doInBackground(final String... args) {
 
         String myString = "";
-        String currentTag = "";
-        String currentName = "";
+        String bggProcess = "false";
 
         int i = 0;
         int totalCount = 0;
@@ -98,6 +98,16 @@ public class LoadGamesTask extends AsyncTask<String, Void, String> {
                     if (myString != null && myString.contains("will be processed")){
                         //do it again
                         myString = getGamesCollection(defaultPlayer.bggUsername);
+                        bggProcess = "true";
+                        /*fiveSecondHandler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                //System.gc();
+                                //Log.d("V1", "background status allocated=" + Long.toString(Debug.getNativeHeapAllocatedSize()));
+                                //Log.d("V1", "background status free=" + Long.toString(Debug.getNativeHeapFreeSize()));
+                                doGetStatus();
+                            }
+                        }, 5000);*/
                     }
 
                     XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
@@ -190,12 +200,14 @@ public class LoadGamesTask extends AsyncTask<String, Void, String> {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
+        return bggProcess;
     }
 
     @Override
     protected void onPostExecute(final String result) {
-
+        if (result.equals("true")) {
+            Toast.makeText(theContext, theContext.getString(R.string.bgg_process_notice), Toast.LENGTH_LONG).show();
+        }
     }
 
     private Game readEntry(XmlPullParser parser, String gameBGGID) throws XmlPullParserException, IOException {

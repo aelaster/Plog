@@ -68,6 +68,7 @@ public class GamesFragment extends Fragment{
     private EditText mSearch;
     String mSearchQuery = "";
     private boolean releaseFocus = false;
+    FastScroller fastScroller;
 
 
     @Override
@@ -90,11 +91,22 @@ public class GamesFragment extends Fragment{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        final View rootView = inflater.inflate(R.layout.collection_view_frag, container, false);
+        final View rootView = inflater.inflate(R.layout.games_view_frag, container, false);
         rootView.setTag(TAG);
 
         // BEGIN_INCLUDE(initializeRecyclerView)
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerView);
+        pullToRefreshView = (SwipeRefreshLayout) rootView.findViewById(R.id.pull_to_refresh_listview);
+        pullToRefreshView.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+
+            @Override
+            public void onRefresh() {
+                initDataset();
+            }
+        });
+
+        fastScroller = (FastScroller) rootView.findViewById(R.id.fastscroller);
+        fastScroller.setRecyclerView(mRecyclerView, pullToRefreshView);
 
         FloatingActionButton addPlayer = (FloatingActionButton) rootView.findViewById(R.id.add_game);
         addPlayer.setOnClickListener(new View.OnClickListener() {
@@ -131,14 +143,7 @@ public class GamesFragment extends Fragment{
         // Set CustomAdapter as the adapter for RecyclerView.
         mRecyclerView.setAdapter(mAdapter);
 
-        pullToRefreshView = (SwipeRefreshLayout) rootView.findViewById(R.id.pull_to_refresh_listview);
-        pullToRefreshView.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
 
-            @Override
-            public void onRefresh() {
-                initDataset();
-            }
-        });
 
         if (mSearch != null) {
             mSearch.addTextChangedListener(new TextWatcher() {
@@ -312,6 +317,7 @@ public class GamesFragment extends Fragment{
         mAdapter = new GameAdapter(this, mActivity,mSearchQuery);
         // Set CustomAdapter as the adapter for RecyclerView.
         mRecyclerView.setAdapter(mAdapter);
+        fastScroller.setPosition(0);
     }
 
     protected void updateDataset(){
@@ -350,6 +356,7 @@ public class GamesFragment extends Fragment{
             mAdapter = new GameAdapter(GamesFragment.this, mActivity,mSearchQuery);
             // Set CustomAdapter as the adapter for RecyclerView.
             mRecyclerView.setAdapter(mAdapter);
+            fastScroller.setPosition(0);
 
             mText.setVisibility(View.GONE);
             mProgress.setVisibility(View.GONE);

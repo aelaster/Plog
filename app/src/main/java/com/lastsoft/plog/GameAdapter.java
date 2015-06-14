@@ -131,7 +131,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
         // with that element
         //if (searchQuery.equals("") || (games.get(position).gameName.toLowerCase().contains(searchQuery.toLowerCase()))) {
             viewHolder.getTextView().setText(games.get(position).gameName);
-            if (games.get(position).gameThumb != null) {
+            if (games.get(position).gameThumb != null  && !games.get(position).gameThumb.equals("")) {
                 ImageLoader.getInstance().displayImage("http:" + games.get(position).gameThumb, viewHolder.getImageView(), options);
             } else {
                 viewHolder.getImageView().setImageDrawable(null);
