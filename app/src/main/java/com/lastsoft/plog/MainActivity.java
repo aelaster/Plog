@@ -76,6 +76,7 @@ public class MainActivity extends AppCompatActivity
     private AddGroupFragment mAddGroupFragment;
     PlaysFragment mPlaysFragment;
     GamesFragment mGamesFragment;
+    StatsFragment mStatsFragment;
     PlayAdapter mPlayAdapter;
     protected PostMortemReportExceptionHandler mDamageReport = new PostMortemReportExceptionHandler(this);
     CallbackManager callbackManager;
@@ -233,6 +234,11 @@ public class MainActivity extends AppCompatActivity
                 //fragmentManager.popBackStack(fragmentManager.getBackStackEntryAt(0).getId(), FragmentManager.POP_BACK_STACK_INCLUSIVE);
                 fragUp = false;
             }
+
+            if (mStatsFragment != null){
+                mStatsFragment = null;
+            }
+
             if (position == 1) {
                 openPlays("", true, 0);
             } else if (position == 2) {
@@ -242,9 +248,7 @@ public class MainActivity extends AppCompatActivity
             } else if (position == 0) {
                 openGames("", true, 0);
             } else if (position == 3) {
-                fragmentManager.beginTransaction()
-                        .replace(R.id.container, new StatsFragment(), "stats")
-                        .commitAllowingStateLoss();
+                openStats();
         /*}else if (position == 4){
 
             fragmentManager.beginTransaction()
@@ -261,6 +265,14 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    public void openStats(){
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        mStatsFragment = new StatsFragment();
+        fragmentManager.beginTransaction()
+                .replace(R.id.container, mStatsFragment, "stats")
+                .commitAllowingStateLoss();
+    }
+
     public void openGames(String searchQuery, boolean fromDrawer, int playListType){
         if(!fromDrawer){
             mNavigationDrawerFragment.mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
@@ -274,10 +286,8 @@ public class MainActivity extends AppCompatActivity
             ft.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right);
             ft.addToBackStack("games");
         }
-        StatsFragment statsFrag = (StatsFragment)
-                getSupportFragmentManager().findFragmentByTag("stats");
-        if (statsFrag != null) {
-            ft.hide(statsFrag);
+        if (mStatsFragment != null) {
+            ft.hide(mStatsFragment);
             ft.add(R.id.container, mGamesFragment, "games");
         }else {
             ft.replace(R.id.container, mGamesFragment, "games");
@@ -301,10 +311,10 @@ public class MainActivity extends AppCompatActivity
             ft.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right);
             ft.addToBackStack("plays");
         }
-        StatsFragment statsFrag = (StatsFragment)
-                getSupportFragmentManager().findFragmentByTag("stats");
-        if (statsFrag != null) {
-            ft.hide(statsFrag);
+
+        if (mStatsFragment != null) {
+            Log.d("V1", "stats frag isn't null");
+            ft.hide(mStatsFragment);
             ft.add(R.id.container, mPlaysFragment, "plays");
         }else {
             ft.replace(R.id.container, mPlaysFragment, "plays");
@@ -875,6 +885,11 @@ public class MainActivity extends AppCompatActivity
             } else {
                 if (forceBack){
                     forceBack = false;
+
+                    /*FragmentManager fragmentManager = getSupportFragmentManager();
+                    if (fragmentManager.getBackStackEntryCount() > 0) {
+                        fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                    }*/
                     super.onBackPressed();
                 }else {
                     //super.onBackPressed();
@@ -896,6 +911,7 @@ public class MainActivity extends AppCompatActivity
             if (mNavigationDrawerFragment != null) {
                 mNavigationDrawerFragment.closeDrawer();
             } else {
+                Log.d("V1", "in here 2");
                 super.onBackPressed();
             }
         }
