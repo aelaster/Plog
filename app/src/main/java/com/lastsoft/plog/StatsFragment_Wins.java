@@ -18,7 +18,8 @@ import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
-import com.github.mikephil.charting.utils.ColorTemplate;
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
+import com.github.mikephil.charting.utils.Highlight;
 import com.github.mikephil.charting.utils.ValueFormatter;
 import com.lastsoft.plog.db.Game;
 import com.lastsoft.plog.db.GameGroup;
@@ -93,8 +94,6 @@ public class StatsFragment_Wins extends Fragment {
 
         ArrayList<String> filteredGames;
         Context theContext;
-        boolean loserFlag = true;
-        boolean sharedFlag = true;
         int sharedCounter = 0;
         int loserCounter = 0;
         long theGroup;
@@ -168,10 +167,10 @@ public class StatsFragment_Wins extends Fragment {
                 } else {
                     result_out2 = result[arrayBounds+1];
                 }
-                addStat(2, groupPlayers.get(x).playerName + " Regular Wins:", result_out+"", groupPlayers.get(x).getId()+"");
-                addStat(3, groupPlayers.get(x).playerName + " Asterisk Wins:", (result_out2-result_out)+"", groupPlayers.get(x).getId()+"");
+                //addStat(2, groupPlayers.get(x).playerName + " Regular Wins:", result_out+"", groupPlayers.get(x).getId()+"");
+                //addStat(3, groupPlayers.get(x).playerName + " Asterisk Wins:", (result_out2-result_out)+"", groupPlayers.get(x).getId()+"");
                 addStat(4, groupPlayers.get(x).playerName + " Total Wins:", result_out2+"", groupPlayers.get(x).getId()+"");
-                addPieChart(groupPlayers.get(x).playerName, result_out, (result_out2-result_out));
+                addPieChart(groupPlayers.get(x).playerName, result_out, (result_out2-result_out), groupPlayers.get(x).getId()+"");
             }
             //addStat(4, "Shared Wins: ", sharedCounter + "");totalSharedWins
             sharedCounter = Play.totalSharedWins(GameGroup.findById(GameGroup.class, theGroup)).size();
@@ -202,7 +201,7 @@ public class StatsFragment_Wins extends Fragment {
             }
     }
 
-    private void addPieChart(String centerLabel, long regular, long asterisk){
+    private void addPieChart(String centerLabel, long regular, long asterisk, final String playerValue ){
         try {
             final ViewGroup newView = (ViewGroup) LayoutInflater.from(mActivity).inflate(
                     R.layout.stats_viewpie_item, mContainerView_Players, false);
@@ -210,31 +209,38 @@ public class StatsFragment_Wins extends Fragment {
 
             mChart.setUsePercentValues(false);
             mChart.setDescription("");
-
             mChart.setDragDecelerationFrictionCoef(0.95f);
-
-            //tf = Typeface.createFromAsset(getAssets(), "OpenSans-Regular.ttf");
-
-            //mChart.setCenterTextTypeface(Typeface.createFromAsset(getAssets(), "OpenSans-Light.ttf"));
             mChart.setDrawSliceText(false);
             mChart.setDrawHoleEnabled(true);
             mChart.setHoleColorTransparent(true);
-
             mChart.setTransparentCircleColor(Color.WHITE);
-
             mChart.setHoleRadius(58f);
             mChart.setTransparentCircleRadius(61f);
-
             mChart.setDrawCenterText(true);
-
             mChart.setRotationAngle(0);
-            // enable rotation of the chart by touch
-            mChart.setRotationEnabled(true);
-
-            // add a selection listener
-            //mChart.setOnChartValueSelectedListener(this);
-
+            mChart.setRotationEnabled(false);
             mChart.setCenterText(centerLabel);
+
+            mChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
+                @Override
+                public void onValueSelected(Entry e, int dataSetIndex, Highlight h) {
+                    switch (e.getXIndex()) {
+                        case 0:
+                            ((MainActivity) mActivity).openPlays(gameGroup + "$" + playerValue, false, 2);
+                            break;
+                        case 1:
+                            ((MainActivity) mActivity).openPlays(gameGroup + "$" + playerValue, false, 3);
+                            break;
+                    }
+                }
+
+                @Override
+                public void onNothingSelected() {
+
+                }
+            });
+
+
 
             ArrayList<Entry> percent = new ArrayList<Entry>();
             percent.add(0, new Entry((long) regular, 0));
@@ -260,14 +266,14 @@ public class StatsFragment_Wins extends Fragment {
 
         PieDataSet dataSet = new PieDataSet(percent, "");
         dataSet.setSliceSpace(3f);
-        dataSet.setSelectionShift(5f);
+        dataSet.setSelectionShift(0f);
+
 
         // add a lot of colors
 
         ArrayList<Integer> colors = new ArrayList<Integer>();
-        for (int c : ColorTemplate.COLORFUL_COLORS)
-            colors.add(c);
-        colors.add(ColorTemplate.getHoloBlue());
+        colors.add(getResources().getColor(R.color.pie_chart_regular));
+        colors.add(getResources().getColor(R.color.pie_chart_asterisk));
         dataSet.setColors(colors);
 
         PieData data = new PieData(types, dataSet);
@@ -319,7 +325,7 @@ public class StatsFragment_Wins extends Fragment {
                                 break;
                             case 1:
                                 //((MainActivity) mActivity).openPlays(games.get(position).gameName, false);
-                                //((MainActivity) mActivity).openPlays(gameGroup+"", false, 1);
+                                ((MainActivity) mActivity).openGames(gameGroup+"", false, 1);
                                 break;
                             case 2:
                                 //((MainActivity) mActivity).openPlays(games.get(position).gameName, false);

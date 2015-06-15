@@ -40,4 +40,7 @@
 
     <color name="background_photo_tint">#4f808080</color>
     <color name="main_photo_tint">#2f505050</color>
+
+    <color name="pie_chart_regular">#3949AB</color>
+    <color name="pie_chart_asterisk">#9FA8DA</color>
 </resources>

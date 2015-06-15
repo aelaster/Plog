@@ -31,6 +31,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.lastsoft.plog.db.Game;
+import com.lastsoft.plog.db.GameGroup;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
@@ -46,7 +47,9 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
     private DisplayImageOptions options;
     private Activity myActivity;
     private Fragment myFragment;
+    private boolean fromDrawer;
     int mPosition;
+    int playListType;
 
     // BEGIN_INCLUDE(recyclerViewSampleViewHolder)
     /**
@@ -93,15 +96,25 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
     }
     // END_INCLUDE(recyclerViewSampleViewHolder)
 
-    public GameAdapter(Fragment mFragment, Activity mActivity, String mSearchQuery) {
+    public GameAdapter(Fragment mFragment, Activity mActivity, String mSearchQuery, boolean mFromDrawer, int mPlayListType) {
         //games = Game.listAll(Game.class);
         //find(Class<T> type, String whereClause, String[] whereArgs, String groupBy, String orderBy, String limit)
         myFragment = mFragment;
         myActivity = mActivity;
+        playListType = mPlayListType;
 
-        //games = Game.find(Game.class, null, null, null, StringUtil.toSQLName("gameName")+" ASC");
-        //searchQuery = mSearchQuery;
-        games = Game.findBaseGames(mSearchQuery);
+        switch (playListType) {
+            case 0:
+                games = Game.findBaseGames(mSearchQuery);
+                break;
+            case 1:
+                games = Game.getUniqueGames_GameGroup(GameGroup.findById(GameGroup.class, Long.parseLong(mSearchQuery)));
+                break;
+            default:
+                games = Game.findBaseGames(mSearchQuery);
+                break;
+        }
+
         options = new DisplayImageOptions.Builder()
                 .cacheOnDisk(true)
                 .cacheInMemory(true)
@@ -136,18 +149,22 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
             } else {
                 viewHolder.getImageView().setImageDrawable(null);
             }
-            viewHolder.getOverflowView().setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    playPopup(view, position);
-                }
-            });
-            viewHolder.getClickLayout().setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    ((MainActivity)myActivity).openAddPlay(myFragment, games.get(position).gameName, -1);
-                }
-            });
+            if (playListType != 1) {
+                viewHolder.getOverflowView().setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        playPopup(view, position);
+                    }
+                });
+                viewHolder.getClickLayout().setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        ((MainActivity) myActivity).openAddPlay(myFragment, games.get(position).gameName, -1);
+                    }
+                });
+            }else{
+                viewHolder.getOverflowView().setVisibility(View.GONE);
+            }
         //}
 
     }

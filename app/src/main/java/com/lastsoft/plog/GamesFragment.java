@@ -27,6 +27,7 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -46,6 +47,7 @@ public class GamesFragment extends Fragment{
     private static final int SPAN_COUNT = 2;
     private static final int DATASET_COUNT = 60;
     private float x,y;
+    private boolean fromDrawer;
 
 
 
@@ -69,21 +71,42 @@ public class GamesFragment extends Fragment{
     String mSearchQuery = "";
     private boolean releaseFocus = false;
     FastScroller fastScroller;
+    private int playListType = 0;
+
+
+    public static GamesFragment newInstance(boolean fromDrawer, String searchQuery, int playListType) {
+        GamesFragment fragment = new GamesFragment();
+        Bundle args = new Bundle();
+        args.putBoolean("fromDrawer", fromDrawer);
+        args.putString("searchQuery", searchQuery);
+        args.putInt("playListType", playListType);
+        fragment.setArguments(args);
+        return fragment;
+    }
 
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        try {
-            ActionBar actionBar = ((MainActivity) mActivity).getSupportActionBar();
-            //actionBar.setDisplayShowCustomEnabled(true);
-            actionBar.setCustomView(R.layout.search_bar);
-            mSearch = (EditText) actionBar.getCustomView()
-                    .findViewById(R.id.etSearch);
-            mCancel = (ImageView) actionBar.getCustomView()
-                    .findViewById(R.id.closeButton);
-        }catch (Exception e){}
-
+        if (getArguments() != null) {
+            fromDrawer = getArguments().getBoolean("fromDrawer");
+            mSearchQuery = getArguments().getString("searchQuery");
+            playListType = getArguments().getInt("playListType");
+        }
+        if (fromDrawer) {
+            try {
+                ActionBar actionBar = ((MainActivity) mActivity).getSupportActionBar();
+                //actionBar.setDisplayShowCustomEnabled(true);
+                actionBar.setCustomView(R.layout.search_bar);
+                mSearch = (EditText) actionBar.getCustomView()
+                        .findViewById(R.id.etSearch);
+                mCancel = (ImageView) actionBar.getCustomView()
+                        .findViewById(R.id.closeButton);
+            } catch (Exception e) {
+            }
+        }else{
+            setHasOptionsMenu(true);
+        }
     }
 
 
@@ -109,17 +132,21 @@ public class GamesFragment extends Fragment{
         fastScroller.setRecyclerView(mRecyclerView, pullToRefreshView);
 
         FloatingActionButton addPlayer = (FloatingActionButton) rootView.findViewById(R.id.add_game);
-        addPlayer.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int viewXY[] = new int[2];
-                v.getLocationOnScreen(viewXY);
+        if (fromDrawer) {
+            addPlayer.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int viewXY[] = new int[2];
+                    v.getLocationOnScreen(viewXY);
 
-                if (mListener != null) {
-                    mListener.onFragmentInteraction("add_game", viewXY[0], viewXY[1]);
+                    if (mListener != null) {
+                        mListener.onFragmentInteraction("add_game", viewXY[0], viewXY[1]);
+                    }
                 }
-            }
-        });
+            });
+        }else{
+            addPlayer.setVisibility(View.GONE);
+        }
 
         mProgress = (LinearLayout) rootView.findViewById(R.id.progressContainer);
         mText = (TextView) rootView.findViewById(R.id.LoadingText);
@@ -139,7 +166,7 @@ public class GamesFragment extends Fragment{
         setRecyclerViewLayoutManager(mCurrentLayoutManagerType);
 
         //mAdapter = new CustomAdapter(mDataset, mDataset_Thumb);
-        mAdapter = new GameAdapter(this, mActivity,mSearchQuery);
+        mAdapter = new GameAdapter(this, mActivity,mSearchQuery, fromDrawer, playListType);
         // Set CustomAdapter as the adapter for RecyclerView.
         mRecyclerView.setAdapter(mAdapter);
 
@@ -158,7 +185,7 @@ public class GamesFragment extends Fragment{
                     // When user changed the Text
                     mSearchQuery = cs.toString();
                     //initDataset();
-                    mAdapter = new GameAdapter(GamesFragment.this, mActivity, mSearchQuery);
+                    mAdapter = new GameAdapter(GamesFragment.this, mActivity, mSearchQuery, fromDrawer, playListType);
                     // Set CustomAdapter as the adapter for RecyclerView.
                     mRecyclerView.setAdapter(mAdapter);
                 }
@@ -228,11 +255,29 @@ public class GamesFragment extends Fragment{
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Get item selected and deal with it
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                //called when the up affordance/carat in actionbar is pressed
+                mActivity.onBackPressed();
+                return true;
+        }
+        return false;
+    }
+
+
+    @Override
     public void onStart() {
         super.onStart();
-
-        if (mActivity != null) {
-            ((MainActivity) mActivity).setUpActionBar(4);
+        if (fromDrawer) {
+            if (mActivity != null) {
+                ((MainActivity) mActivity).setUpActionBar(4);
+            }
+        }else{
+            if (mActivity != null) {
+                ((MainActivity) mActivity).setUpActionBar(11);
+            }
         }
     }
 
@@ -314,7 +359,7 @@ public class GamesFragment extends Fragment{
         if (reInit) {
             initDataset();
         }
-        mAdapter = new GameAdapter(this, mActivity,mSearchQuery);
+        mAdapter = new GameAdapter(this, mActivity,mSearchQuery, fromDrawer, playListType);
         // Set CustomAdapter as the adapter for RecyclerView.
         mRecyclerView.setAdapter(mAdapter);
         fastScroller.setPosition(0);
@@ -353,7 +398,7 @@ public class GamesFragment extends Fragment{
             myTask = null;
 
             //mAdapter = new CustomAdapter(mDataset, mDataset_Thumb);
-            mAdapter = new GameAdapter(GamesFragment.this, mActivity,mSearchQuery);
+            mAdapter = new GameAdapter(GamesFragment.this, mActivity,mSearchQuery, fromDrawer, playListType);
             // Set CustomAdapter as the adapter for RecyclerView.
             mRecyclerView.setAdapter(mAdapter);
             fastScroller.setPosition(0);

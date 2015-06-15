@@ -18,6 +18,7 @@ public class Game extends SugarRecord<Game> {
     public String gameImage;
     public String gameThumb;
     public boolean expansionFlag;
+    public int tbtCount;
 
     public Game() {
     }
@@ -111,6 +112,25 @@ public class Game extends SugarRecord<Game> {
         return expansionsFor.list();
     }
 
+    public static List<Game> totalTenByTen_GameGroup(GameGroup group, int year){
+        return Game.findWithQuery(Game.class,
+                " SELECT G.*, COUNT(G."+ StringUtil.toSQLName("gameName") +") AS " + StringUtil.toSQLName("tbtCount") +
+                        " FROM " + StringUtil.toSQLName("Play") + " P " +
+                        " INNER JOIN " + StringUtil.toSQLName("PlaysPerGameGroup") + " PPGG " +
+                        " ON P." + StringUtil.toSQLName("id") + " = PPGG." + StringUtil.toSQLName("play") +
+                        " INNER JOIN " + StringUtil.toSQLName("GamesPerPlay") + " GPP " +
+                        " ON P." + StringUtil.toSQLName("id") + " = GPP." + StringUtil.toSQLName("play") +
+                        " INNER JOIN " + StringUtil.toSQLName("Game") + " G " +
+                        " ON GPP." + StringUtil.toSQLName("game") + " = G." + StringUtil.toSQLName("id") +
+                        " INNER JOIN " + StringUtil.toSQLName("TenByTen") + " TBT " +
+                        " ON PPGG." + StringUtil.toSQLName("gameGroup") + " = TBT." + StringUtil.toSQLName("gameGroup") +
+                        " WHERE PPGG. " + StringUtil.toSQLName("GameGroup") + " = ?" +
+                        " AND TBT." + StringUtil.toSQLName("game") + " = GPP." + StringUtil.toSQLName("game") +
+                        " AND STRFTIME('%Y', DATETIME(SUBSTR(P." + StringUtil.toSQLName("playDate") + ",0, 11), 'unixepoch')) = ? " +
+                        " GROUP BY G." + StringUtil.toSQLName("gameName") +
+                        " ORDER BY G." + StringUtil.toSQLName("gameName"), group.getId().toString(), year + "");
+    }
+
 
     public static List<Game> getUniqueGames_GameGroup(GameGroup group){
         return Game.findWithQuery(Game.class,
@@ -122,6 +142,7 @@ public class Game extends SugarRecord<Game> {
                         " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("play") + " = " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") +
                         " INNER JOIN " + StringUtil.toSQLName("PlaysPerGameGroup") +
                         " ON " + StringUtil.toSQLName("PlaysPerGameGroup") + "." + StringUtil.toSQLName("play") + " = " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") +
-                        " and " + StringUtil.toSQLName("GameGroup") + " = ? group by " + StringUtil.toSQLName("game"), group.getId().toString());
+                        " and " + StringUtil.toSQLName("GameGroup") + " = ? group by " + StringUtil.toSQLName("game") +
+                        " order by " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " ASC, "  + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " DESC", group.getId().toString());
     }
 }

@@ -75,6 +75,7 @@ public class MainActivity extends AppCompatActivity
     private AddPlayFragment mAddPlayFragment;
     private AddGroupFragment mAddGroupFragment;
     PlaysFragment mPlaysFragment;
+    GamesFragment mGamesFragment;
     PlayAdapter mPlayAdapter;
     protected PostMortemReportExceptionHandler mDamageReport = new PostMortemReportExceptionHandler(this);
     CallbackManager callbackManager;
@@ -160,8 +161,8 @@ public class MainActivity extends AppCompatActivity
         BackupManager bm = new BackupManager(this);
         bm.dataChanged();
 
-        //List<Play> winses = Play.totalWins_GameGroup_Player(GameGroup.findById(GameGroup.class, (long)1), Player.findById(Player.class, (long)1));
-        //Log.d("V1", "wins count = " + winses.size());
+        //List<Game> winses = Game.totalTenByTen_GameGroup(GameGroup.findById(GameGroup.class, (long) 1), 2015);
+        //Log.d("V1", "TBT count = " + winses.size());
         if (!doesDatabaseExist(this, "SRX.db")) {
             setContentView(R.layout.activity_main0);
             mTitle = "Welcome!";
@@ -239,9 +240,7 @@ public class MainActivity extends AppCompatActivity
                         .replace(R.id.container, new PlayersFragment(), "players")
                         .commitAllowingStateLoss();
             } else if (position == 0) {
-                fragmentManager.beginTransaction()
-                        .replace(R.id.container, new GamesFragment(), "games")
-                        .commitAllowingStateLoss();
+                openGames("", true, 0);
             } else if (position == 3) {
                 fragmentManager.beginTransaction()
                         .replace(R.id.container, new StatsFragment(), "stats")
@@ -260,6 +259,31 @@ public class MainActivity extends AppCompatActivity
         }catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    public void openGames(String searchQuery, boolean fromDrawer, int playListType){
+        if(!fromDrawer){
+            mNavigationDrawerFragment.mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+            mNavigationDrawerFragment.mDrawerToggle.setDrawerIndicatorEnabled(false);
+        }
+        forceBack = !fromDrawer;
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        mGamesFragment = GamesFragment.newInstance(fromDrawer, searchQuery, playListType);
+        FragmentTransaction ft = fragmentManager.beginTransaction();
+        if (!fromDrawer){
+            ft.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right);
+            ft.addToBackStack("games");
+        }
+        StatsFragment statsFrag = (StatsFragment)
+                getSupportFragmentManager().findFragmentByTag("stats");
+        if (statsFrag != null) {
+            ft.hide(statsFrag);
+            ft.add(R.id.container, mGamesFragment, "games");
+        }else {
+            ft.replace(R.id.container, mGamesFragment, "games");
+        }
+        ft.commitAllowingStateLoss();
+        fragmentManager.executePendingTransactions();
     }
 
     public void openPlays(String searchQuery, boolean fromDrawer, int playListType){
@@ -332,7 +356,7 @@ public class MainActivity extends AppCompatActivity
                 mNavigationDrawerFragment.mDrawerToggle.setDrawerIndicatorEnabled(false);
                 actionBar.setDisplayShowCustomEnabled(false);
                 actionBar.setDisplayShowTitleEnabled(true);
-                actionBar.setTitle(getString(R.string.groups));
+                actionBar.setTitle(getString(R.string.groups_header));
                 actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
             } else if (fragmentCode == 2) {
                 //addplayer
@@ -411,6 +435,15 @@ public class MainActivity extends AppCompatActivity
                 actionBar.setDisplayShowTitleEnabled(true);
                 actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
                 mTitle = getString(R.string.title_plays);
+                actionBar.setTitle(mTitle);
+            } else if (fragmentCode == 11) {
+                //plays, filtered by player
+                mNavigationDrawerFragment.mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+                mNavigationDrawerFragment.mDrawerToggle.setDrawerIndicatorEnabled(false);
+                actionBar.setDisplayShowCustomEnabled(false);
+                actionBar.setDisplayShowTitleEnabled(true);
+                actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+                mTitle = getString(R.string.title_games);
                 actionBar.setTitle(mTitle);
             }
         }

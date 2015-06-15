@@ -85,6 +85,26 @@ public class Play extends SugarRecord<Play> {
 
     }
 
+    public static List<Play> gameTenByTen_GameGroup(GameGroup group, Game game, int year){
+        return Play.findWithQuery(Play.class,
+                " SELECT P.* " +
+                        " FROM " + StringUtil.toSQLName("Play") + " P " +
+                        " INNER JOIN " + StringUtil.toSQLName("PlaysPerGameGroup") + " PPGG " +
+                        " ON P." + StringUtil.toSQLName("id") + " = PPGG." + StringUtil.toSQLName("play") +
+                        " INNER JOIN " + StringUtil.toSQLName("GamesPerPlay") + " GPP " +
+                        " ON P." + StringUtil.toSQLName("id") + " = GPP." + StringUtil.toSQLName("play") +
+                        " INNER JOIN " + StringUtil.toSQLName("TenByTen") + " TBT " +
+                        " ON PPGG." + StringUtil.toSQLName("gameGroup") + " = TBT." + StringUtil.toSQLName("gameGroup") +
+                        " INNER JOIN " + StringUtil.toSQLName("Game") + " G " +
+                        " ON GPP." + StringUtil.toSQLName("game") + " = G." + StringUtil.toSQLName("id") +
+                        " WHERE PPGG. " + StringUtil.toSQLName("GameGroup") + " = ?" +
+                        " AND TBT." + StringUtil.toSQLName("game") + " = GPP." + StringUtil.toSQLName("game") +
+                        " AND G." + StringUtil.toSQLName("id") + " = ? " +
+                        " AND STRFTIME('%Y', DATETIME(SUBSTR(P." + StringUtil.toSQLName("playDate") + ",0, 11), 'unixepoch')) = ? " +
+                        " GROUP BY P." + StringUtil.toSQLName("id") +
+                        " ORDER BY P." + StringUtil.toSQLName("playDate") + " DESC, P." + StringUtil.toSQLName("id") + " DESC", group.getId().toString(), game.getId().toString(), year + "");
+    }
+
     public static List<Play> totalWins_GameGroup_Player(GameGroup group, Player player) {
         return Play.findWithQuery(Play.class,
                 " SELECT "+ StringUtil.toSQLName("Play") +".* " +
@@ -166,7 +186,7 @@ public class Play extends SugarRecord<Play> {
                         " (SELECT COUNT(" + StringUtil.toSQLName("player") + ")" +
                         "  FROM " + StringUtil.toSQLName("PlayersPerGameGroup") +
                         "  WHERE " + StringUtil.toSQLName("GameGroup") + " = ?)" +
-                        " order by " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("playDate") + " DESC, "  + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " DESC", group.getId().toString(), group.getId().toString(), group.getId().toString());
+                        " ORDER BY " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("playDate") + " DESC, "  + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " DESC", group.getId().toString(), group.getId().toString(), group.getId().toString());
     }
 
     public static List<Play> totalSharedWins(GameGroup group) {

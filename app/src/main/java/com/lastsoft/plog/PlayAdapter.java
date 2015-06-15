@@ -31,6 +31,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.lastsoft.plog.db.Game;
 import com.lastsoft.plog.db.GameGroup;
 import com.lastsoft.plog.db.GamesPerPlay;
 import com.lastsoft.plog.db.Play;
@@ -122,6 +123,7 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
         4 - a players total wins, passed in the search query.  it is group and then player id, split with a dollar sign
         5 - total group shared wins
         6 - total group losses
+        7 - plays for a ten by ten game.  Group, then game, then year.
          */
 
         switch (playListType) {
@@ -155,6 +157,10 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
                 break;
             case 6:
                 plays = Play.totalGroupLosses(GameGroup.findById(GameGroup.class, Long.parseLong(mSearchQuery)));
+                break;
+            case 7:
+                String[] query4 = mSearchQuery.split("\\$");
+                plays = Play.gameTenByTen_GameGroup(GameGroup.findById(GameGroup.class, Long.parseLong(query4[0])), Game.findById(Game.class, Long.parseLong(query4[1])), Integer.parseInt(query4[2]));
                 break;
             default:
                 plays = Play.listPlaysNewOld(mSearchQuery, fromDrawer);

@@ -1,0 +1,1 @@
+DELETE table TEN_BY_TEN_STATS;

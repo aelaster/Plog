@@ -5,7 +5,7 @@
 
     <ImageButton
         android:id="@+id/fastscroller_handle"
-        android:layout_width="0dp"
+        android:layout_width="5dp"
         android:layout_height="wrap_content"
         android:background="@drawable/fastscroller_handle"
         android:elevation="4dp"

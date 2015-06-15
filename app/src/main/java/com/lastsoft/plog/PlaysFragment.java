@@ -96,13 +96,6 @@ public class PlaysFragment extends Fragment{
         }else{
             setHasOptionsMenu(true);
         }
-        // Initialize dataset, this data would usually come from a local content provider or
-        // remote server.
-
-        //String currentDBPath = currentDB.toString();
-        //Log.d("V1", "database directory=" + currentDBPath);
-        //Log.d("V1", "file directory=" + V1GolfLib.this.getFilesDir().toString());
-
     }
 
     @Override
