@@ -999,9 +999,14 @@ public class MainActivity extends AppCompatActivity
             boolean checkedItems[] = new boolean[gameGroups.size()];
             int i = 0;
             for(GameGroup group:gameGroups){
-                gameGroupNames.add(group.groupName);
-                if (TenByTen.isGroupAdded(group, theGame)){
+                if (TenByTen.isGroupAdded(group, theGame)){//if this group has this one checked, it's always okay to add to the dialog
+                    gameGroupNames.add(group.groupName);
                     checkedItems[i] = true;
+                }else{
+                    List<TenByTen> tens = TenByTen.tenByTens_Group(group);
+                    if (tens.size() < 10){//if this group doesn't have 10 selected, we can add it.  this stops adding more than 10
+                        gameGroupNames.add(group.groupName);
+                    }
                 }
                 i++;
             }

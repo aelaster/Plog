@@ -54,7 +54,11 @@ public class StatsFragment_TenByTen extends Fragment {
             List<Game> tbts = Game.totalTenByTen_GameGroup(GameGroup.findById(GameGroup.class, gameGroup), year);
             int tbtCounts = 0;
             for (Game tbt : tbts){
-                tbtCounts = tbtCounts + tbt.tbtCount;
+                if (tbt.tbtCount <= 10) { //count only uses the value if it's less than or equal to 10
+                    tbtCounts = tbtCounts + tbt.tbtCount;
+                }else{//otherwise, it adds 10
+                    tbtCounts = tbtCounts + 10;
+                }
                 addStat(tbt.gameName + ":", tbt.tbtCount+"", tbt.getId()+"");
             }
             addStat("Percent Completed:", ((int) (tbtCounts * 100.0 / 100 + 0.5)) + "%", "");
