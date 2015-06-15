@@ -29,6 +29,8 @@ import com.lastsoft.plog.db.PlayersPerPlay;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class StatsFragment_Wins extends Fragment {
@@ -90,13 +92,31 @@ public class StatsFragment_Wins extends Fragment {
         mActivity = null;
     }
 
-    public class LoadStatsTask extends AsyncTask<Long, Void, Long[]> {
 
-        ArrayList<String> filteredGames;
+    public class WinStats {
+        public Player player;
+        public int regularWins;
+        public int asteriskWins;
+        public long totalPlays;
+        public long totalUnique;
+
+        public WinStats(Player player, int regularWins, int asteriskWins, long totalPlays, long totalUnique) {
+            this.player = player;
+            this.regularWins = regularWins;
+            this.asteriskWins = asteriskWins;
+            this.totalPlays = totalPlays;
+            this.totalUnique = totalUnique;
+        }
+    }
+
+    public class LoadStatsTask extends AsyncTask<Long, Void, ArrayList<WinStats>> {
+
         Context theContext;
         int sharedCounter = 0;
         int loserCounter = 0;
         long theGroup;
+        ArrayList<WinStats> theStats;
+
 
         private final ProgressDialog mydialog = new ProgressDialog(mActivity);
 
@@ -118,30 +138,30 @@ public class StatsFragment_Wins extends Fragment {
 
         // automatically done on worker thread (separate from UI thread)
         @Override
-        protected Long[] doInBackground(final Long... args) {
+        protected ArrayList<WinStats> doInBackground(final Long... args) {
 
-            filteredGames = new ArrayList<>();
-            int outputBounds = ((groupPlayers.size() * 2) + 2);
-            Long[] output = new Long[outputBounds];
+            ArrayList<WinStats> output = new ArrayList<>();
+            //Long[] output = new Long[outputBounds];
             //times 2 because each player needs regular and asterisk totals
             //plus two because we put total and unique plays on the top
-            int[] playerScoreHolder = new int[groupPlayers.size()];
+            long totalPlays = ((long)PlayersPerPlay.totalPlays_GameGroup(GameGroup.findById(GameGroup.class, theGroup)).size()/(long)groupPlayers.size());
+            long totalUnique = Game.getUniqueGames_GameGroup(GameGroup.findById(GameGroup.class, theGroup)).size();
             try {
-
-                List<PlayersPerPlay> groupTotalPlays = PlayersPerPlay.totalPlays_GameGroup(GameGroup.findById(GameGroup.class, theGroup));
-                long uniquePlays = Game.getUniqueGames_GameGroup(GameGroup.findById(GameGroup.class, theGroup)).size();
-                output[0] = ((long)groupTotalPlays.size()/(long)groupPlayers.size());
-                output[1] = uniquePlays;
-
                 for (int i = 0; i < groupPlayers.size(); i++){
-                    int arrayBounds = 2 + (i * 2);
+                    GameGroup thisGroup = GameGroup.findById(GameGroup.class, theGroup);
+                    Player thisPlayer = Player.findById(Player.class, groupPlayers.get(i).getId());
                     //regular wins
-                    int regularWins = Play.totalWins_GameGroup_Player(GameGroup.findById(GameGroup.class, theGroup), Player.findById(Player.class, groupPlayers.get(i).getId())).size();
-                    output[arrayBounds] = (long)regularWins;
+                    int regularWins = Play.totalWins_GameGroup_Player(thisGroup, thisPlayer).size();
                     //asterisk wins
-                    int asteriskWins = Play.totalAsteriskWins_GameGroup_Player(GameGroup.findById(GameGroup.class, theGroup), Player.findById(Player.class, groupPlayers.get(i).getId())).size();
-                    output[arrayBounds+1] = (long)(regularWins + asteriskWins);
+                    int asteriskWins = Play.totalAsteriskWins_GameGroup_Player(thisGroup, thisPlayer).size();
+                    //output[arrayBounds+1] = (long)(regularWins + asteriskWins);
+                    output.add(new WinStats(thisPlayer, regularWins, asteriskWins, totalPlays, totalUnique));
                 }
+                Collections.sort(output, new Comparator<WinStats>() {
+                    public int compare(WinStats left, WinStats right) {
+                        return Integer.compare(right.regularWins, left.regularWins); // The order depends on the direction of sorting.
+                    }
+                });
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -149,56 +169,28 @@ public class StatsFragment_Wins extends Fragment {
         }
 
         @Override
-        protected void onPostExecute ( final Long[] result){
-            long totalPlays = result[0];
-            long totalUnique = result[1];
-            addStat(0, "Total Plays: ", totalPlays + "", "");
-            addStat(1, "Unique Games: ", totalUnique + "", "");
-            for(int x = 0; x < groupPlayers.size(); x++) {
-                int arrayBounds = 2 + (x * 2);
-                long result_out, result_out2;
-                if (result[arrayBounds] == null){
-                    result_out = 0;
-                }else{
-                    result_out = result[arrayBounds];
+        protected void onPostExecute ( final ArrayList<WinStats> result){
+            if (result.size() > 0) {
+                addStat(0, "Total Plays: ", result.get(0).totalPlays + "", "");
+                addStat(1, "Unique Games: ", result.get(0).totalUnique + "", "");
+                for (int x = 0; x < result.size(); x++) {
+                    addStat(4, result.get(x).player.playerName + " Total Wins:", (result.get(x).asteriskWins + result.get(x).regularWins) + "", result.get(x).player.getId() + "");
+                    addPieChart(result.get(x).player.playerName, result.get(x).regularWins, result.get(x).asteriskWins, result.get(x).player.playerName + "");
                 }
-                if (result[arrayBounds + 1] == null) {
-                    result_out2 = 0;
-                } else {
-                    result_out2 = result[arrayBounds+1];
+                sharedCounter = Play.totalSharedWins(GameGroup.findById(GameGroup.class, theGroup)).size();
+                addStat(5, "Shared Wins: ", sharedCounter + "", "");
+                loserCounter = Play.totalGroupLosses(GameGroup.findById(GameGroup.class, theGroup)).size();
+                addStat(6, "Total Losses: ", loserCounter + "", "");
+                for (int x = 0; x < result.size(); x++) {
+                    addStat(-1, result.get(x).player.playerName + " Regular Wins Percentage:", ((int) (result.get(x).regularWins * 100.0 / result.get(0).totalPlays + 0.5)) + "%", result.get(x).player.getId() + "");
+                    addStat(-1, result.get(x).player.playerName + " Asterisk Wins Percentage:", ((int) ((result.get(x).asteriskWins) * 100.0 / result.get(0).totalPlays + 0.5)) + "%", result.get(x).player.getId() + "");
+                    addStat(-1, result.get(x).player.playerName + " Total Wins Percentage:", ((int) ((result.get(x).asteriskWins + result.get(x).regularWins) * 100.0 / result.get(0).totalPlays + 0.5)) + "%", result.get(x).player.getId() + "");
                 }
-                //addStat(2, groupPlayers.get(x).playerName + " Regular Wins:", result_out+"", groupPlayers.get(x).getId()+"");
-                //addStat(3, groupPlayers.get(x).playerName + " Asterisk Wins:", (result_out2-result_out)+"", groupPlayers.get(x).getId()+"");
-                addStat(4, groupPlayers.get(x).playerName + " Total Wins:", result_out2+"", groupPlayers.get(x).getId()+"");
-                addPieChart(groupPlayers.get(x).playerName, result_out, (result_out2-result_out), groupPlayers.get(x).getId()+"");
+                addStat(-1, "Shared Wins Percentage: ", ((int) (sharedCounter * 100.0 / result.get(0).totalPlays + 0.5)) + "%", "");
+                addStat(-1, "Total Losses Percentage: ", ((int) (loserCounter * 100.0 / result.get(0).totalPlays + 0.5)) + "%", "");
             }
-            //addStat(4, "Shared Wins: ", sharedCounter + "");totalSharedWins
-            sharedCounter = Play.totalSharedWins(GameGroup.findById(GameGroup.class, theGroup)).size();
-            addStat(5, "Shared Wins: ", sharedCounter + "", "");
-            //addStat(5, "Total Losses: ", loserCounter + "");
-            loserCounter = Play.totalGroupLosses(GameGroup.findById(GameGroup.class, theGroup)).size();
-            addStat(6, "Total Losses: ", loserCounter + "", "");
-            for(int x = 0; x < groupPlayers.size(); x++) {
-                int arrayBounds = 2 + (x * 2);
-                long result_out, result_out2;
-                if (result[arrayBounds] == null){
-                    result_out = 0;
-                }else{
-                    result_out = result[arrayBounds];
-                }
-                if (result[arrayBounds+1] == null){
-                    result_out2 = 0;
-                }else{
-                    result_out2 = result[arrayBounds+1];
-                }
-                addStat(-1, groupPlayers.get(x).playerName + " Regular Wins Percentage:", ((int) (result_out * 100.0 / totalPlays + 0.5)) + "%", groupPlayers.get(x).getId()+"");
-                addStat(-1, groupPlayers.get(x).playerName + " Asterisk Wins Percentage:", ((int) ((result_out2-result_out) * 100.0 / totalPlays + 0.5)) + "%", groupPlayers.get(x).getId()+"");
-                addStat(-1, groupPlayers.get(x).playerName + " Total Wins Percentage:", ((int) (result_out2 * 100.0 / totalPlays + 0.5)) + "%", groupPlayers.get(x).getId()+"");
-            }
-            addStat(-1, "Shared Wins Percentage: ", ((int) (sharedCounter * 100.0 / totalPlays + 0.5)) + "%", "");
-            addStat(-1, "Total Losses Percentage: ", ((int) (loserCounter * 100.0 / totalPlays + 0.5)) + "%", "");
             mydialog.dismiss();
-            }
+        }
     }
 
     private void addPieChart(String centerLabel, long regular, long asterisk, final String playerValue ){

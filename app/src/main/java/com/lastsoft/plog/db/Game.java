@@ -128,7 +128,7 @@ public class Game extends SugarRecord<Game> {
                         " AND TBT." + StringUtil.toSQLName("game") + " = GPP." + StringUtil.toSQLName("game") +
                         " AND STRFTIME('%Y', DATETIME(SUBSTR(P." + StringUtil.toSQLName("playDate") + ",0, 11), 'unixepoch')) = ? " +
                         " GROUP BY G." + StringUtil.toSQLName("gameName") +
-                        " ORDER BY G." + StringUtil.toSQLName("gameName"), group.getId().toString(), year + "");
+                        " ORDER BY COUNT(G."+ StringUtil.toSQLName("gameName") +") DESC, G." + StringUtil.toSQLName("gameName"), group.getId().toString(), year + "");
     }
 
 

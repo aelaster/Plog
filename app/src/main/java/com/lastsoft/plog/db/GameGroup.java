@@ -1,7 +1,5 @@
 package com.lastsoft.plog.db;
 
-import android.util.Log;
-
 import com.orm.StringUtil;
 import com.orm.SugarRecord;
 
@@ -23,7 +21,7 @@ public class GameGroup extends SugarRecord<GameGroup> {
 
     public static List<Player> getGroupPlayers(GameGroup group){
         //Log.d("V1", "Select * from " + StringUtil.toSQLName("Player") + " where " + StringUtil.toSQLName("id") + " in (Select " + StringUtil.toSQLName("player") + " from " + StringUtil.toSQLName("PlayersPerGameGroup") + " where " + StringUtil.toSQLName("GameGroup") + " = ?)");
-        return Player.findWithQuery(Player.class, "Select * from " + StringUtil.toSQLName("Player") + " where " + StringUtil.toSQLName("id") + " in (Select " + StringUtil.toSQLName("player") + " from " + StringUtil.toSQLName("PlayersPerGameGroup") + " where " + StringUtil.toSQLName("GameGroup") + " = ?)", group.getId().toString());
+        return Player.findWithQuery(Player.class, "Select * from " + StringUtil.toSQLName("Player") + " where " + StringUtil.toSQLName("id") + " in (Select " + StringUtil.toSQLName("player") + " from " + StringUtil.toSQLName("PlayersPerGameGroup") + " where " + StringUtil.toSQLName("GameGroup") + " = ?) ORDER BY " + StringUtil.toSQLName("playerName"), group.getId().toString());
     }
 
 }
