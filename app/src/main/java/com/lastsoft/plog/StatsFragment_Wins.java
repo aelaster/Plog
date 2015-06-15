@@ -171,23 +171,23 @@ public class StatsFragment_Wins extends Fragment {
         @Override
         protected void onPostExecute ( final ArrayList<WinStats> result){
             if (result.size() > 0) {
-                addStat(0, "Total Plays: ", result.get(0).totalPlays + "", "");
-                addStat(1, "Unique Games: ", result.get(0).totalUnique + "", "");
+                addStat(0, getString(R.string.stats_total_plays) + ":", result.get(0).totalPlays + "", "");
+                addStat(1, getString(R.string.stats_unique_plays) + ":", result.get(0).totalUnique + "", "");
                 for (int x = 0; x < result.size(); x++) {
-                    addStat(4, result.get(x).player.playerName + " Total Wins:", (result.get(x).asteriskWins + result.get(x).regularWins) + "", result.get(x).player.getId() + "");
-                    addPieChart(result.get(x).player.playerName, result.get(x).regularWins, result.get(x).asteriskWins, result.get(x).player.playerName + "");
+                    addStat(4, result.get(x).player.playerName + " " + getString(R.string.stats_total_wins) + ":", (result.get(x).asteriskWins + result.get(x).regularWins) + "", result.get(x).player.getId() + "");
+                    addPieChart(result.get(x).player.playerName, result.get(x).regularWins, result.get(x).asteriskWins, result.get(x).player.getId() + "");
                 }
                 sharedCounter = Play.totalSharedWins(GameGroup.findById(GameGroup.class, theGroup)).size();
-                addStat(5, "Shared Wins: ", sharedCounter + "", "");
+                addStat(5, getString(R.string.stats_shared_wins) + ":", sharedCounter + "", "");
                 loserCounter = Play.totalGroupLosses(GameGroup.findById(GameGroup.class, theGroup)).size();
-                addStat(6, "Total Losses: ", loserCounter + "", "");
+                addStat(6, getString(R.string.stats_total_losses) + ":", loserCounter + "", "");
                 for (int x = 0; x < result.size(); x++) {
-                    addStat(-1, result.get(x).player.playerName + " Regular Wins Percentage:", ((int) (result.get(x).regularWins * 100.0 / result.get(0).totalPlays + 0.5)) + "%", result.get(x).player.getId() + "");
-                    addStat(-1, result.get(x).player.playerName + " Asterisk Wins Percentage:", ((int) ((result.get(x).asteriskWins) * 100.0 / result.get(0).totalPlays + 0.5)) + "%", result.get(x).player.getId() + "");
-                    addStat(-1, result.get(x).player.playerName + " Total Wins Percentage:", ((int) ((result.get(x).asteriskWins + result.get(x).regularWins) * 100.0 / result.get(0).totalPlays + 0.5)) + "%", result.get(x).player.getId() + "");
+                    addStat(-1, result.get(x).player.playerName + " " + getString(R.string.stats_regular_wins) + getString(R.string.percentage) + ":", ((int) (result.get(x).regularWins * 100.0 / result.get(0).totalPlays + 0.5)) + "%", result.get(x).player.getId() + "");
+                    addStat(-1, result.get(x).player.playerName + " " + getString(R.string.stats_asterisk_wins) + getString(R.string.percentage) + ":", ((int) ((result.get(x).asteriskWins) * 100.0 / result.get(0).totalPlays + 0.5)) + "%", result.get(x).player.getId() + "");
+                    addStat(-1, result.get(x).player.playerName + " " + getString(R.string.stats_total_wins) + getString(R.string.percentage) + ":", ((int) ((result.get(x).asteriskWins + result.get(x).regularWins) * 100.0 / result.get(0).totalPlays + 0.5)) + "%", result.get(x).player.getId() + "");
                 }
-                addStat(-1, "Shared Wins Percentage: ", ((int) (sharedCounter * 100.0 / result.get(0).totalPlays + 0.5)) + "%", "");
-                addStat(-1, "Total Losses Percentage: ", ((int) (loserCounter * 100.0 / result.get(0).totalPlays + 0.5)) + "%", "");
+                addStat(-1, getString(R.string.stats_shared_wins) + getString(R.string.percentage) + ":", ((int) (sharedCounter * 100.0 / result.get(0).totalPlays + 0.5)) + "%", "");
+                addStat(-1, getString(R.string.stats_total_losses) + getString(R.string.percentage) + ":", ((int) (loserCounter * 100.0 / result.get(0).totalPlays + 0.5)) + "%", "");
             }
             mydialog.dismiss();
         }
@@ -212,6 +212,7 @@ public class StatsFragment_Wins extends Fragment {
             mChart.setRotationAngle(0);
             mChart.setRotationEnabled(false);
             mChart.setCenterText(centerLabel);
+            mChart.setHardwareAccelerationEnabled(true);
 
             mChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
                 @Override
@@ -238,8 +239,8 @@ public class StatsFragment_Wins extends Fragment {
             percent.add(0, new Entry((long) regular, 0));
             percent.add(1, new Entry((long) asterisk, 1));
             ArrayList<String> types = new ArrayList<String>();
-            types.add(0, "Regular Wins");
-            types.add(1, "Asterisk Wins");
+            types.add(0, getString(R.string.stats_regular_wins));
+            types.add(1, getString(R.string.stats_asterisk_wins));
 
             setData(mChart, percent, types);
 
