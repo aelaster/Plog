@@ -1,4 +1,12 @@
-package com.lastsoft.plog;
+package com.lastsoft.plog.util;
+
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.os.Build;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -13,14 +21,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-
-import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.os.Build;
 
 /**
  * Exception report delivery via email and user interaction.  Avoids giving an app the

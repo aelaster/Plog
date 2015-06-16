@@ -1,4 +1,4 @@
-package com.lastsoft.plog;
+package com.lastsoft.plog.util;
 
 import android.animation.Animator;
 import android.animation.TimeInterpolator;

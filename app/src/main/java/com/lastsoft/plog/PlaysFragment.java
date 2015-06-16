@@ -34,6 +34,9 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 
+import com.lastsoft.plog.adapter.PlayAdapter;
+import com.lastsoft.plog.util.FastScroller;
+
 public class PlaysFragment extends Fragment{
 
     private static final String TAG = "PlaysFragment";

@@ -1,4 +1,4 @@
-package com.lastsoft.plog;
+package com.lastsoft.plog.util;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -14,6 +14,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.LinearLayout;
 
+import com.lastsoft.plog.R;
 import com.lastsoft.plog.calculation.VerticalScrollBoundsProvider;
 import com.lastsoft.plog.calculation.position.VerticalScreenPositionCalculator;
 import com.lastsoft.plog.calculation.progress.VerticalLinearLayoutManagerScrollProgressCalculator;

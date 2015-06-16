@@ -40,10 +40,13 @@ import com.facebook.share.model.ShareLinkContent;
 import com.facebook.share.model.SharePhoto;
 import com.facebook.share.model.SharePhotoContent;
 import com.facebook.share.widget.ShareDialog;
+import com.lastsoft.plog.adapter.PlayAdapter;
+import com.lastsoft.plog.adapter.TransitionListenerAdapter;
 import com.lastsoft.plog.db.GamesPerPlay;
 import com.lastsoft.plog.db.Play;
 import com.lastsoft.plog.db.PlayersPerPlay;
 import com.lastsoft.plog.db.PlaysPerGameGroup;
+import com.lastsoft.plog.util.CustomViewPager;
 
 import java.io.File;
 import java.util.List;

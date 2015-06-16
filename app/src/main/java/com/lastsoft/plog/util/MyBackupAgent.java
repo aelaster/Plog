@@ -1,8 +1,7 @@
-package com.lastsoft.plog;
+package com.lastsoft.plog.util;
 
 import android.app.backup.BackupAgentHelper;
 import android.app.backup.FileBackupHelper;
-import android.app.backup.SharedPreferencesBackupHelper;
 import android.util.Log;
 
 import java.io.File;

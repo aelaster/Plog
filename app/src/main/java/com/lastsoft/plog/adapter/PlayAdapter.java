@@ -14,7 +14,7 @@
 * limitations under the License.
 */
 
-package com.lastsoft.plog;
+package com.lastsoft.plog.adapter;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
@@ -31,6 +31,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.lastsoft.plog.MainActivity;
+import com.lastsoft.plog.R;
 import com.lastsoft.plog.db.Game;
 import com.lastsoft.plog.db.GameGroup;
 import com.lastsoft.plog.db.GamesPerPlay;
@@ -54,7 +56,7 @@ import java.util.List;
 public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
     private static final String TAG = "PlayAdapter";
 
-    List<Play> plays;
+    public List<Play> plays;
     private DisplayImageOptions options;
     private String searchQuery;
     private Activity myActivity;

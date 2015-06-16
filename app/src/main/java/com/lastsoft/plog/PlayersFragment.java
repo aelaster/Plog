@@ -27,7 +27,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.lastsoft.plog.adapter.PlayerAdapter;
 import com.lastsoft.plog.db.Player;
+import com.lastsoft.plog.util.FastScroller;
 
 import net.i2p.android.ext.floatingactionbutton.FloatingActionButton;
 import net.i2p.android.ext.floatingactionbutton.FloatingActionsMenu;

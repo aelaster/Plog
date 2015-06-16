@@ -36,6 +36,7 @@ import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
 import com.facebook.share.Sharer;
 import com.facebook.share.widget.ShareDialog;
+import com.lastsoft.plog.adapter.PlayAdapter;
 import com.lastsoft.plog.db.Game;
 import com.lastsoft.plog.db.GameGroup;
 import com.lastsoft.plog.db.GamesPerPlay;
@@ -45,6 +46,9 @@ import com.lastsoft.plog.db.PlayersPerGameGroup;
 import com.lastsoft.plog.db.PlayersPerPlay;
 import com.lastsoft.plog.db.PlaysPerGameGroup;
 import com.lastsoft.plog.db.TenByTen;
+import com.lastsoft.plog.util.BGGLogInHelper;
+import com.lastsoft.plog.util.Cookies;
+import com.lastsoft.plog.util.PostMortemReportExceptionHandler;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
@@ -64,7 +68,8 @@ public class MainActivity extends AppCompatActivity
         PlayersFragment.OnFragmentInteractionListener,
         GamesFragment.OnFragmentInteractionListener,
         StatsFragment.OnFragmentInteractionListener,
-        View.OnClickListener {
+        View.OnClickListener,
+        BGGLogInHelper.LogInListener {
 
     static final String EXTRA_CURRENT_ITEM_POSITION = "extra_current_item_position";
     static final String EXTRA_OLD_ITEM_POSITION = "extra_old_item_position";
@@ -93,6 +98,7 @@ public class MainActivity extends AppCompatActivity
     private CharSequence mTitle;
     private Bundle mTmpState;
     private boolean mIsReentering;
+    private BGGLogInHelper mLogInHelper;
 
     private final SharedElementCallback mCallback = new SharedElementCallback() {
         @Override
@@ -138,6 +144,8 @@ public class MainActivity extends AppCompatActivity
         setExitSharedElementCallback(mCallback);
         mDamageReport.initialize();
 
+        mLogInHelper = new BGGLogInHelper(this, this);
+
         FacebookSdk.sdkInitialize(getApplicationContext());
         callbackManager = CallbackManager.Factory.create();
         shareDialog = new ShareDialog(this);
@@ -161,6 +169,7 @@ public class MainActivity extends AppCompatActivity
 
         BackupManager bm = new BackupManager(this);
         bm.dataChanged();
+
 
         //List<Game> winses = Game.totalTenByTen_GameGroup(GameGroup.findById(GameGroup.class, (long) 1), 2015);
         //Log.d("V1", "TBT count = " + winses.size());
@@ -198,6 +207,14 @@ public class MainActivity extends AppCompatActivity
                     this, mDrawerLayout, R.string.navigation_drawer_open, R.string.navigation_drawer_close
             );
         }
+    }
+
+    @Override
+    protected void onResume() {
+        Cookies mCookies = new Cookies(this);
+        mCookies.clearCookies();
+        mLogInHelper.logIn();
+        super.onResume();
     }
 
     @Override
@@ -631,6 +648,21 @@ public class MainActivity extends AppCompatActivity
     public void deleteGame(long gameId){
         DeleteGameFragment newFragment = new DeleteGameFragment().newInstance(gameId);
         newFragment.show(getSupportFragmentManager(), "deleteGame");
+    }
+
+    @Override
+    public void onLogInSuccess() {
+
+    }
+
+    @Override
+    public void onLogInError(String errorMessage) {
+
+    }
+
+    @Override
+    public void onNeedCredentials() {
+
     }
 
     public class DeleteGameFragment extends DialogFragment {

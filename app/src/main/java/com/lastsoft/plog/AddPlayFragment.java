@@ -250,6 +250,14 @@ public class AddPlayFragment extends Fragment implements
         photoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                try{
+                    InputMethodManager inputManager = (InputMethodManager)
+                            mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
+
+                    inputManager.hideSoftInputFromWindow(mActivity.getCurrentFocus().getWindowToken(),
+                            InputMethodManager.HIDE_NOT_ALWAYS);
+                }catch (Exception ignored){}
+
                 Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 // Ensure that there's a camera activity to handle the intent
                 if (takePictureIntent.resolveActivity(mActivity.getPackageManager()) != null) {
@@ -375,6 +383,14 @@ public class AddPlayFragment extends Fragment implements
     }
 
     private void chooseImage() {
+        try{
+            InputMethodManager inputManager = (InputMethodManager)
+                    mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
+
+            inputManager.hideSoftInputFromWindow(mActivity.getCurrentFocus().getWindowToken(),
+                    InputMethodManager.HIDE_NOT_ALWAYS);
+        }catch (Exception ignored){}
+
         int chooserType = ChooserType.REQUEST_PICK_PICTURE;
         imageChooserManager = new ImageChooserManager(this,
                 ChooserType.REQUEST_PICK_PICTURE, "myfolder", true);

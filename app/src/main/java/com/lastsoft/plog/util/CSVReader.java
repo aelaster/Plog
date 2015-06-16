@@ -1,4 +1,4 @@
-package com.lastsoft.plog;
+package com.lastsoft.plog.util;
 /**
  Copyright 2005 Bytecode Pty Ltd.
 

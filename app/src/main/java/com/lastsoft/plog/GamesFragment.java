@@ -36,7 +36,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.lastsoft.plog.adapter.GameAdapter;
 import com.lastsoft.plog.db.Game;
+import com.lastsoft.plog.util.FastScroller;
 
 import net.i2p.android.ext.floatingactionbutton.FloatingActionButton;
 

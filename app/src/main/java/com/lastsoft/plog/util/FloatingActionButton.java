@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.lastsoft.plog;
+package com.lastsoft.plog.util;
 
 import android.content.Context;
 import android.graphics.Outline;

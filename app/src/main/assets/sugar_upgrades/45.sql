@@ -1,1 +1,1 @@
-DELETE table TEN_BY_TEN_STATS;
+alter table PLAYER add BGG_PASSWORD TEXT;

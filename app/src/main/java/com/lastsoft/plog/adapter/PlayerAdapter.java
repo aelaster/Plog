@@ -14,7 +14,7 @@
 * limitations under the License.
 */
 
-package com.lastsoft.plog;
+package com.lastsoft.plog.adapter;
 
 import android.app.Activity;
 import android.support.v4.app.Fragment;
@@ -25,6 +25,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.lastsoft.plog.MainActivity;
+import com.lastsoft.plog.R;
 import com.lastsoft.plog.db.Player;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;

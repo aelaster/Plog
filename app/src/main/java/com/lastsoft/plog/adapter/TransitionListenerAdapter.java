@@ -1,4 +1,4 @@
-package com.lastsoft.plog;
+package com.lastsoft.plog.adapter;
 
 import android.transition.Transition;
 
