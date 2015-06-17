@@ -513,6 +513,16 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
                                 }
                             }
 
+                            //delete play from bgg
+                            if (deleteMe.bggPlayID != null && !deleteMe.bggPlayID.equals("")){
+                                DeletePlayTask deletePlay = new DeletePlayTask(getActivity());
+                                try {
+                                    deletePlay.execute(deleteMe);
+                                } catch (Exception e) {
+
+                                }
+                            }
+
                             //delete play
                             deleteMe.delete();
 

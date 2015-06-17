@@ -1,7 +1,5 @@
 package com.lastsoft.plog.db;
 
-import android.util.Log;
-
 import com.orm.StringUtil;
 import com.orm.SugarRecord;
 import com.orm.query.Select;
@@ -14,22 +12,30 @@ public class Player extends SugarRecord<Player> {
     public String bggUsername;
     public String playerPhoto;
     public String defaultColor;
+    public String bggPassword;
 
     public Player() {
     }
 
-
-    public Player(String playerName, String bggUsername, String playerPhoto, String defaultColor) {
+    public Player(String playerName, String bggUsername, String playerPhoto, String defaultColor, String bggPassword) {
         this.playerName = playerName;
         this.bggUsername = bggUsername;
         this.playerPhoto = playerPhoto;
         this.defaultColor = defaultColor;
+        this.defaultColor = defaultColor;
     }
 
-    public Player(String playerName, String bggUsername, String defaultColor) {
+    public Player(String playerName, String bggUsername, String bggPassword, String defaultColor) {
         this.playerName = playerName;
         this.bggUsername = bggUsername;
+        this.bggPassword = bggPassword;
         this.defaultColor = defaultColor;
+    }
+
+    public Player(String playerName, String bggUsername, String bggPassword) {
+        this.playerName = playerName;
+        this.bggUsername = bggUsername;
+        this.bggPassword = bggPassword;
     }
 
     public Player(String playerName, String bggUsername) {

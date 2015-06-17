@@ -3,14 +3,17 @@ package com.lastsoft.plog;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -694,6 +697,23 @@ public class AddPlayFragment extends Fragment implements
                         }
 
                         savedThis = true;
+                        if (playID <= 0){
+                            //new play
+                            if (((MainActivity)mActivity).mLogInHelper.canLogIn()) {
+                                SharedPreferences app_preferences = PreferenceManager.getDefaultSharedPreferences(mActivity);
+                                long currentDefaultPlayer = app_preferences.getLong("defaultPlayer", -1);
+                                if (currentDefaultPlayer >= 0) {
+                                    Player defaultPlayer = Player.findById(Player.class, currentDefaultPlayer);
+                                    //post this to BGG
+                                    PlayPoster postPlay = new PlayPoster(getActivity(), defaultPlayer.bggUsername);
+                                    try {
+                                        postPlay.execute(thePlay);
+                                    } catch (Exception e) {
+
+                                    }
+                                }
+                            }
+                        }
                     } catch (ParseException e) {
                         e.printStackTrace();
                     }
@@ -789,6 +809,31 @@ public class AddPlayFragment extends Fragment implements
         super.onDestroy();
         if (mActivity instanceof MainActivity) {
             ((MainActivity) mActivity).unbindDrawables(rootView);
+        }
+    }
+
+    public class PlayPoster extends PostPlayTask {
+        private final ProgressDialog mydialog;
+        public PlayPoster(Context context, String bggUsername) {
+            super(context, bggUsername);
+            mydialog = new ProgressDialog(theContext);
+        }
+
+        // can use UI thread here
+        @Override
+        protected void onPreExecute() {
+
+            mydialog.setMessage(theContext.getString(R.string.posting_play));
+            mydialog.setCancelable(false);
+            try{
+                mydialog.show();
+            }catch (Exception e){}
+        }
+
+
+        @Override
+        protected void onPostExecute(final String result) {
+            mydialog.dismiss();
         }
     }
 

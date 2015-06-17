@@ -18,7 +18,7 @@ public class SetupWizard_Model extends AbstractWizardModel {
         @Override
         protected PageList onNewRootPageList() {
                 return new PageList(
-                        new CustomerInfoPage(this, "Enter your name.  You will be the first player entered.  Your BGG Name will be used to pull your collection.")
+                        new CustomerInfoPage(this, "Enter your name.  You will be the first player entered.  Your BGG Name will be used to pull your collection.  Your BGG Password will be used to log your plays.")
                                 .setRequired(true)
                 );
         }

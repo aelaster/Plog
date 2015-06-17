@@ -1,0 +1,1 @@
+alter table PLAY add BGG_PLAY_FLAG INTEGER;

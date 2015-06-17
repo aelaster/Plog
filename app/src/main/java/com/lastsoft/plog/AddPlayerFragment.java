@@ -53,6 +53,7 @@ public class AddPlayerFragment extends Fragment {
     SharedPreferences.Editor editor;
     EditText playerName;
     EditText bggUsername;
+    EditText bggPassword;
     Switch defaultSwitch;
     Button deleteButton;
     Spinner color;
@@ -120,6 +121,7 @@ public class AddPlayerFragment extends Fragment {
         deleteButton = (Button) rootView.findViewById(R.id.deleteButton);
         playerName = (EditText) rootView.findViewById(R.id.playerName);
         bggUsername = (EditText) rootView.findViewById(R.id.bggUsername);
+        bggPassword = (EditText) rootView.findViewById(R.id.bggPassword);
         defaultSwitch = (Switch) rootView.findViewById(R.id.defaultSwitch);
         color = (Spinner) rootView.findViewById(R.id.color);
         ArrayAdapter<CharSequence> colorSpinnerArrayAdapter = ArrayAdapter.createFromResource(mActivity, R.array.color_choices, android.R.layout.simple_spinner_item);
@@ -143,6 +145,7 @@ public class AddPlayerFragment extends Fragment {
             editPlayer = Player.findById(Player.class, playerID);
             playerName.setText(editPlayer.playerName);
             bggUsername.setText(editPlayer.bggUsername);
+            bggPassword.setText(editPlayer.bggPassword);
             if (editPlayer.defaultColor != null && !editPlayer.defaultColor.equals("")){
                 int spinnerPostion = colorSpinnerArrayAdapter.getPosition(editPlayer.defaultColor);
                 color.setSelection(spinnerPostion);
@@ -292,11 +295,12 @@ public class AddPlayerFragment extends Fragment {
                     }else {
                         if (playerID >= 0) {
                             editPlayer.bggUsername = bggUsername.getText().toString();
+                            editPlayer.bggPassword = bggPassword.getText().toString();
                             editPlayer.playerName = playerName.getText().toString();
                             editPlayer.defaultColor = color.getSelectedItem().toString();
                             editPlayer.save();
                         } else {
-                            Player player = new Player(playerName.getText().toString(), bggUsername.getText().toString());
+                            Player player = new Player(playerName.getText().toString(), bggUsername.getText().toString(), bggPassword.getText().toString(), color.getSelectedItem().toString());
                             player.save();
                             playerID = player.getId();
                         }

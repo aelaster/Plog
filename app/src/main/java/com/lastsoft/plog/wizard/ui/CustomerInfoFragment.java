@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.lastsoft.plog.wizard.ui;;
+package com.lastsoft.plog.wizard.ui;
 
 import android.app.Activity;
 import android.content.Context;
@@ -22,7 +22,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,6 +31,8 @@ import android.widget.TextView;
 import com.lastsoft.plog.R;
 import com.lastsoft.plog.wizard.model.CustomerInfoPage;
 
+;
+
 public class CustomerInfoFragment extends Fragment {
     private static final String ARG_KEY = "key";
 
@@ -40,6 +41,7 @@ public class CustomerInfoFragment extends Fragment {
     private CustomerInfoPage mPage;
     private TextView mNameView;
     private TextView mEmailView;
+    private TextView mPasswordView;
 
     public static CustomerInfoFragment create(String key) {
         Bundle args = new Bundle();
@@ -73,6 +75,9 @@ public class CustomerInfoFragment extends Fragment {
 
         mEmailView = ((TextView) rootView.findViewById(R.id.your_email));
         mEmailView.setText(mPage.getData().getString(CustomerInfoPage.EMAIL_DATA_KEY));
+
+        mPasswordView = ((TextView) rootView.findViewById(R.id.your_password));
+        mPasswordView.setText(mPage.getData().getString(CustomerInfoPage.PASSWORD_DATA_KEY));
         return rootView;
     }
 
@@ -99,7 +104,7 @@ public class CustomerInfoFragment extends Fragment {
         mNameView.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1,
-                    int i2) {
+                                          int i2) {
             }
 
             @Override
@@ -127,6 +132,24 @@ public class CustomerInfoFragment extends Fragment {
             @Override
             public void afterTextChanged(Editable editable) {
                 mPage.getData().putString(CustomerInfoPage.EMAIL_DATA_KEY,
+                        (editable != null) ? editable.toString() : null);
+                mPage.notifyDataChanged();
+            }
+        });
+
+        mPasswordView.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1,
+                                          int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                mPage.getData().putString(CustomerInfoPage.PASSWORD_DATA_KEY,
                         (editable != null) ? editable.toString() : null);
                 mPage.notifyDataChanged();
             }

@@ -13,6 +13,7 @@ public class Play extends SugarRecord<Play> {
     public Date playDate;
     public String playNotes;
     public String playPhoto;
+    public String bggPlayID;
 
     public Play() {
     }

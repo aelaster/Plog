@@ -53,6 +53,7 @@
 
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="bgg_username">BGG Username</string>
+    <string name="bgg_password">BGG Password</string>
     <string name="name">Name</string>
     <string name="game_name">Game Name</string>
     <string name="game_notes">Game Notes</string>
@@ -86,8 +87,11 @@
     <string name="setup_info">Enter your name.  You will be the first player entered.  Your BGG Name will be used to pull your collection.</string>
     <string name="label_your_name">Name</string>
     <string name="label_your_email">BGG Username</string>
+    <string name="label_your_password">BGG Password</string>
     <string name="hint_your_name">e.g. Adam</string>
     <string name="hint_your_email">Optional</string>
+    <string name="hint_your_password">Optional</string>
+    <string name="posting_play">Posting Play to BGG...</string>
 
     <string name="submit_confirm_message">Start adding players and games, creating groups, and plogging!</string>
     <string name="submit_confirm_button">Go!</string>

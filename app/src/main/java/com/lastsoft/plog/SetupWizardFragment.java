@@ -124,10 +124,11 @@ public class SetupWizardFragment extends Fragment implements
                                     .setPositiveButton(R.string.submit_confirm_button, new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialogInterface, int i) {
-                                            String userName = mWizardModel.findByKey("Enter your name.  You will be the first player entered.  Your BGG Name will be used to pull your collection.").getData().getString(CustomerInfoPage.NAME_DATA_KEY);
+                                            String userName = mWizardModel.findByKey("Enter your name.  You will be the first player entered.  Your BGG Name will be used to pull your collection.  Your BGG Password will be used to log your plays.").getData().getString(CustomerInfoPage.NAME_DATA_KEY);
                                             if (userName != null) {
                                                 //add theis player
-                                                String bggInfo = mWizardModel.findByKey("Enter your name.  You will be the first player entered.  Your BGG Name will be used to pull your collection.").getData().getString(CustomerInfoPage.EMAIL_DATA_KEY);
+                                                String bggInfo = mWizardModel.findByKey("Enter your name.  You will be the first player entered.  Your BGG Name will be used to pull your collection.  Your BGG Password will be used to log your plays.").getData().getString(CustomerInfoPage.EMAIL_DATA_KEY);
+                                                String bggInfo_pw = mWizardModel.findByKey("Enter your name.  You will be the first player entered.  Your BGG Name will be used to pull your collection.  Your BGG Password will be used to log your plays.").getData().getString(CustomerInfoPage.PASSWORD_DATA_KEY);
                                                 boolean nameTakenFlag = false;
                                                 //if this new player's name already exists
                                                 if (Player.playerExists(userName)) {
@@ -136,7 +137,7 @@ public class SetupWizardFragment extends Fragment implements
                                                 if (nameTakenFlag) {
                                                     Toast.makeText(mActivity, getString(R.string.name_taken), Toast.LENGTH_SHORT).show();
                                                 } else {
-                                                    Player player = new Player(userName, bggInfo);
+                                                    Player player = new Player(userName, bggInfo, bggInfo_pw);
                                                     player.save();
                                                     if (bggInfo != null) {
                                                         //set app preference

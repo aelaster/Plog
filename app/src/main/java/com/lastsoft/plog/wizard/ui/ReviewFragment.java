@@ -34,6 +34,7 @@ import com.lastsoft.plog.wizard.model.Page;
 import com.lastsoft.plog.wizard.model.ReviewItem;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -168,6 +169,11 @@ public class ReviewFragment extends ListFragment implements ModelCallbacks {
             String value = reviewItem.getDisplayValue();
             if (TextUtils.isEmpty(value)) {
                 value = "(None)";
+            }
+            if (reviewItem.getTitle().equals("Your BGG Password")){
+                char[] charArray = new char[value.length()];
+                Arrays.fill(charArray, '*');
+                value = new String(charArray);
             }
             ((TextView) rootView.findViewById(android.R.id.text1)).setText(reviewItem.getTitle());
             ((TextView) rootView.findViewById(android.R.id.text2)).setText(value);

@@ -1,10 +1,14 @@
 package com.lastsoft.plog.util;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
+
+import com.lastsoft.plog.db.Player;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -70,8 +74,13 @@ public class BGGLogInHelper {
     }
 
     public boolean canLogIn() {
-        mUsername = "aelaster";
-        mPassword = "pzwbkzk7";
+        SharedPreferences app_preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
+        long currentDefaultPlayer = app_preferences.getLong("defaultPlayer", -1);
+        if (currentDefaultPlayer>=0) {
+            Player defaultPlayer = Player.findById(Player.class, currentDefaultPlayer);
+            mUsername = defaultPlayer.bggUsername;
+            mPassword = defaultPlayer.bggPassword;
+        }
         if (TextUtils.isEmpty(mUsername) || TextUtils.isEmpty(mPassword)) {
             return false;
         }

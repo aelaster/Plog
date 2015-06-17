@@ -16,10 +16,10 @@
 
 package com.lastsoft.plog.wizard.model;
 
-import com.lastsoft.plog.wizard.ui.CustomerInfoFragment;
-
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
+
+import com.lastsoft.plog.wizard.ui.CustomerInfoFragment;
 
 import java.util.ArrayList;
 
@@ -29,6 +29,7 @@ import java.util.ArrayList;
 public class CustomerInfoPage extends Page {
     public static final String NAME_DATA_KEY = "name";
     public static final String EMAIL_DATA_KEY = "email";
+    public static final String PASSWORD_DATA_KEY = "password";
 
     public CustomerInfoPage(ModelCallbacks callbacks, String title) {
         super(callbacks, title);
@@ -43,6 +44,7 @@ public class CustomerInfoPage extends Page {
     public void getReviewItems(ArrayList<ReviewItem> dest) {
         dest.add(new ReviewItem("Your name", mData.getString(NAME_DATA_KEY), getKey(), -1));
         dest.add(new ReviewItem("Your BGG Username", mData.getString(EMAIL_DATA_KEY), getKey(), -1));
+        dest.add(new ReviewItem("Your BGG Password", mData.getString(PASSWORD_DATA_KEY), getKey(), -1));
     }
 
     @Override

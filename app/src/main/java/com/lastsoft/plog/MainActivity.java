@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity
     private CharSequence mTitle;
     private Bundle mTmpState;
     private boolean mIsReentering;
-    private BGGLogInHelper mLogInHelper;
+    public BGGLogInHelper mLogInHelper;
 
     private final SharedElementCallback mCallback = new SharedElementCallback() {
         @Override
@@ -447,8 +447,8 @@ public class MainActivity extends AppCompatActivity
                 mTitle = getString(R.string.title_plays);
             } else if (fragmentCode == 9) {
                 //set up
-                mNavigationDrawerFragment.mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
-                mNavigationDrawerFragment.mDrawerToggle.setDrawerIndicatorEnabled(true);
+                //mNavigationDrawerFragment.mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+                //mNavigationDrawerFragment.mDrawerToggle.setDrawerIndicatorEnabled(true);
                 actionBar.setDisplayShowCustomEnabled(false);
                 actionBar.setDisplayShowTitleEnabled(true);
                 actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
@@ -828,6 +828,16 @@ public class MainActivity extends AppCompatActivity
                                 File deleteImage_thumb = new File(deleteMe.playPhoto.substring(7, deleteMe.playPhoto.length() - 4) + "_thumb.jpg");
                                 if (deleteImage_thumb.exists()) {
                                     deleteImage_thumb.delete();
+                                }
+                            }
+
+                            //delete play from bgg
+                            if (deleteMe.bggPlayID != null && !deleteMe.bggPlayID.equals("")){
+                                DeletePlayTask deletePlay = new DeletePlayTask(getActivity());
+                                try {
+                                    deletePlay.execute(deleteMe);
+                                } catch (Exception e) {
+
                                 }
                             }
 
