@@ -73,7 +73,7 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
         private final TextView gameNameView;
         private final TextView playDateView;
         private final ImageView imageView;
-        private final ImageView overflowView;
+        private final LinearLayout overflowLayout;
         private final LinearLayout clickLayout;
         private final View myView;
 
@@ -83,7 +83,7 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
             gameNameView = (TextView) v.findViewById(R.id.gameName);
             playDateView = (TextView) v.findViewById(R.id.playDate);
             imageView = (ImageView) v.findViewById(R.id.imageView1);
-            overflowView = (ImageView) v.findViewById(R.id.overflowMenu);
+            overflowLayout = (LinearLayout) v.findViewById(R.id.overflowLayout);
             clickLayout = (LinearLayout) v.findViewById(R.id.clickLayout);
             myView = v;
         }
@@ -97,8 +97,8 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
         public TextView getGameNameView() {
             return gameNameView;
         }
-        public ImageView getOverflowView() {
-            return overflowView;
+        public LinearLayout getOverflowLayout() {
+            return overflowLayout;
         }
         public View getView() {
             return myView;
@@ -214,7 +214,7 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
                     ((MainActivity) myActivity).onPlayClicked(plays.get(position), myFragment, viewHolder.getImageView(), viewHolder.getGameNameView(), viewHolder.getPlayDateView(), position, fromDrawer, playListType);
                 }
             });
-            viewHolder.getOverflowView().setOnClickListener(new View.OnClickListener() {
+            viewHolder.getOverflowLayout().setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     playPopup(view, position);

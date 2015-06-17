@@ -60,7 +60,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private final TextView textView;
         private final ImageView imageView;
-        private final ImageView overflowView;
+        private final LinearLayout overflowLayout;
         private final LinearLayout clickLayout;
         private final View myView;
 
@@ -75,7 +75,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
             });
             textView = (TextView) v.findViewById(R.id.gameName);
             imageView = (ImageView) v.findViewById(R.id.imageView1);
-            overflowView = (ImageView) v.findViewById(R.id.overflowMenu);
+            overflowLayout = (LinearLayout) v.findViewById(R.id.overflowLayout);
             clickLayout = (LinearLayout) v.findViewById(R.id.clickLayout);
             myView = v;
         }
@@ -86,8 +86,8 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
         public TextView getTextView() {
             return textView;
         }
-        public ImageView getOverflowView() {
-            return overflowView;
+        public LinearLayout getOverflowLayout() {
+            return overflowLayout;
         }
         public View getView() {
             return myView;
@@ -152,7 +152,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
                 viewHolder.getImageView().setImageDrawable(null);
             }
             if (playListType != 1) {
-                viewHolder.getOverflowView().setOnClickListener(new View.OnClickListener() {
+                viewHolder.getOverflowLayout().setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         playPopup(view, position);
@@ -165,7 +165,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
                     }
                 });
             }else{
-                viewHolder.getOverflowView().setVisibility(View.GONE);
+                viewHolder.getOverflowLayout().setVisibility(View.GONE);
             }
         //}
 
