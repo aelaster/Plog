@@ -102,41 +102,53 @@ public class PostPlayTask extends AsyncTask<Play, Void, String> {
 
                 } else {
                     String theResponse = HttpUtils.parseResponse(response);
+
                     if (isValidResponse(theResponse)) {
-                        //in here, play is logged.  therefore, poll and get the id for the most recent play of the game and save the id
-                        String getPlayIDurl = HttpUtils.constructPlayUrlSpecific(bggUsername, GamesPerPlay.getBaseGame(playToLog[0]).gameBGGID, output);
-                        post = new HttpPost(getPlayIDurl);
-                        mClient = HttpUtils.createHttpClient(theContext, helper.getCookieStore());
-                        response = mClient.execute(post);
-                        String theResponse2 = HttpUtils.parseResponse(response);
+                        if (theResponse.contains("playid")) {
+                            //{"playid":"15110214","numplays":"1","html":"Plays: <a href=\"\/plays\/thing\/95527?userid=515783\">1<\/a>"}
+                            //in here, play is logged.  therefore, poll and get the id for the most recent play of the game and save the id
+                            String[] values = theResponse.split("\\,");
+                            String[] playIDarray = values[0].split("\\:");
+                            playToLog[0].bggPlayID = playIDarray[1].replace("\"", "");
+                            playToLog[0].save();
+                        }else {
 
-                        XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
-                        factory.setNamespaceAware(true);
-                        XmlPullParser parser = factory.newPullParser();
-                        parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
-                        parser.setInput(new StringReader(theResponse2));
-                        //parser.nextTag();
-                        // parser.require(XmlPullParser.START_TAG, null, "items");
+                            String getPlayIDurl = HttpUtils.constructPlayUrlSpecific(bggUsername, GamesPerPlay.getBaseGame(playToLog[0]).gameBGGID, output);
 
-                        while (parser.next() != XmlPullParser.END_DOCUMENT) {
-                            if (parser.getEventType() != XmlPullParser.START_TAG) {
-                                continue;
-                            }
-                            String name = parser.getName();
-                            // Starts by looking for the entry tag
-                            if (name.equals("play")) {
-                                //entries.add(readEntry(parser));
-                                String readPlayID = "";
-                                readPlayID = readPlayID(parser);
-                                playToLog[0].bggPlayID = readPlayID;
-                                playToLog[0].save();
-                                break;
-                            } else if (name.equals("plays")){
+                            post = new HttpPost(getPlayIDurl);
+                            mClient = HttpUtils.createHttpClient(theContext, helper.getCookieStore());
+                            response = mClient.execute(post);
+                            String theResponse2 = HttpUtils.parseResponse(response);
 
-                            } else{
-                                skip(parser);
+                            XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
+                            factory.setNamespaceAware(true);
+                            XmlPullParser parser = factory.newPullParser();
+                            parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
+                            parser.setInput(new StringReader(theResponse2));
+                            //parser.nextTag();
+                            // parser.require(XmlPullParser.START_TAG, null, "items");
+
+                            while (parser.next() != XmlPullParser.END_DOCUMENT) {
+                                if (parser.getEventType() != XmlPullParser.START_TAG) {
+                                    continue;
+                                }
+                                String name = parser.getName();
+                                // Starts by looking for the entry tag
+                                if (name.equals("play")) {
+                                    //entries.add(readEntry(parser));
+                                    String readPlayID = "";
+                                    readPlayID = readPlayID(parser);
+                                    playToLog[0].bggPlayID = readPlayID;
+                                    playToLog[0].save();
+                                    break;
+                                } else if (name.equals("plays")) {
+
+                                } else {
+                                    skip(parser);
+                                }
                             }
                         }
+
 
                     } else {
                         //savePending(play);
@@ -179,7 +191,7 @@ public class PostPlayTask extends AsyncTask<Play, Void, String> {
         if (TextUtils.isEmpty(mResponse)) {
             return false;
         }
-        return mResponse.startsWith("Plays: <a") || mResponse.startsWith("{\"html\":\"Plays:");
+        return mResponse.startsWith("Plays: <a") || mResponse.startsWith("{\"html\":\"Plays:")|| mResponse.startsWith("{\"playid\":");
     }
 
     @Override

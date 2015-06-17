@@ -84,7 +84,7 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
     private final SharedElementCallback mCallback = new SharedElementCallback() {
         @Override
         public void onMapSharedElements(List<String> names, Map<String, View> sharedElements) {
-            if (mIsReturning) {
+            if (mIsReturning && mPlayAdapter.getItemCount() > 0) {
                 View sharedImageView = mPagerAdapter.getCurrentDetailsFragment().getSharedImageElement();
                 View sharedNameView = mPagerAdapter.getCurrentDetailsFragment().getSharedNameElement();
                 View sharedDateView = mPagerAdapter.getCurrentDetailsFragment().getSharedDateElement();
@@ -186,42 +186,47 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
     }
 
     private Transition makeReturnTransition() {
-        View rootView = mPagerAdapter.getCurrentDetailsFragment().getView();
-        assert rootView != null;
+        if (mPlayAdapter.getItemCount() > 0) {
+            View rootView = mPagerAdapter.getCurrentDetailsFragment().getView();
+            assert rootView != null;
 
-        TransitionSet returnTransition = new TransitionSet();
+            TransitionSet returnTransition = new TransitionSet();
 
-        // Slide and fade the circular reveal container off the top of the screen.
-        /*TransitionSet slideFade = new TransitionSet();
-        slideFade.addTarget(rootView.findViewById(R.id.imageView1));
-        slideFade.addTransition(new Slide(Gravity.TOP));
-        slideFade.addTransition(new Fade());
-        returnTransition.addTransition(slideFade);*/
+            // Slide and fade the circular reveal container off the top of the screen.
+            /*TransitionSet slideFade = new TransitionSet();
+            slideFade.addTarget(rootView.findViewById(R.id.imageView1));
+            slideFade.addTransition(new Slide(Gravity.TOP));
+            slideFade.addTransition(new Fade());
+            returnTransition.addTransition(slideFade);*/
 
-        /*returnTransition.setOrdering(TransitionSet.ORDERING_TOGETHER);
+            /*returnTransition.setOrdering(TransitionSet.ORDERING_TOGETHER);
 
-        Transition recolor = new Recolor();
-        recolor.addTarget(mPagerAdapter.getCurrentDetailsFragment().getSharedNameElement());
-        recolor.addTarget(mPagerAdapter.getCurrentDetailsFragment().getSharedDateElement());
-        returnTransition.addTransition(recolor);
+            Transition recolor = new Recolor();
+            recolor.addTarget(mPagerAdapter.getCurrentDetailsFragment().getSharedNameElement());
+            recolor.addTarget(mPagerAdapter.getCurrentDetailsFragment().getSharedDateElement());
+            returnTransition.addTransition(recolor);
 
-        Transition changeBounds = new ChangeBounds();
-        changeBounds.addTarget(mPagerAdapter.getCurrentDetailsFragment().getSharedNameElement());
-        changeBounds.addTarget(mPagerAdapter.getCurrentDetailsFragment().getSharedDateElement());
-        returnTransition.addTransition(changeBounds);
+            Transition changeBounds = new ChangeBounds();
+            changeBounds.addTarget(mPagerAdapter.getCurrentDetailsFragment().getSharedNameElement());
+            changeBounds.addTarget(mPagerAdapter.getCurrentDetailsFragment().getSharedDateElement());
+            returnTransition.addTransition(changeBounds);
 
-        Transition textSize = new TextSizeTransition();
-        textSize.addTarget(mPagerAdapter.getCurrentDetailsFragment().getSharedNameElement());
-        textSize.addTarget(mPagerAdapter.getCurrentDetailsFragment().getSharedDateElement());
-        returnTransition.addTransition(textSize);*/
-        try {
-            // Slide the cards off the bottom of the screen.
-            Transition cardSlide = new Slide(Gravity.BOTTOM);
-            cardSlide.addTarget(rootView.findViewById(R.id.container));
-            returnTransition.addTransition(cardSlide);
-        }catch (Exception ignored){}
-        returnTransition.setDuration(getResources().getInteger(R.integer.transition_duration_millis));
-        return returnTransition;
+            Transition textSize = new TextSizeTransition();
+            textSize.addTarget(mPagerAdapter.getCurrentDetailsFragment().getSharedNameElement());
+            textSize.addTarget(mPagerAdapter.getCurrentDetailsFragment().getSharedDateElement());
+            returnTransition.addTransition(textSize);*/
+            try {
+                // Slide the cards off the bottom of the screen.
+                Transition cardSlide = new Slide(Gravity.BOTTOM);
+                cardSlide.addTarget(rootView.findViewById(R.id.container));
+                returnTransition.addTransition(cardSlide);
+            } catch (Exception ignored) {
+            }
+            returnTransition.setDuration(getResources().getInteger(R.integer.transition_duration_millis));
+            return returnTransition;
+        }
+        return null;
+
     }
 
     @Override
@@ -528,6 +533,9 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
 
                             mPlayAdapter = new PlayAdapter(getActivity(), null, searchQuery, fromDrawer, playListType);
                             mPagerAdapter.notifyDataSetChanged();
+                            if (mPlayAdapter.getItemCount() == 0){
+                                onBackPressed();
+                            }
 
                             dismiss();
                         }
