@@ -35,7 +35,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 
 import com.lastsoft.plog.adapter.PlayAdapter;
-import com.lastsoft.plog.util.FastScroller;
+
+import xyz.danoz.recyclerviewfastscroller.vertical.VerticalRecyclerViewFastScroller;
 
 public class PlaysFragment extends Fragment{
 
@@ -109,8 +110,13 @@ public class PlaysFragment extends Fragment{
 
         // BEGIN_INCLUDE(initializeRecyclerView)
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerView);
-        FastScroller fastScroller = (FastScroller) rootView.findViewById(R.id.fastscroller);
+        VerticalRecyclerViewFastScroller fastScroller = (VerticalRecyclerViewFastScroller) rootView.findViewById(R.id.fastscroller);
+
+        // Connect the recycler to the scroller (to let the scroller scroll the list)
         fastScroller.setRecyclerView(mRecyclerView, null);
+
+        // Connect the scroller to the recycler (to let the recycler scroll the scroller's handle)
+        mRecyclerView.setOnScrollListener(fastScroller.getOnScrollListener());
 
         // LinearLayoutManager is used here, this will layout the elements in a similar fashion
         // to the way ListView would layout elements. The RecyclerView.LayoutManager defines how
@@ -163,6 +169,7 @@ public class PlaysFragment extends Fragment{
                         mSearchQuery = "";
                         ((MainActivity) mActivity).initPlayAdapter(mSearchQuery, fromDrawer, playListType);
                         mSearch.setText(mSearchQuery);
+
                         //mActivity.onBackPressed();
                     }
 

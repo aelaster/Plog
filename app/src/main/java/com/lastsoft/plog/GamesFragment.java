@@ -18,7 +18,11 @@ package com.lastsoft.plog;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
@@ -38,9 +42,16 @@ import android.widget.TextView;
 
 import com.lastsoft.plog.adapter.GameAdapter;
 import com.lastsoft.plog.db.Game;
-import com.lastsoft.plog.util.FastScroller;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
 
 import net.i2p.android.ext.floatingactionbutton.FloatingActionButton;
+
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import xyz.danoz.recyclerviewfastscroller.vertical.VerticalRecyclerViewFastScroller;
 
 public class GamesFragment extends Fragment{
 
@@ -50,6 +61,9 @@ public class GamesFragment extends Fragment{
     private static final int DATASET_COUNT = 60;
     private float x,y;
     private boolean fromDrawer;
+    Uri photoUri;
+    File photoFile;
+    String mCurrentPhotoPath = "";
 
 
 
@@ -72,7 +86,6 @@ public class GamesFragment extends Fragment{
     private EditText mSearch;
     String mSearchQuery = "";
     private boolean releaseFocus = false;
-    FastScroller fastScroller;
     private int playListType = 0;
 
 
@@ -130,8 +143,13 @@ public class GamesFragment extends Fragment{
             }
         });
 
-        fastScroller = (FastScroller) rootView.findViewById(R.id.fastscroller);
+        VerticalRecyclerViewFastScroller fastScroller = (VerticalRecyclerViewFastScroller) rootView.findViewById(R.id.fastscroller);
+
+        // Connect the recycler to the scroller (to let the scroller scroll the list)
         fastScroller.setRecyclerView(mRecyclerView, pullToRefreshView);
+
+        // Connect the scroller to the recycler (to let the recycler scroll the scroller's handle)
+        mRecyclerView.setOnScrollListener(fastScroller.getOnScrollListener());
 
         FloatingActionButton addPlayer = (FloatingActionButton) rootView.findViewById(R.id.add_game);
         if (fromDrawer) {
@@ -256,6 +274,7 @@ public class GamesFragment extends Fragment{
         }
     }
 
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Get item selected and deal with it
@@ -364,7 +383,6 @@ public class GamesFragment extends Fragment{
         mAdapter = new GameAdapter(this, mActivity,mSearchQuery, fromDrawer, playListType);
         // Set CustomAdapter as the adapter for RecyclerView.
         mRecyclerView.setAdapter(mAdapter);
-        fastScroller.setPosition(0);
     }
 
     protected void updateDataset(){
@@ -372,7 +390,6 @@ public class GamesFragment extends Fragment{
         int firstVisible = ((LinearLayoutManager) mRecyclerView.getLayoutManager())
                 .findFirstCompletelyVisibleItemPosition();
         refreshDataset(false);
-        mRecyclerView.scrollToPosition(firstVisible);
     }
 
     /**
@@ -403,11 +420,73 @@ public class GamesFragment extends Fragment{
             mAdapter = new GameAdapter(GamesFragment.this, mActivity,mSearchQuery, fromDrawer, playListType);
             // Set CustomAdapter as the adapter for RecyclerView.
             mRecyclerView.setAdapter(mAdapter);
-            fastScroller.setPosition(0);
 
             mText.setVisibility(View.GONE);
             mProgress.setVisibility(View.GONE);
             mRecyclerView.setVisibility(View.VISIBLE);
+        }
+    }
+
+    Game theGame;
+    public void captureBox(Game game){
+        theGame = game;
+        try{
+            InputMethodManager inputManager = (InputMethodManager)
+                    mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
+
+            inputManager.hideSoftInputFromWindow(mActivity.getCurrentFocus().getWindowToken(),
+                    InputMethodManager.HIDE_NOT_ALWAYS);
+        }catch (Exception ignored){}
+
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        // Ensure that there's a camera activity to handle the intent
+        if (takePictureIntent.resolveActivity(mActivity.getPackageManager()) != null) {
+            // Create the File where the photo should go
+            photoFile = null;
+            try {
+                photoFile = createImageFile();
+            } catch (IOException ex) {
+                // Error occurred while creating the File
+
+            }
+            // Continue only if the File was successfully created
+            if (photoFile != null) {
+                photoUri = Uri.fromFile(photoFile);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,
+                        photoUri);
+                startActivityForResult(takePictureIntent, 0);
+            }
+        }
+    }
+
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "PLAY_" + timeStamp + "_";
+        File storageDir = Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        mCurrentPhotoPath = "file://" + image.getAbsolutePath();
+        return image;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        DisplayImageOptions options = new DisplayImageOptions.Builder()
+                .cacheOnDisk(true)
+                .cacheInMemory(true)
+                .considerExifParams(true)
+                .build();
+        if (requestCode == 0 && resultCode == -1) {
+            //captured
+            theGame.gameBoxImage = mCurrentPhotoPath;
+            theGame.save();
         }
     }
 }

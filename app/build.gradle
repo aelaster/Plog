@@ -36,4 +36,5 @@ dependencies {
     compile 'com.kbeanie:image-chooser-library:1.4.4@aar'
     compile 'com.facebook.android:facebook-android-sdk:4.1.0'
     compile 'com.github.PhilJay:MPAndroidChart:v2.1.0'
+    compile project(':recyclerviewfastscroller')
 }

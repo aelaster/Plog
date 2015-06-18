@@ -18,11 +18,13 @@ public class Game extends SugarRecord<Game> {
     public String gameBGGID;
     public String gameImage;
     public String gameThumb;
+    public String gameBoxImage;
     public boolean expansionFlag;
     public int tbtCount;
     public Date taggedToPlay;
 
     public Game() {
+        this.taggedToPlay = null;
     }
 
     public Game(String gameName, String gameBGGID, String gameImage, String gameThumb, boolean expansionFlag) {

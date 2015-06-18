@@ -29,12 +29,13 @@ import android.view.ViewGroup;
 
 import com.lastsoft.plog.adapter.PlayerAdapter;
 import com.lastsoft.plog.db.Player;
-import com.lastsoft.plog.util.FastScroller;
 
 import net.i2p.android.ext.floatingactionbutton.FloatingActionButton;
 import net.i2p.android.ext.floatingactionbutton.FloatingActionsMenu;
 
 import java.util.List;
+
+import xyz.danoz.recyclerviewfastscroller.vertical.VerticalRecyclerViewFastScroller;
 
 /**
  * Demonstrates the use of {@link RecyclerView} with a {@link LinearLayoutManager} and a
@@ -81,8 +82,13 @@ public class PlayersFragment extends Fragment{
 
         // BEGIN_INCLUDE(initializeRecyclerView)
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerView);
-        FastScroller fastScroller = (FastScroller) rootView.findViewById(R.id.fastscroller);
+        VerticalRecyclerViewFastScroller fastScroller = (VerticalRecyclerViewFastScroller) rootView.findViewById(R.id.fastscroller);
+
+        // Connect the recycler to the scroller (to let the scroller scroll the list)
         fastScroller.setRecyclerView(mRecyclerView, null);
+
+        // Connect the scroller to the recycler (to let the recycler scroll the scroller's handle)
+        mRecyclerView.setOnScrollListener(fastScroller.getOnScrollListener());
 
         fabMenu = (FloatingActionsMenu) rootView.findViewById(R.id.multiple_actions);
 

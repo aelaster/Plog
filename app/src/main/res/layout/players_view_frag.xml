@@ -31,13 +31,12 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             />
-    <com.lastsoft.plog.util.FastScroller
+    <xyz.danoz.recyclerviewfastscroller.vertical.VerticalRecyclerViewFastScroller
         android:id="@+id/fastscroller"
-        android:layout_width="wrap_content"
+        android:layout_width="10dp"
         android:layout_height="match_parent"
-        android:layout_alignTop="@id/recyclerView"
-        android:layout_alignBottom="@id/recyclerView"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignParentRight="true"
+        />
 
     <!--</android.support.v4.widget.SwipeRefreshLayout>-->
 

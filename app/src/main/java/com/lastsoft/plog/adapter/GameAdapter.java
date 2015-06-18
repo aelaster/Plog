@@ -17,6 +17,8 @@
 package com.lastsoft.plog.adapter;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -30,6 +32,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.lastsoft.plog.GamesFragment;
 import com.lastsoft.plog.MainActivity;
 import com.lastsoft.plog.R;
 import com.lastsoft.plog.db.Game;
@@ -47,7 +50,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
 
     private List<Game> games;
     private DisplayImageOptions options;
-    private Activity myActivity;
+    private Activity mActivity;
     private Fragment myFragment;
     private boolean fromDrawer;
     int mPosition;
@@ -98,11 +101,11 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
     }
     // END_INCLUDE(recyclerViewSampleViewHolder)
 
-    public GameAdapter(Fragment mFragment, Activity mActivity, String mSearchQuery, boolean mFromDrawer, int mPlayListType) {
+    public GameAdapter(Fragment mFragment, Activity theActivity, String mSearchQuery, boolean mFromDrawer, int mPlayListType) {
         //games = Game.listAll(Game.class);
         //find(Class<T> type, String whereClause, String[] whereArgs, String groupBy, String orderBy, String limit)
         myFragment = mFragment;
-        myActivity = mActivity;
+        mActivity = theActivity;
         playListType = mPlayListType;
 
         switch (playListType) {
@@ -161,7 +164,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
                 viewHolder.getClickLayout().setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        ((MainActivity) myActivity).openAddPlay(myFragment, games.get(position).gameName, -1);
+                        ((MainActivity) mActivity).openAddPlay(myFragment, games.get(position).gameName, -1);
                     }
                 });
             }else{
@@ -179,13 +182,16 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
     }
 
     public void playPopup(View v, final int position) {
-        PopupMenu popup = new PopupMenu(myActivity, v);
+        PopupMenu popup = new PopupMenu(mActivity, v);
 
         MenuInflater inflater = popup.getMenuInflater();
-        if(games.get(position).gameBGGID.equals("")){
-            inflater.inflate(R.menu.game_overflow_update, popup.getMenu());
-        }else {
-            inflater.inflate(R.menu.game_overflow, popup.getMenu());
+
+        inflater.inflate(R.menu.game_overflow, popup.getMenu());
+        if(games.get(position).gameBGGID == null || games.get(position).gameBGGID.equals("")) {
+            popup.getMenu().removeItem(R.id.update_bgg);
+        }
+        if (games.get(position).gameBoxImage == null || games.get(position).gameBoxImage.equals("")){
+            popup.getMenu().removeItem(R.id.view_box_photo);
         }
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
@@ -194,23 +200,32 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
                     case R.id.delete_game:
                         //delete the play
                         //refresh play list
-                        ((MainActivity) myActivity).deleteGame(games.get(position).getId());
+                        ((MainActivity) mActivity).deleteGame(games.get(position).getId());
                         return true;
                     case R.id.add_tenbyten:
                         //delete the play
                         //refresh play list
-                        ((MainActivity) myActivity).addToTenXTen(games.get(position).getId());
+                        ((MainActivity) mActivity).addToTenXTen(games.get(position).getId());
                         return true;
                     case R.id.view_plays:
                         //delete the play
                         //refresh play list
-                        ((MainActivity) myActivity).openPlays(games.get(position).gameName, false, 0);
+                        ((MainActivity) mActivity).openPlays(games.get(position).gameName, false, 0);
                         return true;
                     case R.id.update_bgg:
                         //delete the play
                         //refresh play list
                         mPosition = position;
-                        ((MainActivity) myActivity).updateGameViaBGG(games.get(position).gameName);
+                        ((MainActivity) mActivity).updateGameViaBGG(games.get(position).gameName);
+                        return true;
+                    case R.id.add_box_photo:
+                        ((GamesFragment)myFragment).captureBox(games.get(position));
+                        return true;
+                    case R.id.view_box_photo:
+                        Intent intent = new Intent();
+                        intent.setAction(Intent.ACTION_VIEW);
+                        intent.setDataAndType(Uri.parse(games.get(position).gameBoxImage), "image/*");
+                        mActivity.startActivity(intent);
                         return true;
                     default:
                         return false;
