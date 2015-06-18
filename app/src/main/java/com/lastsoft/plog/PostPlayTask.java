@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.lastsoft.plog.db.Game;
 import com.lastsoft.plog.db.GamesPerPlay;
 import com.lastsoft.plog.db.Play;
 import com.lastsoft.plog.db.PlayersPerPlay;
@@ -58,13 +59,14 @@ public class PostPlayTask extends AsyncTask<Play, Void, String> {
             String output = outputFormatter.format(playToLog[0].playDate); // Output : 01/20/2010
 
 
+            Game theGame = GamesPerPlay.getBaseGame(playToLog[0]);
             UrlEncodedFormEntity entity;
             List<NameValuePair> nvps = new ArrayList<NameValuePair>();
             nvps.add(new BasicNameValuePair("ajax", "1"));
             nvps.add(new BasicNameValuePair("action", "save"));
             nvps.add(new BasicNameValuePair("version", "2"));
             nvps.add(new BasicNameValuePair("objecttype", "thing"));
-            nvps.add(new BasicNameValuePair("objectid", GamesPerPlay.getBaseGame(playToLog[0]).gameBGGID));
+            nvps.add(new BasicNameValuePair("objectid", theGame.gameBGGID));
             nvps.add(new BasicNameValuePair("playdate", output));
             nvps.add(new BasicNameValuePair("dateinput", output));
             //nvps.add(new BasicNameValuePair("length", String.valueOf(60)));
@@ -83,8 +85,8 @@ public class PostPlayTask extends AsyncTask<Play, Void, String> {
                 //addPair(nvps, player.getId().intValue(), "position", StartingPosition);
                 addPair(nvps, player.getId().intValue(), "score", player.score+"");
                 //addPair(nvps, player.getId().intValue(), "rating", String.valueOf(Rating));
-                //addPair(nvps, player.getId().intValue(), "new", New ? "1" : "0");
-                //addPair(nvps, player.getId().intValue(), "win", Win ? "1" : "0");
+                addPair(nvps, player.getId().intValue(), "new", GamesPerPlay.hasGameBeenPlayed(theGame, player.player) ? "0" : "1");
+                addPair(nvps, player.getId().intValue(), "win", PlayersPerPlay.isWinner(playToLog[0], player.player) ? "1" : "0");
             }
 
 

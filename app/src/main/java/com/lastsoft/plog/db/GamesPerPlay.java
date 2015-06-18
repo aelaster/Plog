@@ -1,7 +1,5 @@
 package com.lastsoft.plog.db;
 
-import android.util.Log;
-
 import com.orm.StringUtil;
 import com.orm.SugarRecord;
 import com.orm.query.Condition;
@@ -60,4 +58,14 @@ public class GamesPerPlay extends SugarRecord<GamesPerPlay> {
         return (!tester.isEmpty());
     }
 
+    public static boolean hasGameBeenPlayed(Game game, Player player){
+        List<GamesPerPlay> query = GamesPerPlay.findWithQuery(GamesPerPlay.class,
+                " SELECT "+ StringUtil.toSQLName("GamesPerPlay") + ".*" +
+                        " FROM " + StringUtil.toSQLName("GamesPerPlay") +
+                        " INNER JOIN " + StringUtil.toSQLName("PlayersPerPlay") +
+                        " ON " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("play") + " = " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("play") +
+                        " and " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("game") + " = ? " +
+                        " and " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("player") + " = ? ", game.getId().toString(), player.getId().toString());
+        return query.size() > 1;
+    }
 }

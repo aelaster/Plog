@@ -176,6 +176,16 @@ public class PlayersPerPlay extends SugarRecord<PlayersPerPlay> {
         return getPlayers.list();
     }
 
+
+    public static boolean isWinner(Play play, Player player) {
+        return !(PlayersPerPlay.findWithQuery(PlayersPerPlay.class,
+                " SELECT "+ StringUtil.toSQLName("PlayersPerPlay") +".* " +
+                        " FROM " + StringUtil.toSQLName("PlayersPerPlay") +
+                        " WHERE "+ StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("play") + " = ? " +
+                        " AND "+ StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("player") + " = ? " +
+                        " AND "+ StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("score") + " >= " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("playHighScore"), play.getId().toString(), player.getId().toString()).isEmpty());
+    }
+
     public static int getHighScore(Play play){
         List<PlayersPerPlay> queery = PlayersPerPlay.findWithQuery(PlayersPerPlay.class, "Select * from " + StringUtil.toSQLName("PlayersPerPlay") + " where " + StringUtil.toSQLName("play") + " = ? and " + StringUtil.toSQLName("score") + " = (Select Max(" + StringUtil.toSQLName("score") + ") from " + StringUtil.toSQLName("PlayersPerPlay") + " where " + StringUtil.toSQLName("play") + " = ?)", play.getId().toString(), play.getId().toString());
         return queery.get(0).score;

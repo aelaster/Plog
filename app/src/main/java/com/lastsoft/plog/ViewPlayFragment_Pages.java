@@ -130,7 +130,6 @@ public class ViewPlayFragment_Pages extends Fragment {
 
     public void drawLayout(){
         thisPlay = Play.findById(Play.class, playID);
-
         //Log.d("V1", "imageTransID = " + imageTransID);
 
         DisplayImageOptions options = new DisplayImageOptions.Builder()
