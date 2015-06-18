@@ -85,6 +85,18 @@ public class FastScroller extends LinearLayout {
         super.onLayout(changed, l, t, r, b);
         if(changed) {
             setUpCalculator();
+            View visibleChild = recyclerView.getChildAt(0);
+            RecyclerView.ViewHolder holder = recyclerView.getChildViewHolder(visibleChild);
+            int itemHeight = holder.itemView.getHeight();
+            int recyclerHeight = recyclerView.getHeight();
+            int itemsInWindow = recyclerHeight / itemHeight;
+
+            int numItemsInList = recyclerView.getAdapter().getItemCount();
+            if (numItemsInList <= itemsInWindow){
+                bubble.setVisibility(View.GONE);
+            }else{
+                bubble.setVisibility(View.VISIBLE);
+            }
         }
 
     }
@@ -113,7 +125,6 @@ public class FastScroller extends LinearLayout {
         this.recyclerView = recyclerView;
         this.pullToRefresh = pullToRefresh;
         recyclerView.setOnScrollListener(scrollListener);
-
     }
 
     private void setRecyclerViewPosition(float y) {
