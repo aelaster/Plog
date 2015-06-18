@@ -6,6 +6,7 @@ import com.orm.query.Condition;
 import com.orm.query.Select;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -19,6 +20,7 @@ public class Game extends SugarRecord<Game> {
     public String gameThumb;
     public boolean expansionFlag;
     public int tbtCount;
+    public Date taggedToPlay;
 
     public Game() {
     }

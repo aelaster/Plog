@@ -142,7 +142,6 @@ public class PlaysFragment extends Fragment{
                     mSearchQuery = cs.toString();
                     //initDataset();
                     //mAdapter = new GameAdapter(PlaysFragment.this, mActivity,mSearchQuery);
-
                     mAdapter = ((MainActivity) mActivity).initPlayAdapter(mSearchQuery, fromDrawer, playListType);
                     // Set CustomAdapter as the adapter for RecyclerView.
                     mRecyclerView.setAdapter(mAdapter);

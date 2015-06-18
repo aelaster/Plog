@@ -113,8 +113,7 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
         myActivity = mActivity;
         myFragment = mFragment;
         playListType = mPlayListType;
-        //fromDrawer = mFromDrawer;
-        //plays = Play.listPlaysNewOld();
+        fromDrawer = mFromDrawer;
 
         /*
         playListType:

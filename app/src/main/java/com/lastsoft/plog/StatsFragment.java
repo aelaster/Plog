@@ -84,7 +84,7 @@ public class StatsFragment extends Fragment {
 
         ArrayAdapter<String> mSpinnerAdapter = null;
         if (mActionBar != null) {
-            mSpinnerAdapter = new ArrayAdapter<>(mActionBar.getThemedContext(), android.R.layout.simple_list_item_1, gameGroupNames);
+            mSpinnerAdapter = new ArrayAdapter<>(mActionBar.getThemedContext(), R.layout.simple_list_item_1, gameGroupNames);
         }
         if (mActionBar != null) {
             mActionBar.setListNavigationCallbacks(mSpinnerAdapter, new ActionBar.OnNavigationListener() {
