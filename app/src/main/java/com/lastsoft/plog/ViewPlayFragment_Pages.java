@@ -24,6 +24,8 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
@@ -107,8 +109,9 @@ public class ViewPlayFragment_Pages extends Fragment {
 
         TextView playerView = (TextView) newView.findViewById(R.id.player);
         TextView scoreView = (TextView) newView.findViewById(R.id.score);
+        NumberFormat nf = new DecimalFormat("###.#");
         playerView.setText(playerName);
-        scoreView.setText(score);
+        scoreView.setText(nf.format(Float.parseFloat(score)));
         if (winnerFlag){
             playerView.setTextSize(20);
             scoreView.setTextSize(20);
@@ -192,7 +195,7 @@ public class ViewPlayFragment_Pages extends Fragment {
         }
 
         List<PlayersPerPlay> players = PlayersPerPlay.getPlayers_Winners(thisPlay);
-        int highScore = PlayersPerPlay.getHighScore(thisPlay);
+        float highScore = PlayersPerPlay.getHighScore(thisPlay);
         for(PlayersPerPlay player:players){
             Player thisPlayer = player.player;
             if (player.score < highScore) {

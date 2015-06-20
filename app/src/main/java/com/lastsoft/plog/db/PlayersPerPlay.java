@@ -14,15 +14,15 @@ public class PlayersPerPlay extends SugarRecord<PlayersPerPlay> {
 
     public Player player;
     public Play play;
-    public int score;
+    public float score;
     public String color;
-    public int playHighScore;
+    public float playHighScore;
 
     public PlayersPerPlay() {
     }
 
 
-    public PlayersPerPlay(Player player, Play play, int score, String color, int playHighScore) {
+    public PlayersPerPlay(Player player, Play play, float score, String color, float playHighScore) {
         this.player = player;
         this.play = play;
         this.score = score;
@@ -30,7 +30,7 @@ public class PlayersPerPlay extends SugarRecord<PlayersPerPlay> {
         this.playHighScore = playHighScore;
     }
 
-    public PlayersPerPlay(Player player, Play play, int score, int playHighScore) {
+    public PlayersPerPlay(Player player, Play play, float score, float playHighScore) {
         this.player = player;
         this.play = play;
         this.score = score;
@@ -186,7 +186,7 @@ public class PlayersPerPlay extends SugarRecord<PlayersPerPlay> {
                         " AND "+ StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("score") + " >= " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("playHighScore"), play.getId().toString(), player.getId().toString()).isEmpty());
     }
 
-    public static int getHighScore(Play play){
+    public static float getHighScore(Play play){
         List<PlayersPerPlay> queery = PlayersPerPlay.findWithQuery(PlayersPerPlay.class, "Select * from " + StringUtil.toSQLName("PlayersPerPlay") + " where " + StringUtil.toSQLName("play") + " = ? and " + StringUtil.toSQLName("score") + " = (Select Max(" + StringUtil.toSQLName("score") + ") from " + StringUtil.toSQLName("PlayersPerPlay") + " where " + StringUtil.toSQLName("play") + " = ?)", play.getId().toString(), play.getId().toString());
         return queery.get(0).score;
     }

@@ -64,15 +64,17 @@ public class StatsFragment_Wins extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        statsView = inflater.inflate(R.layout.fragment_statistics, container, false);
-        if (gameGroup > 0) {
-            groupPlayers = GameGroup.getGroupPlayers(GameGroup.findById(GameGroup.class, gameGroup));
-            mContainerView_Players = (ViewGroup) statsView.findViewById(R.id.container_players);
-            LoadStatsTask initStats = new LoadStatsTask(mActivity, gameGroup);
-            try {
-                initStats.execute();
-            } catch (Exception ignored) {
+        if (savedInstanceState == null) {
+            statsView = inflater.inflate(R.layout.fragment_statistics, container, false);
+            if (gameGroup > 0) {
+                groupPlayers = GameGroup.getGroupPlayers(GameGroup.findById(GameGroup.class, gameGroup));
+                mContainerView_Players = (ViewGroup) statsView.findViewById(R.id.container_players);
+                LoadStatsTask initStats = new LoadStatsTask(mActivity, gameGroup);
+                try {
+                    initStats.execute();
+                } catch (Exception ignored) {
 
+                }
             }
         }
         return statsView;

@@ -128,19 +128,10 @@ public class LoadGamesTask extends AsyncTask<String, Void, String> {
                 if (defaultPlayer != null) {
                     //Log.d("V1", "https://www.boardgamegeek.com/xmlapi2/collection?username=" + defaultPlayer.bggUsername);
                     myString = getGamesCollection(defaultPlayer.bggUsername);
+                   // Log.d("V1", myString);
                     if (myString != null && myString.contains("will be processed")){
                         //do it again
-                        myString = getGamesCollection(defaultPlayer.bggUsername);
                         bggProcess = "true";
-                        /*fiveSecondHandler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                //System.gc();
-                                //Log.d("V1", "background status allocated=" + Long.toString(Debug.getNativeHeapAllocatedSize()));
-                                //Log.d("V1", "background status free=" + Long.toString(Debug.getNativeHeapFreeSize()));
-                                doGetStatus();
-                            }
-                        }, 5000);*/
                     }
 
                     XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
@@ -235,6 +226,7 @@ public class LoadGamesTask extends AsyncTask<String, Void, String> {
 
     @Override
     protected void onPostExecute(final String result) {
+        Log.d("V1", "result = " + result);
         if (result.equals("true")) {
             Toast.makeText(theContext, theContext.getString(R.string.bgg_process_notice), Toast.LENGTH_LONG).show();
         }

@@ -413,17 +413,24 @@ public class GamesFragment extends Fragment{
 
         @Override
         protected void onPostExecute(final String result) {
-            pullToRefreshView.setRefreshing(false);
-            myTask = null;
+            if (result.equals("true")) {
+                //Toast.makeText(theContext, theContext.getString(R.string.bgg_process_notice), Toast.LENGTH_LONG).show();
+                //go again
+                //wait a few seconds before tryi
+                initDataset();
+            }else {
+                pullToRefreshView.setRefreshing(false);
+                myTask = null;
 
-            //mAdapter = new CustomAdapter(mDataset, mDataset_Thumb);
-            mAdapter = new GameAdapter(GamesFragment.this, mActivity,mSearchQuery, fromDrawer, playListType);
-            // Set CustomAdapter as the adapter for RecyclerView.
-            mRecyclerView.setAdapter(mAdapter);
+                //mAdapter = new CustomAdapter(mDataset, mDataset_Thumb);
+                mAdapter = new GameAdapter(GamesFragment.this, mActivity, mSearchQuery, fromDrawer, playListType);
+                // Set CustomAdapter as the adapter for RecyclerView.
+                mRecyclerView.setAdapter(mAdapter);
 
-            mText.setVisibility(View.GONE);
-            mProgress.setVisibility(View.GONE);
-            mRecyclerView.setVisibility(View.VISIBLE);
+                mText.setVisibility(View.GONE);
+                mProgress.setVisibility(View.GONE);
+                mRecyclerView.setVisibility(View.VISIBLE);
+            }
         }
     }
 

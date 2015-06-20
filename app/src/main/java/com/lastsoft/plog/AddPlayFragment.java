@@ -56,6 +56,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -439,7 +441,8 @@ public class AddPlayFragment extends Fragment implements
         scoreValue.addTextChangedListener(new MyTextWatcher(player, addedPlayer));
         scoreValue.setSelectAllOnFocus(true);
         //if (addedPlayer.score != -9999999) {
-        scoreValue.setText(""+addedPlayer.score);
+        NumberFormat nf = new DecimalFormat("###.#");
+        scoreValue.setText(""+nf.format(addedPlayer.score));
         //}
 
 
@@ -629,7 +632,7 @@ public class AddPlayFragment extends Fragment implements
                             }
                         }
 
-                        int highScore = -99999;
+                        float highScore = -99999;
                         for (int i = 0; i < adapter.getCount(); i++) {
                             AddPlayer thisGuy = adapter.getItem(i);
                             if (thisGuy.score > highScore){
@@ -933,9 +936,9 @@ public class AddPlayFragment extends Fragment implements
         public long playerID;
         public String playerName;
         public String color;
-        public int score;
+        public float score;
 
-        public AddPlayer(long playerID, String playerName, String color, int score) {
+        public AddPlayer(long playerID, String playerName, String color, float score) {
             this.playerID = playerID;
             this.playerName = playerName;
             this.color = color;
@@ -1015,7 +1018,7 @@ public class AddPlayFragment extends Fragment implements
                 //Log.d("V1", playerToUpdate.playerName);
                 String score = editable.toString().trim();
                 if (!score.equals("")) {
-                    playerToUpdate.score = Integer.parseInt(score);
+                    playerToUpdate.score = Float.parseFloat(score);
                 }
             }
         }
