@@ -146,13 +146,14 @@ public class GamesFragment extends Fragment{
         VerticalRecyclerViewFastScroller fastScroller = (VerticalRecyclerViewFastScroller) rootView.findViewById(R.id.fastscroller);
 
         // Connect the recycler to the scroller (to let the scroller scroll the list)
-        fastScroller.setRecyclerView(mRecyclerView, pullToRefreshView);
+        //fastScroller.setRecyclerView(mRecyclerView, pullToRefreshView);
 
         // Connect the scroller to the recycler (to let the recycler scroll the scroller's handle)
         mRecyclerView.setOnScrollListener(fastScroller.getOnScrollListener());
 
         FloatingActionButton addPlayer = (FloatingActionButton) rootView.findViewById(R.id.add_game);
         if (fromDrawer && playListType != 2) {
+            fastScroller.setRecyclerView(mRecyclerView, pullToRefreshView);
             addPlayer.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -165,6 +166,8 @@ public class GamesFragment extends Fragment{
                 }
             });
         }else{
+            fastScroller.setRecyclerView(mRecyclerView, null);
+            pullToRefreshView.setEnabled(false);
             addPlayer.setVisibility(View.GONE);
         }
 
