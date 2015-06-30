@@ -3,7 +3,6 @@ package com.lastsoft.plog;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -699,10 +698,19 @@ public class AddPlayFragment extends Fragment implements
                             }
                         }
 
+                        //remove from bucket list if it's there
+                        Game baseGame = Game.findGameByName(gameName);
+                        if (baseGame.taggedToPlay > 0){
+                            baseGame.taggedToPlay = 0;
+                            baseGame.save();
+                            if (mActivity instanceof MainActivity) {
+                                onButtonPressed("refresh_games");
+                            }
+                        }
+
                         savedThis = true;
-                        if (playID <= 0){
-                            //new play
-                            if (((MainActivity)mActivity).mLogInHelper.canLogIn()) {
+                        //if (playID <= 0){
+                            //if (((MainActivity)mActivity).mLogInHelper.canLogIn()) {
                                 SharedPreferences app_preferences = PreferenceManager.getDefaultSharedPreferences(mActivity);
                                 long currentDefaultPlayer = app_preferences.getLong("defaultPlayer", -1);
                                 if (currentDefaultPlayer >= 0) {
@@ -715,8 +723,8 @@ public class AddPlayFragment extends Fragment implements
 
                                     }
                                 }
-                            }
-                        }
+                            //}
+                        //}
                     } catch (ParseException e) {
                         e.printStackTrace();
                     }
@@ -800,7 +808,13 @@ public class AddPlayFragment extends Fragment implements
                         ((MainActivity) mActivity).setUpActionBar(6);
                     }
                 } else {
-                    ((MainActivity) mActivity).setUpActionBar(4);
+                    if (((MainActivity) mActivity).mGamesFragment != null) {
+                        if(((MainActivity) mActivity).mGamesFragment.getQuery().equals("BucketList")) {
+                            ((MainActivity) mActivity).setUpActionBar(12);
+                        }else{
+                            ((MainActivity) mActivity).setUpActionBar(4);
+                        }
+                    }
                 }
             }
             mActivity = null;
@@ -816,27 +830,27 @@ public class AddPlayFragment extends Fragment implements
     }
 
     public class PlayPoster extends PostPlayTask {
-        private final ProgressDialog mydialog;
+        //private final ProgressDialog mydialog;
         public PlayPoster(Context context, String bggUsername) {
             super(context, bggUsername);
-            mydialog = new ProgressDialog(theContext);
+            //mydialog = new ProgressDialog(theContext);
         }
 
         // can use UI thread here
         @Override
         protected void onPreExecute() {
 
-            mydialog.setMessage(theContext.getString(R.string.posting_play));
+            /*mydialog.setMessage(theContext.getString(R.string.posting_play));
             mydialog.setCancelable(false);
             try{
                 mydialog.show();
-            }catch (Exception e){}
+            }catch (Exception e){}*/
         }
 
 
         @Override
         protected void onPostExecute(final String result) {
-            mydialog.dismiss();
+            //mydialog.dismiss();
         }
     }
 

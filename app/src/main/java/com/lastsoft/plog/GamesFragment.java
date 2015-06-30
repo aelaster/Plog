@@ -108,7 +108,7 @@ public class GamesFragment extends Fragment{
             mSearchQuery = getArguments().getString("searchQuery");
             playListType = getArguments().getInt("playListType");
         }
-        if (fromDrawer) {
+        if (fromDrawer && playListType != 2) {
             try {
                 ActionBar actionBar = ((MainActivity) mActivity).getSupportActionBar();
                 //actionBar.setDisplayShowCustomEnabled(true);
@@ -152,7 +152,7 @@ public class GamesFragment extends Fragment{
         mRecyclerView.setOnScrollListener(fastScroller.getOnScrollListener());
 
         FloatingActionButton addPlayer = (FloatingActionButton) rootView.findViewById(R.id.add_game);
-        if (fromDrawer) {
+        if (fromDrawer && playListType != 2) {
             addPlayer.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -293,7 +293,11 @@ public class GamesFragment extends Fragment{
         super.onStart();
         if (fromDrawer) {
             if (mActivity != null) {
-                ((MainActivity) mActivity).setUpActionBar(4);
+                if(playListType != 2) {
+                    ((MainActivity) mActivity).setUpActionBar(4);
+                }else{
+                    ((MainActivity) mActivity).setUpActionBar(12);
+                }
             }
         }else{
             if (mActivity != null) {

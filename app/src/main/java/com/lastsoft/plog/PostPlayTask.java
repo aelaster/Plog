@@ -30,6 +30,8 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,12 +56,13 @@ public class PostPlayTask extends AsyncTask<Play, Void, String> {
         Log.d("V1", "trying to post a play to bgg");
 
         BGGLogInHelper helper = new BGGLogInHelper(theContext, null);
-        if (helper.checkCookies()) {
+        if (helper.canLogIn() && helper.checkCookies()) {
             DateFormat outputFormatter = new SimpleDateFormat("yyyy-MM-dd");
             String output = outputFormatter.format(playToLog[0].playDate); // Output : 01/20/2010
 
-
+            //first we do the base game
             Game theGame = GamesPerPlay.getBaseGame(playToLog[0]);
+
             UrlEncodedFormEntity entity;
             List<NameValuePair> nvps = new ArrayList<NameValuePair>();
             nvps.add(new BasicNameValuePair("ajax", "1"));
@@ -69,6 +72,9 @@ public class PostPlayTask extends AsyncTask<Play, Void, String> {
             nvps.add(new BasicNameValuePair("objectid", theGame.gameBGGID));
             nvps.add(new BasicNameValuePair("playdate", output));
             nvps.add(new BasicNameValuePair("dateinput", output));
+            if (playToLog[0].bggPlayID != null && !playToLog[0].bggPlayID.equals("")){
+                nvps.add(new BasicNameValuePair("playid", playToLog[0].bggPlayID));
+            }
             //nvps.add(new BasicNameValuePair("length", String.valueOf(60)));
             nvps.add(new BasicNameValuePair("location", "Plog"));
             nvps.add(new BasicNameValuePair("quantity", String.valueOf(1)));
@@ -83,14 +89,12 @@ public class PostPlayTask extends AsyncTask<Play, Void, String> {
                 addPair(nvps, player.getId().intValue(), "username", player.player.bggUsername);
                 addPair(nvps, player.getId().intValue(), "color", player.color);
                 //addPair(nvps, player.getId().intValue(), "position", StartingPosition);
-                addPair(nvps, player.getId().intValue(), "score", player.score+"");
+                NumberFormat nf = new DecimalFormat("###.#");
+                addPair(nvps, player.getId().intValue(), "score", nf.format(player.score)+"");
                 //addPair(nvps, player.getId().intValue(), "rating", String.valueOf(Rating));
                 addPair(nvps, player.getId().intValue(), "new", GamesPerPlay.hasGameBeenPlayed(theGame, player.player) ? "0" : "1");
                 addPair(nvps, player.getId().intValue(), "win", PlayersPerPlay.isWinner(playToLog[0], player.player) ? "1" : "0");
             }
-
-
-
 
             try {
                 entity = new UrlEncodedFormEntity(nvps, HTTP.UTF_8);

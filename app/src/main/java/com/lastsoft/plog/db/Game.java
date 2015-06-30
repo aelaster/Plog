@@ -162,4 +162,13 @@ public class Game extends SugarRecord<Game> {
                         " and " + StringUtil.toSQLName("GameGroup") + " = ? group by " + StringUtil.toSQLName("game") +
                         " order by " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " ASC, "  + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " DESC", group.getId().toString());
     }
+
+    public static List<Game> getBucketList(){
+        //return Game.find(Game.class, StringUtil.toSQLName("expansionFlag") + " = 0");
+        Select findBaseGames = Select.from(Game.class);
+        findBaseGames.where(Condition.prop(StringUtil.toSQLName("taggedToPlay")).notEq("0"), Condition.prop(StringUtil.toSQLName("taggedToPlay")).notEq(""), Condition.prop(StringUtil.toSQLName("expansionFlag")).eq("0"));
+        findBaseGames.orderBy(StringUtil.toSQLName("taggedToPlay") + " ASC");
+        findBaseGames.orderBy(StringUtil.toSQLName("gameName") + " ASC");
+        return findBaseGames.list();
+    }
 }

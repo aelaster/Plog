@@ -40,6 +40,11 @@ import com.lastsoft.plog.db.GameGroup;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -61,7 +66,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
      * Provide a reference to the type of views that you are using (custom ViewHolder)
      */
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        private final TextView textView;
+        private final TextView textView, bucketDateView;
         private final ImageView imageView;
         private final LinearLayout overflowLayout;
         private final LinearLayout clickLayout;
@@ -77,6 +82,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
                 }
             });
             textView = (TextView) v.findViewById(R.id.gameName);
+            bucketDateView = (TextView) v.findViewById(R.id.bucketDate);
             imageView = (ImageView) v.findViewById(R.id.imageView1);
             overflowLayout = (LinearLayout) v.findViewById(R.id.overflowLayout);
             clickLayout = (LinearLayout) v.findViewById(R.id.clickLayout);
@@ -88,6 +94,9 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
         }
         public TextView getTextView() {
             return textView;
+        }
+        public TextView getBucketDateView() {
+            return bucketDateView;
         }
         public LinearLayout getOverflowLayout() {
             return overflowLayout;
@@ -114,6 +123,9 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
                 break;
             case 1:
                 games = Game.getUniqueGames_GameGroup(GameGroup.findById(GameGroup.class, Long.parseLong(mSearchQuery)));
+                break;
+            case 2:
+                games = Game.getBucketList();
                 break;
             default:
                 games = Game.findBaseGames(mSearchQuery);
@@ -154,6 +166,17 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
             } else {
                 viewHolder.getImageView().setImageDrawable(null);
             }
+
+            if (games.get(position).taggedToPlay > 0 && playListType == 2){
+                Date theDate = new Date(((long)games.get(position).taggedToPlay)*1000L);
+                DateFormat outputFormatter = new SimpleDateFormat("MM/dd/yyyy");
+                String output_date = outputFormatter.format(theDate); // Output : 01/20/2012
+                viewHolder.getBucketDateView().setText(output_date);
+                viewHolder.getBucketDateView().setVisibility(View.VISIBLE);
+            }else{
+                viewHolder.getBucketDateView().setVisibility(View.GONE);
+            }
+
             if (playListType != 1) {
                 viewHolder.getOverflowLayout().setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -193,6 +216,11 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
         if (games.get(position).gameBoxImage == null || games.get(position).gameBoxImage.equals("")){
             popup.getMenu().removeItem(R.id.view_box_photo);
         }
+        if (games.get(position).taggedToPlay <= 0){
+            popup.getMenu().removeItem(R.id.remove_bucket_list);
+        }else{
+            popup.getMenu().removeItem(R.id.add_bucket_list);
+        }
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
@@ -219,7 +247,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
                         ((MainActivity) mActivity).updateGameViaBGG(games.get(position).gameName);
                         return true;
                     case R.id.add_box_photo:
-                        ((GamesFragment)myFragment).captureBox(games.get(position));
+                        ((GamesFragment) myFragment).captureBox(games.get(position));
                         return true;
                     case R.id.view_box_photo:
                         Intent intent = new Intent();
@@ -227,11 +255,41 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
                         intent.setDataAndType(Uri.parse(games.get(position).gameBoxImage), "image/*");
                         mActivity.startActivity(intent);
                         return true;
+                    case R.id.add_bucket_list:
+                        try {
+                            String gameDate;
+                            final Calendar c = Calendar.getInstance();
+                            int year = c.get(Calendar.YEAR);
+                            int month = c.get(Calendar.MONTH);
+                            int day = c.get(Calendar.DAY_OF_MONTH);
+                            if (String.valueOf(month+1).length()==1) {
+                                gameDate = year + "-0" + (month + 1) + "-" + day;
+                            }else{
+                                gameDate = year + "-" + (month + 1) + "-" + day;
+                            }
+                            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+                            Date date1 = null;
+                            date1 = dateFormat.parse(gameDate);
+                            int i = (int) (date1.getTime()/1000);
+                            games.get(position).taggedToPlay = i;
+                            games.get(position).save();
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                        return true;
+                    case R.id.remove_bucket_list:
+                        games.get(position).taggedToPlay = 0;
+                        games.get(position).save();
+                        ((MainActivity) mActivity).onFragmentInteraction("refresh_games");
+                        return true;
                     default:
                         return false;
+                    }
                 }
             }
-        });
-        popup.show();
+
+            );
+            popup.show();
+        }
     }
-}

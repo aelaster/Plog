@@ -59,9 +59,9 @@ public class StatsFragment_TenByTen extends Fragment {
                 }else{//otherwise, it adds 10
                     tbtCounts = tbtCounts + 10;
                 }
-                addStat(tbt.gameName + ":", tbt.tbtCount+"", tbt.getId()+"");
+                addStat(tbt.gameName, tbt.tbtCount+"", tbt.getId()+"");
             }
-            addStat("Percent Completed:", ((int) (tbtCounts * 100.0 / 100 + 0.5)) + "%", "");
+            addStat("Percent Completed", ((int) (tbtCounts * 100.0 / 100 + 0.5)) + "%", "");
         }
         return statsView;
     }

@@ -105,6 +105,7 @@ public class NavigationDrawerFragment extends Fragment {
                         getString(R.string.title_games),
                         getString(R.string.title_plays),
                         getString(R.string.title_players),
+                        getString(R.string.title_bucket_list),
                         getString(R.string.title_statistics),
 //                        getString(R.string.title_section5),
                         getString(R.string.title_exit)

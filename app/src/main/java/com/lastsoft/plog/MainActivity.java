@@ -7,6 +7,8 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -15,7 +17,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.SharedElementCallback;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -28,6 +29,7 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.CallbackManager;
@@ -199,13 +201,27 @@ public class MainActivity extends AppCompatActivity
             // Set up the drawer.
             DrawerLayout mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
             mNavigationDrawerFragment.setUp(
-                    R.id.navigation_drawer,
+                    R.id.left_drawer,
                     mDrawerLayout);
 
+            PackageManager pm = getPackageManager();
+            PackageInfo pi;
+            try {
+                pi = pm.getPackageInfo(getPackageName(), 0);
+            } catch (PackageManager.NameNotFoundException nnfe) {
+                //doubt this will ever run since we want info about our own package
+                pi = new PackageInfo();
+                pi.versionName = "unknown";
+                pi.versionCode = 699999;
+            }
 
-            ActionBarDrawerToggle mDrawerToggle = new ActionBarDrawerToggle(
-                    this, mDrawerLayout, R.string.navigation_drawer_open, R.string.navigation_drawer_close
-            );
+            TextView versionNumber = (TextView) findViewById(R.id.version_label);
+            versionNumber.setText(getString(R.string.version_label) + pi.versionName);
+
+
+            //ActionBarDrawerToggle mDrawerToggle = new ActionBarDrawerToggle(
+            //        this, mDrawerLayout, R.string.navigation_drawer_open, R.string.navigation_drawer_close
+            //);
         }
     }
 
@@ -255,6 +271,12 @@ public class MainActivity extends AppCompatActivity
             if (mStatsFragment != null){
                 mStatsFragment = null;
             }
+            if (mPlaysFragment != null){
+                mPlaysFragment = null;
+            }
+            if (mGamesFragment != null){
+                mGamesFragment = null;
+            }
 
             if (position == 1) {
                 openPlays("", true, 0);
@@ -265,6 +287,8 @@ public class MainActivity extends AppCompatActivity
             } else if (position == 0) {
                 openGames("", true, 0);
             } else if (position == 3) {
+                openGames("BucketList", true, 2);
+            } else if (position == 4) {
                 openStats();
         /*}else if (position == 4){
 
@@ -471,6 +495,15 @@ public class MainActivity extends AppCompatActivity
                 actionBar.setDisplayShowTitleEnabled(true);
                 actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
                 mTitle = getString(R.string.title_games);
+                actionBar.setTitle(mTitle);
+            } else if (fragmentCode == 12) {
+                //bucket list
+                mNavigationDrawerFragment.mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+                mNavigationDrawerFragment.mDrawerToggle.setDrawerIndicatorEnabled(true);
+                actionBar.setDisplayShowCustomEnabled(false);
+                actionBar.setDisplayShowTitleEnabled(true);
+                actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+                mTitle = getString(R.string.title_bucket_list);
                 actionBar.setTitle(mTitle);
             }
         }
