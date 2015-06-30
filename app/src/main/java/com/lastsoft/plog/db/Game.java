@@ -74,7 +74,12 @@ public class Game extends SugarRecord<Game> {
     }
 
     public static Game findGameByName(String name){
-        return (Game.find(Game.class, StringUtil.toSQLName("gameName") + " = ?", name)).get(0);
+        List<Game> queery = Game.find(Game.class, StringUtil.toSQLName("gameName") + " = ?", name);
+        if (queery.size() > 0) {
+            return queery.get(0);
+        } else {
+            return null;
+        }
     }
 
     public static Game findGameByName_NoCase(String name) {
