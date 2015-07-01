@@ -74,6 +74,7 @@
     <string name="tab0">Wins</string>
     <string name="tab1">10x10</string>
 
+    <string name="add_to_bgg">Add to BGG</string>
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
     <string name="choose_task">Choose:</string>

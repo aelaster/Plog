@@ -14,6 +14,7 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.Switch;
 
 import com.lastsoft.plog.db.Game;
 
@@ -80,6 +81,8 @@ public class AddGameFragment extends Fragment {
 
         View button = rootView.findViewById(R.id.button);
         final EditText gameName = (EditText) rootView.findViewById(R.id.gameName);
+        final Switch addToBGG = (Switch) rootView.findViewById(R.id.addToBGG);
+
 
 
         // Set a listener to reveal the view when clicked.
@@ -93,7 +96,7 @@ public class AddGameFragment extends Fragment {
                 dbHandler.addPlayer(newPlayer);*/
                 Game game = new Game(gameName.getText().toString());
                 game.save();
-                ((MainActivity) mActivity).updateGameViaBGG(gameName.getText().toString());
+                ((MainActivity) mActivity).updateGameViaBGG(gameName.getText().toString(), addToBGG.isChecked());
                 onButtonPressed("refresh_games");
             }
             removeYourself();

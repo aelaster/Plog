@@ -17,6 +17,4 @@
         app:showAsAction="withText|ifRoom" />
     <item android:id="@+id/delete_game" android:title="@string/delete"
         app:showAsAction="withText|ifRoom" />
-    <!--<item android:id="@+id/action_settings" android:title="@string/action_settings"
-        android:orderInCategory="100" app:showAsAction="never" />-->
 </menu>

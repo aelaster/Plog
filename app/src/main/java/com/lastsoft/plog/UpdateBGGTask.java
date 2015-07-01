@@ -2,15 +2,22 @@ package com.lastsoft.plog;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.lastsoft.plog.db.Game;
-import com.lastsoft.plog.db.Player;
-import com.orm.StringUtil;
+import com.lastsoft.plog.util.BGGLogInHelper;
+import com.lastsoft.plog.util.HttpUtils;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.protocol.HTTP;
 import org.apache.http.util.ByteArrayBuffer;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -20,9 +27,11 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -31,8 +40,10 @@ import java.util.List;
 public class UpdateBGGTask extends AsyncTask<String, Void, String> {
     private final ProgressDialog mydialog;
     Context theContext;
-    public UpdateBGGTask(Context context){
+    boolean addMe;
+    public UpdateBGGTask(Context context, boolean addToCollection){
         this.theContext = context;
+        this.addMe = addToCollection;
         mydialog = new ProgressDialog(theContext);
     }
 
@@ -162,6 +173,45 @@ public class UpdateBGGTask extends AsyncTask<String, Void, String> {
                     }
                 }
             }
+
+
+            if (addMe){
+                //try adding this bia
+                ///geekcollection.php?fieldname=status&collid=&objecttype=thing&objectid=157327&own=1&B1=Cancel&wishlistpriority=1&ajax=1&action=savedata
+                BGGLogInHelper helper = new BGGLogInHelper(theContext, null);
+                if (helper.canLogIn() && helper.checkCookies()) {
+                    UrlEncodedFormEntity entity;
+                    List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+                    nvps.add(new BasicNameValuePair("fieldname", "status"));
+                    nvps.add(new BasicNameValuePair("objecttype", "thing"));
+                    nvps.add(new BasicNameValuePair("objectid", bggID));
+                    nvps.add(new BasicNameValuePair("own", "1"));
+                    nvps.add(new BasicNameValuePair("B1", "Cancel"));
+                    nvps.add(new BasicNameValuePair("wishlistpriority", "1"));
+                    nvps.add(new BasicNameValuePair("ajax", "1"));
+                    nvps.add(new BasicNameValuePair("action", "savedata"));
+                    try {
+                        entity = new UrlEncodedFormEntity(nvps, HTTP.UTF_8);
+                        HttpPost post = new HttpPost("http://www.boardgamegeek.com/geekcollection.php");
+                        post.setEntity(entity);
+                        HttpClient mClient = HttpUtils.createHttpClient(theContext, helper.getCookieStore());
+                        HttpResponse response = mClient.execute(post);
+                        if (response == null) {
+
+                        } else if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
+
+                        } else {
+
+                        }
+                    } catch (UnsupportedEncodingException e) {
+                    } catch (ClientProtocolException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -194,10 +244,12 @@ public class UpdateBGGTask extends AsyncTask<String, Void, String> {
 
         parser.require(XmlPullParser.END_TAG, null, "item");
         Game game = Game.findGameByName(gameName);
-        game.gameBGGID = gameBGGID;
-        game.gameImage = gameImage;
-        game.gameThumb = gameThumb;
-        game.save();
+        if (game != null) {
+            game.gameBGGID = gameBGGID;
+            game.gameImage = gameImage;
+            game.gameThumb = gameThumb;
+            game.save();
+        }
         return game;
     }
 

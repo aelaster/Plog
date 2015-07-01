@@ -244,7 +244,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
                         //delete the play
                         //refresh play list
                         mPosition = position;
-                        ((MainActivity) mActivity).updateGameViaBGG(games.get(position).gameName);
+                        ((MainActivity) mActivity).updateGameViaBGG(games.get(position).gameName, false);
                         return true;
                     case R.id.add_box_photo:
                         ((GamesFragment) myFragment).captureBox(games.get(position));

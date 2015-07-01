@@ -659,8 +659,11 @@ public class AddPlayFragment extends Fragment implements
                             }
                         }else{//not a play yet, add the base game
                             //Log.d("V1", "game name= " + gameName);
-                            GamesPerPlay newBaseGame = new GamesPerPlay(thePlay, Game.findGameByName(gameName), false);
-                            newBaseGame.save();
+                            Game theGame = Game.findGameByName(gameName);
+                            if (theGame != null) {
+                                GamesPerPlay newBaseGame = new GamesPerPlay(thePlay, theGame, false);
+                                newBaseGame.save();
+                            }
                         }
 
                         for (int i = 0; i < addedExpansions.size(); i++) {
@@ -700,7 +703,7 @@ public class AddPlayFragment extends Fragment implements
 
                         //remove from bucket list if it's there
                         Game baseGame = Game.findGameByName(gameName);
-                        if (baseGame.taggedToPlay > 0){
+                        if (baseGame != null && baseGame.taggedToPlay > 0){
                             baseGame.taggedToPlay = 0;
                             baseGame.save();
                             if (mActivity instanceof MainActivity) {

@@ -742,8 +742,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     GameUpdater gameUpdate;
-    public void updateGameViaBGG(String gameName){
-        gameUpdate = new GameUpdater(this);
+    public void updateGameViaBGG(String gameName, boolean addToCollection){
+        gameUpdate = new GameUpdater(this, addToCollection);
         try {
             gameUpdate.execute(gameName);
         } catch (Exception e) {
@@ -1038,8 +1038,8 @@ public class MainActivity extends AppCompatActivity
 
 
     public class GameUpdater extends UpdateBGGTask {
-        public GameUpdater(Context context) {
-            super(context);
+        public GameUpdater(Context context, boolean addToCollection) {
+            super(context, addToCollection);
         }
 
         @Override

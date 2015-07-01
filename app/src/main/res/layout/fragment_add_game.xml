@@ -19,6 +19,21 @@
             android:layout_centerHorizontal="true"
             android:hint="@string/game_name" />
 
+        <Switch
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/add_to_bgg"
+            android:layout_marginBottom="@dimen/margin_small"
+            android:id="@+id/addToBGG"
+            android:checked="false"/>
+
+        <!--<Switch
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/default_player"
+            android:layout_marginBottom="@dimen/margin_small"
+            android:id="@+id/isExpansion" />-->
+
 
         <!--<Spinner
             android:layout_width="fill_parent"

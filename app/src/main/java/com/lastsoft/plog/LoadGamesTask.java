@@ -134,86 +134,92 @@ public class LoadGamesTask extends AsyncTask<String, Void, String> {
                         bggProcess = "true";
                     }
 
-                    XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
-                    factory.setNamespaceAware(true);
-                    XmlPullParser parser = factory.newPullParser();
-                    parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
-                    parser.setInput(new StringReader(myString));
-                    //parser.nextTag();
-                    // parser.require(XmlPullParser.START_TAG, null, "items");
+                    if (myString != null) {
+                        XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
+                        factory.setNamespaceAware(true);
+                        XmlPullParser parser = factory.newPullParser();
+                        parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
+                        parser.setInput(new StringReader(myString));
+                        //parser.nextTag();
+                        // parser.require(XmlPullParser.START_TAG, null, "items");
 
-                    while (parser.next() != XmlPullParser.END_DOCUMENT) {
-                        if (parser.getEventType() != XmlPullParser.START_TAG) {
-                            continue;
+                        while (parser.next() != XmlPullParser.END_DOCUMENT) {
+                            if (parser.getEventType() != XmlPullParser.START_TAG) {
+                                continue;
+                            }
+                            String name = parser.getName();
+                            //Log.d("V1", "name = " + name);
+                            // Starts by looking for the entry tag
+                            if (name.equals("items")) {
+                                //entries.add(readEntry(parser));
+                                int total = 0;
+                                total = Integer.parseInt(readTotal(parser));
+
+                                //mDataset = new String[total];
+                                //mDataset_Thumb = new String[total];
+                            } else if (name.equals("item")) {
+                                //Log.d("V1", "name = " + mDataset[i]);
+                                readEntry(parser, readBGGID(parser));
+                            } else {
+                                skip(parser);
+                            }
                         }
-                        String name = parser.getName();
-                        //Log.d("V1", "name = " + name);
-                        // Starts by looking for the entry tag
-                        if (name.equals("items")) {
-                            //entries.add(readEntry(parser));
-                            int total = 0;
-                            total = Integer.parseInt(readTotal(parser));
 
-                            //mDataset = new String[total];
-                            //mDataset_Thumb = new String[total];
-                        } else if (name.equals("item")) {
-                            //Log.d("V1", "name = " + mDataset[i]);
-                            readEntry(parser, readBGGID(parser));
-                        } else {
-                            skip(parser);
-                        }
-                    }
 
-                    // then we go through and flag every expansion in my collection
-                    url = new URL("https://www.boardgamegeek.com/xmlapi2/collection?username=" + defaultPlayer.bggUsername + "&subtype=boardgameexpansion");
-                    URLConnection ucon = url.openConnection();
-                    ucon.setConnectTimeout(3000);
-                    ucon.setReadTimeout(30000);
+                        // then we go through and flag every expansion in my collection
+                        url = new URL("https://www.boardgamegeek.com/xmlapi2/collection?username=" + defaultPlayer.bggUsername + "&subtype=boardgameexpansion");
+                        URLConnection ucon = url.openConnection();
+                        ucon.setConnectTimeout(3000);
+                        ucon.setReadTimeout(30000);
                      /* Define InputStreams to read
                         * from the URLConnection. */
-                    InputStream is = ucon.getInputStream();
-                    BufferedInputStream bis = new BufferedInputStream(is, 1024);
+                        InputStream is = ucon.getInputStream();
+                        BufferedInputStream bis = new BufferedInputStream(is, 1024);
 
                        /* Read bytes to the Buffer until
                         * there is nothing more to read(-1). */
-                    ByteArrayBuffer baf = new ByteArrayBuffer(1024);
-                    int current = 0;
-                    while ((current = bis.read()) != -1) {
-                        baf.append((byte) current);
-                    }
-
-                    myString = new String(baf.toByteArray());
-
-                    bis.close();
-                    is.close();
-
-                    factory = XmlPullParserFactory.newInstance();
-                    factory.setNamespaceAware(true);
-                    parser = factory.newPullParser();
-                    parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
-                    parser.setInput(new StringReader(myString));
-                    //parser.nextTag();
-                    // parser.require(XmlPullParser.START_TAG, null, "items");
-
-                    while (parser.next() != XmlPullParser.END_DOCUMENT) {
-                        if (parser.getEventType() != XmlPullParser.START_TAG) {
-                            continue;
+                        ByteArrayBuffer baf = new ByteArrayBuffer(1024);
+                        int current = 0;
+                        while ((current = bis.read()) != -1) {
+                            baf.append((byte) current);
                         }
-                        String name = parser.getName();
-                        //Log.d("V1", "name = " + name);
-                        // Starts by looking for the entry tag
-                        if (name.equals("items")) {
-                            //entries.add(readEntry(parser));
-                            int total = 0;
-                            total = Integer.parseInt(readTotal(parser));
 
-                            //mDataset = new String[total];
-                            //mDataset_Thumb = new String[total];
-                        } else if (name.equals("item")) {
-                            //Log.d("V1", "name = " + mDataset[i]);
-                            readEntry_Expansion(parser);
-                        } else {
-                            skip(parser);
+                        myString = new String(baf.toByteArray());
+
+                        bis.close();
+                        is.close();
+
+                        if (myString != null) {
+
+                            factory = XmlPullParserFactory.newInstance();
+                            factory.setNamespaceAware(true);
+                            parser = factory.newPullParser();
+                            parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
+                            parser.setInput(new StringReader(myString));
+                            //parser.nextTag();
+                            // parser.require(XmlPullParser.START_TAG, null, "items");
+
+                            while (parser.next() != XmlPullParser.END_DOCUMENT) {
+                                if (parser.getEventType() != XmlPullParser.START_TAG) {
+                                    continue;
+                                }
+                                String name = parser.getName();
+                                //Log.d("V1", "name = " + name);
+                                // Starts by looking for the entry tag
+                                if (name.equals("items")) {
+                                    //entries.add(readEntry(parser));
+                                    int total = 0;
+                                    total = Integer.parseInt(readTotal(parser));
+
+                                    //mDataset = new String[total];
+                                    //mDataset_Thumb = new String[total];
+                                } else if (name.equals("item")) {
+                                    //Log.d("V1", "name = " + mDataset[i]);
+                                    readEntry_Expansion(parser);
+                                } else {
+                                    skip(parser);
+                                }
+                            }
                         }
                     }
                 }
@@ -298,7 +304,7 @@ public class LoadGamesTask extends AsyncTask<String, Void, String> {
         parser.require(XmlPullParser.END_TAG, null, "item");
         if (gameOwn.equals("1")) {
             Game updateMe = Game.findGameByName(gameName);
-            if (updateMe.expansionFlag == false) {
+            if (updateMe != null && !updateMe.expansionFlag) {
                 updateMe.expansionFlag = true;
                 updateMe.save();
             }
