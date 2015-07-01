@@ -206,11 +206,13 @@ public class StatsFragment_Wins extends Fragment {
                 addStat(0, getString(R.string.stats_total_plays), result.get(0).totalPlays + "", "");
                 addStat(1, getString(R.string.stats_unique_plays), result.get(0).totalUnique + "", "");
                 for (int x = 0; x < result.size(); x++) {
-                    addStat(4, result.get(x).player.playerName + " " + getString(R.string.stats_total_wins), (result.get(x).asteriskWins + result.get(x).regularWins) + "", result.get(x).player.getId() + "");
+
                     if (theGroup == 0){
+                        addStat(4, result.get(x).player.playerName + " " + getString(R.string.stats_regular_wins), (result.get(x).regularWins) + "", result.get(x).player.getId() + "");
                         //addStat(2, result.get(x).player.playerName + " " + getString(R.string.stats_regular_wins), result.get(x).regularWins + "", result.get(x).player.getId() + "");
                         //addStat(3, result.get(x).player.playerName + " " + getString(R.string.stats_asterisk_wins), result.get(x).asteriskWins + "", result.get(x).player.getId() + "");
                     }else {
+                        addStat(4, result.get(x).player.playerName + " " + getString(R.string.stats_total_wins), (result.get(x).asteriskWins + result.get(x).regularWins) + "", result.get(x).player.getId() + "");
                         addPieChart(result.get(x).player.playerName, result.get(x).regularWins, result.get(x).asteriskWins, result.get(x).player.getId() + "");
                     }
                 }
@@ -226,14 +228,15 @@ public class StatsFragment_Wins extends Fragment {
                 }
                 for (int x = 0; x < result.size(); x++) {
                     if (theGroup == 0) {
-
+                        addStat(-1, result.get(x).player.playerName + " " + getString(R.string.stats_regular_wins) + getString(R.string.percentage), ((int) ((result.get(x).regularWins) * 100.0 / result.get(0).totalPlays + 0.5)) + "%", result.get(x).player.getId() + "");
                     } else {
+                        addStat(-1, result.get(x).player.playerName + " " + getString(R.string.stats_total_wins) + getString(R.string.percentage), ((int) ((result.get(x).asteriskWins + result.get(x).regularWins) * 100.0 / result.get(0).totalPlays + 0.5)) + "%", result.get(x).player.getId() + "");
                         addStat(-1, result.get(x).player.playerName + " " + getString(R.string.stats_regular_wins) + getString(R.string.percentage), ((int) (result.get(x).regularWins * 100.0 / result.get(0).totalPlays + 0.5)) + "%", result.get(x).player.getId() + "");
                         if (result.get(x).asteriskWins > 0) {
                             addStat(-1, result.get(x).player.playerName + " " + getString(R.string.stats_asterisk_wins) + getString(R.string.percentage), ((int) ((result.get(x).asteriskWins) * 100.0 / result.get(0).totalPlays + 0.5)) + "%", result.get(x).player.getId() + "");
                         }
                     }
-                    addStat(-1, result.get(x).player.playerName + " " + getString(R.string.stats_total_wins) + getString(R.string.percentage), ((int) ((result.get(x).asteriskWins + result.get(x).regularWins) * 100.0 / result.get(0).totalPlays + 0.5)) + "%", result.get(x).player.getId() + "");
+
 
                     if (sharedCounter > 0) {
                         addStat(-1, getString(R.string.stats_shared_wins) + getString(R.string.percentage), ((int) (sharedCounter * 100.0 / result.get(0).totalPlays + 0.5)) + "%", "");
