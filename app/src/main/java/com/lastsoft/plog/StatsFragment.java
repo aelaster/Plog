@@ -77,6 +77,7 @@ public class StatsFragment extends Fragment {
         final List<GameGroup> gameGroups = GameGroup.listAll(GameGroup.class);
         int i = 0;
         gameGroupNames.add(getString(R.string.select_group));
+        gameGroupNames.add(getString(R.string.everyone));
         for(GameGroup group:gameGroups){
             gameGroupNames.add(group.groupName);
             i++;
@@ -91,8 +92,17 @@ public class StatsFragment extends Fragment {
                 @Override
                 public boolean onNavigationItemSelected(int position, long itemId) {
                     if (position > 0) {
-                        GameGroup checker = gameGroups.get(position - 1);
-                        groupToPoll = checker.getId();
+
+                        if (position - 2 == -2) {
+                            groupToPoll = -1; //dont do anything
+                        }else if (position - 2 == -1) {
+                            groupToPoll = 0; //this is the everyone group
+                        } else {
+                            GameGroup checker = gameGroups.get(position - 2);
+                            groupToPoll = checker.getId();
+                        }
+
+
                         mPagerAdapter = new ScreenSlidePagerAdapter(getChildFragmentManager(), groupToPoll);
                         mPager.setAdapter(mPagerAdapter);
                     }
@@ -103,7 +113,7 @@ public class StatsFragment extends Fragment {
 
         // Instantiate a ViewPager and a PagerAdapter.
         mPager = (ViewPager) viewPlayLayout.findViewById(R.id.pager);
-        mPagerAdapter = new ScreenSlidePagerAdapter(getChildFragmentManager(), 0);
+        mPagerAdapter = new ScreenSlidePagerAdapter(getChildFragmentManager(), -1);
         mPager.setAdapter(mPagerAdapter);
         mPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override

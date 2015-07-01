@@ -494,7 +494,7 @@ public class GamesFragment extends Fragment{
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         DisplayImageOptions options = new DisplayImageOptions.Builder()
                 .cacheOnDisk(true)
-                .cacheInMemory(true)
+                .cacheInMemory(false)
                 .considerExifParams(true)
                 .build();
         if (requestCode == 0 && resultCode == -1) {

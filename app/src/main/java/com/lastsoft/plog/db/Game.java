@@ -153,6 +153,18 @@ public class Game extends SugarRecord<Game> {
                         " order by " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " ASC, "  + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " DESC", group.getId().toString());
     }
 
+    public static List<Game> getUniqueGames(){
+        return Game.findWithQuery(Game.class,
+                " SELECT "+ StringUtil.toSQLName("Game") + ".*" +
+                        " FROM " + StringUtil.toSQLName("Game") +
+                        " INNER JOIN " + StringUtil.toSQLName("GamesPerPlay") +
+                        " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("game") + " = " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("id") +
+                        " INNER JOIN " + StringUtil.toSQLName("Play") +
+                        " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("play") + " = " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") +
+                        " and " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("expansionFlag") + " = 0 group by " + StringUtil.toSQLName("game") +
+                        " order by " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " ASC, "  + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " DESC");
+    }
+
     public static List<Game> isFirstPlay(GameGroup group){
         return Game.findWithQuery(Game.class,
                 " SELECT "+ StringUtil.toSQLName("Game") + ".*" +

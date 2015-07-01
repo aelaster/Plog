@@ -361,7 +361,7 @@ public class AddPlayFragment extends Fragment implements
             //photo
             final DisplayImageOptions options = new DisplayImageOptions.Builder()
                     .cacheOnDisk(true)
-                    .cacheInMemory(true)
+                    .cacheInMemory(false)
                     .considerExifParams(true)
                     .build();
             ImageLoader.getInstance().displayImage(editPlay.playPhoto, playPhoto, options);
@@ -510,7 +510,7 @@ public class AddPlayFragment extends Fragment implements
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         DisplayImageOptions options = new DisplayImageOptions.Builder()
                 .cacheOnDisk(true)
-                .cacheInMemory(true)
+                .cacheInMemory(false)
                 .considerExifParams(true)
                 .build();
         if (requestCode == 0 && resultCode == -1) {
@@ -866,7 +866,7 @@ public class AddPlayFragment extends Fragment implements
                 if (chosenImage != null) {
                     DisplayImageOptions options = new DisplayImageOptions.Builder()
                             .cacheOnDisk(true)
-                            .cacheInMemory(true)
+                            .cacheInMemory(false)
                             .considerExifParams(true)
                             .build();
                     mCurrentPhotoPath = "file://" + chosenImage.getFilePathOriginal();

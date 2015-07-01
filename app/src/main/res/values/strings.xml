@@ -98,6 +98,7 @@
     <string name="posting_play">Posting Play to BGG...</string>
     <string name="add_box_photo">Add Box Photo</string>
     <string name="view_box_photo">View Box Photo</string>
+    <string name="everyone">Everyone</string>
 
     <string name="submit_confirm_message">Start adding players and games, creating groups, and plogging!</string>
     <string name="submit_confirm_button">Go!</string>

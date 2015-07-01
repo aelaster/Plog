@@ -51,6 +51,13 @@ public class PlayersPerPlay extends SugarRecord<PlayersPerPlay> {
                         " WHERE " + StringUtil.toSQLName("GameGroup") + " = ?)" +
                         " ORDER BY PLAY, PLAYER", group.getId().toString(), group.getId().toString());
     }
+
+    public static List<PlayersPerPlay> totalPlays() {
+        return PlayersPerPlay.findWithQuery(PlayersPerPlay.class,
+                " SELECT "+ StringUtil.toSQLName("PlayersPerPlay") +".* " +
+                        " FROM " + StringUtil.toSQLName("PlayersPerPlay") +
+                        " ORDER BY PLAY, PLAYER");
+    }
 /*
     public static List<PlayersPerPlay> totalWins_GameGroup_Player(GameGroup group, Player player) {
         return PlayersPerPlay.findWithQuery(PlayersPerPlay.class,

@@ -137,7 +137,7 @@ public class ViewPlayFragment_Pages extends Fragment {
 
         DisplayImageOptions options = new DisplayImageOptions.Builder()
                 .cacheOnDisk(true)
-                .cacheInMemory(true)
+                .cacheInMemory(false)
                 .considerExifParams(true)
                 .build();
 

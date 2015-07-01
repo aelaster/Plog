@@ -132,20 +132,38 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
                 plays = Play.listPlaysNewOld(mSearchQuery, fromDrawer);
                 break;
             case 1:
-                plays = Play.listPlaysNewOld_GameGroup(mSearchQuery);
+                if (mSearchQuery.equals("0")){
+                    plays = Play.listPlaysNewOld();
+                }else {
+                    plays = Play.listPlaysNewOld_GameGroup(mSearchQuery);
+                }
                 break;
             case 2:
                 String[] query = mSearchQuery.split("\\$");
-                plays = Play.totalWins_GameGroup_Player(GameGroup.findById(GameGroup.class, Long.parseLong(query[0])), Player.findById(Player.class, Long.parseLong(query[1])));
+                if (query[0].equals("0")){
+                    plays = Play.totalWins_Player(Player.findById(Player.class, Long.parseLong(query[1])));
+                }else {
+                    plays = Play.totalWins_GameGroup_Player(GameGroup.findById(GameGroup.class, Long.parseLong(query[0])), Player.findById(Player.class, Long.parseLong(query[1])));
+                }
                 break;
             case 3:
                 String[] query2 = mSearchQuery.split("\\$");
-                plays = Play.totalAsteriskWins_GameGroup_Player(GameGroup.findById(GameGroup.class, Long.parseLong(query2[0])), Player.findById(Player.class, Long.parseLong(query2[1])));
+                if (query2[0].equals("0")){
+                    plays = Play.totalAsteriskWins_Player(Player.findById(Player.class, Long.parseLong(query2[1])));
+                }else {
+                    plays = Play.totalAsteriskWins_GameGroup_Player(GameGroup.findById(GameGroup.class, Long.parseLong(query2[0])), Player.findById(Player.class, Long.parseLong(query2[1])));
+                }
                 break;
             case 4:
                 String[] query3 = mSearchQuery.split("\\$");
-                List<Play> wins = Play.totalWins_GameGroup_Player(GameGroup.findById(GameGroup.class, Long.parseLong(query3[0])), Player.findById(Player.class, Long.parseLong(query3[1])));
-                plays = Play.totalAsteriskWins_GameGroup_Player(GameGroup.findById(GameGroup.class, Long.parseLong(query3[0])), Player.findById(Player.class, Long.parseLong(query3[1])));
+                List<Play> wins;
+                if (query3[0].equals("0")){
+                    wins = Play.totalWins_Player(Player.findById(Player.class, Long.parseLong(query3[1])));
+                    plays = Play.totalAsteriskWins_Player(Player.findById(Player.class, Long.parseLong(query3[1])));
+                }else {
+                    wins = Play.totalWins_GameGroup_Player(GameGroup.findById(GameGroup.class, Long.parseLong(query3[0])), Player.findById(Player.class, Long.parseLong(query3[1])));
+                    plays = Play.totalAsteriskWins_GameGroup_Player(GameGroup.findById(GameGroup.class, Long.parseLong(query3[0])), Player.findById(Player.class, Long.parseLong(query3[1])));
+                }
                 plays.addAll(wins);
                 Collections.sort(plays, new Comparator<Play>() {
                     public int compare(Play left, Play right)  {
@@ -154,10 +172,18 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
                 });
                 break;
             case 5:
-                plays = Play.totalSharedWins(GameGroup.findById(GameGroup.class, Long.parseLong(mSearchQuery)));
+                if (mSearchQuery.equals("0")){
+                    plays = Play.totalSharedWins();
+                }else {
+                    plays = Play.totalSharedWins(GameGroup.findById(GameGroup.class, Long.parseLong(mSearchQuery)));
+                }
                 break;
             case 6:
-                plays = Play.totalGroupLosses(GameGroup.findById(GameGroup.class, Long.parseLong(mSearchQuery)));
+                if (mSearchQuery.equals("0")){
+                    plays = Play.totalGroupLosses();
+                }else {
+                    plays = Play.totalGroupLosses(GameGroup.findById(GameGroup.class, Long.parseLong(mSearchQuery)));
+                }
                 break;
             case 7:
                 String[] query4 = mSearchQuery.split("\\$");
@@ -169,7 +195,7 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
 
         options = new DisplayImageOptions.Builder()
                 .cacheOnDisk(true)
-                .cacheInMemory(true)
+                .cacheInMemory(false)
                 .considerExifParams(true)
                 .resetViewBeforeLoading(true)
                 .build();

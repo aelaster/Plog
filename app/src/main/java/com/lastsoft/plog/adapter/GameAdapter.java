@@ -124,7 +124,11 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
                 games = Game.findBaseGames(mSearchQuery);
                 break;
             case 1:
-                games = Game.getUniqueGames_GameGroup(GameGroup.findById(GameGroup.class, Long.parseLong(mSearchQuery)));
+                if (mSearchQuery.equals("0")){
+                    games = Game.getUniqueGames();
+                }else {
+                    games = Game.getUniqueGames_GameGroup(GameGroup.findById(GameGroup.class, Long.parseLong(mSearchQuery)));
+                }
                 break;
             case 2:
                 games = Game.getBucketList();
@@ -136,7 +140,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
 
         options = new DisplayImageOptions.Builder()
                 .cacheOnDisk(true)
-                .cacheInMemory(true)
+                .cacheInMemory(false)
                 .resetViewBeforeLoading(true)
                 .build();
     }
