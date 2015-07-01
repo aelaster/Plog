@@ -41,11 +41,13 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.SimpleTimeZone;
+import java.util.TimeZone;
 
 /**
  * Provide views to RecyclerView with data from mDataSet.
@@ -256,27 +258,29 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
                         mActivity.startActivity(intent);
                         return true;
                     case R.id.add_bucket_list:
-                        try {
-                            String gameDate;
-                            final Calendar c = Calendar.getInstance();
-                            int year = c.get(Calendar.YEAR);
-                            int month = c.get(Calendar.MONTH);
-                            int day = c.get(Calendar.DAY_OF_MONTH);
-                            if (String.valueOf(month+1).length()==1) {
-                                gameDate = year + "-0" + (month + 1) + "-" + day;
-                            }else{
-                                gameDate = year + "-" + (month + 1) + "-" + day;
-                            }
-                            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                        String[] ids = TimeZone.getAvailableIDs(-5 * 60 * 60 * 1000);
+                        // if no ids were returned, something is wrong. get out.
+                        if (ids.length == 0)
+                            System.exit(0);
 
-                            Date date1 = null;
-                            date1 = dateFormat.parse(gameDate);
-                            int i = (int) (date1.getTime()/1000);
-                            games.get(position).taggedToPlay = i;
-                            games.get(position).save();
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                        }
+                        // begin output
+                        //System.out.println("Current Time");
+
+                        // create a Eastern Standard Time time zone
+                        SimpleTimeZone pdt = new SimpleTimeZone(-5 * 60 * 60 * 1000, ids[0]);
+
+                        // set up rules for daylight savings time
+                        pdt.setStartRule(Calendar.APRIL, 1, Calendar.SUNDAY, 2 * 60 * 60 * 1000);
+                        pdt.setEndRule(Calendar.OCTOBER, -1, Calendar.SUNDAY, 2 * 60 * 60 * 1000);
+
+                        // create a GregorianCalendar with the Pacific Daylight time zone
+                        // and the current date and time
+                        Calendar calendar = new GregorianCalendar(pdt);
+                        Date trialTime = new Date();
+                        calendar.setTime(trialTime);
+                        int i = (int) (calendar.getTime().getTime()/1000);
+                        games.get(position).taggedToPlay = i;
+                        games.get(position).save();
                         return true;
                     case R.id.remove_bucket_list:
                         games.get(position).taggedToPlay = 0;

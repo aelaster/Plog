@@ -172,8 +172,7 @@ public class Game extends SugarRecord<Game> {
         //return Game.find(Game.class, StringUtil.toSQLName("expansionFlag") + " = 0");
         Select findBaseGames = Select.from(Game.class);
         findBaseGames.where(Condition.prop(StringUtil.toSQLName("taggedToPlay")).notEq("0"), Condition.prop(StringUtil.toSQLName("taggedToPlay")).notEq(""), Condition.prop(StringUtil.toSQLName("expansionFlag")).eq("0"));
-        findBaseGames.orderBy(StringUtil.toSQLName("taggedToPlay") + " ASC");
-        findBaseGames.orderBy(StringUtil.toSQLName("gameName") + " ASC");
+        findBaseGames.orderBy(StringUtil.toSQLName("taggedToPlay") + " DESC");
         return findBaseGames.list();
     }
 }
