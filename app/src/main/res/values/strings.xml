@@ -22,6 +22,7 @@
     <string name="share_play">Share Play</string>
     <string name="edit_player">Edit Player</string>
     <string name="add_group">Add Group</string>
+    <string name="edit_group">Edit Group</string>
     <string name="delete_group">Delete Group</string>
     <string name="add_game">Add Game</string>
     <string name="filter_games">Filter Games</string>
@@ -106,6 +107,7 @@
     <string name="bgg_process_notice">BGG is processing this request.  Try again if your collection is not updated.</string>
 
     <string name="confirm_delete_game">Are you sure you want to delete this game?</string>
+    <string name="confirm_delete_group">Are you sure you want to delete this group?</string>
     <string name="confirm_delete_player">Are you sure you want to delete this player?</string>
     <string name="confirm_delete_play">Are you sure you want to delete this play?</string>
 

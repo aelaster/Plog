@@ -1,0 +1,55 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+<android.support.v4.view.ViewPager xmlns:android="http://schemas.android.com/apk/res/android"
+
+    android:id="@+id/pager"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.v4.view.PagerTitleStrip
+        android:id="@+id/pager_title_strip"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:background="@color/logo_blue"
+        android:textColor="#fff"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp" />
+
+
+</android.support.v4.view.ViewPager>
+    <net.i2p.android.ext.floatingactionbutton.FloatingActionsMenu
+        android:id="@+id/multiple_actions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        fab:fab_addButtonColorNormal="@color/accent_material_light"
+        fab:fab_addButtonColorPressed="@color/accent_material_light"
+        fab:fab_addButtonPlusIconColor="@color/white"
+        fab:fab_labelStyle="@style/menu_labels_style"
+        android:layout_marginBottom="5dp"
+        android:layout_marginEnd="7dp">
+
+        <net.i2p.android.ext.floatingactionbutton.FloatingActionButton
+            android:id="@+id/add_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            fab:fab_colorNormal="@color/accent_material_light"
+            fab:fab_title="@string/add_group"
+            fab:fab_colorPressed="@color/accent_material_light"/>
+
+        <net.i2p.android.ext.floatingactionbutton.FloatingActionButton
+            android:id="@+id/add_player"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            fab:fab_colorNormal="@color/accent_material_light"
+            fab:fab_title="@string/add_player"
+            fab:fab_colorPressed="@color/accent_material_light"/>
+
+    </net.i2p.android.ext.floatingactionbutton.FloatingActionsMenu>
+    </RelativeLayout>

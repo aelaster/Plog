@@ -43,6 +43,7 @@ import java.util.List;
 public class AddGroupFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
+    long groupID;
     private ViewGroup mContainerView_Players;
     int cx, cy;
     ArrayList<AddPlayer> arrayOfUsers;
@@ -51,13 +52,15 @@ public class AddGroupFragment extends Fragment {
     ArrayList<Integer> playersID;
     ArrayList<String> playersName;
     EditText groupName;
+    GameGroup editGroup;
 
-    public static AddGroupFragment newInstance(int centerX, int centerY, boolean doAccelerate) {
+    public static AddGroupFragment newInstance(int centerX, int centerY, boolean doAccelerate, long groupID) {
         AddGroupFragment fragment = new AddGroupFragment();
         Bundle args = new Bundle();
         args.putInt("cx", centerX);
         args.putInt("cy", centerY);
         args.putBoolean("doAccelerate", doAccelerate);
+        args.putLong("groupID", groupID);
         fragment.setArguments(args);
         return fragment;
     }
@@ -70,7 +73,7 @@ public class AddGroupFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-
+            groupID = getArguments().getLong("groupID");
         }
         List<Player> players = Player.listPlayersAZ();
         addedUsers = new ArrayList<>();
@@ -90,25 +93,26 @@ public class AddGroupFragment extends Fragment {
         // Inflate the layout for this fragment
         rootView = inflater.inflate(R.layout.fragment_add_group, container, false);
         rootView.setBackgroundColor(getResources().getColor(R.color.cardview_initial_background));
-        rootView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-            @Override
-            public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop,
-                                       int oldRight, int oldBottom) {
-                v.removeOnLayoutChangeListener(this);
-                cx = getArguments().getInt("cx");
-                cy = getArguments().getInt("cy");
-                // get the hypothenuse so the radius is from one corner to the other
-                int radius = (int) Math.hypot(right, bottom);
+        if (groupID<0) {
+            rootView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+                @Override
+                public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop,
+                                           int oldRight, int oldBottom) {
+                    v.removeOnLayoutChangeListener(this);
+                    cx = getArguments().getInt("cx");
+                    cy = getArguments().getInt("cy");
+                    // get the hypothenuse so the radius is from one corner to the other
+                    int radius = (int) Math.hypot(right, bottom);
 
-                Animator reveal = ViewAnimationUtils.createCircularReveal(v, cx, cy, 0, radius);
-                if (getArguments().getBoolean("doAccelerate")) {
-                    reveal.setInterpolator(new DecelerateInterpolator(1.5f));
+                    Animator reveal = ViewAnimationUtils.createCircularReveal(v, cx, cy, 0, radius);
+                    if (getArguments().getBoolean("doAccelerate")) {
+                        reveal.setInterpolator(new DecelerateInterpolator(1.5f));
+                    }
+                    reveal.setDuration(700);
+                    reveal.start();
                 }
-                reveal.setDuration(700);
-                reveal.start();
-            }
-        });
-
+            });
+        }
         mContainerView_Players = (ViewGroup) rootView.findViewById(R.id.container_players);
         groupName  = (EditText) rootView.findViewById(R.id.groupName);
 
@@ -123,11 +127,40 @@ public class AddGroupFragment extends Fragment {
             }
         });
 
+        View deleteButton = rootView.findViewById(R.id.deleteButton);
+        deleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (groupID >= 0) {
+                    ((MainActivity) mActivity).deleteGroup(groupID);
+                }else{
+                    mActivity.onBackPressed();
+                }
+            }
+        });
+
 
         // Construct the data source
         arrayOfUsers = new ArrayList<AddPlayer>();
         // Create the adapter to convert the array to views
         adapter = new AddPlayerAdapter(mActivity, arrayOfUsers);
+
+        if (groupID >= 0){
+            editGroup = GameGroup.findById(GameGroup.class, groupID);
+            groupName.setText(editGroup.groupName);
+
+            //get players and add them
+            List<Player> groupers = GameGroup.getGroupPlayers(GameGroup.findById(GameGroup.class,groupID));
+            if (groupers.size() > 0) {
+                //if there are groups, show them
+                for (Player grouper : groupers) {
+                    AddPlayer newUser = new AddPlayer(grouper.getId(), grouper.playerName);
+                    adapter.add(newUser);
+                    adapter.notifyDataSetChanged();
+                    addPlayer(newUser);
+                }
+            }
+        }
 
         return rootView;
     }
@@ -136,7 +169,11 @@ public class AddGroupFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.add_group, menu);
+        if(groupID >= 0 ){
+            inflater.inflate(R.menu.edit_group, menu);
+        }else {
+            inflater.inflate(R.menu.add_group, menu);
+        }
         mMenu = menu;
     }
 
@@ -165,10 +202,12 @@ public class AddGroupFragment extends Fragment {
                 return true;
 
             case R.id.add_group:
-                adapter.notifyDataSetChanged();
-                if (adapter.getCount()>0) {
-
-                    if (!groupName.getText().toString().isEmpty()) {
+                if (!groupName.getText().toString().isEmpty()) {
+                    if (groupID >= 0) {
+                        editGroup.groupName = groupName.getText().toString();
+                        editGroup.save();
+                        mActivity.onBackPressed();
+                    } else {
                         //first, add the group
                         GameGroup newGroup = new GameGroup(groupName.getText().toString());
                         newGroup.save();
@@ -176,7 +215,7 @@ public class AddGroupFragment extends Fragment {
                         //then add the players to the group
                         for (int i = 0; i < adapter.getCount(); i++) {
                             AddPlayer thisGuy = adapter.getItem(i);
-                            addedUsers.add(Player.findById(Player.class,thisGuy.playerID));
+                            addedUsers.add(Player.findById(Player.class, thisGuy.playerID));
                             PlayersPerGameGroup newPlayer = new PlayersPerGameGroup(Player.findById(Player.class, thisGuy.playerID), newGroup);
                             newPlayer.save();
                         }
@@ -188,11 +227,7 @@ public class AddGroupFragment extends Fragment {
                         } catch (Exception ignored) {
 
                         }
-                    }else{
-                        mActivity.onBackPressed();
                     }
-                }else{
-                    mActivity.onBackPressed();
                 }
                 return true;
         }
@@ -252,10 +287,16 @@ public class AddGroupFragment extends Fragment {
         @Override
         protected void onPostExecute ( final Long[] result){
             mydialog.dismiss();
+            onButtonPressed("refresh_players_add");
             mActivity.onBackPressed();
         }
     }
 
+    public void onButtonPressed(String string) {
+        if (mListener != null) {
+            mListener.onFragmentInteraction(string);
+        }
+    }
 
     private void addPlayer(final AddPlayer addedPlayer) {
         // Instantiate a new "row" view.
@@ -383,39 +424,50 @@ public class AddGroupFragment extends Fragment {
     public void removeYourself(){
         mMenu.clear();
         final AddGroupFragment mfragment = this;
-        Animator unreveal = mfragment.prepareUnrevealAnimator(cx, cy);
-        if(unreveal != null) {
-            unreveal.addListener(new Animator.AnimatorListener() {
-                @Override
-                public void onAnimationStart(Animator animation) {
-                    try{
-                        InputMethodManager inputManager = (InputMethodManager)
-                                mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (groupID >= 0){
+            try {
+                getFragmentManager().popBackStack();
+                getFragmentManager().beginTransaction().remove(mfragment).commitAllowingStateLoss();
+                getFragmentManager().executePendingTransactions(); //Prevents the flashing.
+            } catch (Exception ignored) {
+            }
+        }else {
+            Animator unreveal = mfragment.prepareUnrevealAnimator(cx, cy);
+            if (unreveal != null) {
+                unreveal.addListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {
+                        try {
+                            InputMethodManager inputManager = (InputMethodManager)
+                                    mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
 
-                        inputManager.hideSoftInputFromWindow(mActivity.getCurrentFocus().getWindowToken(),
-                                InputMethodManager.HIDE_NOT_ALWAYS);
-                    }catch (Exception e){}
-                }
+                            inputManager.hideSoftInputFromWindow(mActivity.getCurrentFocus().getWindowToken(),
+                                    InputMethodManager.HIDE_NOT_ALWAYS);
+                        } catch (Exception e) {
+                        }
+                    }
 
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    // removeFragment the fragment only when the animation finishes
-                    try {
-                        getFragmentManager().popBackStack();
-                        getFragmentManager().beginTransaction().remove(mfragment).commitAllowingStateLoss();
-                        getFragmentManager().executePendingTransactions(); //Prevents the flashing.
-                    }catch (Exception e){}
-                }
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        // removeFragment the fragment only when the animation finishes
+                        try {
+                            getFragmentManager().popBackStack();
+                            getFragmentManager().beginTransaction().remove(mfragment).commitAllowingStateLoss();
+                            getFragmentManager().executePendingTransactions(); //Prevents the flashing.
+                        } catch (Exception e) {
+                        }
+                    }
 
-                @Override
-                public void onAnimationCancel(Animator animation) {
-                }
+                    @Override
+                    public void onAnimationCancel(Animator animation) {
+                    }
 
-                @Override
-                public void onAnimationRepeat(Animator animation) {
-                }
-            });
-            unreveal.start();
+                    @Override
+                    public void onAnimationRepeat(Animator animation) {
+                    }
+                });
+                unreveal.start();
+            }
         }
     }
 

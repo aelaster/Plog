@@ -1,98 +1,58 @@
-/*
-* Copyright (C) 2014 The Android Open Source Project
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
-
 package com.lastsoft.plog;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.lastsoft.plog.adapter.PlayerAdapter;
-import com.lastsoft.plog.db.Player;
-
 import net.i2p.android.ext.floatingactionbutton.FloatingActionButton;
 import net.i2p.android.ext.floatingactionbutton.FloatingActionsMenu;
 
-import java.util.List;
 
-import xyz.danoz.recyclerviewfastscroller.vertical.VerticalRecyclerViewFastScroller;
-
-/**
- * Demonstrates the use of {@link RecyclerView} with a {@link LinearLayoutManager} and a
- * {@link GridLayoutManager}.
- */
-public class PlayersFragment extends Fragment{
-
-    private static final String TAG = "PlayersFragment";
-    private static final String KEY_LAYOUT_MANAGER = "layoutManager";
-    private static final int SPAN_COUNT = 2;
-    private static final int DATASET_COUNT = 60;
-    private float x,y;
-
-
-    private enum LayoutManagerType {
-        LINEAR_LAYOUT_MANAGER
-    }
-
-    protected LayoutManagerType mCurrentLayoutManagerType;
-
-    protected RecyclerView mRecyclerView;
-    protected PlayerAdapter mAdapter;
-    protected RecyclerView.LayoutManager mLayoutManager;
-    protected String[] mDataset;
-    private SwipeRefreshLayout pullToRefreshView;
+public class PlayersFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
     FloatingActionsMenu fabMenu;
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        // Initialize dataset, this data would usually come from a local content provider or
-        // remote server.
-        initDataset();
+    public PlayersFragment() {
+        // Required empty public constructor
     }
 
     @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if (!hidden){
+            if (mActivity != null) {
+                ((MainActivity) mActivity).setUpActionBar(6);
+            }
+        }
+    }
+
+    public ViewPager mPager;
+
+
+    /**
+     * The pager adapter, which provides the pages to the view pager widget.
+     */
+    private PagerAdapter mPagerAdapter;
+    View viewPlayLayout;
+    long groupToPoll = 0;
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
-        final View rootView = inflater.inflate(R.layout.players_view_frag, container, false);
-        rootView.setTag(TAG);
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        viewPlayLayout = inflater.inflate(R.layout.fragment_players_swipe, container, false);
+        viewPlayLayout.setBackgroundColor(getResources().getColor(R.color.cardview_initial_background));
 
-        // BEGIN_INCLUDE(initializeRecyclerView)
-        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerView);
-        VerticalRecyclerViewFastScroller fastScroller = (VerticalRecyclerViewFastScroller) rootView.findViewById(R.id.fastscroller);
+        fabMenu = (FloatingActionsMenu) viewPlayLayout.findViewById(R.id.multiple_actions);
 
-        // Connect the recycler to the scroller (to let the scroller scroll the list)
-        fastScroller.setRecyclerView(mRecyclerView, null);
-
-        // Connect the scroller to the recycler (to let the recycler scroll the scroller's handle)
-        mRecyclerView.setOnScrollListener(fastScroller.getOnScrollListener());
-
-        fabMenu = (FloatingActionsMenu) rootView.findViewById(R.id.multiple_actions);
-
-        FloatingActionButton addPlayer = (FloatingActionButton) rootView.findViewById(R.id.add_player);
+        FloatingActionButton addPlayer = (FloatingActionButton) viewPlayLayout.findViewById(R.id.add_player);
         addPlayer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -106,7 +66,7 @@ public class PlayersFragment extends Fragment{
             }
         });
 
-        FloatingActionButton addGroup = (FloatingActionButton) rootView.findViewById(R.id.add_group);
+        FloatingActionButton addGroup = (FloatingActionButton) viewPlayLayout.findViewById(R.id.add_group);
         addGroup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -119,33 +79,23 @@ public class PlayersFragment extends Fragment{
             }
         });
 
-
-        // LinearLayoutManager is used here, this will layout the elements in a similar fashion
-        // to the way ListView would layout elements. The RecyclerView.LayoutManager defines how
-        // elements are laid out.
-        mLayoutManager = new LinearLayoutManager(mActivity);
-
-        mCurrentLayoutManagerType = LayoutManagerType.LINEAR_LAYOUT_MANAGER;
-
-        if (savedInstanceState != null) {
-            // Restore saved layout manager type.
-            mCurrentLayoutManagerType = (LayoutManagerType) savedInstanceState
-                    .getSerializable(KEY_LAYOUT_MANAGER);
-        }
-        setRecyclerViewLayoutManager(mCurrentLayoutManagerType);
-
-        mAdapter = new PlayerAdapter(mActivity, this);
-        // Set CustomAdapter as the adapter for RecyclerView.
-        mRecyclerView.setAdapter(mAdapter);
-        return rootView;
+        // Instantiate a ViewPager and a PagerAdapter.
+        mPager = (ViewPager) viewPlayLayout.findViewById(R.id.pager);
+        mPagerAdapter = new ScreenSlidePagerAdapter(getChildFragmentManager(), -1);
+        mPager.setAdapter(mPagerAdapter);
+        mPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+            @Override
+            public void onPageSelected(int position) {
+                // When changing pages, reset the action bar actions since they are dependent
+                // on which page is currently active. An alternative approach is to have each
+                // fragment expose actions itself (rather than the activity exposing actions),
+                // but for simplicity, the activity provides the actions in this sample.
+                mActivity.invalidateOptionsMenu();
+            }
+        });
+        return viewPlayLayout;
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
-        // Save currently selected layout manager.
-        savedInstanceState.putSerializable(KEY_LAYOUT_MANAGER, mCurrentLayoutManagerType);
-        super.onSaveInstanceState(savedInstanceState);
-    }
 
     Activity mActivity;
     @Override
@@ -164,7 +114,7 @@ public class PlayersFragment extends Fragment{
     public void onStart() {
         super.onStart();
         if (mActivity != null) {
-            ((MainActivity) mActivity).setUpActionBar(5);
+            ((MainActivity) mActivity).setUpActionBar(6);
         }
     }
 
@@ -172,62 +122,67 @@ public class PlayersFragment extends Fragment{
     public void onDetach() {
         super.onDetach();
         mListener = null;
-        if (mActivity != null) {
-            ((MainActivity) mActivity).setUpActionBar(6);
-        }
+        mActivity = null;
     }
 
-    /**
-     * Set RecyclerView's LayoutManager to the one given.
-     *
-     * @param layoutManagerType Type of layout manager to switch to.
-     */
-    public void setRecyclerViewLayoutManager(LayoutManagerType layoutManagerType) {
-        int scrollPosition = 0;
-
-        // If a layout manager has already been set, get current scroll position.
-        if (mRecyclerView.getLayoutManager() != null) {
-            scrollPosition = ((LinearLayoutManager) mRecyclerView.getLayoutManager())
-                    .findFirstCompletelyVisibleItemPosition();
-        }
-
-        switch (layoutManagerType) {
-            case LINEAR_LAYOUT_MANAGER:
-                mLayoutManager = new LinearLayoutManager(mActivity);
-                mCurrentLayoutManagerType = LayoutManagerType.LINEAR_LAYOUT_MANAGER;
-                break;
-            default:
-                mLayoutManager = new LinearLayoutManager(mActivity);
-                mCurrentLayoutManagerType = LayoutManagerType.LINEAR_LAYOUT_MANAGER;
-        }
-
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.scrollToPosition(scrollPosition);
+    public void refreshDataset(boolean addFlag){
+        ((ScreenSlidePagerAdapter)mPagerAdapter).setAddDropFlag(addFlag);
+        mPagerAdapter.notifyDataSetChanged();
     }
 
+    private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
+        long theGroup;
+        boolean addFlag;
+        public ScreenSlidePagerAdapter(FragmentManager fm, long theGroup) {
+            super(fm);
+            this.theGroup = theGroup;
+        }
 
-    /**
-     * Generates Strings for RecyclerView's adapter. This data would usually come
-     * from a local content provider or remote server.
-     */
-    private void initDataset() {
-        List<Player> players = Player.listPlayersAZ();
-        if (players != null) {
-            mDataset = new String[players.size()];
-            int i = 0;
-            for(Player player:players){
-                mDataset[i] = player.playerName;
-                //Log.d("V1", "player name = " + player.playerName);
-                i++;
+        public void setAddDropFlag(boolean addDropFlag){
+            addFlag = addDropFlag;
+        }
+
+        public void refreshPages(){
+            if (this.getItem(0) instanceof PlayersFragment_Players) {
+                ((PlayersFragment_Players)this.getItem(0)).updateDataset();
+            }
+            if (this.getItem(1) instanceof PlayersFragment_Groups) {
+                ((PlayersFragment_Groups)this.getItem(1)).updateDataset();
             }
         }
-    }
 
-    protected void refreshDataset(){
-        initDataset();
-        mAdapter = new PlayerAdapter(mActivity, this);
-        // Set CustomAdapter as the adapter for RecyclerView.
-        mRecyclerView.setAdapter(mAdapter);
+        @Override
+        public Fragment getItem(int position) {
+            if (position == 0){
+                return PlayersFragment_Players.newInstance();
+            }else {
+                return PlayersFragment_Groups.newInstance();
+            }
+        }
+
+        @Override
+        public int getCount() {
+            return 2;
+        }
+
+        @Override
+        public int getItemPosition(Object object) {
+            if (addFlag) {
+                return POSITION_NONE;
+            }else{
+                return POSITION_UNCHANGED;
+            }
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            if (position == 0){
+                return getString(R.string.title_players);
+            }else{
+                return getString(R.string.groups_header);
+            }
+        }
+
     }
 
     /**

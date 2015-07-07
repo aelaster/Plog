@@ -326,7 +326,7 @@ public class AddPlayerFragment extends Fragment {
                             }
                         }
                         if (!removingGroup) {
-                            onButtonPressed("refresh_players");
+                            onButtonPressed("refresh_players_add");
                         }
                     }
                 }
@@ -403,7 +403,7 @@ public class AddPlayerFragment extends Fragment {
         @Override
         protected void onPostExecute ( final Long[] result){
             mydialog.dismiss();
-            onButtonPressed("refresh_players");
+            onButtonPressed("refresh_players_add");
             removeYourself();
         }
     }

@@ -44,7 +44,7 @@
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp" />
 
-            <!--<Button
+            <Button
                 android:id="@+id/deleteButton"
                 style="?android:attr/buttonStyleSmall"
                 android:layout_width="wrap_content"
@@ -53,7 +53,7 @@
                 android:text="@string/delete_group"
                 android:layout_marginBottom="16dp"
                 android:layout_gravity="center_horizontal|bottom"
-                />-->
+                />
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

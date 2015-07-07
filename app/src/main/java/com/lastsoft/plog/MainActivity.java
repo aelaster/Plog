@@ -2,6 +2,7 @@ package com.lastsoft.plog;
 
 import android.app.ActivityOptions;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.app.backup.BackupManager;
 import android.content.Context;
 import android.content.ContextWrapper;
@@ -9,6 +10,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -540,11 +542,17 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onFragmentInteraction(String id) {
-        if (id.contains("refresh_players")){
+        if (id.contains("refresh_players_add")){
             PlayersFragment playersFrag = (PlayersFragment)
                     getSupportFragmentManager().findFragmentByTag("players");
             if (playersFrag != null) {
-                playersFrag.refreshDataset();
+                playersFrag.refreshDataset(true);
+            }
+        }else if (id.contains("refresh_players_drop")){
+            PlayersFragment playersFrag = (PlayersFragment)
+                    getSupportFragmentManager().findFragmentByTag("players");
+            if (playersFrag != null) {
+                playersFrag.refreshDataset(false);
             }
         }else if (id.contains("refresh_games")){
             GamesFragment collectionFrag = (GamesFragment)
@@ -589,6 +597,22 @@ public class MainActivity extends AppCompatActivity
         ft.commitAllowingStateLoss();
         fragmentManager.executePendingTransactions(); //Prevents the flashing.
     }
+
+    public void openAddGroup(Fragment mFragment, long groupID){
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction ft = fragmentManager.beginTransaction();
+        fragUp = true;
+        mAddGroupFragment = AddGroupFragment.newInstance( 0,  0, true, groupID);
+
+        ft.setCustomAnimations(R.anim.slide_in_bottom, R.anim.slide_out_top, R.anim.slide_in_top, R.anim.slide_out_bottom);
+        ft.replace(R.id.container, mAddGroupFragment, "add_group");
+        ft.addToBackStack("add_group");
+        ft.commitAllowingStateLoss();
+        fragmentManager.executePendingTransactions(); //Prevents the flashing.
+    }
+
+
     int firstVisible, lastVisible;
     public void onPlayClicked(Play clickedPlay, Fragment mFragment, final View view, final View nameView, final View dateView, int position, boolean fromDrawer, int playListType){
 
@@ -683,6 +707,11 @@ public class MainActivity extends AppCompatActivity
         newFragment.show(getSupportFragmentManager(), "deleteGame");
     }
 
+    public void deleteGroup(long groupId){
+        DeleteGroupFragment newFragment = new DeleteGroupFragment().newInstance(groupId);
+        newFragment.show(getSupportFragmentManager(), "deleteGroup");
+    }
+
     @Override
     public void onLogInSuccess() {
 
@@ -696,6 +725,94 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onNeedCredentials() {
 
+    }
+
+    public class DeleteGroupFragment extends DialogFragment {
+        public DeleteGroupFragment newInstance(long groupId) {
+            DeleteGroupFragment frag = new DeleteGroupFragment();
+            Bundle args = new Bundle();
+            args.putLong("groupId", groupId);
+            frag.setArguments(args);
+            return frag;
+        }
+
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // Use the Builder class for convenient dialog construction
+            final long groupId = getArguments().getLong("groupId");
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setTitle(R.string.delete);
+            builder.setMessage(R.string.confirm_delete_group)
+                    .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dismiss();
+                            RemoveGroupTask removeGroup = new RemoveGroupTask(MainActivity.this, GameGroup.findById(GameGroup.class, groupId));
+                            try {
+                                removeGroup.execute();
+                            } catch (Exception ignored) {
+
+                            }
+                        }
+                    })
+                    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dismiss();
+                        }
+                    });
+            // Create the AlertDialog object and return it
+            return builder.create();
+        }
+    }
+
+    public class RemoveGroupTask extends AsyncTask<Long, Void, Long[]> {
+
+        Context theContext;
+        GameGroup theGroup;
+
+        private final ProgressDialog mydialog = new ProgressDialog(MainActivity.this);
+
+        public RemoveGroupTask(Context context, GameGroup gameGroup) {
+            this.theGroup = gameGroup;
+            this.theContext = context;
+        }
+
+        // can use UI thread here
+        @Override
+        protected void onPreExecute() {
+            mydialog.setMessage(getString(R.string.removeGroup) + theGroup.groupName);
+            mydialog.setCancelable(false);
+            try{
+                mydialog.show();
+            }catch (Exception ignored){}
+        }
+
+        // automatically done on worker thread (separate from UI thread)
+        @Override
+        protected Long[] doInBackground(final Long... args) {
+
+            List<PlayersPerGameGroup> players =  PlayersPerGameGroup.getPlayers(theGroup);
+            for (PlayersPerGameGroup player : players) {
+                player.delete();
+            }
+
+            //delete the plays
+            List<PlaysPerGameGroup> plays = PlaysPerGameGroup.getPlays(theGroup);
+            for(PlaysPerGameGroup play:plays){
+                play.delete();
+            }
+
+            theGroup.delete();
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute ( final Long[] result){
+            mydialog.dismiss();
+            onFragmentInteraction("refresh_players_drop");
+            onBackPressed();
+        }
     }
 
     public class DeleteGameFragment extends DialogFragment {
@@ -791,7 +908,7 @@ public class MainActivity extends AppCompatActivity
 
                             //delete player
                             deleteMe.delete();
-                            onFragmentInteraction("refresh_players");
+                            onFragmentInteraction("refresh_players_drop");
                             onBackPressed();
                             dismiss();
                         }
@@ -917,7 +1034,7 @@ public class MainActivity extends AppCompatActivity
             //restoreActionBar();*/
         }else if (id.equals("add_group")) {
             fragUp = true;
-            mAddGroupFragment = AddGroupFragment.newInstance((int) x, (int) y, true);
+            mAddGroupFragment = AddGroupFragment.newInstance((int) x, (int) y, true, -1);
             ft.add(R.id.container, mAddGroupFragment, id);
             ft.addToBackStack(id);
             ft.commitAllowingStateLoss();
