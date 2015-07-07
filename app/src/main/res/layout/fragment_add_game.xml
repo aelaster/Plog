@@ -50,6 +50,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_medium"
             android:text="@string/add_game"
+            android:textColor="@color/black"
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="16dp"
             android:layout_gravity="center_horizontal|bottom"

@@ -47,12 +47,14 @@
                         android:layout_height="wrap_content"
                         android:id="@+id/gameName"
                         android:layout_alignParentTop="true"
+                        android:textColor="@color/black"
                         android:textSize="20sp"
                         />
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:id="@+id/playDate"
+                        android:textColor="@color/black"
                         android:layout_below="@+id/gameName"
                         />
 

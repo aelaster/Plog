@@ -29,7 +29,6 @@
         <item name="android:colorPrimaryDark">@color/darker_logo_blue</item>
         <item name="colorPrimaryDark">@color/darker_logo_blue</item>
         <item name="actionBarStyle">@style/MyActionBar</item>
-        <item name="android:textColor">@color/black</item>
     </style>
 
 

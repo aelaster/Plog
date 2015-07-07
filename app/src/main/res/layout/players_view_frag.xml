@@ -47,29 +47,28 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        fab:fab_addButtonColorNormal="@color/pink"
-        fab:fab_addButtonColorPressed="@color/pink_pressed"
+        fab:fab_addButtonColorNormal="@color/accent_material_light"
+        fab:fab_addButtonColorPressed="@color/accent_material_light"
         fab:fab_addButtonPlusIconColor="@color/white"
         fab:fab_labelStyle="@style/menu_labels_style"
-        android:layout_marginBottom="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginEnd="16dp">
+        android:layout_marginBottom="5dp"
+        android:layout_marginEnd="7dp">
 
         <net.i2p.android.ext.floatingactionbutton.FloatingActionButton
             android:id="@+id/add_group"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            fab:fab_colorNormal="@color/cardview_initial_background"
+            fab:fab_colorNormal="@color/accent_material_light"
             fab:fab_title="@string/add_group"
-            fab:fab_colorPressed="@color/cardview_initial_background_pressed"/>
+            fab:fab_colorPressed="@color/accent_material_light"/>
 
         <net.i2p.android.ext.floatingactionbutton.FloatingActionButton
             android:id="@+id/add_player"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            fab:fab_colorNormal="@color/cardview_initial_background"
+            fab:fab_colorNormal="@color/accent_material_light"
             fab:fab_title="@string/add_player"
-            fab:fab_colorPressed="@color/cardview_initial_background_pressed"/>
+            fab:fab_colorPressed="@color/accent_material_light"/>
 
     </net.i2p.android.ext.floatingactionbutton.FloatingActionsMenu>
 </RelativeLayout>

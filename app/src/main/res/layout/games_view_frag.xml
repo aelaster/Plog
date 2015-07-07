@@ -15,11 +15,11 @@
  limitations under the License.
 -->
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:fab="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/coordinatorLayout"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_width="match_parent">
     <LinearLayout
         android:id="@+id/progressContainer"
         android:layout_width="match_parent"
@@ -62,19 +62,19 @@
         android:layout_width="10dp"
         android:layout_height="match_parent"
         android:layout_alignParentRight="true"
+        android:layout_gravity="right"
         />
-    <net.i2p.android.ext.floatingactionbutton.AddFloatingActionButton
+    <android.support.design.widget.FloatingActionButton
         android:id="@+id/add_game"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:src="@drawable/ic_add"
+        android:layout_gravity="bottom|end"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        fab:fab_colorNormal="@color/pink"
-        fab:fab_colorPressed="@color/pink_pressed"
-        fab:fab_plusIconColor="@color/white"
         android:layout_marginBottom="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginEnd="16dp"/>
+        android:layout_marginEnd="16dp"
+        app:elevation="4dp"
+        app:borderWidth="0dp"/>
 
-</RelativeLayout>
+</android.support.design.widget.CoordinatorLayout>

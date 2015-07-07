@@ -109,6 +109,9 @@
     <string name="confirm_delete_player">Are you sure you want to delete this player?</string>
     <string name="confirm_delete_play">Are you sure you want to delete this play?</string>
 
+    <string name="undo">Undo</string>
+    <string name="added_to_bl">" added to Bucket List"</string>
+
     <string-array name="color_choices">
         <item>Blue</item>
         <item>Green</item>
@@ -121,6 +124,7 @@
         <item>Pink</item>
         <item>Natural</item>
         <item>Grey</item>
+        <item>Brown</item>
         <item>None</item>
     </string-array>
 

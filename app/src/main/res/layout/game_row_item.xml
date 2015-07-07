@@ -44,6 +44,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/gameName"
+                    android:textColor="@color/black"
                     android:layout_alignParentTop="true"
                     android:textSize="20sp"
                     />
@@ -51,6 +52,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/bucketDate"
+                    android:textColor="@color/black"
                     android:layout_below="@+id/gameName"
                     android:visibility="gone"
                     />

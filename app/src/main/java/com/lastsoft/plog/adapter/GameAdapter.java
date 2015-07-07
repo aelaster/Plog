@@ -19,6 +19,7 @@ package com.lastsoft.plog.adapter;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -285,11 +286,30 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
                         int i = (int) (calendar.getTime().getTime()/1000);
                         games.get(position).taggedToPlay = i;
                         games.get(position).save();
+
+                        Snackbar
+                                .make(((GamesFragment) myFragment).mCoordinatorLayout,
+                                        games.get(position).gameName + mActivity.getString(R.string.added_to_bl),
+                                        Snackbar.LENGTH_LONG)
+                                .setAction(mActivity.getString(R.string.undo), new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        games.get(position).taggedToPlay = 0;
+                                        games.get(position).save();
+                                        if (playListType == 2) {
+                                            ((MainActivity) mActivity).onFragmentInteraction("refresh_games");
+                                        }
+                                    }
+                                })
+                                .show(); // Do not forget to show!
+
                         return true;
                     case R.id.remove_bucket_list:
                         games.get(position).taggedToPlay = 0;
                         games.get(position).save();
-                        ((MainActivity) mActivity).onFragmentInteraction("refresh_games");
+                        if (playListType == 2) {
+                            ((MainActivity) mActivity).onFragmentInteraction("refresh_games");
+                        }
                         return true;
                     default:
                         return false;

@@ -23,6 +23,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
@@ -43,8 +45,6 @@ import android.widget.TextView;
 import com.lastsoft.plog.adapter.GameAdapter;
 import com.lastsoft.plog.db.Game;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
-
-import net.i2p.android.ext.floatingactionbutton.FloatingActionButton;
 
 import java.io.File;
 import java.io.IOException;
@@ -85,6 +85,7 @@ public class GamesFragment extends Fragment{
     private ImageView mCancel;
     private EditText mSearch;
     String mSearchQuery = "";
+    public CoordinatorLayout mCoordinatorLayout;
     private boolean releaseFocus = false;
     private int playListType = 0;
 
@@ -133,6 +134,7 @@ public class GamesFragment extends Fragment{
         rootView.setTag(TAG);
 
         // BEGIN_INCLUDE(initializeRecyclerView)
+        mCoordinatorLayout = (CoordinatorLayout) rootView.findViewById(R.id.coordinatorLayout);
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerView);
         pullToRefreshView = (SwipeRefreshLayout) rootView.findViewById(R.id.pull_to_refresh_listview);
         pullToRefreshView.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
