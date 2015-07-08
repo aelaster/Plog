@@ -27,6 +27,7 @@ import android.widget.TextView;
 
 import com.lastsoft.plog.MainActivity;
 import com.lastsoft.plog.R;
+import com.lastsoft.plog.db.Game;
 import com.lastsoft.plog.db.GameGroup;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 
@@ -49,7 +50,8 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
      * Provide a reference to the type of views that you are using (custom ViewHolder)
      */
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        private final TextView textView;
+        private final TextView nameView;
+        private final TextView winsView;
         private final ImageView imageView;
         private final View myView;
 
@@ -63,15 +65,19 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
                 }
             });
             myView = v;
-            textView = (TextView) v.findViewById(R.id.textView);
+            nameView = (TextView) v.findViewById(R.id.groupName);
+            winsView = (TextView) v.findViewById(R.id.groupWins);
             imageView = (ImageView) v.findViewById(R.id.imageView1);
         }
 
         public ImageView getImageView() {
             return imageView;
         }
-        public TextView getTextView() {
-            return textView;
+        public TextView getNameView() {
+            return nameView;
+        }
+        public TextView getWinsView() {
+            return winsView;
         }
         public View getView() {
             return myView;
@@ -98,7 +104,7 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         // Create a new view.
         View v = LayoutInflater.from(viewGroup.getContext())
-                .inflate(R.layout.text_row_item, viewGroup, false);
+                .inflate(R.layout.group_row_item, viewGroup, false);
 
         return new ViewHolder(v);
     }
@@ -108,7 +114,10 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
     // Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, final int position) {
-        viewHolder.getTextView().setText(groups.get(position).groupName);
+        //long totalPlays = ((long) PlayersPerPlay.totalPlays_GameGroup(GameGroup.findById(GameGroup.class, groups.get(position).getId())).size() / (long) GameGroup.getGroupPlayers(GameGroup.findById(GameGroup.class, groups.get(position).getId())).size());
+        long totalUnique = Game.getUniqueGames_GameGroup(GameGroup.findById(GameGroup.class, groups.get(position).getId())).size();
+        viewHolder.getNameView().setText(groups.get(position).groupName);
+        viewHolder.getWinsView().setText(myActivity.getString(R.string.unique_games) + totalUnique);
         viewHolder.getView().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -130,6 +130,8 @@
         <item>None</item>
     </string-array>
 
+    <string name="unique_games">"Unique Games: "</string>
+    <string name="wins">"Wins: "</string>
     <string name="stats_regular_wins">Regular Wins</string>
     <string name="stats_asterisk_wins">Asterisk Wins</string>
     <string name="stats_total_plays">Total Plays</string>

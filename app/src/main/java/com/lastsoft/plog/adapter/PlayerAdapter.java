@@ -27,6 +27,7 @@ import android.widget.TextView;
 
 import com.lastsoft.plog.MainActivity;
 import com.lastsoft.plog.R;
+import com.lastsoft.plog.db.Play;
 import com.lastsoft.plog.db.Player;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -50,7 +51,8 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.ViewHolder
      * Provide a reference to the type of views that you are using (custom ViewHolder)
      */
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        private final TextView textView;
+        private final TextView nameView;
+        private final TextView winsView;
         private final ImageView imageView;
         private final View myView;
 
@@ -64,15 +66,19 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.ViewHolder
                 }
             });
             myView = v;
-            textView = (TextView) v.findViewById(R.id.textView);
+            nameView = (TextView) v.findViewById(R.id.playerName);
+            winsView = (TextView) v.findViewById(R.id.playerWins);
             imageView = (ImageView) v.findViewById(R.id.imageView1);
         }
 
         public ImageView getImageView() {
             return imageView;
         }
-        public TextView getTextView() {
-            return textView;
+        public TextView getNameView() {
+            return nameView;
+        }
+        public TextView getWinsView() {
+            return winsView;
         }
         public View getView() {
             return myView;
@@ -97,7 +103,7 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.ViewHolder
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         // Create a new view.
         View v = LayoutInflater.from(viewGroup.getContext())
-                .inflate(R.layout.text_row_item, viewGroup, false);
+                .inflate(R.layout.player_row_item, viewGroup, false);
 
         return new ViewHolder(v);
     }
@@ -107,7 +113,10 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.ViewHolder
     // Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, final int position) {
-        viewHolder.getTextView().setText(players.get(position).playerName);
+        int regularWins = Play.totalWins_Player(players.get(position)).size();
+        viewHolder.getNameView().setText(players.get(position).playerName);
+        viewHolder.getWinsView().setText(myActivity.getString(R.string.wins) + regularWins);
+
         if (players.get(position).playerPhoto != null) {
             ImageLoader.getInstance().displayImage(players.get(position).playerPhoto, viewHolder.getImageView(), options);
         }
