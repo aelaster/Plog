@@ -203,31 +203,26 @@ public class AddGroupFragment extends Fragment {
 
             case R.id.add_group:
                 if (!groupName.getText().toString().isEmpty()) {
+                    boolean editFlag = false;
+                    GameGroup newGroup;
                     if (groupID >= 0) {
+                        editFlag = true;
                         editGroup.groupName = groupName.getText().toString();
                         editGroup.save();
-                        mActivity.onBackPressed();
+                        newGroup = editGroup;
                     } else {
                         //first, add the group
-                        GameGroup newGroup = new GameGroup(groupName.getText().toString());
+                        newGroup = new GameGroup(groupName.getText().toString());
                         newGroup.save();
-
-                        //then add the players to the group
-                        for (int i = 0; i < adapter.getCount(); i++) {
-                            AddPlayer thisGuy = adapter.getItem(i);
-                            addedUsers.add(Player.findById(Player.class, thisGuy.playerID));
-                            PlayersPerGameGroup newPlayer = new PlayersPerGameGroup(Player.findById(Player.class, thisGuy.playerID), newGroup);
-                            newPlayer.save();
-                        }
-
-                        //now go through existing plays and determine if this group should have plays logged in the plays per game group table
-                        AddGroupTask initGroup = new AddGroupTask(mActivity, newGroup);
-                        try {
-                            initGroup.execute();
-                        } catch (Exception ignored) {
-
-                        }
                     }
+
+                    AddGroupTask initGroup = new AddGroupTask(mActivity, newGroup, editFlag);
+                    try {
+                        initGroup.execute();
+                    } catch (Exception ignored) {
+
+                    }
+
                 }
                 return true;
         }
@@ -240,12 +235,14 @@ public class AddGroupFragment extends Fragment {
 
         Context theContext;
         GameGroup theGroup;
+        boolean theEditFlag;
 
         private final ProgressDialog mydialog = new ProgressDialog(mActivity);
 
-        public AddGroupTask(Context context, GameGroup gameGroup) {
+        public AddGroupTask(Context context, GameGroup gameGroup, boolean editFlag) {
             this.theGroup = gameGroup;
             this.theContext = context;
+            this.theEditFlag = editFlag;
         }
 
         // can use UI thread here
@@ -262,6 +259,28 @@ public class AddGroupFragment extends Fragment {
         @Override
         protected Long[] doInBackground(final Long... args) {
 
+            if (theEditFlag) {
+                //remove the players
+                List<PlayersPerGameGroup> playaz = PlayersPerGameGroup.getPlayers(theGroup);
+                for (PlayersPerGameGroup player : playaz) {
+                    player.delete();
+                }
+                //remove the plays
+                List<PlaysPerGameGroup> playaz2 = PlaysPerGameGroup.getPlays(theGroup);
+                for (PlaysPerGameGroup play : playaz2) {
+                    play.delete();
+                }
+            }
+
+            //then add the players to the group
+            for (int i = 0; i < adapter.getCount(); i++) {
+                AddPlayer thisGuy = adapter.getItem(i);
+                addedUsers.add(Player.findById(Player.class, thisGuy.playerID));
+                PlayersPerGameGroup newPlayer = new PlayersPerGameGroup(Player.findById(Player.class, thisGuy.playerID), theGroup);
+                newPlayer.save();
+            }
+
+            //now go through existing plays and determine if this group should have plays logged in the plays per game group table
             List<Play> plays = Play.listPlaysNewOld("", true);
             for (Play play:plays){
                 List<Player> players = Player.getPlayersIDs(play);
@@ -287,7 +306,11 @@ public class AddGroupFragment extends Fragment {
         @Override
         protected void onPostExecute ( final Long[] result){
             mydialog.dismiss();
-            onButtonPressed("refresh_players_add");
+            if (theEditFlag){
+                onButtonPressed("refresh_players_drop");
+            }else {
+                onButtonPressed("refresh_players_add");
+            }
             mActivity.onBackPressed();
         }
     }

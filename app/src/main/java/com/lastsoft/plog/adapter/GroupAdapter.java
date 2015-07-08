@@ -82,7 +82,9 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
     public GroupAdapter(Activity mActivity, Fragment mFragment) {
         myActivity = mActivity;
         myFragment = mFragment;
-        groups = GameGroup.listAll(GameGroup.class);
+
+        groups = GameGroup.listAll_AZ();
+
         options = new DisplayImageOptions.Builder()
                 .cacheOnDisk(true)
                 .cacheInMemory(true)

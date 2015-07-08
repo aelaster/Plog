@@ -97,38 +97,6 @@ public class PlayersFragment_Groups extends Fragment{
         // Connect the scroller to the recycler (to let the recycler scroll the scroller's handle)
         mRecyclerView.setOnScrollListener(fastScroller.getOnScrollListener());
 
-        /*
-        fabMenu = (FloatingActionsMenu) rootView.findViewById(R.id.multiple_actions);
-
-        FloatingActionButton addPlayer = (FloatingActionButton) rootView.findViewById(R.id.add_player);
-        addPlayer.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                fabMenu.toggle();
-                int viewXY[] = new int[2];
-                v.getLocationOnScreen(viewXY);
-
-                if (mListener != null) {
-                    mListener.onFragmentInteraction("add_player", viewXY[0], viewXY[1]);
-                }
-            }
-        });
-
-        FloatingActionButton addGroup = (FloatingActionButton) rootView.findViewById(R.id.add_group);
-        addGroup.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                fabMenu.toggle();
-                int viewXY[] = new int[2];
-                v.getLocationOnScreen(viewXY);
-                if (mListener != null) {
-                    mListener.onFragmentInteraction("add_group", viewXY[0], viewXY[1]);
-                }
-            }
-        });
-        */
-
-
         // LinearLayoutManager is used here, this will layout the elements in a similar fashion
         // to the way ListView would layout elements. The RecyclerView.LayoutManager defines how
         // elements are laid out.
