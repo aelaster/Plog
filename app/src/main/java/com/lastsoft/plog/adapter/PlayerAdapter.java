@@ -18,11 +18,15 @@ package com.lastsoft.plog.adapter;
 
 import android.app.Activity;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.lastsoft.plog.MainActivity;
@@ -54,6 +58,7 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.ViewHolder
         private final TextView nameView;
         private final TextView winsView;
         private final ImageView imageView;
+        private final LinearLayout overflowLayout;
         private final View myView;
 
         public ViewHolder(View v) {
@@ -68,6 +73,7 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.ViewHolder
             myView = v;
             nameView = (TextView) v.findViewById(R.id.playerName);
             winsView = (TextView) v.findViewById(R.id.playerWins);
+            overflowLayout = (LinearLayout) v.findViewById(R.id.overflowLayout);
             imageView = (ImageView) v.findViewById(R.id.imageView1);
         }
 
@@ -79,6 +85,9 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.ViewHolder
         }
         public TextView getWinsView() {
             return winsView;
+        }
+        public LinearLayout getOverflowLayout() {
+            return overflowLayout;
         }
         public View getView() {
             return myView;
@@ -126,6 +135,32 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.ViewHolder
                 ((MainActivity)myActivity).openAddPlayer(myFragment, players.get(position).getId());
             }
         });
+        viewHolder.getOverflowLayout().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                playerPopup(view, position);
+            }
+        });
+    }
+
+    public void playerPopup(View v, final int position) {
+        PopupMenu popup = new PopupMenu(myActivity, v);
+
+        MenuInflater inflater = popup.getMenuInflater();
+        inflater.inflate(R.menu.player_overflow, popup.getMenu());
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.view_plays:
+                        ((MainActivity) myActivity).openPlays("0$" + players.get(position).getId(), false, 2);
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        });
+        popup.show();
     }
     // END_INCLUDE(recyclerViewOnBindViewHolder)
 
