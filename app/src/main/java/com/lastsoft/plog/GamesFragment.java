@@ -36,6 +36,8 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -45,6 +47,7 @@ import android.widget.TextView;
 import com.lastsoft.plog.adapter.GameAdapter;
 import com.lastsoft.plog.db.Game;
 import com.lastsoft.plog.util.LoadGamesTask;
+import com.lastsoft.plog.util.MyRecyclerScroll;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 
 import java.io.File;
@@ -89,6 +92,8 @@ public class GamesFragment extends Fragment{
     public CoordinatorLayout mCoordinatorLayout;
     private boolean releaseFocus = false;
     private int playListType = 0;
+    FloatingActionButton addPlayer;
+    int fabMargin;
 
 
     public static GamesFragment newInstance(boolean fromDrawer, String searchQuery, int playListType) {
@@ -155,7 +160,7 @@ public class GamesFragment extends Fragment{
         // Connect the scroller to the recycler (to let the recycler scroll the scroller's handle)
         mRecyclerView.setOnScrollListener(fastScroller.getOnScrollListener());
 
-        FloatingActionButton addPlayer = (FloatingActionButton) rootView.findViewById(R.id.add_game);
+        addPlayer = (FloatingActionButton) rootView.findViewById(R.id.add_game);
         if (fromDrawer && playListType != 2) {
             fastScroller.setRecyclerView(mRecyclerView, pullToRefreshView);
             addPlayer.setOnClickListener(new View.OnClickListener() {
@@ -197,7 +202,18 @@ public class GamesFragment extends Fragment{
         // Set CustomAdapter as the adapter for RecyclerView.
         mRecyclerView.setAdapter(mAdapter);
 
+        fabMargin = getResources().getDimensionPixelSize(R.dimen.fab_margin);
+        mRecyclerView.addOnScrollListener(new MyRecyclerScroll() {
+            @Override
+            public void show() {
+                addPlayer.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();
+            }
 
+            @Override
+            public void hide() {
+                addPlayer.animate().translationY(addPlayer.getHeight() + fabMargin).setInterpolator(new AccelerateInterpolator(2)).start();
+            }
+        });
 
         if (mSearch != null) {
             mSearch.addTextChangedListener(new TextWatcher() {

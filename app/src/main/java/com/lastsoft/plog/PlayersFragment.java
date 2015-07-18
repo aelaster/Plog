@@ -10,6 +10,8 @@ import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
 
 import net.i2p.android.ext.floatingactionbutton.FloatingActionButton;
 import net.i2p.android.ext.floatingactionbutton.FloatingActionsMenu;
@@ -19,6 +21,7 @@ public class PlayersFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
     FloatingActionsMenu fabMenu;
+    int fabMargin;
 
     public PlayersFragment() {
         // Required empty public constructor
@@ -93,9 +96,19 @@ public class PlayersFragment extends Fragment {
                 mActivity.invalidateOptionsMenu();
             }
         });
+
+        fabMargin = getResources().getDimensionPixelSize(R.dimen.fab_margin2);
+
         return viewPlayLayout;
     }
 
+    public void showFAB(){
+        fabMenu.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();
+    }
+
+    public void hideFAB(){
+        fabMenu.animate().translationY(fabMenu.getHeight() + fabMargin).setInterpolator(new AccelerateInterpolator(2)).start();
+    }
 
     Activity mActivity;
     @Override

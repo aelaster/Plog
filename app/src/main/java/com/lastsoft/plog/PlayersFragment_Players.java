@@ -29,6 +29,7 @@ import android.view.ViewGroup;
 
 import com.lastsoft.plog.adapter.PlayerAdapter;
 import com.lastsoft.plog.db.Player;
+import com.lastsoft.plog.util.MyRecyclerScroll;
 
 import net.i2p.android.ext.floatingactionbutton.FloatingActionsMenu;
 
@@ -60,6 +61,7 @@ public class PlayersFragment_Players extends Fragment{
     protected RecyclerView.LayoutManager mLayoutManager;
     protected String[] mDataset;
     private SwipeRefreshLayout pullToRefreshView;
+    int fabMargin;
 
     //private OnFragmentInteractionListener mListener;
     FloatingActionsMenu fabMenu;
@@ -146,6 +148,22 @@ public class PlayersFragment_Players extends Fragment{
         mAdapter = new PlayerAdapter(mActivity, this);
         // Set CustomAdapter as the adapter for RecyclerView.
         mRecyclerView.setAdapter(mAdapter);
+
+        fabMargin = getResources().getDimensionPixelSize(R.dimen.fab_margin);
+        mRecyclerView.addOnScrollListener(new MyRecyclerScroll() {
+            @Override
+            public void show() {
+                ((MainActivity) mActivity).showPlayerFAB();
+            }
+
+            @Override
+            public void hide() {
+                ((MainActivity) mActivity).hidePlayerFAB();
+
+            }
+        });
+
+
         return rootView;
     }
 

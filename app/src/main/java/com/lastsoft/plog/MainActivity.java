@@ -587,6 +587,22 @@ public class MainActivity extends AppCompatActivity
         Toast.makeText(this, id + " List Item Clicked", Toast.LENGTH_SHORT).show();
     }
 
+    public void hidePlayerFAB(){
+        PlayersFragment playersFrag = (PlayersFragment)
+                getSupportFragmentManager().findFragmentByTag("players");
+        if (playersFrag != null) {
+            playersFrag.hideFAB();
+        }
+    }
+
+    public void showPlayerFAB(){
+        PlayersFragment playersFrag = (PlayersFragment)
+                getSupportFragmentManager().findFragmentByTag("players");
+        if (playersFrag != null) {
+            playersFrag.showFAB();
+        }
+    }
+
     public void openAddPlayer(Fragment mFragment, long playerID){
 
         FragmentManager fragmentManager = getSupportFragmentManager();
