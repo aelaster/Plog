@@ -17,6 +17,7 @@
 package com.lastsoft.plog.adapter;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v4.app.Fragment;
@@ -27,6 +28,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -59,8 +61,8 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
     public List<Play> plays;
     private DisplayImageOptions options;
     private String searchQuery;
-    private Activity myActivity;
-    private Fragment myFragment;
+    private Activity mActivity;
+    private Fragment mFragment;
     private boolean fromDrawer;
     int mPosition;
     int playListType;
@@ -109,9 +111,9 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
     }
     // END_INCLUDE(recyclerViewSampleViewHolder)
 
-    public PlayAdapter(Activity mActivity, Fragment mFragment, String mSearchQuery, boolean mFromDrawer, int mPlayListType) {
-        myActivity = mActivity;
-        myFragment = mFragment;
+    public PlayAdapter(Activity theActivity, Fragment theFragment, String mSearchQuery, boolean mFromDrawer, int mPlayListType) {
+        mActivity = theActivity;
+        mFragment = theFragment;
         playListType = mPlayListType;
         fromDrawer = mFromDrawer;
 
@@ -236,7 +238,7 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
             viewHolder.getClickLayout().setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ((MainActivity) myActivity).onPlayClicked(plays.get(position), myFragment, viewHolder.getImageView(), viewHolder.getGameNameView(), viewHolder.getPlayDateView(), position, fromDrawer, playListType);
+                    ((MainActivity) mActivity).onPlayClicked(plays.get(position), mFragment, viewHolder.getImageView(), viewHolder.getGameNameView(), viewHolder.getPlayDateView(), position, fromDrawer, playListType);
                 }
             });
             viewHolder.getOverflowLayout().setOnClickListener(new View.OnClickListener() {
@@ -322,7 +324,16 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
     }
 
     public void playPopup(View v, final int position) {
-        PopupMenu popup = new PopupMenu(myActivity, v);
+
+        try{
+            InputMethodManager inputManager = (InputMethodManager)
+                    mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
+
+            inputManager.hideSoftInputFromWindow(mActivity.getCurrentFocus().getWindowToken(),
+                    InputMethodManager.HIDE_NOT_ALWAYS);
+        }catch (Exception ignored){}
+        
+        PopupMenu popup = new PopupMenu(mActivity, v);
 
         MenuInflater inflater = popup.getMenuInflater();
         inflater.inflate(R.menu.play_overflow, popup.getMenu());
@@ -332,12 +343,12 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
                 mPosition = position;
                 switch (item.getItemId()) {
                     case R.id.edit_play:
-                        ((MainActivity) myActivity).openAddPlay(myFragment, GamesPerPlay.getBaseGame(plays.get(position)).gameName, plays.get(position).getId());
+                        ((MainActivity) mActivity).openAddPlay(mFragment, GamesPerPlay.getBaseGame(plays.get(position)).gameName, plays.get(position).getId());
                         return true;
                     case R.id.delete_play:
                         //delete the play
                         //refresh play list
-                        ((MainActivity) myActivity).deletePlay(plays.get(position).getId());
+                        ((MainActivity) mActivity).deletePlay(plays.get(position).getId());
                         return true;
                     default:
                         return false;

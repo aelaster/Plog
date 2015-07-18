@@ -47,6 +47,7 @@ import com.lastsoft.plog.db.Play;
 import com.lastsoft.plog.db.PlayersPerPlay;
 import com.lastsoft.plog.db.PlaysPerGameGroup;
 import com.lastsoft.plog.util.CustomViewPager;
+import com.lastsoft.plog.util.DeletePlayTask;
 
 import java.io.File;
 import java.util.List;

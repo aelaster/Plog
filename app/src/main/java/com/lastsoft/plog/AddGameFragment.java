@@ -96,7 +96,7 @@ public class AddGameFragment extends Fragment {
                 dbHandler.addPlayer(newPlayer);*/
                 Game game = new Game(gameName.getText().toString());
                 game.save();
-                ((MainActivity) mActivity).updateGameViaBGG(gameName.getText().toString(), addToBGG.isChecked());
+                ((MainActivity) mActivity).searchGameViaBGG(gameName.getText().toString(), addToBGG.isChecked());
                 onButtonPressed("refresh_games");
             }
             removeYourself();

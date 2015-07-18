@@ -1,13 +1,12 @@
-package com.lastsoft.plog;
+package com.lastsoft.plog.util;
 
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.lastsoft.plog.R;
 import com.lastsoft.plog.db.Game;
-import com.lastsoft.plog.util.BGGLogInHelper;
-import com.lastsoft.plog.util.HttpUtils;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -30,7 +29,6 @@ import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,26 +60,23 @@ public class UpdateBGGTask extends AsyncTask<String, Void, String> {
     protected String doInBackground(final String... args) {
 
         String myString = "";
-        String bggID = "";
+        String bggID = args[0];
         int i = 0;
         int totalCount = 0;
 
         try {
 
             // first we search for the game by its name
-            URL url;
+            /*URL url;
             Log.d("V1", "https://www.boardgamegeek.com/xmlapi2/search?exact=1&query=" + URLEncoder.encode(args[0], "UTF-8"));
             url = new URL("https://www.boardgamegeek.com/xmlapi2/search?exact=1&query=" + URLEncoder.encode(args[0], "UTF-8"));
             URLConnection ucon = url.openConnection();
             ucon.setConnectTimeout(3000);
             ucon.setReadTimeout(30000);
-                     /* Define InputStreams to read
-                        * from the URLConnection. */
+
             InputStream is = ucon.getInputStream();
             BufferedInputStream bis = new BufferedInputStream(is, 1024);
 
-                       /* Read bytes to the Buffer until
-                        * there is nothing more to read(-1). */
             ByteArrayBuffer baf = new ByteArrayBuffer(1024);
             int current = 0;
             while ((current = bis.read()) != -1) {
@@ -117,62 +112,61 @@ public class UpdateBGGTask extends AsyncTask<String, Void, String> {
                         break;
                     }
                 } else if (name.equals("item")) {
-                    //Log.d("V1", "name = " + mDataset[i]);
                     bggID = readBGGID(parser);
                     break;
                 } else {
                     skip(parser);
                 }
-            }
-            if (!bggID.equals("")) {
+            }*/
+            //if (!bggID.equals("")) {
                 // then we go through and flag every expansion in my collection
-                url = new URL("https://www.boardgamegeek.com/xmlapi2/thing?id=" + bggID);
-                ucon = url.openConnection();
-                ucon.setConnectTimeout(3000);
-                ucon.setReadTimeout(30000);
-                     /* Define InputStreams to read
-                        * from the URLConnection. */
-                is = ucon.getInputStream();
-                bis = new BufferedInputStream(is, 1024);
 
-                       /* Read bytes to the Buffer until
-                        * there is nothing more to read(-1). */
-                baf = new ByteArrayBuffer(1024);
-                current = 0;
-                while ((current = bis.read()) != -1) {
-                    baf.append((byte) current);
+            Log.d("V1", "https://www.boardgamegeek.com/xmlapi2/thing?id=" + bggID);
+            URL url;
+            url = new URL("https://www.boardgamegeek.com/xmlapi2/thing?id=" + bggID);
+            URLConnection ucon = url.openConnection();
+            ucon.setConnectTimeout(3000);
+            ucon.setReadTimeout(30000);
+
+            InputStream is = ucon.getInputStream();
+            BufferedInputStream bis = new BufferedInputStream(is, 1024);
+
+            ByteArrayBuffer baf = new ByteArrayBuffer(1024);
+            int current = 0;
+            while ((current = bis.read()) != -1) {
+                baf.append((byte) current);
+            }
+
+            myString = new String(baf.toByteArray());
+            //Log.d("V1", myString);
+
+
+            bis.close();
+            is.close();
+
+            XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
+            factory.setNamespaceAware(true);
+            XmlPullParser parser = factory.newPullParser();
+            parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
+            parser.setInput(new StringReader(myString));
+            //parser.nextTag();
+            // parser.require(XmlPullParser.START_TAG, null, "items");
+
+            while (parser.next() != XmlPullParser.END_DOCUMENT) {
+                if (parser.getEventType() != XmlPullParser.START_TAG) {
+                    continue;
                 }
-
-                myString = new String(baf.toByteArray());
-
-
-
-                bis.close();
-                is.close();
-
-                factory = XmlPullParserFactory.newInstance();
-                factory.setNamespaceAware(true);
-                parser = factory.newPullParser();
-                parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
-                parser.setInput(new StringReader(myString));
-                //parser.nextTag();
-                // parser.require(XmlPullParser.START_TAG, null, "items");
-
-                while (parser.next() != XmlPullParser.END_DOCUMENT) {
-                    if (parser.getEventType() != XmlPullParser.START_TAG) {
-                        continue;
-                    }
-                    String name = parser.getName();
-                    // Starts by looking for the entry tag
-                    if (name.equals("items")) {
-                    } else if (name.equals("item")) {
-                        readEntry(parser, args[0], bggID);
-                        break;
-                    } else {
-                        skip(parser);
-                    }
+                String name = parser.getName();
+                // Starts by looking for the entry tag
+                if (name.equals("items")) {
+                } else if (name.equals("item")) {
+                    readEntry(parser, args[1], bggID);
+                    break;
+                } else {
+                    skip(parser);
                 }
             }
+           // }
 
 
             if (addMe){
@@ -223,6 +217,7 @@ public class UpdateBGGTask extends AsyncTask<String, Void, String> {
         mydialog.dismiss();
     }
 
+
     private Game readEntry(XmlPullParser parser, String gameName, String gameBGGID) throws XmlPullParserException, IOException {
         String gameThumb = "", gameImage = "";
 
@@ -263,6 +258,7 @@ public class UpdateBGGTask extends AsyncTask<String, Void, String> {
         }
         return bggid;
     }
+
 
     private String readTotal(XmlPullParser parser) throws IOException, XmlPullParserException {
         String total = "";

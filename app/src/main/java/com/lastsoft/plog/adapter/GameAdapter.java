@@ -17,6 +17,7 @@
 package com.lastsoft.plog.adapter;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.design.widget.Snackbar;
@@ -29,6 +30,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -59,7 +61,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
     private List<Game> games;
     private DisplayImageOptions options;
     private Activity mActivity;
-    private Fragment myFragment;
+    private Fragment mFragment;
     private boolean fromDrawer;
     int mPosition;
     int playListType;
@@ -113,10 +115,10 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
     }
     // END_INCLUDE(recyclerViewSampleViewHolder)
 
-    public GameAdapter(Fragment mFragment, Activity theActivity, String mSearchQuery, boolean mFromDrawer, int mPlayListType) {
+    public GameAdapter(Fragment theFragment, Activity theActivity, String mSearchQuery, boolean mFromDrawer, int mPlayListType) {
         //games = Game.listAll(Game.class);
         //find(Class<T> type, String whereClause, String[] whereArgs, String groupBy, String orderBy, String limit)
-        myFragment = mFragment;
+        mFragment = theFragment;
         mActivity = theActivity;
         playListType = mPlayListType;
 
@@ -162,13 +164,14 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
     // Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, final int position) {
-        //Log.d(TAG, "Element " + position + " set.");
+        Log.d(TAG, "Element " + position + " set.");
 
         // Get element from your dataset at this position and replace the contents of the view
         // with that element
         //if (searchQuery.equals("") || (games.get(position).gameName.toLowerCase().contains(searchQuery.toLowerCase()))) {
             viewHolder.getTextView().setText(games.get(position).gameName);
             if (games.get(position).gameThumb != null  && !games.get(position).gameThumb.equals("")) {
+                //Log.d("V1", "gameThumb = " + games.get(position).gameThumb);
                 ImageLoader.getInstance().displayImage("http:" + games.get(position).gameThumb, viewHolder.getImageView(), options);
             } else {
                 viewHolder.getImageView().setImageDrawable(null);
@@ -194,7 +197,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
                 viewHolder.getClickLayout().setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        ((MainActivity) mActivity).openAddPlay(myFragment, games.get(position).gameName, -1);
+                        ((MainActivity) mActivity).openAddPlay(mFragment, games.get(position).gameName, -1);
                     }
                 });
             }else{
@@ -212,6 +215,15 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
     }
 
     public void playPopup(View v, final int position) {
+
+        try{
+            InputMethodManager inputManager = (InputMethodManager)
+                    mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
+
+            inputManager.hideSoftInputFromWindow(mActivity.getCurrentFocus().getWindowToken(),
+                    InputMethodManager.HIDE_NOT_ALWAYS);
+        }catch (Exception ignored){}
+        
         PopupMenu popup = new PopupMenu(mActivity, v);
 
         MenuInflater inflater = popup.getMenuInflater();
@@ -251,10 +263,10 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
                         //delete the play
                         //refresh play list
                         mPosition = position;
-                        ((MainActivity) mActivity).updateGameViaBGG(games.get(position).gameName, false);
+                        ((MainActivity) mActivity).searchGameViaBGG(games.get(position).gameName, false);
                         return true;
                     case R.id.add_box_photo:
-                        ((GamesFragment) myFragment).captureBox(games.get(position));
+                        ((GamesFragment) mFragment).captureBox(games.get(position));
                         return true;
                     case R.id.view_box_photo:
                         Intent intent = new Intent();
@@ -288,7 +300,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
                         games.get(position).save();
 
                         Snackbar
-                                .make(((GamesFragment) myFragment).mCoordinatorLayout,
+                                .make(((GamesFragment) mFragment).mCoordinatorLayout,
                                         games.get(position).gameName + mActivity.getString(R.string.added_to_bl),
                                         Snackbar.LENGTH_LONG)
                                 .setAction(mActivity.getString(R.string.undo), new View.OnClickListener() {

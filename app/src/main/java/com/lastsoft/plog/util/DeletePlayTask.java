@@ -1,12 +1,11 @@
-package com.lastsoft.plog;
+package com.lastsoft.plog.util;
 
 import android.content.Context;
 import android.os.AsyncTask;
 import android.widget.Toast;
 
+import com.lastsoft.plog.R;
 import com.lastsoft.plog.db.Play;
-import com.lastsoft.plog.util.BGGLogInHelper;
-import com.lastsoft.plog.util.HttpUtils;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;

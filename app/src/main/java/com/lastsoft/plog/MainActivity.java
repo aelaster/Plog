@@ -52,7 +52,10 @@ import com.lastsoft.plog.db.PlaysPerGameGroup;
 import com.lastsoft.plog.db.TenByTen;
 import com.lastsoft.plog.util.BGGLogInHelper;
 import com.lastsoft.plog.util.Cookies;
+import com.lastsoft.plog.util.DeletePlayTask;
 import com.lastsoft.plog.util.PostMortemReportExceptionHandler;
+import com.lastsoft.plog.util.SearchBGGTask;
+import com.lastsoft.plog.util.UpdateBGGTask;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
@@ -859,10 +862,20 @@ public class MainActivity extends AppCompatActivity
     }
 
     GameUpdater gameUpdate;
-    public void updateGameViaBGG(String gameName, boolean addToCollection){
+    public void updateGameViaBGG(String gameName, String bggID, boolean addToCollection){
         gameUpdate = new GameUpdater(this, addToCollection);
         try {
-            gameUpdate.execute(gameName);
+            gameUpdate.execute(bggID, gameName);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    GameList gameList;
+    public void searchGameViaBGG(String gameName, boolean addToCollection){
+        gameList = new GameList(this, addToCollection);
+        try {
+            gameList.execute(gameName);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -1166,6 +1179,37 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    public class GameList extends SearchBGGTask {
+        boolean addToCollection;
+        public GameList(Context context, boolean addToCollection) {
+            super(context);
+            this.addToCollection = addToCollection;
+        }
+
+        @Override
+        protected void onPostExecute(final ArrayList<GameInfo> result) {
+            super.onPostExecute(result);
+            if (result.size() > 0) {
+                if (result.size() == 1){
+                    //this is the only game returned, so just go ahead and run update
+                    updateGameViaBGG(result.get(0).gameName, result.get(0).gameBGGID, addToCollection);
+                }else {
+                    //more than one choice, so give the user a dialog and let them pick
+                    ArrayList<String> theGames = new ArrayList<>();
+                    ArrayList<String> theIDs = new ArrayList<>();
+                    for (GameInfo aGame : result) {
+                        theGames.add(aGame.gameName + " (" + aGame.yearPublished + ")");
+                        theIDs.add(aGame.gameBGGID);
+                    }
+
+                    GameChooserFragment newFragment = new GameChooserFragment().newInstance(theGames, theIDs, result.get(0).gameName, addToCollection);
+                    newFragment.show(getSupportFragmentManager(), "gamePicker");
+                }
+                //onFragmentInteraction("update_games");
+            }
+        }
+    }
+
     public class TenByTenDialogFragment extends DialogFragment {
 
         ArrayList<GameGroup> addedGroups;
@@ -1237,6 +1281,65 @@ public class MainActivity extends AppCompatActivity
                             }
                         }
                     })
+                    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int id) {
+
+                        }
+                    });
+            return builder.create();
+        }
+    }
+
+
+    public class GameChooserFragment extends DialogFragment {
+
+        ArrayList<String> theIDs;
+
+        public GameChooserFragment newInstance(ArrayList<String> theGames, ArrayList<String> theIDs, String gameName, boolean addToCollection) {
+            GameChooserFragment frag = new GameChooserFragment();
+            Bundle args = new Bundle();
+            args.putStringArrayList("theGames", theGames);
+            args.putStringArrayList("theIDs", theIDs);
+            args.putString("gameName", gameName);
+            args.putBoolean("addToCollection", addToCollection);
+            frag.setArguments(args);
+            return frag;
+        }
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            theIDs = new ArrayList<>();
+            theIDs = getArguments().getStringArrayList("theIDs");
+            final ArrayList<String> theGames = getArguments().getStringArrayList("theGames");
+            final String gameName = getArguments().getString("gameName");;
+            final boolean addToCollection = getArguments().getBoolean("addToCollection");;
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+            // Set the dialog title
+            builder.setTitle(R.string.choose_version)
+                    // Specify the list array, the items to be selected by default (null for none),
+                    // and the listener through which to receive callbacks when items are selected
+                    .setItems(theGames.toArray(new CharSequence[theGames.size()]),
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    String BGGID = theIDs.get(i);
+                                    updateGameViaBGG(gameName, BGGID, addToCollection);
+                                }
+                            })
+                            // Set the action buttons
+                    /*.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int id) {
+                            TenByTen.deleteTenByTen(gameId);
+                            Calendar calendar = Calendar.getInstance();
+                            int year = calendar.get(Calendar.YEAR);
+                            for (int i = 0; i < addedGroups.size(); i++) {
+                                TenByTen addMe = new TenByTen(theGame, addedGroups.get(i), year);
+                                addMe.save();
+                            }
+                        }
+                    })*/
                     .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int id) {

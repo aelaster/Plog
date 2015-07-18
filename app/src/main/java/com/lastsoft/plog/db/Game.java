@@ -82,6 +82,15 @@ public class Game extends SugarRecord<Game> {
         }
     }
 
+    public static Game findGameByBGGID(String bggID){
+        List<Game> queery = Game.find(Game.class, StringUtil.toSQLName("gameBGGID") + " = ?", bggID);
+        if (queery.size() > 0) {
+            return queery.get(0);
+        } else {
+            return null;
+        }
+    }
+
     public static Game findGameByName_NoCase(String name) {
         List<Game> queery = Game.findWithQuery(Game.class, "Select * from " + StringUtil.toSQLName("Game") + " where " + StringUtil.toSQLName("gameName") + " = ? COLLATE NOCASE", name);
         if (queery.size() > 0) {

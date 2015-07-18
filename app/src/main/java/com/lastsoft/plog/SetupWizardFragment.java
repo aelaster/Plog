@@ -22,6 +22,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.lastsoft.plog.db.Player;
+import com.lastsoft.plog.util.LoadGamesTask;
 import com.lastsoft.plog.wizard.model.AbstractWizardModel;
 import com.lastsoft.plog.wizard.model.CustomerInfoPage;
 import com.lastsoft.plog.wizard.model.ModelCallbacks;

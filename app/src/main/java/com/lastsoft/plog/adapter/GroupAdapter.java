@@ -17,6 +17,7 @@
 package com.lastsoft.plog.adapter;
 
 import android.app.Activity;
+import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -25,6 +26,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -44,8 +46,8 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
     private static final String TAG = "PlayerAdapter";
 
     private DisplayImageOptions options;
-    private Activity myActivity;
-    private Fragment myFragment;
+    private Activity mActivity;
+    private Fragment mFragment;
     private List<GameGroup> groups;
 
 
@@ -94,9 +96,9 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
     }
     // END_INCLUDE(recyclerViewSampleViewHolder)
 
-    public GroupAdapter(Activity mActivity, Fragment mFragment) {
-        myActivity = mActivity;
-        myFragment = mFragment;
+    public GroupAdapter(Activity theActivity, Fragment theFragment) {
+        mActivity = theActivity;
+        mFragment = theFragment;
 
         groups = GameGroup.listAll_AZ();
 
@@ -126,11 +128,11 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
         //long totalPlays = ((long) PlayersPerPlay.totalPlays_GameGroup(GameGroup.findById(GameGroup.class, groups.get(position).getId())).size() / (long) GameGroup.getGroupPlayers(GameGroup.findById(GameGroup.class, groups.get(position).getId())).size());
         long totalUnique = Game.getUniqueGames_GameGroup(GameGroup.findById(GameGroup.class, groups.get(position).getId())).size();
         viewHolder.getNameView().setText(groups.get(position).groupName);
-        viewHolder.getWinsView().setText(myActivity.getString(R.string.unique_games) + totalUnique);
+        viewHolder.getWinsView().setText(mActivity.getString(R.string.unique_games) + totalUnique);
         viewHolder.getView().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((MainActivity) myActivity).openAddGroup(myFragment, groups.get(position).getId());
+                ((MainActivity) mActivity).openAddGroup(mFragment, groups.get(position).getId());
             }
         });
         viewHolder.getOverflowLayout().setOnClickListener(new View.OnClickListener() {
@@ -143,7 +145,16 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
     // END_INCLUDE(recyclerViewOnBindViewHolder)
 
     public void groupPopup(View v, final int position) {
-        PopupMenu popup = new PopupMenu(myActivity, v);
+
+        try{
+            InputMethodManager inputManager = (InputMethodManager)
+                    mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
+
+            inputManager.hideSoftInputFromWindow(mActivity.getCurrentFocus().getWindowToken(),
+                    InputMethodManager.HIDE_NOT_ALWAYS);
+        }catch (Exception ignored){}
+        
+        PopupMenu popup = new PopupMenu(mActivity, v);
 
         MenuInflater inflater = popup.getMenuInflater();
         inflater.inflate(R.menu.player_overflow, popup.getMenu());
@@ -152,7 +163,7 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.view_plays:
-                        ((MainActivity) myActivity).openPlays(groups.get(position).getId()+"", false, 1);
+                        ((MainActivity) mActivity).openPlays(groups.get(position).getId()+"", false, 1);
                         return true;
                     default:
                         return false;

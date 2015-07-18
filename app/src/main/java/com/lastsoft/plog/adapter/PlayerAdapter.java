@@ -17,6 +17,7 @@
 package com.lastsoft.plog.adapter;
 
 import android.app.Activity;
+import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -25,6 +26,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -45,8 +47,8 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.ViewHolder
     private static final String TAG = "PlayerAdapter";
 
     private DisplayImageOptions options;
-    private Activity myActivity;
-    private Fragment myFragment;
+    private Activity mActivity;
+    private Fragment mFragment;
     private List<Player> players;
 
 
@@ -95,9 +97,9 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.ViewHolder
     }
     // END_INCLUDE(recyclerViewSampleViewHolder)
 
-    public PlayerAdapter(Activity mActivity, Fragment mFragment) {
-        myActivity = mActivity;
-        myFragment = mFragment;
+    public PlayerAdapter(Activity theActivity, Fragment theFragment) {
+        mActivity = theActivity;
+        mFragment = theFragment;
         players = Player.listPlayersAZ();
         options = new DisplayImageOptions.Builder()
                 .cacheOnDisk(true)
@@ -124,7 +126,7 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.ViewHolder
     public void onBindViewHolder(ViewHolder viewHolder, final int position) {
         int regularWins = Play.totalWins_Player(players.get(position)).size();
         viewHolder.getNameView().setText(players.get(position).playerName);
-        viewHolder.getWinsView().setText(myActivity.getString(R.string.wins) + regularWins);
+        viewHolder.getWinsView().setText(mActivity.getString(R.string.wins) + regularWins);
 
         if (players.get(position).playerPhoto != null) {
             ImageLoader.getInstance().displayImage(players.get(position).playerPhoto, viewHolder.getImageView(), options);
@@ -132,7 +134,7 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.ViewHolder
         viewHolder.getView().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((MainActivity)myActivity).openAddPlayer(myFragment, players.get(position).getId());
+                ((MainActivity)mActivity).openAddPlayer(mFragment, players.get(position).getId());
             }
         });
         viewHolder.getOverflowLayout().setOnClickListener(new View.OnClickListener() {
@@ -144,7 +146,16 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.ViewHolder
     }
 
     public void playerPopup(View v, final int position) {
-        PopupMenu popup = new PopupMenu(myActivity, v);
+
+        try{
+            InputMethodManager inputManager = (InputMethodManager)
+                    mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
+
+            inputManager.hideSoftInputFromWindow(mActivity.getCurrentFocus().getWindowToken(),
+                    InputMethodManager.HIDE_NOT_ALWAYS);
+        }catch (Exception ignored){}
+        
+        PopupMenu popup = new PopupMenu(mActivity, v);
 
         MenuInflater inflater = popup.getMenuInflater();
         inflater.inflate(R.menu.player_overflow, popup.getMenu());
@@ -153,7 +164,7 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.ViewHolder
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.view_plays:
-                        ((MainActivity) myActivity).openPlays("0$" + players.get(position).getId(), false, 2);
+                        ((MainActivity) mActivity).openPlays("0$" + players.get(position).getId(), false, 2);
                         return true;
                     default:
                         return false;

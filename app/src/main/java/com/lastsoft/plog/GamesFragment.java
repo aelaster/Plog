@@ -44,6 +44,7 @@ import android.widget.TextView;
 
 import com.lastsoft.plog.adapter.GameAdapter;
 import com.lastsoft.plog.db.Game;
+import com.lastsoft.plog.util.LoadGamesTask;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 
 import java.io.File;
@@ -400,6 +401,7 @@ public class GamesFragment extends Fragment{
         int firstVisible = ((LinearLayoutManager) mRecyclerView.getLayoutManager())
                 .findFirstCompletelyVisibleItemPosition();
         refreshDataset(false);
+        mRecyclerView.scrollToPosition(firstVisible);
     }
 
     /**

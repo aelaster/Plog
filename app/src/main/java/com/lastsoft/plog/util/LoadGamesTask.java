@@ -1,4 +1,4 @@
-package com.lastsoft.plog;
+package com.lastsoft.plog.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -7,6 +7,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.lastsoft.plog.R;
 import com.lastsoft.plog.db.Game;
 import com.lastsoft.plog.db.Player;
 import com.orm.StringUtil;
@@ -30,7 +31,7 @@ import java.util.List;
  */
 public class LoadGamesTask extends AsyncTask<String, Void, String> {
 
-    Context theContext;
+    public Context theContext;
     public LoadGamesTask(Context context){
         this.theContext = context;
     }
