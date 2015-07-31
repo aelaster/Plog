@@ -84,6 +84,9 @@ public class AddPlayerFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             playerID = getArguments().getLong("playerID");
+            if (playerID >= 0){
+                editFlag = true;
+            }
         }
         setHasOptionsMenu(true);
     }
@@ -189,6 +192,10 @@ public class AddPlayerFragment extends Fragment {
     }
 
 
+    public void enableDelete(){
+        deleteButton.setEnabled(true);
+    }
+
 
     private void addGroup(final AddGroup addedGroup) {
         // Instantiate a new "row" view.
@@ -248,6 +255,7 @@ public class AddPlayerFragment extends Fragment {
         mMenu = menu;
     }
 
+    boolean editFlag = false;
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -279,6 +287,7 @@ public class AddPlayerFragment extends Fragment {
 
                     if (playerID >= 0){
                         //edit
+                        editFlag = true;
                         if (!editPlayer.playerName.equals(playerName.getText().toString()) && Player.playerExists(playerName.getText().toString())){
                             //if the edit player's name isn't equal to the input name AND the player name already exists
                             nameTakenFlag = true;
@@ -325,7 +334,7 @@ public class AddPlayerFragment extends Fragment {
                                 deleteGroupMember(deleteMe.getId());
                             }
                         }
-                        if (!removingGroup) {
+                        if (!editFlag) {
                             onButtonPressed("refresh_players_add");
                         }
                     }
@@ -465,7 +474,7 @@ public class AddPlayerFragment extends Fragment {
     public void removeYourself(){
         final AddPlayerFragment mfragment = this;
         mMenu.clear();
-        if (playerID >= 0){
+        if (editFlag){
             try {
                 getFragmentManager().popBackStack();
                 getFragmentManager().beginTransaction().remove(mfragment).commitAllowingStateLoss();

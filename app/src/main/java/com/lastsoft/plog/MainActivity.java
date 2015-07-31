@@ -776,6 +776,7 @@ public class MainActivity extends AppCompatActivity
                     })
                     .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
+                            if (mAddGroupFragment != null) mAddGroupFragment.enableDelete();
                             dismiss();
                         }
                     });
@@ -944,6 +945,7 @@ public class MainActivity extends AppCompatActivity
                     })
                     .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
+                            if (mAddPlayerFragment != null) mAddPlayerFragment.enableDelete();
                             dismiss();
                         }
                     });

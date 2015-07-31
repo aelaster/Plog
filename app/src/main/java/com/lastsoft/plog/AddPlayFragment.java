@@ -1036,7 +1036,9 @@ public class AddPlayFragment extends Fragment implements
                 //Log.d("V1", playerToUpdate.playerName);
                 String score = editable.toString().trim();
                 if (!score.equals("")) {
-                    playerToUpdate.score = Float.parseFloat(score);
+                    if (!score.equals(".") && !score.equals("-") && !score.equals("-.")) {
+                        playerToUpdate.score = Float.parseFloat(score);
+                    }
                 }
             }
         }

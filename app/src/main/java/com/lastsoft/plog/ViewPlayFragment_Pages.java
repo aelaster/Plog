@@ -42,6 +42,7 @@ public class ViewPlayFragment_Pages extends Fragment {
     public static final String ARG_PAGE = "page";
     private int mPageNumber;
     LinearLayout progressContainer;
+    DisplayImageOptions options;
 
     public static ViewPlayFragment_Pages newInstance(long playID, String transID, String transID2, String transID3) {
         ViewPlayFragment_Pages fragment = new ViewPlayFragment_Pages();
@@ -67,6 +68,11 @@ public class ViewPlayFragment_Pages extends Fragment {
             nameTransID = getArguments().getString("nameTransID");
             dateTransID = getArguments().getString("dateTransID");
         }
+        options = new DisplayImageOptions.Builder()
+                .cacheOnDisk(true)
+                .cacheInMemory(false)
+                .considerExifParams(true)
+                .build();
         setHasOptionsMenu(true);
     }
 
@@ -88,6 +94,12 @@ public class ViewPlayFragment_Pages extends Fragment {
         progressContainer = (LinearLayout) viewPlayLayout.findViewById(R.id.progressContainer);
         LinearLayout linLayout = (LinearLayout) viewPlayLayout.findViewById(R.id.linearLayout);
         //Log.d("V1", "playID = " + playID);
+
+        options = new DisplayImageOptions.Builder()
+                .cacheOnDisk(true)
+                .cacheInMemory(false)
+                .considerExifParams(true)
+                .build();
 
         drawLayout();
 
@@ -135,11 +147,7 @@ public class ViewPlayFragment_Pages extends Fragment {
         thisPlay = Play.findById(Play.class, playID);
         //Log.d("V1", "imageTransID = " + imageTransID);
 
-        DisplayImageOptions options = new DisplayImageOptions.Builder()
-                .cacheOnDisk(true)
-                .cacheInMemory(false)
-                .considerExifParams(true)
-                .build();
+
 
         mContainerView_Players = (ViewGroup) viewPlayLayout.findViewById(R.id.container_players);
         mContainerView_Expansions = (ViewGroup) viewPlayLayout.findViewById(R.id.container_expansions);
@@ -232,6 +240,11 @@ public class ViewPlayFragment_Pages extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        options = new DisplayImageOptions.Builder()
+                .cacheOnDisk(true)
+                .cacheInMemory(false)
+                .considerExifParams(true)
+                .build();
         progressContainer.setVisibility(View.GONE);
     }
 

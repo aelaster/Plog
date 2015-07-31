@@ -53,6 +53,7 @@ public class AddGroupFragment extends Fragment {
     ArrayList<String> playersName;
     EditText groupName;
     GameGroup editGroup;
+    View deleteButton;
 
     public static AddGroupFragment newInstance(int centerX, int centerY, boolean doAccelerate, long groupID) {
         AddGroupFragment fragment = new AddGroupFragment();
@@ -127,10 +128,11 @@ public class AddGroupFragment extends Fragment {
             }
         });
 
-        View deleteButton = rootView.findViewById(R.id.deleteButton);
+        deleteButton = rootView.findViewById(R.id.deleteButton);
         deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                view.setEnabled(false);
                 if (groupID >= 0) {
                     ((MainActivity) mActivity).deleteGroup(groupID);
                 }else{
@@ -164,6 +166,11 @@ public class AddGroupFragment extends Fragment {
 
         return rootView;
     }
+
+    public void enableDelete(){
+        deleteButton.setEnabled(true);
+    }
+
 
     Menu mMenu;
     @Override
