@@ -191,6 +191,14 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
                 String[] query4 = mSearchQuery.split("\\$");
                 plays = Play.gameTenByTen_GameGroup(GameGroup.findById(GameGroup.class, Long.parseLong(query4[0])), Game.findById(Game.class, Long.parseLong(query4[1])), Integer.parseInt(query4[2]));
                 break;
+            case 8:
+                String[] query8 = mSearchQuery.split("\\$");
+                if (query8[0].equals("0")){
+                    plays = Play.totalPlays_Player(Player.findById(Player.class, Long.parseLong(query8[1])));
+                }/*else {
+                    plays = Play.totalWins_GameGroup_Player(GameGroup.findById(GameGroup.class, Long.parseLong(query[0])), Player.findById(Player.class, Long.parseLong(query[1])));
+                }*/
+                break;
             default:
                 plays = Play.listPlaysNewOld(mSearchQuery, fromDrawer);
         }

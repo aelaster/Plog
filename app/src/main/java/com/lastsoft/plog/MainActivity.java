@@ -721,6 +721,11 @@ public class MainActivity extends AppCompatActivity
         //onBackPressed();
     }
 
+    public void notifyUser(int notificationId){
+        NotificationFragment newFragment = new NotificationFragment().newInstance(notificationId);
+        newFragment.show(getSupportFragmentManager(), "notifyUser");
+    }
+
     public void deleteGame(long gameId){
         DeleteGameFragment newFragment = new DeleteGameFragment().newInstance(gameId);
         newFragment.show(getSupportFragmentManager(), "deleteGame");
@@ -832,6 +837,40 @@ public class MainActivity extends AppCompatActivity
             mydialog.dismiss();
             onFragmentInteraction("refresh_players_drop");
             onBackPressed();
+        }
+    }
+
+    public class NotificationFragment extends DialogFragment {
+        public NotificationFragment newInstance(int notificationId) {
+            NotificationFragment frag = new NotificationFragment();
+            Bundle args = new Bundle();
+            args.putLong("notificationId", notificationId);
+            frag.setArguments(args);
+            return frag;
+        }
+
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // Use the Builder class for convenient dialog construction
+
+            final long notificationId = getArguments().getLong("notificationId");
+            /*
+            0 = didn't add a player to a play
+             */
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            if (notificationId == 0) {
+                builder.setTitle(R.string.error);
+                builder.setMessage(R.string.notify_0_text)
+                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dismiss();
+                            }
+                        });
+                // Create the AlertDialog object and return it
+            }
+            return builder.create();
         }
     }
 

@@ -732,17 +732,21 @@ public class AddPlayFragment extends Fragment implements
                     } catch (ParseException e) {
                         e.printStackTrace();
                     }
+
+                    if (mActivity instanceof MainActivity) {
+                        onButtonPressed("refresh_plays");
+                    }
+                    //}
+                    mActivity.onBackPressed();
+                }else{
+                    ((MainActivity) mActivity).notifyUser(0);
                 }
 
                 //removeYourself();
                 /*if (playID<0) {
                     //((MainActivity) mActivity).getSupportActionBar().setDisplayShowCustomEnabled(true);
                 }else{*/
-                if (mActivity instanceof MainActivity) {
-                    onButtonPressed("refresh_plays");
-                }
-                //}
-                mActivity.onBackPressed();
+
                 return true;
         }
 
