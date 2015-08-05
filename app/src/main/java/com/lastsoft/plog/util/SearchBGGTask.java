@@ -28,6 +28,7 @@ import java.util.ArrayList;
 public class SearchBGGTask extends AsyncTask<String, Void, ArrayList<SearchBGGTask.GameInfo>> {
     private final ProgressDialog mydialog;
     Context theContext;
+    private boolean expansionFlag;
 
     public SearchBGGTask(Context context){
         this.theContext = context;
@@ -37,6 +38,12 @@ public class SearchBGGTask extends AsyncTask<String, Void, ArrayList<SearchBGGTa
     public SearchBGGTask(Context context, boolean addToCollection){
         this.theContext = context;
         mydialog = new ProgressDialog(theContext);
+    }
+
+    public SearchBGGTask(Context context, boolean addToCollection, boolean expansionFlag){
+        this.theContext = context;
+        mydialog = new ProgressDialog(theContext);
+        this.expansionFlag = expansionFlag;
     }
 
     // can use UI thread here
@@ -64,8 +71,9 @@ public class SearchBGGTask extends AsyncTask<String, Void, ArrayList<SearchBGGTa
 
             // first we search for the game by its name
             URL url;
-            Log.d("V1", "https://www.boardgamegeek.com/xmlapi2/search?exact=1&query=" + URLEncoder.encode(args[0], "UTF-8"));
-            url = new URL("https://www.boardgamegeek.com/xmlapi2/search?exact=1&query=" + URLEncoder.encode(args[0], "UTF-8"));
+            Log.d("V1", "https://www.boardgamegeek.com/xmlapi2/search?query=" + URLEncoder.encode(args[0], "UTF-8"));
+            //url = new URL("https://www.boardgamegeek.com/xmlapi2/search?exact=1&query=" + URLEncoder.encode(args[0], "UTF-8"));
+            url = new URL("https://www.boardgamegeek.com/xmlapi2/search?query=" + URLEncoder.encode(args[0], "UTF-8"));
             URLConnection ucon = url.openConnection();
             ucon.setConnectTimeout(3000);
             ucon.setReadTimeout(30000);
@@ -113,10 +121,25 @@ public class SearchBGGTask extends AsyncTask<String, Void, ArrayList<SearchBGGTa
                 } else if (name.equals("item")) {
                     bggID = readBGGID(parser);
                     String gameType = readType(parser);
-                    if (gameType.equals("boardgame")){
-                        GameInfo returnedGame = readGameInfo(parser, args[0], bggID);
+                    String gameTypeChecker;
+                    String gameTypeRemover;
+                    if (expansionFlag){
+                        gameTypeChecker = "boardgameexpansion";
+                        gameTypeRemover = "boardgame";
+                    }else{
+                        gameTypeChecker = "boardgame";
+                        gameTypeRemover = "boardgameexpansion";
+                    }
+                    //Log.d("V1", gameTypeChecker);
+                    if (gameType.equals(gameTypeChecker)){
+                        GameInfo returnedGame = readGameInfo(parser, bggID);
                         if (!returnedGame.yearPublished.equals("")) {
                             returnedGames.add(returnedGame);
+                        }
+                    }else if (gameType.equals(gameTypeRemover)){
+                        GameInfo returnedGame = readGameInfo(parser, bggID);
+                        if (returnedGames.contains(returnedGame)){
+                            returnedGames.remove(returnedGame);
                         }
                     }
                     //break;
@@ -132,11 +155,11 @@ public class SearchBGGTask extends AsyncTask<String, Void, ArrayList<SearchBGGTa
 
     @Override
     protected void onPostExecute(final ArrayList<GameInfo> result) {
-        for (GameInfo aGame : result) {
+        /*for (GameInfo aGame : result) {
             Log.d("V1", "Game Name = " + aGame.gameName);
             Log.d("V1", "Game Year Published = " + aGame.yearPublished);
             Log.d("V1", "Game BGG ID = " + aGame.gameBGGID);
-        }
+        }*/
         mydialog.dismiss();
     }
 
@@ -150,11 +173,26 @@ public class SearchBGGTask extends AsyncTask<String, Void, ArrayList<SearchBGGTa
             this.yearPublished = yearPublished;
             this.gameName = gameName;
         }
+
+        @Override
+        public boolean equals(Object obj) {
+
+            if (obj == this) {
+                return true;
+            }
+
+            if (!(obj instanceof GameInfo)) {
+                return false;
+            }
+
+            GameInfo other = (GameInfo) obj;
+            return gameBGGID == other.gameBGGID;
+        }
     }
 
-    private GameInfo readGameInfo(XmlPullParser parser, String gameName, String gameBGGID) throws XmlPullParserException, IOException {
+    private GameInfo readGameInfo(XmlPullParser parser, String gameBGGID) throws XmlPullParserException, IOException {
         String yearPublished = "";
-
+        String gameName = "";
         parser.require(XmlPullParser.START_TAG, null, "item");
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
@@ -162,7 +200,9 @@ public class SearchBGGTask extends AsyncTask<String, Void, ArrayList<SearchBGGTa
             }
             String name = parser.getName();
 
-            if (name.equals("yearpublished")) {
+            if (name.equals("name")) {
+                gameName = readName(parser);
+            }else if (name.equals("yearpublished")) {
                 yearPublished = readYear(parser);
             }else {
                 skip(parser);
@@ -232,6 +272,16 @@ public class SearchBGGTask extends AsyncTask<String, Void, ArrayList<SearchBGGTa
         }
         parser.nextTag();
         return year;
+    }
+
+    private String readName(XmlPullParser parser) throws IOException, XmlPullParserException {
+        String name = "";
+        String tag = parser.getName();
+        if (tag.equals("name")) {
+            name = parser.getAttributeValue(null, "value");
+        }
+        parser.nextTag();
+        return name;
     }
 
 

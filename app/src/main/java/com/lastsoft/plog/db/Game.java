@@ -49,12 +49,12 @@ public class Game extends SugarRecord<Game> {
         this.expansionFlag = false;
     }
 
-    public Game(String gameName, String gameThumb) {
+    public Game(String gameName, boolean expansionFlag) {
         this.gameName = gameName;
         this.gameBGGID = "";
         this.gameImage = null;
-        this.gameThumb = gameThumb;
-        this.expansionFlag = false;
+        this.gameThumb = null;
+        this.expansionFlag = expansionFlag;
     }
 
     public Game(String gameName, String gameThumb, boolean expansionFlag) {

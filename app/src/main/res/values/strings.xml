@@ -43,7 +43,7 @@
     <string name="plays_for">"Plays for: "</string>
     <string name="select_group">" - Select a Group - "</string>
 
-
+    <string name="is_expansion">Is Expansion</string>
     <string name="color">Color</string>
     <string name="score">Score</string>
     <string name="date">Date</string>

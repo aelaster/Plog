@@ -22,6 +22,14 @@
         <Switch
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="@string/is_expansion"
+            android:layout_marginBottom="@dimen/margin_small"
+            android:id="@+id/expansionFlag"
+            android:checked="false"/>
+
+        <Switch
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:text="@string/add_to_bgg"
             android:layout_marginBottom="@dimen/margin_small"
             android:id="@+id/addToBGG"

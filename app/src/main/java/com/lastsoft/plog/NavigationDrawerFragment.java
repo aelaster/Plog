@@ -96,6 +96,7 @@ public class NavigationDrawerFragment extends Fragment {
         String[] headings;
         String backupDBPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/SRX.db";
         File backupDB = new File(backupDBPath);
+        //Todo:  put export and import into a settings page
         if (backupDB.exists()){
             headings = new String[]{
                     getString(R.string.title_games),
@@ -103,8 +104,8 @@ public class NavigationDrawerFragment extends Fragment {
                     getString(R.string.title_players),
                     getString(R.string.title_bucket_list),
                     getString(R.string.title_statistics),
-                    getString(R.string.title_export_db),
                     getString(R.string.title_import_db),
+                    getString(R.string.title_export_db),
                     getString(R.string.title_exit)};
         }else{
             headings = new String[]{

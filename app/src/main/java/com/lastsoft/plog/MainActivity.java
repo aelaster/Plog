@@ -984,6 +984,7 @@ public class MainActivity extends AppCompatActivity
 
     GameUpdater gameUpdate;
     public void updateGameViaBGG(String gameName, String bggID, boolean addToCollection){
+        Log.d("V1", "updateGame = " + gameName);
         gameUpdate = new GameUpdater(this, addToCollection);
         try {
             gameUpdate.execute(bggID, gameName);
@@ -993,8 +994,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     GameList gameList;
-    public void searchGameViaBGG(String gameName, boolean addToCollection){
-        gameList = new GameList(this, addToCollection);
+    public void searchGameViaBGG(String gameName, boolean addToCollection, boolean expansionFlag, long gameID){
+        gameList = new GameList(this, addToCollection, expansionFlag, gameID);
         try {
             gameList.execute(gameName);
         } catch (Exception e) {
@@ -1313,9 +1314,13 @@ public class MainActivity extends AppCompatActivity
 
     public class GameList extends SearchBGGTask {
         boolean addToCollection;
-        public GameList(Context context, boolean addToCollection) {
-            super(context);
+        boolean expansionFlag;
+        long gameId;
+        public GameList(Context context, boolean addToCollection, boolean expansionFlag, long gameId) {
+            super(context, addToCollection, expansionFlag);
             this.addToCollection = addToCollection;
+            this.expansionFlag = expansionFlag;
+            this.gameId = gameId;
         }
 
         @Override
@@ -1328,13 +1333,15 @@ public class MainActivity extends AppCompatActivity
                 }else {
                     //more than one choice, so give the user a dialog and let them pick
                     ArrayList<String> theGames = new ArrayList<>();
+                    ArrayList<String> theItems = new ArrayList<>();
                     ArrayList<String> theIDs = new ArrayList<>();
                     for (GameInfo aGame : result) {
-                        theGames.add(aGame.gameName + " (" + aGame.yearPublished + ")");
+                        theGames.add(aGame.gameName);
+                        theItems.add(aGame.gameName + " (" + aGame.yearPublished + ")");
                         theIDs.add(aGame.gameBGGID);
                     }
 
-                    GameChooserFragment newFragment = new GameChooserFragment().newInstance(theGames, theIDs, result.get(0).gameName, addToCollection);
+                    GameChooserFragment newFragment = new GameChooserFragment().newInstance(theGames, theItems, theIDs, addToCollection, gameId);
                     newFragment.show(getSupportFragmentManager(), "gamePicker");
                 }
                 //onFragmentInteraction("update_games");
@@ -1426,36 +1433,45 @@ public class MainActivity extends AppCompatActivity
 
     public class GameChooserFragment extends DialogFragment {
 
-        ArrayList<String> theIDs;
 
-        public GameChooserFragment newInstance(ArrayList<String> theGames, ArrayList<String> theIDs, String gameName, boolean addToCollection) {
+        public GameChooserFragment newInstance(ArrayList<String> theGames, ArrayList<String> theItems, ArrayList<String> theIDs, boolean addToCollection, long gameId) {
             GameChooserFragment frag = new GameChooserFragment();
             Bundle args = new Bundle();
             args.putStringArrayList("theGames", theGames);
+            args.putStringArrayList("theItems", theItems);
             args.putStringArrayList("theIDs", theIDs);
-            args.putString("gameName", gameName);
             args.putBoolean("addToCollection", addToCollection);
+            args.putLong("gameId", gameId);
             frag.setArguments(args);
+            frag.setCancelable(false);
             return frag;
         }
 
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
-            theIDs = new ArrayList<>();
-            theIDs = getArguments().getStringArrayList("theIDs");
+            final long gameId = getArguments().getLong("gameId");
+            final ArrayList<String> theIDs = getArguments().getStringArrayList("theIDs");
             final ArrayList<String> theGames = getArguments().getStringArrayList("theGames");
-            final String gameName = getArguments().getString("gameName");;
+            final ArrayList<String> theItems = getArguments().getStringArrayList("theItems");
             final boolean addToCollection = getArguments().getBoolean("addToCollection");;
             AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
             // Set the dialog title
+            builder.setCancelable(false);
             builder.setTitle(R.string.choose_version)
                     // Specify the list array, the items to be selected by default (null for none),
                     // and the listener through which to receive callbacks when items are selected
-                    .setItems(theGames.toArray(new CharSequence[theGames.size()]),
+                    .setItems(theItems.toArray(new CharSequence[theItems.size()]),
                             new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
                                     String BGGID = theIDs.get(i);
+                                    String gameName = theGames.get(i);
+                                    Log.d("V1", "game name = " + gameName);
+                                    if (gameId >= 0) {
+                                        Game updateMe = Game.findById(Game.class, gameId);
+                                        updateMe.gameName = gameName;
+                                        updateMe.save();
+                                    }
                                     updateGameViaBGG(gameName, BGGID, addToCollection);
                                 }
                             })
@@ -1475,7 +1491,21 @@ public class MainActivity extends AppCompatActivity
                     .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int id) {
-
+                            if (gameId >= 0) {
+                                Game updateMe = Game.findById(Game.class, gameId);
+                                updateMe.delete();
+                                onFragmentInteraction("update_games");
+                            }
+                        }
+                    });
+                    builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                        @Override
+                        public void onDismiss(DialogInterface dialogInterface) {
+                            if (gameId >= 0) {
+                                Game updateMe = Game.findById(Game.class, gameId);
+                                updateMe.delete();
+                                onFragmentInteraction("update_games");
+                            }
                         }
                     });
             return builder.create();

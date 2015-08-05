@@ -245,25 +245,17 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.delete_game:
-                        //delete the play
-                        //refresh play list
                         ((MainActivity) mActivity).deleteGame(games.get(position).getId());
                         return true;
                     case R.id.add_tenbyten:
-                        //delete the play
-                        //refresh play list
                         ((MainActivity) mActivity).addToTenXTen(games.get(position).getId());
                         return true;
                     case R.id.view_plays:
-                        //delete the play
-                        //refresh play list
                         ((MainActivity) mActivity).openPlays(games.get(position).gameName, false, 0);
                         return true;
                     case R.id.update_bgg:
-                        //delete the play
-                        //refresh play list
                         mPosition = position;
-                        ((MainActivity) mActivity).searchGameViaBGG(games.get(position).gameName, false);
+                        ((MainActivity) mActivity).searchGameViaBGG(games.get(position).gameName, false, false, -1);
                         return true;
                     case R.id.add_box_photo:
                         ((GamesFragment) mFragment).captureBox(games.get(position));

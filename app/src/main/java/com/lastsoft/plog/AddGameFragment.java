@@ -82,6 +82,7 @@ public class AddGameFragment extends Fragment {
         View button = rootView.findViewById(R.id.button);
         final EditText gameName = (EditText) rootView.findViewById(R.id.gameName);
         final Switch addToBGG = (Switch) rootView.findViewById(R.id.addToBGG);
+        final Switch expansionFlag = (Switch) rootView.findViewById(R.id.expansionFlag);
 
 
 
@@ -94,9 +95,9 @@ public class AddGameFragment extends Fragment {
                 /*Player newPlayer = new Player(playerName.getText().toString(), bggUsername.getText().toString());
                 MyDBHandler dbHandler = new MyDBHandler(mActivity, null, null, 1);
                 dbHandler.addPlayer(newPlayer);*/
-                Game game = new Game(gameName.getText().toString());
+                Game game = new Game(gameName.getText().toString(), expansionFlag.isChecked());
                 game.save();
-                ((MainActivity) mActivity).searchGameViaBGG(gameName.getText().toString(), addToBGG.isChecked());
+                ((MainActivity) mActivity).searchGameViaBGG(gameName.getText().toString(), addToBGG.isChecked(), expansionFlag.isChecked(), game.getId());
                 onButtonPressed("refresh_games");
             }
             removeYourself();
