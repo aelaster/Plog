@@ -12,6 +12,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -60,6 +61,9 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -283,30 +287,80 @@ public class MainActivity extends AppCompatActivity
                 mGamesFragment = null;
             }
 
-            if (position == 1) {
+            String positionName = mNavigationDrawerFragment.getPositionHeading(position);
+
+            if (positionName.equals(getString(R.string.title_plays))) {
                 openPlays("", true, 0);
-            } else if (position == 2) {
+            } else if (positionName.equals(getString(R.string.title_players))) {
                 fragmentManager.beginTransaction()
                         .replace(R.id.container, new PlayersFragment(), "players")
                         .commitAllowingStateLoss();
-            } else if (position == 0) {
+            } else if (positionName.equals(getString(R.string.title_games))) {
                 openGames("", true, 0);
-            } else if (position == 3) {
+            } else if (positionName.equals(getString(R.string.title_bucket_list))) {
                 openGames("BucketList", true, 2);
-            } else if (position == 4) {
+            } else if (positionName.equals(getString(R.string.title_statistics))) {
                 openStats();
-        /*}else if (position == 4){
-
-            fragmentManager.beginTransaction()
-                    .replace(R.id.container, new SetupWizardFragment(), "wizard")
-                    .commitAllowingStateLoss()
-                                /*fragmentManager.beginTransaction()
-                    .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
-                    .commitAllowingStateLoss();*/
+            } else if (positionName.equals(getString(R.string.title_export_db))) {
+                exportDB();
+            } else if (positionName.equals(getString(R.string.title_import_db))) {
+                importDB();
             } else {
                 super.onBackPressed();
             }
         }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public void importDB(){
+        try{
+            File oldDb = getDatabasePath("SRX.db");
+            File newDb = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/SRX.db");
+            if (newDb.exists()) {
+                if(oldDb.exists()){
+
+                }
+                else{
+                    //This'll create the directories you wanna write to, so you
+                    //can put the DB in the right spot.
+                    oldDb.getParentFile().mkdirs();
+                }
+                Log.d("V1", "importing database");
+                FileInputStream src_input = new FileInputStream(newDb);
+                FileOutputStream dst_input = new FileOutputStream(oldDb);
+                FileChannel src = src_input.getChannel();
+                FileChannel dst = dst_input.getChannel();
+                dst.transferFrom(src, 0, src.size());
+                src.close();
+                dst.close();
+                src_input.close();
+                dst_input.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void exportDB(){
+        try{
+            File currentDB = getDatabasePath("SRX.db");
+            String backupDBPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/SRX.db";
+            File backupDB = new File(backupDBPath);
+
+            if (currentDB.exists()) {
+                FileInputStream src_input = new FileInputStream(currentDB);
+                FileOutputStream dst_input = new FileOutputStream(backupDB);
+                FileChannel src = src_input.getChannel();
+                FileChannel dst = dst_input.getChannel();
+                dst.transferFrom(src, 0, src.size());
+                src.close();
+                dst.close();
+                src_input.close();
+                dst_input.close();
+            }
+            notifyUser(1);
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -844,7 +898,7 @@ public class MainActivity extends AppCompatActivity
         public NotificationFragment newInstance(int notificationId) {
             NotificationFragment frag = new NotificationFragment();
             Bundle args = new Bundle();
-            args.putLong("notificationId", notificationId);
+            args.putInt("notificationId", notificationId);
             frag.setArguments(args);
             return frag;
         }
@@ -854,21 +908,32 @@ public class MainActivity extends AppCompatActivity
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             // Use the Builder class for convenient dialog construction
 
-            final long notificationId = getArguments().getLong("notificationId");
+            final int notificationId = getArguments().getInt("notificationId");
             /*
             0 = didn't add a player to a play
+            1 = database exported
              */
 
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            if (notificationId == 0) {
-                builder.setTitle(R.string.error);
-                builder.setMessage(R.string.notify_0_text)
-                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dismiss();
-                            }
-                        });
-                // Create the AlertDialog object and return it
+            switch (notificationId) {
+                case 0:
+                    builder.setTitle(R.string.error);
+                    builder.setMessage(R.string.notify_0_text)
+                            .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    dismiss();
+                                }
+                            });
+                    break;
+                case 1:
+                    builder.setTitle(R.string.db_exported);
+                    builder.setMessage(getString(R.string.db_exported_1) + Environment.getExternalStorageDirectory().getAbsolutePath() + "/SRX.db" + getString(R.string.db_exported_2))
+                            .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    dismiss();
+                                }
+                            });
+                    break;
             }
             return builder.create();
         }
@@ -1028,6 +1093,16 @@ public class MainActivity extends AppCompatActivity
                             //delete GamesPerPay
                             List<GamesPerPlay> games = GamesPerPlay.getGames(deleteMe);
                             for(GamesPerPlay game:games){
+                                if (game.expansionFlag == true){
+                                    if (game.bggPlayId != null && !game.bggPlayId.equals("")){
+                                        DeletePlayTask deletePlay = new DeletePlayTask(getActivity());
+                                        try {
+                                            deletePlay.execute(game.bggPlayId);
+                                        } catch (Exception e) {
+
+                                        }
+                                    }
+                                }
                                 game.delete();
                             }
 
@@ -1055,7 +1130,7 @@ public class MainActivity extends AppCompatActivity
                             if (deleteMe.bggPlayID != null && !deleteMe.bggPlayID.equals("")){
                                 DeletePlayTask deletePlay = new DeletePlayTask(getActivity());
                                 try {
-                                    deletePlay.execute(deleteMe);
+                                    deletePlay.execute(deleteMe.bggPlayID);
                                 } catch (Exception e) {
 
                                 }

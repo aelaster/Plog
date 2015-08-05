@@ -255,7 +255,7 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
                     playPopup(view, position);
                 }
             });
-            if(plays.get(position).playPhoto != null && plays.get(position).playPhoto.equals("")) {
+            if(plays.get(position).playPhoto != null && (plays.get(position).playPhoto.equals("") || new File(plays.get(position).playPhoto.substring(7, plays.get(position).playPhoto.length())).exists() == false)) {
                 String gameThumb = GamesPerPlay.getBaseGame(plays.get(position)).gameThumb;
                 if (gameThumb != null && !gameThumb.equals("")) {
                     ImageLoader.getInstance().displayImage("http:" + GamesPerPlay.getBaseGame(plays.get(position)).gameThumb, viewHolder.getImageView(), options);

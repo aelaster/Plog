@@ -1,0 +1,1 @@
+alter table GAMES_PER_PLAY add BGG_PLAY_ID INTEGER;

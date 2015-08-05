@@ -5,7 +5,6 @@ import android.os.AsyncTask;
 import android.widget.Toast;
 
 import com.lastsoft.plog.R;
-import com.lastsoft.plog.db.Play;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -25,7 +24,7 @@ import java.util.List;
 /**
  * Created by TheFlash on 5/25/2015.
  */
-public class DeletePlayTask extends AsyncTask<Play, Void, String> {
+public class DeletePlayTask extends AsyncTask<String, Void, String> {
 
     Context theContext;
     public DeletePlayTask(Context context){
@@ -33,7 +32,7 @@ public class DeletePlayTask extends AsyncTask<Play, Void, String> {
     }
 
     @Override
-    protected String doInBackground(final Play... playToLog) {
+    protected String doInBackground(final String... playToLog) {
 
         String myString = "";
         String bggProcess = "false";
@@ -44,7 +43,7 @@ public class DeletePlayTask extends AsyncTask<Play, Void, String> {
             List<NameValuePair> nvps = new ArrayList<NameValuePair>();
             nvps.add(new BasicNameValuePair("ajax", "1"));
             nvps.add(new BasicNameValuePair("action", "delete"));
-            nvps.add(new BasicNameValuePair("playid", playToLog[0].bggPlayID));
+            nvps.add(new BasicNameValuePair("playid", playToLog[0]));
 
 
 

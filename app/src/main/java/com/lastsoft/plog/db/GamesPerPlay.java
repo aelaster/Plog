@@ -12,6 +12,7 @@ public class GamesPerPlay extends SugarRecord<GamesPerPlay> {
     public Play play;
     public Game game;
     public boolean expansionFlag;
+    public String bggPlayId;
 
     public GamesPerPlay() {
     }

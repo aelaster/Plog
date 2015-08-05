@@ -23,6 +23,7 @@ import com.lastsoft.plog.db.PlayersPerPlay;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
+import java.io.File;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -154,7 +155,7 @@ public class ViewPlayFragment_Pages extends Fragment {
 
         playImage = (ImageView) viewPlayLayout.findViewById(R.id.imageView1);
         playImage.setTransitionName(imageTransID);
-        if (thisPlay.playPhoto != null && !thisPlay.playPhoto.equals("")){
+        if (thisPlay.playPhoto != null && !thisPlay.playPhoto.equals("") && new File(thisPlay.playPhoto.substring(7, thisPlay.playPhoto.length())).exists()){
             ImageLoader.getInstance().displayImage(thisPlay.playPhoto, playImage, options);
             playImage.setOnClickListener(new View.OnClickListener() {
                 @Override

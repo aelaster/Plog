@@ -46,6 +46,7 @@ import com.lastsoft.plog.db.Play;
 import com.lastsoft.plog.db.Player;
 import com.lastsoft.plog.db.PlayersPerPlay;
 import com.lastsoft.plog.db.PlaysPerGameGroup;
+import com.lastsoft.plog.util.DeletePlayTask;
 import com.lastsoft.plog.util.PostPlayTask;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -656,6 +657,16 @@ public class AddPlayFragment extends Fragment implements
                             //otherwise, delete the old expansions
                             List<GamesPerPlay> gamez = GamesPerPlay.getExpansions(thePlay);
                             for(GamesPerPlay game:gamez){
+                                if (game.expansionFlag == true){
+                                    if (game.bggPlayId != null && !game.bggPlayId.equals("")){
+                                        DeletePlayTask deletePlay = new DeletePlayTask(getActivity());
+                                        try {
+                                            deletePlay.execute(game.bggPlayId);
+                                        } catch (Exception e) {
+
+                                        }
+                                    }
+                                }
                                 game.delete();
                             }
                         }else{//not a play yet, add the base game

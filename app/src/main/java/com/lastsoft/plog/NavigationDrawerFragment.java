@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -21,6 +22,8 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+
+import java.io.File;
 
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.
@@ -89,6 +92,33 @@ public class NavigationDrawerFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        //detect presence of db
+        String[] headings;
+        String backupDBPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/SRX.db";
+        File backupDB = new File(backupDBPath);
+        if (backupDB.exists()){
+            headings = new String[]{
+                    getString(R.string.title_games),
+                    getString(R.string.title_plays),
+                    getString(R.string.title_players),
+                    getString(R.string.title_bucket_list),
+                    getString(R.string.title_statistics),
+                    getString(R.string.title_export_db),
+                    getString(R.string.title_import_db),
+                    getString(R.string.title_exit)};
+        }else{
+            headings = new String[]{
+                    getString(R.string.title_games),
+                    getString(R.string.title_plays),
+                    getString(R.string.title_players),
+                    getString(R.string.title_bucket_list),
+                    getString(R.string.title_statistics),
+                    getString(R.string.title_export_db),
+                    getString(R.string.title_exit)};
+        }
+
+
+
         mDrawerListView = (ListView) inflater.inflate(
                 R.layout.fragment_navigation_drawer, container, false);
         mDrawerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -101,17 +131,13 @@ public class NavigationDrawerFragment extends Fragment {
                 getActionBar().getThemedContext(),
                 R.layout.simple_list_item_1,
                 android.R.id.text1,
-                new String[]{
-                        getString(R.string.title_games),
-                        getString(R.string.title_plays),
-                        getString(R.string.title_players),
-                        getString(R.string.title_bucket_list),
-                        getString(R.string.title_statistics),
-//                        getString(R.string.title_section5),
-                        getString(R.string.title_exit)
-                }));
+                headings));
         mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
         return mDrawerListView;
+    }
+
+    public String getPositionHeading(int position){
+       return mDrawerListView.getAdapter().getItem(position).toString();
     }
 
     public boolean isDrawerOpen() {

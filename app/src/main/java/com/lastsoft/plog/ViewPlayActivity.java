@@ -496,6 +496,16 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
                             //delete GamesPerPay
                             List<GamesPerPlay> games = GamesPerPlay.getGames(deleteMe);
                             for(GamesPerPlay game:games){
+                                if (game.expansionFlag == true){
+                                    if (game.bggPlayId != null && !game.bggPlayId.equals("")){
+                                        DeletePlayTask deletePlay = new DeletePlayTask(getActivity());
+                                        try {
+                                            deletePlay.execute(game.bggPlayId);
+                                        } catch (Exception e) {
+
+                                        }
+                                    }
+                                }
                                 game.delete();
                             }
 
@@ -523,7 +533,7 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
                             if (deleteMe.bggPlayID != null && !deleteMe.bggPlayID.equals("")){
                                 DeletePlayTask deletePlay = new DeletePlayTask(getActivity());
                                 try {
-                                    deletePlay.execute(deleteMe);
+                                    deletePlay.execute(deleteMe.bggPlayID);
                                 } catch (Exception e) {
 
                                 }
