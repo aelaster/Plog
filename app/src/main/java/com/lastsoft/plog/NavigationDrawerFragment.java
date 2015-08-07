@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -22,8 +21,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-
-import java.io.File;
 
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.
@@ -94,7 +91,7 @@ public class NavigationDrawerFragment extends Fragment {
                              Bundle savedInstanceState) {
         //detect presence of db
         String[] headings;
-        String backupDBPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/SRX.db";
+        /*String backupDBPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/SRX_export.db";
         File backupDB = new File(backupDBPath);
         //Todo:  put export and import into a settings page
         if (backupDB.exists()){
@@ -116,7 +113,16 @@ public class NavigationDrawerFragment extends Fragment {
                     getString(R.string.title_statistics),
                     getString(R.string.title_export_db),
                     getString(R.string.title_exit)};
-        }
+        }*/
+
+        headings = new String[]{
+                getString(R.string.title_games),
+                getString(R.string.title_plays),
+                getString(R.string.title_players),
+                getString(R.string.title_bucket_list),
+                getString(R.string.title_statistics),
+                getString(R.string.title_settings),
+                getString(R.string.title_exit)};
 
 
 

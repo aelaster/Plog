@@ -54,6 +54,7 @@ import com.lastsoft.plog.db.TenByTen;
 import com.lastsoft.plog.util.BGGLogInHelper;
 import com.lastsoft.plog.util.Cookies;
 import com.lastsoft.plog.util.DeletePlayTask;
+import com.lastsoft.plog.util.NotificationFragment;
 import com.lastsoft.plog.util.PostMortemReportExceptionHandler;
 import com.lastsoft.plog.util.SearchBGGTask;
 import com.lastsoft.plog.util.UpdateBGGTask;
@@ -305,6 +306,9 @@ public class MainActivity extends AppCompatActivity
                 exportDB();
             } else if (positionName.equals(getString(R.string.title_import_db))) {
                 importDB();
+            } else if (positionName.equals(getString(R.string.title_settings))) {
+                Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+                startActivity(intent);
             } else {
                 super.onBackPressed();
             }
@@ -316,7 +320,7 @@ public class MainActivity extends AppCompatActivity
     public void importDB(){
         try{
             File oldDb = getDatabasePath("SRX.db");
-            File newDb = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/SRX.db");
+            File newDb = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/SRX_export.db");
             if (newDb.exists()) {
                 if(oldDb.exists()){
 
@@ -345,7 +349,7 @@ public class MainActivity extends AppCompatActivity
     public void exportDB(){
         try{
             File currentDB = getDatabasePath("SRX.db");
-            String backupDBPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/SRX.db";
+            String backupDBPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/SRX_export.db";
             File backupDB = new File(backupDBPath);
 
             if (currentDB.exists()) {
@@ -777,7 +781,7 @@ public class MainActivity extends AppCompatActivity
 
     public void notifyUser(int notificationId){
         NotificationFragment newFragment = new NotificationFragment().newInstance(notificationId);
-        newFragment.show(getSupportFragmentManager(), "notifyUser");
+        newFragment.show(getFragmentManager(), "notifyUser");
     }
 
     public void deleteGame(long gameId){
@@ -894,50 +898,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public class NotificationFragment extends DialogFragment {
-        public NotificationFragment newInstance(int notificationId) {
-            NotificationFragment frag = new NotificationFragment();
-            Bundle args = new Bundle();
-            args.putInt("notificationId", notificationId);
-            frag.setArguments(args);
-            return frag;
-        }
 
-
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            // Use the Builder class for convenient dialog construction
-
-            final int notificationId = getArguments().getInt("notificationId");
-            /*
-            0 = didn't add a player to a play
-            1 = database exported
-             */
-
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            switch (notificationId) {
-                case 0:
-                    builder.setTitle(R.string.error);
-                    builder.setMessage(R.string.notify_0_text)
-                            .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    dismiss();
-                                }
-                            });
-                    break;
-                case 1:
-                    builder.setTitle(R.string.db_exported);
-                    builder.setMessage(getString(R.string.db_exported_1) + Environment.getExternalStorageDirectory().getAbsolutePath() + "/SRX.db" + getString(R.string.db_exported_2))
-                            .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    dismiss();
-                                }
-                            });
-                    break;
-            }
-            return builder.create();
-        }
-    }
 
     public class DeleteGameFragment extends DialogFragment {
         public DeleteGameFragment newInstance(long gameId) {

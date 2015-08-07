@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:title="@string/title_pref_backup">
+
+        <Preference
+            android:key="export_db"
+            android:title="@string/title_export_db">
+        </Preference>
+
+        <Preference
+            android:key="import_db"
+            android:title="@string/title_import_db">
+        </Preference>
+
+
+    </PreferenceCategory>
+</PreferenceScreen>
