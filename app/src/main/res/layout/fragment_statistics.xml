@@ -14,6 +14,8 @@
             <LinearLayout android:id="@+id/container_players"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
                 android:orientation="vertical"
                 android:showDividers="middle"
                 android:divider="?android:dividerHorizontal"

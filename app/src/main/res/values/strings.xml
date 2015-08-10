@@ -19,6 +19,7 @@
     <string name="db_exported_1">"Database has been exported to "</string>
     <string name="db_exported_2">".  Place it in the same directory on your new device to import."</string>
 
+    <string name="year_label">Year:</string>
     <string name="add_bucket_list">Add to Bucket List</string>
     <string name="remove_bucket_list">Remove from Bucket List</string>
     <string name="add_player">Add Player</string>

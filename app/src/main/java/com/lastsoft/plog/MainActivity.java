@@ -232,6 +232,17 @@ public class MainActivity extends AppCompatActivity
             //ActionBarDrawerToggle mDrawerToggle = new ActionBarDrawerToggle(
             //        this, mDrawerLayout, R.string.navigation_drawer_open, R.string.navigation_drawer_close
             //);
+            /*new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (mDrawerListView != null) {
+                        mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
+                    }
+                    if (mCallbacks != null) {
+                        mCallbacks.onNavigationDrawerItemSelected(mCurrentSelectedPosition);
+                    }
+                }
+            }, 300);*/
         }
     }
 

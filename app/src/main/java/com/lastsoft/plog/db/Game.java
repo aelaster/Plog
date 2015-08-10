@@ -140,6 +140,7 @@ public class Game extends SugarRecord<Game> {
                         " INNER JOIN " + StringUtil.toSQLName("TenByTen") + " TBT " +
                         " ON PPGG." + StringUtil.toSQLName("gameGroup") + " = TBT." + StringUtil.toSQLName("gameGroup") +
                         " WHERE PPGG. " + StringUtil.toSQLName("GameGroup") + " = ?" +
+                        " AND TBT." + StringUtil.toSQLName("year") + " = " + year +
                         " AND TBT." + StringUtil.toSQLName("game") + " = GPP." + StringUtil.toSQLName("game") +
                         " AND STRFTIME('%Y', DATETIME(SUBSTR(P." + StringUtil.toSQLName("playDate") + ",0, 11), 'unixepoch')) = ? " +
                         " GROUP BY G." + StringUtil.toSQLName("gameName") +
