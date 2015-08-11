@@ -56,7 +56,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -181,41 +180,12 @@ public class AddPlayFragment extends Fragment implements
             ((ViewPlayActivity)mActivity).setSupportActionBar(toolbar);
         }
 
-
-        /*rootView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-            @Override
-            public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop,
-                                       int oldRight, int oldBottom) {
-                v.removeOnLayoutChangeListener(this);
-                cx = getArguments().getInt("cx");
-                cy = getArguments().getInt("cy");
-                // get the hypothenuse so the radius is from one corner to the other
-                int radius = (int) Math.hypot(right, bottom);
-
-                Animator reveal = ViewAnimationUtils.createCircularReveal(v, cx, cy, 0, radius);
-                if (getArguments().getBoolean("doAccelerate")) {
-                    reveal.setInterpolator(new DecelerateInterpolator(1.5f));
-                }
-                reveal.setDuration(700);
-                reveal.start();
-            }
-        });*/
-
-        try {
-
-            expansions = Game.findExpansionsFor(gameName);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-
         ExpansionsLoader myExpansions = new ExpansionsLoader(mActivity);
         try {
             myExpansions.execute(Game.findGameByName(gameName).gameBGGID);
         } catch (Exception ignored) {
 
         }
-
-
 
         mContainerView_Players = (ViewGroup) rootView.findViewById(R.id.container_players);
         mContainerView_Expansions = (ViewGroup) rootView.findViewById(R.id.container_expansions);
@@ -1062,12 +1032,10 @@ public class AddPlayFragment extends Fragment implements
         protected void onPostExecute(final List<Game> result) {
             expansions = result;
             checkedItems = new boolean[expansions.size()];
-            if (expansions.size()==0) {
-                mContainerView_Expansions.setVisibility(View.GONE);
-                mContainerView_Expansions.setVisibility(View.GONE);
+            if (expansions.size()>0) {
+                mContainerView_Expansions.setVisibility(View.VISIBLE);
                 ViewGroup expLayout = (ViewGroup) rootView.findViewById(R.id.expansionsLayout);
-                expLayout.setVisibility(View.GONE);
-            }else{
+                expLayout.setVisibility(View.VISIBLE);
                 expansionButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
