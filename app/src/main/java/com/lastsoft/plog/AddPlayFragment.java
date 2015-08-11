@@ -47,6 +47,7 @@ import com.lastsoft.plog.db.Player;
 import com.lastsoft.plog.db.PlayersPerPlay;
 import com.lastsoft.plog.db.PlaysPerGameGroup;
 import com.lastsoft.plog.util.DeletePlayTask;
+import com.lastsoft.plog.util.LoadExpansionsTask;
 import com.lastsoft.plog.util.PostPlayTask;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -87,6 +88,7 @@ public class AddPlayFragment extends Fragment implements
     String gameName;
     long playID;
     TextView textViewDate;
+    View expansionButton;
 
     private ViewGroup mContainerView_Players;
     private ViewGroup mContainerView_Expansions;
@@ -200,11 +202,20 @@ public class AddPlayFragment extends Fragment implements
         });*/
 
         try {
+
             expansions = Game.findExpansionsFor(gameName);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        checkedItems = new boolean[expansions.size()];
+
+        ExpansionsLoader myExpansions = new ExpansionsLoader(mActivity);
+        try {
+            myExpansions.execute(Game.findGameByName(gameName).gameBGGID);
+        } catch (Exception ignored) {
+
+        }
+
+
 
         mContainerView_Players = (ViewGroup) rootView.findViewById(R.id.container_players);
         mContainerView_Expansions = (ViewGroup) rootView.findViewById(R.id.container_expansions);
@@ -224,25 +235,8 @@ public class AddPlayFragment extends Fragment implements
         notesText = (EditText) rootView.findViewById(R.id.notesText);
         notesText.setSelectAllOnFocus(true);
 
-        View expansionButton = rootView.findViewById(R.id.addGameButton);
-        if (expansions.size()==0) {
-            mContainerView_Expansions.setVisibility(View.GONE);
-            mContainerView_Expansions.setVisibility(View.GONE);
-            ViewGroup expLayout = (ViewGroup) rootView.findViewById(R.id.expansionsLayout);
-            expLayout.setVisibility(View.GONE);
-        }else{
-            expansionButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    CheckBoxAlertDialogFragment newFragment = new CheckBoxAlertDialogFragment().newInstance(checkedItems, gameName);
-                    if (mActivity instanceof MainActivity) {
-                        newFragment.show(((MainActivity) mActivity).getSupportFragmentManager(), "datePicker");
-                    }else{
-                        newFragment.show(((ViewPlayActivity) mActivity).getSupportFragmentManager(), "datePicker");
-                    }
-                }
-            });
-        }
+        expansionButton = rootView.findViewById(R.id.addGameButton);
+
 
         playPhoto = (ImageView) rootView.findViewById(R.id.gamePhoto);
         playPhoto.setOnClickListener(new View.OnClickListener() {
@@ -1055,6 +1049,36 @@ public class AddPlayFragment extends Fragment implements
                         playerToUpdate.score = Float.parseFloat(score);
                     }
                 }
+            }
+        }
+    }
+
+    public class ExpansionsLoader extends LoadExpansionsTask {
+        public ExpansionsLoader(Context context) {
+            super(context);
+        }
+
+        @Override
+        protected void onPostExecute(final List<Game> result) {
+            expansions = result;
+            checkedItems = new boolean[expansions.size()];
+            if (expansions.size()==0) {
+                mContainerView_Expansions.setVisibility(View.GONE);
+                mContainerView_Expansions.setVisibility(View.GONE);
+                ViewGroup expLayout = (ViewGroup) rootView.findViewById(R.id.expansionsLayout);
+                expLayout.setVisibility(View.GONE);
+            }else{
+                expansionButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        CheckBoxAlertDialogFragment newFragment = new CheckBoxAlertDialogFragment().newInstance(checkedItems, gameName);
+                        if (mActivity instanceof MainActivity) {
+                            newFragment.show(((MainActivity) mActivity).getSupportFragmentManager(), "datePicker");
+                        }else{
+                            newFragment.show(((ViewPlayActivity) mActivity).getSupportFragmentManager(), "datePicker");
+                        }
+                    }
+                });
             }
         }
     }

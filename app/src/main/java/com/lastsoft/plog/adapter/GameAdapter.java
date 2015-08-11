@@ -154,7 +154,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
         mActivity = theActivity;
         playListType = mPlayListType;
 
-        games = generateGameList(mSearchQuery,mPlayListType);
+        games = generateGameList(mSearchQuery, mPlayListType);
 
         options = new DisplayImageOptions.Builder()
                 .cacheOnDisk(true)
@@ -209,12 +209,16 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
                         playPopup(view, position);
                     }
                 });
-                viewHolder.getClickLayout().setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        ((MainActivity) mActivity).openAddPlay(mFragment, games.get(position).gameName, -1);
-                    }
-                });
+                if (games.get(position).expansionFlag == false) {
+                    viewHolder.getClickLayout().setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            ((MainActivity) mActivity).openAddPlay(mFragment, games.get(position).gameName, -1);
+                        }
+                    });
+                }else{
+                    viewHolder.getClickLayout().setOnClickListener(null);
+                }
             }else{
                 viewHolder.getOverflowLayout().setVisibility(View.GONE);
             }
