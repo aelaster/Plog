@@ -45,6 +45,10 @@
     <string name="plays_for">"Plays for: "</string>
     <string name="select_group">" - Select a Group - "</string>
 
+    <string name="show_expansions">Show Expansions</string>
+    <string name="hide_expansions">Hide Expansions</string>
+    <string name="unable_remove_game">Unable to remove played games</string>
+
     <string name="is_expansion">Is Expansion</string>
     <string name="color">Color</string>
     <string name="score">Score</string>

@@ -148,7 +148,11 @@ public class ViewPlayFragment_Pages extends Fragment {
         thisPlay = Play.findById(Play.class, playID);
         //Log.d("V1", "imageTransID = " + imageTransID);
 
-
+        options = new DisplayImageOptions.Builder()
+                .cacheOnDisk(true)
+                .cacheInMemory(false)
+                .considerExifParams(true)
+                .build();
 
         mContainerView_Players = (ViewGroup) viewPlayLayout.findViewById(R.id.container_players);
         mContainerView_Expansions = (ViewGroup) viewPlayLayout.findViewById(R.id.container_expansions);

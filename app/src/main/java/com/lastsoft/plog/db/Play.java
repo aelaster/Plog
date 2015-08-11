@@ -44,7 +44,7 @@ public class Play extends SugarRecord<Play> {
 
 
 
-    public static List<Play> listPlaysNewOld(String mSearchQuery, boolean allowLike){
+    public static List<Play> listPlaysNewOld(String mSearchQuery, boolean allowLike, boolean allowExpansions){
         String query;
         if (mSearchQuery.contains("'")) {
             mSearchQuery = mSearchQuery.replaceAll("'", "''");
@@ -57,8 +57,10 @@ public class Play extends SugarRecord<Play> {
                     " INNER JOIN " + StringUtil.toSQLName("GamesPerPlay") +
                     " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("play") + " = " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") +
                     " INNER JOIN " + StringUtil.toSQLName("Game") +
-                    " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("game") + " = " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("id") +
-                    " and " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("expansionFlag") + " = 0 ";
+                    " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("game") + " = " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("id");
+            if (!allowExpansions){
+                query = query + " and " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("expansionFlag") + " = 0 ";
+            }
            if(allowLike){
                query = query + " and " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " LIKE '%" + mSearchQuery + "%'";
            }else {

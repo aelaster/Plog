@@ -115,6 +115,38 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
     }
     // END_INCLUDE(recyclerViewSampleViewHolder)
 
+    public void updateData(List<Game> updatedGames){
+        this.games = updatedGames;
+        this.notifyDataSetChanged();
+    }
+
+    public List<Game> generateGameList(String mSearchQuery, int playListType){
+        List<Game> games_out;
+        switch (playListType) {
+            case 0:
+                games_out = Game.findBaseGames(mSearchQuery);
+                break;
+            case 1:
+                if (mSearchQuery.equals("0")){
+                    games_out = Game.getUniqueGames();
+                }else {
+                    games_out = Game.getUniqueGames_GameGroup(GameGroup.findById(GameGroup.class, Long.parseLong(mSearchQuery)));
+                }
+                break;
+            case 2:
+                games_out = Game.getBucketList();
+                break;
+            case 3:
+                games_out = Game.findAllGames(mSearchQuery);
+                break;
+            default:
+                games_out = Game.findBaseGames(mSearchQuery);
+                break;
+        }
+
+        return games_out;
+    }
+
     public GameAdapter(Fragment theFragment, Activity theActivity, String mSearchQuery, boolean mFromDrawer, int mPlayListType) {
         //games = Game.listAll(Game.class);
         //find(Class<T> type, String whereClause, String[] whereArgs, String groupBy, String orderBy, String limit)
@@ -122,24 +154,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
         mActivity = theActivity;
         playListType = mPlayListType;
 
-        switch (playListType) {
-            case 0:
-                games = Game.findBaseGames(mSearchQuery);
-                break;
-            case 1:
-                if (mSearchQuery.equals("0")){
-                    games = Game.getUniqueGames();
-                }else {
-                    games = Game.getUniqueGames_GameGroup(GameGroup.findById(GameGroup.class, Long.parseLong(mSearchQuery)));
-                }
-                break;
-            case 2:
-                games = Game.getBucketList();
-                break;
-            default:
-                games = Game.findBaseGames(mSearchQuery);
-                break;
-        }
+        games = generateGameList(mSearchQuery,mPlayListType);
 
         options = new DisplayImageOptions.Builder()
                 .cacheOnDisk(true)
@@ -228,7 +243,11 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
 
         MenuInflater inflater = popup.getMenuInflater();
 
-        inflater.inflate(R.menu.game_overflow, popup.getMenu());
+        if (games.get(position).expansionFlag == true){
+            inflater.inflate(R.menu.game_expansion_overflow, popup.getMenu());
+        }else {
+            inflater.inflate(R.menu.game_overflow, popup.getMenu());
+        }
         if(games.get(position).gameBGGID == null || games.get(position).gameBGGID.equals("")) {
             popup.getMenu().removeItem(R.id.update_bgg);
         }
@@ -251,7 +270,11 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
                         ((MainActivity) mActivity).addToTenXTen(games.get(position).getId());
                         return true;
                     case R.id.view_plays:
-                        ((MainActivity) mActivity).openPlays(games.get(position).gameName, false, 0);
+                        if (games.get(position).expansionFlag == true) {
+                            ((MainActivity) mActivity).openPlays(games.get(position).gameName, false, 9);
+                        }else{
+                            ((MainActivity) mActivity).openPlays(games.get(position).gameName, false, 0);
+                        }
                         return true;
                     case R.id.update_bgg:
                         mPosition = position;

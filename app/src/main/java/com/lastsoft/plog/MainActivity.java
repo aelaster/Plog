@@ -13,6 +13,7 @@ import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -937,6 +938,12 @@ public class MainActivity extends AppCompatActivity
                             //if so, can't delete
                             if (!GamesPerPlay.hasGameBeenPlayed(deleteMe)){
                                 deleteMe.delete();
+                            }else{
+                                Snackbar
+                                        .make(mGamesFragment.mCoordinatorLayout,
+                                                getString(R.string.unable_remove_game),
+                                                Snackbar.LENGTH_LONG)
+                                        .show(); // Do not forget to show!
                             }
 
                             onFragmentInteraction("refresh_games");

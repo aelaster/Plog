@@ -1,0 +1,10 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools" tools:context=".MainActivity">
+    <item android:id="@+id/view_plays" android:title="@string/view_plays"
+        app:showAsAction="withText|ifRoom" />
+    <item android:id="@+id/update_bgg" android:title="@string/update_bgg"
+        app:showAsAction="withText|ifRoom" />
+    <item android:id="@+id/delete_game" android:title="@string/delete"
+        app:showAsAction="withText|ifRoom" />
+</menu>

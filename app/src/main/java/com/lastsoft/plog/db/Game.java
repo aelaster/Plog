@@ -115,14 +115,29 @@ public class Game extends SugarRecord<Game> {
         return findBaseGames.list();
     }
 
+    public static List<Game> findAllGames(String mSearchQuery){
+        //return Game.find(Game.class, StringUtil.toSQLName("expansionFlag") + " = 0");
+        if (mSearchQuery.contains("'")) {
+            mSearchQuery = mSearchQuery.replaceAll("'", "''");
+        }
+        Select findBaseGames = Select.from(Game.class);
+        if (!mSearchQuery.equals("")) {
+            findBaseGames.where(Condition.prop(StringUtil.toSQLName("gameName")).like("%" + mSearchQuery + "%"));
+        }
+        findBaseGames.orderBy(StringUtil.toSQLName("gameName") + " ASC");
+        return findBaseGames.list();
+    }
+
     public static List<Game> findExpansionsFor(String name) throws UnsupportedEncodingException {
         if (name.contains("'")) {
             name = name.replaceAll("'", "''");
         }
         Select expansionsFor = Select.from(Game.class);
-        //expansionsFor.where(Condition.prop(StringUtil.toSQLName("gameName")).like("%" + name + "%"), Condition.prop(StringUtil.toSQLName("expansionFlag")).eq("1"));
+        //todo Just changed this back to contains.  Must have made it starts with for a reason
+        //contains
+        expansionsFor.where(Condition.prop(StringUtil.toSQLName("gameName")).like("%" + name + "%"), Condition.prop(StringUtil.toSQLName("expansionFlag")).eq("1"));
         //starts with
-        expansionsFor.where(Condition.prop(StringUtil.toSQLName("gameName")).like(name + "%"), Condition.prop(StringUtil.toSQLName("expansionFlag")).eq("1"));
+        //expansionsFor.where(Condition.prop(StringUtil.toSQLName("gameName")).like(name + "%"), Condition.prop(StringUtil.toSQLName("expansionFlag")).eq("1"));
         expansionsFor.orderBy(StringUtil.toSQLName("gameName") + " ASC");
         return expansionsFor.list();
     }

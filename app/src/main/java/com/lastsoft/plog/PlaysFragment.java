@@ -278,7 +278,7 @@ public class PlaysFragment extends Fragment{
 
 
     protected void refreshDataset(){
-        int firstVisible = ((LinearLayoutManager) mRecyclerView.getLayoutManager())
+        /*int firstVisible = ((LinearLayoutManager) mRecyclerView.getLayoutManager())
                 .findFirstCompletelyVisibleItemPosition();
         //int current = ((PlayAdapter)mRecyclerView.getAdapter()).mPosition;
 
@@ -286,7 +286,8 @@ public class PlaysFragment extends Fragment{
 
         // Set CustomAdapter as the adapter for RecyclerView.
         mRecyclerView.setAdapter(mAdapter);
-        mRecyclerView.scrollToPosition(firstVisible);
+        mRecyclerView.scrollToPosition(firstVisible);*/
+        mAdapter.updateData(mAdapter.generatePlayData(mSearchQuery, playListType));
     }
 
 }

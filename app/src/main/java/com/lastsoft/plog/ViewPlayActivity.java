@@ -48,6 +48,8 @@ import com.lastsoft.plog.db.PlayersPerPlay;
 import com.lastsoft.plog.db.PlaysPerGameGroup;
 import com.lastsoft.plog.util.CustomViewPager;
 import com.lastsoft.plog.util.DeletePlayTask;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 import java.io.File;
 import java.util.List;
@@ -253,6 +255,13 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
         setContentView(R.layout.fragment_view_play_swipe);
 
         FacebookSdk.sdkInitialize(getApplicationContext());
+
+        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this)
+                .memoryCacheSize(41943040)
+                .diskCacheSize(104857600)
+                .threadPoolSize(10)
+                .build();
+        ImageLoader.getInstance().init(config);
         callbackManager = CallbackManager.Factory.create();
         shareDialog = new ShareDialog(this);
         // this part is optional

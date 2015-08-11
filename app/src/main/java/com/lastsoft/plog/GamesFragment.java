@@ -33,6 +33,8 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -68,6 +70,7 @@ public class GamesFragment extends Fragment{
     Uri photoUri;
     File photoFile;
     String mCurrentPhotoPath = "";
+    boolean showExpansions = false;
 
 
 
@@ -92,6 +95,7 @@ public class GamesFragment extends Fragment{
     public CoordinatorLayout mCoordinatorLayout;
     private boolean releaseFocus = false;
     private int playListType = 0;
+    private int playListType_Holder = 0;
     FloatingActionButton addPlayer;
     int fabMargin;
 
@@ -126,9 +130,8 @@ public class GamesFragment extends Fragment{
                         .findViewById(R.id.closeButton);
             } catch (Exception e) {
             }
-        }else{
-            setHasOptionsMenu(true);
         }
+        setHasOptionsMenu(true);
     }
 
 
@@ -297,6 +300,13 @@ public class GamesFragment extends Fragment{
         }
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        if (fromDrawer && playListType != 2) {
+            inflater.inflate(R.menu.games, menu);
+        }
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -305,6 +315,26 @@ public class GamesFragment extends Fragment{
             case android.R.id.home:
                 //called when the up affordance/carat in actionbar is pressed
                 mActivity.onBackPressed();
+                return true;
+            case R.id.show_expansions:
+                if (showExpansions) {
+                    //currently showing expansions
+                    //trying to hide them
+                    //make it say show expansions
+                    item.setTitle(getString(R.string.show_expansions));
+                    playListType = playListType_Holder;
+                    mAdapter.updateData(mAdapter.generateGameList(mSearchQuery, playListType));
+                    showExpansions = false;
+                }else{
+                    //currently hiding expansions
+                    //trying to show them
+                    //make it say hide expansions
+                    item.setTitle(getString(R.string.hide_expansions));
+                    playListType_Holder = playListType;
+                    playListType = 3;
+                    mAdapter.updateData(mAdapter.generateGameList(mSearchQuery, playListType));
+                    showExpansions = true;
+                }
                 return true;
         }
         return false;
@@ -407,17 +437,19 @@ public class GamesFragment extends Fragment{
         if (reInit) {
             initDataset();
         }
-        mAdapter = new GameAdapter(this, mActivity,mSearchQuery, fromDrawer, playListType);
+        //mAdapter = new GameAdapter(this, mActivity,mSearchQuery, fromDrawer, playListType);
         // Set CustomAdapter as the adapter for RecyclerView.
-        mRecyclerView.setAdapter(mAdapter);
+        //mRecyclerView.setAdapter(mAdapter);
+        mAdapter.updateData(mAdapter.generateGameList(mSearchQuery, playListType));
     }
 
     protected void updateDataset(){
         //int current = ((GameAdapter)mRecyclerView.getAdapter()).mPosition;
-        int firstVisible = ((LinearLayoutManager) mRecyclerView.getLayoutManager())
+        /*int firstVisible = ((LinearLayoutManager) mRecyclerView.getLayoutManager())
                 .findFirstCompletelyVisibleItemPosition();
         refreshDataset(false);
-        mRecyclerView.scrollToPosition(firstVisible);
+        mRecyclerView.scrollToPosition(firstVisible);*/
+        mAdapter.updateData(mAdapter.generateGameList(mSearchQuery, playListType));
     }
 
     /**
