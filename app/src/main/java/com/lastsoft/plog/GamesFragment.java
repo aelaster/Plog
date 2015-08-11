@@ -303,7 +303,7 @@ public class GamesFragment extends Fragment{
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        if (fromDrawer && playListType != 2) {
+        if (fromDrawer && playListType != 2 && !((MainActivity) mActivity).mNavigationDrawerFragment.isDrawerOpen()) {
             inflater.inflate(R.menu.games, menu);
             if (showExpansions) {
                 menu.getItem(0).setTitle(getString(R.string.hide_expansions));
