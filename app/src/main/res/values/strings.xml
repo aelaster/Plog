@@ -57,6 +57,8 @@
     <string name="expansions">Expansions</string>
     <string name="view_plays">View Plays</string>
     <string name="view_wins">View Wins</string>
+    <string name="winners">"Winner: "</string>
+    <string name="plays">"Plays: "</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>

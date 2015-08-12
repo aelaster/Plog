@@ -20,6 +20,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Typeface;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -40,6 +41,7 @@ import com.lastsoft.plog.db.GameGroup;
 import com.lastsoft.plog.db.GamesPerPlay;
 import com.lastsoft.plog.db.Play;
 import com.lastsoft.plog.db.Player;
+import com.lastsoft.plog.db.PlayersPerPlay;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
@@ -73,7 +75,7 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
      */
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private final TextView gameNameView;
-        private final TextView playDateView;
+        private final TextView playDateView, playWinnerView;
         private final ImageView imageView;
         private final LinearLayout overflowLayout;
         private final LinearLayout clickLayout;
@@ -84,6 +86,7 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
             // Define click listener for the ViewHolder's View.
             gameNameView = (TextView) v.findViewById(R.id.gameName);
             playDateView = (TextView) v.findViewById(R.id.playDate);
+            playWinnerView = (TextView) v.findViewById(R.id.playWinner);
             imageView = (ImageView) v.findViewById(R.id.imageView1);
             overflowLayout = (LinearLayout) v.findViewById(R.id.overflowLayout);
             clickLayout = (LinearLayout) v.findViewById(R.id.clickLayout);
@@ -95,6 +98,9 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
         }
         public TextView getPlayDateView() {
             return playDateView;
+        }
+        public TextView getPlayWinnerView() {
+            return playWinnerView;
         }
         public TextView getGameNameView() {
             return gameNameView;
@@ -253,6 +259,20 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
             String output_date = outputFormatter.format(plays.get(position).playDate); // Output : 01/20/2012
             viewHolder.getGameNameView().setText(GamesPerPlay.getBaseGame(plays.get(position)).gameName);
             viewHolder.getPlayDateView().setText(output_date);
+            String winners = "";
+            List<PlayersPerPlay> players = PlayersPerPlay.getPlayers_Winners(plays.get(position));
+            float highScore = PlayersPerPlay.getHighScore(plays.get(position));
+            for(PlayersPerPlay player:players){
+                Player thisPlayer = player.player;
+                if (player.score >= highScore) {
+                    winners = winners + thisPlayer.playerName + ", ";
+                }
+            }
+            winners = winners.substring(0, winners.length()-2);
+
+            viewHolder.getPlayWinnerView().setTypeface(null, Typeface.BOLD);
+            viewHolder.getPlayWinnerView().setText(mActivity.getString(R.string.winners) + winners);
+
             viewHolder.getImageView().setTransitionName("imageTrans" + position);
             viewHolder.getImageView().setTag("imageTrans" + position);
             viewHolder.getGameNameView().setTransitionName("nameTrans" + position);

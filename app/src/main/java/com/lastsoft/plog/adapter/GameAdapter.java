@@ -40,6 +40,7 @@ import com.lastsoft.plog.MainActivity;
 import com.lastsoft.plog.R;
 import com.lastsoft.plog.db.Game;
 import com.lastsoft.plog.db.GameGroup;
+import com.lastsoft.plog.db.Play;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
@@ -71,7 +72,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
      * Provide a reference to the type of views that you are using (custom ViewHolder)
      */
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        private final TextView textView, bucketDateView;
+        private final TextView textView, bucketDateView, gamePlaysView;
         private final ImageView imageView;
         private final LinearLayout overflowLayout;
         private final LinearLayout clickLayout;
@@ -87,6 +88,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
                 }
             });
             textView = (TextView) v.findViewById(R.id.gameName);
+            gamePlaysView = (TextView) v.findViewById(R.id.gamePlays);
             bucketDateView = (TextView) v.findViewById(R.id.bucketDate);
             imageView = (ImageView) v.findViewById(R.id.imageView1);
             overflowLayout = (LinearLayout) v.findViewById(R.id.overflowLayout);
@@ -102,6 +104,9 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
         }
         public TextView getBucketDateView() {
             return bucketDateView;
+        }
+        public TextView getGamePlaysView() {
+            return gamePlaysView;
         }
         public LinearLayout getOverflowLayout() {
             return overflowLayout;
@@ -180,6 +185,9 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, final int position) {
         //Log.d(TAG, "Element " + position + " set.");
+        int totalPlays = Play.listPlaysNewOld(games.get(position).gameName, fromDrawer, games.get(position).expansionFlag).size();
+
+        viewHolder.getGamePlaysView().setText(mActivity.getString(R.string.plays) + totalPlays);
 
         // Get element from your dataset at this position and replace the contents of the view
         // with that element

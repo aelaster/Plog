@@ -51,9 +51,16 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/bucketDate"
+                    android:id="@+id/gamePlays"
                     android:textColor="@color/black"
                     android:layout_below="@+id/gameName"
+                    />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/bucketDate"
+                    android:textColor="@color/black"
+                    android:layout_below="@+id/gamePlays"
                     android:visibility="gone"
                     />
 
