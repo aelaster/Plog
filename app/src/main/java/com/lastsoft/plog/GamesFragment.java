@@ -32,6 +32,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -171,7 +172,6 @@ public class GamesFragment extends Fragment{
                 public void onClick(View v) {
                     int viewXY[] = new int[2];
                     v.getLocationOnScreen(viewXY);
-
                     if (mListener != null) {
                         mListener.onFragmentInteraction("add_game", viewXY[0], viewXY[1]);
                     }
@@ -300,15 +300,18 @@ public class GamesFragment extends Fragment{
         }
     }
 
+    private MenuItem menuItem0;
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        if (fromDrawer && playListType != 2 && !((MainActivity) mActivity).mNavigationDrawerFragment.isDrawerOpen()) {
+        Log.d("V1", "games fragment create menu");
+        if (fromDrawer && playListType != 2 && !((MainActivity) mActivity).mNavigationDrawerFragment.isDrawerOpen() && ((MainActivity) mActivity).currentFragmentCode != 0) {
             inflater.inflate(R.menu.games, menu);
+            menuItem0 = menu.getItem(0);
             if (showExpansions) {
-                menu.getItem(0).setTitle(getString(R.string.hide_expansions));
+                menuItem0.setTitle(getString(R.string.hide_expansions));
             }else{
-                menu.getItem(0).setTitle(getString(R.string.show_expansions));
+                menuItem0.setTitle(getString(R.string.show_expansions));
             }
         }
     }

@@ -20,6 +20,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -298,24 +299,6 @@ public class AddPlayFragment extends Fragment implements
             Play editPlay = Play.findById(Play.class, playID);
             //set up the values, based on DB
 
-            //expansions
-            //for each expansion the game has
-            int x = 0;
-            for(Game expansion0:expansions){
-                //if the added expansions contains it
-                if (GamesPerPlay.doesExpansionExist(editPlay, expansion0)) {
-                    //add to added expansions
-                    addedExpansions.add(expansion0);
-                    //add the game to the list
-                    addGame(expansion0);
-                    //check it
-                    checkedItems[x] = true;
-                }else{
-                    //don't check it
-                    checkedItems[x] = false;
-                }
-                x++;
-            }
 
             //date
             DateFormat outputFormatter = new SimpleDateFormat("MM/dd/yyyy");
@@ -784,6 +767,7 @@ public class AddPlayFragment extends Fragment implements
         mListener = null;
         if (mActivity != null) {
             if (mActivity instanceof MainActivity) {
+                Log.d("V1", "mActivity is main");
                 if (((MainActivity) mActivity).mPlaysFragment != null) {
                     if (((MainActivity) mActivity).forceBack) {
                         ((MainActivity) mActivity).setUpActionBar(10);
@@ -799,6 +783,8 @@ public class AddPlayFragment extends Fragment implements
                         }
                     }
                 }
+            }else{
+                Log.d("V1", "mActivity isn't main");
             }
             mActivity = null;
         }
@@ -1031,22 +1017,49 @@ public class AddPlayFragment extends Fragment implements
         @Override
         protected void onPostExecute(final List<Game> result) {
             expansions = result;
-            checkedItems = new boolean[expansions.size()];
-            if (expansions.size()>0) {
-                mContainerView_Expansions.setVisibility(View.VISIBLE);
-                ViewGroup expLayout = (ViewGroup) rootView.findViewById(R.id.expansionsLayout);
-                expLayout.setVisibility(View.VISIBLE);
-                expansionButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        CheckBoxAlertDialogFragment newFragment = new CheckBoxAlertDialogFragment().newInstance(checkedItems, gameName);
-                        if (mActivity instanceof MainActivity) {
-                            newFragment.show(((MainActivity) mActivity).getSupportFragmentManager(), "datePicker");
-                        }else{
-                            newFragment.show(((ViewPlayActivity) mActivity).getSupportFragmentManager(), "datePicker");
+            if (expansions != null) {
+                checkedItems = new boolean[expansions.size()];
+                if (expansions.size() > 0) {
+                    mContainerView_Expansions.setVisibility(View.VISIBLE);
+                    ViewGroup expLayout = (ViewGroup) rootView.findViewById(R.id.expansionsLayout);
+                    expLayout.setVisibility(View.VISIBLE);
+                    expansionButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            CheckBoxAlertDialogFragment newFragment = new CheckBoxAlertDialogFragment().newInstance(checkedItems, gameName);
+                            if (mActivity instanceof MainActivity) {
+                                newFragment.show(((MainActivity) mActivity).getSupportFragmentManager(), "datePicker");
+                            } else {
+                                newFragment.show(((ViewPlayActivity) mActivity).getSupportFragmentManager(), "datePicker");
+                            }
+                        }
+                    });
+                    if (playID >= 0) {
+                        //we're editing a play
+                        //Log.d("V1", "editing a play");
+                        Play editPlay = Play.findById(Play.class, playID);
+                        //set up the values, based on DB
+
+                        //expansions
+                        //for each expansion the game has
+                        int x = 0;
+                        for (Game expansion0 : expansions) {
+                            //if the added expansions contains it
+                            if (GamesPerPlay.doesExpansionExist(editPlay, expansion0)) {
+                                //add to added expansions
+                                addedExpansions.add(expansion0);
+                                //add the game to the list
+                                addGame(expansion0);
+                                //check it
+                                checkedItems[x] = true;
+                            } else {
+                                //don't check it
+                                checkedItems[x] = false;
+                            }
+                            x++;
                         }
                     }
-                });
+                }
             }
         }
     }

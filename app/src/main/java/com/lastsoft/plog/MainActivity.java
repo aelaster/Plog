@@ -290,15 +290,7 @@ public class MainActivity extends AppCompatActivity
                 fragUp = false;
             }
 
-            if (mStatsFragment != null){
-                mStatsFragment = null;
-            }
-            if (mPlaysFragment != null){
-                mPlaysFragment = null;
-            }
-            if (mGamesFragment != null){
-                mGamesFragment = null;
-            }
+
 
             String positionName = mNavigationDrawerFragment.getPositionHeading(position);
 
@@ -383,6 +375,11 @@ public class MainActivity extends AppCompatActivity
 
     public void openStats(){
         FragmentManager fragmentManager = getSupportFragmentManager();
+
+        if (mStatsFragment != null){
+            mStatsFragment = null;
+        }
+
         mStatsFragment = new StatsFragment();
         fragmentManager.beginTransaction()
                 .replace(R.id.container, mStatsFragment, "stats")
@@ -396,6 +393,11 @@ public class MainActivity extends AppCompatActivity
         }
         forceBack = !fromDrawer;
         FragmentManager fragmentManager = getSupportFragmentManager();
+
+        if (mGamesFragment != null){
+            mGamesFragment = null;
+        }
+
         mGamesFragment = GamesFragment.newInstance(fromDrawer, searchQuery, playListType);
         FragmentTransaction ft = fragmentManager.beginTransaction();
         if (!fromDrawer){
@@ -419,6 +421,11 @@ public class MainActivity extends AppCompatActivity
         }
         forceBack = !fromDrawer;
         FragmentManager fragmentManager = getSupportFragmentManager();
+
+        if (mPlaysFragment != null){
+            mPlaysFragment = null;
+        }
+
         mPlaysFragment = PlaysFragment.newInstance(fromDrawer, searchQuery, playListType);
         mPlayAdapter = initPlayAdapter(searchQuery, fromDrawer, playListType);
         //initPlayAdapter();
