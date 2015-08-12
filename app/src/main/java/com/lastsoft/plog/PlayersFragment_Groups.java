@@ -84,7 +84,7 @@ public class PlayersFragment_Groups extends Fragment{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        final View rootView = inflater.inflate(R.layout.players_view_frag, container, false);
+        final View rootView = inflater.inflate(R.layout.fragment_players, container, false);
         rootView.setTag(TAG);
 
         // BEGIN_INCLUDE(initializeRecyclerView)

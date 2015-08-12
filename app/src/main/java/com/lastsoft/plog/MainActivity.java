@@ -404,7 +404,7 @@ public class MainActivity extends AppCompatActivity
             ft.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right);
             ft.addToBackStack("games");
         }
-        if (mStatsFragment != null) {
+        if (mStatsFragment != null && mStatsFragment.isVisible() && !fromDrawer) {
             ft.hide(mStatsFragment);
             ft.add(R.id.container, mGamesFragment, "games");
         }else {
@@ -435,8 +435,7 @@ public class MainActivity extends AppCompatActivity
             ft.addToBackStack("plays");
         }
 
-        if (mStatsFragment != null) {
-            Log.d("V1", "stats frag isn't null");
+        if (mStatsFragment != null && mStatsFragment.isVisible() && !fromDrawer) {
             ft.hide(mStatsFragment);
             ft.add(R.id.container, mPlaysFragment, "plays");
         }else {

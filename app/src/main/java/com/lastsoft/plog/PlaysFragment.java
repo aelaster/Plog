@@ -105,7 +105,7 @@ public class PlaysFragment extends Fragment{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        final View rootView = inflater.inflate(R.layout.plays_view_frag, container, false);
+        final View rootView = inflater.inflate(R.layout.fragment_plays, container, false);
         rootView.setBackgroundColor(getResources().getColor(R.color.cardview_initial_background));
         rootView.setTag(TAG);
 
