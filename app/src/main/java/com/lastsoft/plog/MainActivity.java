@@ -36,12 +36,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.facebook.CallbackManager;
-import com.facebook.FacebookCallback;
-import com.facebook.FacebookException;
-import com.facebook.FacebookSdk;
-import com.facebook.share.Sharer;
-import com.facebook.share.widget.ShareDialog;
 import com.lastsoft.plog.adapter.PlayAdapter;
 import com.lastsoft.plog.db.Game;
 import com.lastsoft.plog.db.GameGroup;
@@ -97,8 +91,6 @@ public class MainActivity extends AppCompatActivity
     StatsFragment mStatsFragment;
     PlayAdapter mPlayAdapter;
     protected PostMortemReportExceptionHandler mDamageReport = new PostMortemReportExceptionHandler(this);
-    CallbackManager callbackManager;
-    ShareDialog shareDialog;
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -159,26 +151,6 @@ public class MainActivity extends AppCompatActivity
 
         mLogInHelper = new BGGLogInHelper(this, this);
 
-        FacebookSdk.sdkInitialize(getApplicationContext());
-        callbackManager = CallbackManager.Factory.create();
-        shareDialog = new ShareDialog(this);
-        // this part is optional
-        shareDialog.registerCallback(callbackManager, new FacebookCallback<Sharer.Result>() {
-            @Override
-            public void onSuccess(Sharer.Result result) {
-
-            }
-
-            @Override
-            public void onCancel() {
-
-            }
-
-            @Override
-            public void onError(FacebookException e) {
-
-            }
-        });
 
         BackupManager bm = new BackupManager(this);
         bm.dataChanged();
@@ -1106,7 +1078,7 @@ public class MainActivity extends AppCompatActivity
                                 }
 
                                 //delete play image thumb
-                                File deleteImage_thumb = new File(deleteMe.playPhoto.substring(7, deleteMe.playPhoto.length() - 4) + "_thumb.jpg");
+                                File deleteImage_thumb = new File(deleteMe.playPhoto.substring(7, deleteMe.playPhoto.length() - 4) + "_thumb3.jpg");
                                 if (deleteImage_thumb.exists()) {
                                     deleteImage_thumb.delete();
                                 }

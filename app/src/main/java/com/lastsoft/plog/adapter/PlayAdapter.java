@@ -259,20 +259,6 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
             String output_date = outputFormatter.format(plays.get(position).playDate); // Output : 01/20/2012
             viewHolder.getGameNameView().setText(GamesPerPlay.getBaseGame(plays.get(position)).gameName);
             viewHolder.getPlayDateView().setText(output_date);
-            String winners = "";
-            List<PlayersPerPlay> players = PlayersPerPlay.getPlayers_Winners(plays.get(position));
-            float highScore = PlayersPerPlay.getHighScore(plays.get(position));
-            for(PlayersPerPlay player:players){
-                Player thisPlayer = player.player;
-                if (player.score >= highScore) {
-                    winners = winners + thisPlayer.playerName + ", ";
-                }
-            }
-            winners = winners.substring(0, winners.length()-2);
-
-            viewHolder.getPlayWinnerView().setTypeface(null, Typeface.BOLD);
-            viewHolder.getPlayWinnerView().setText(mActivity.getString(R.string.winners) + winners);
-
             viewHolder.getImageView().setTransitionName("imageTrans" + position);
             viewHolder.getImageView().setTag("imageTrans" + position);
             viewHolder.getGameNameView().setTransitionName("nameTrans" + position);
@@ -300,8 +286,8 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
                     viewHolder.getImageView().setImageDrawable(null);
                 }
             }else{
-                String thumbPathCheck = plays.get(position).playPhoto.substring(7, plays.get(position).playPhoto.length() - 4) + "_thumb.jpg";
-                String thumbPath = plays.get(position).playPhoto.substring(0, plays.get(position).playPhoto.length() - 4) + "_thumb.jpg";
+                String thumbPathCheck = plays.get(position).playPhoto.substring(7, plays.get(position).playPhoto.length() - 4) + "_thumb3.jpg";
+                String thumbPath = plays.get(position).playPhoto.substring(0, plays.get(position).playPhoto.length() - 4) + "_thumb3.jpg";
                 if (new File(thumbPathCheck).exists()) {
                     ImageLoader.getInstance().displayImage(thumbPath, viewHolder.getImageView(), options);
                 }else{
@@ -309,16 +295,16 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
 
                     // make a thumb
                     String fixedPath = plays.get(position).playPhoto.substring(6, plays.get(position).playPhoto.length());
-                    String thumbPath2 = fixedPath.substring(0, fixedPath.length() - 4) + "_thumb.jpg";
+                    String thumbPath2 = fixedPath.substring(0, fixedPath.length() - 4) + "_thumb3.jpg";
                     try {
                         FileInputStream fis;
                         fis = new FileInputStream(fixedPath);
                         Bitmap imageBitmap = BitmapFactory.decodeStream(fis);
-                        Bitmap b = resizeImageForImageView(imageBitmap, 500);
+                        Bitmap b = resizeImageForImageView(imageBitmap, 100);
 
                         if (b != null) {
                             try {
-                                b.compress(Bitmap.CompressFormat.JPEG,100, new FileOutputStream(new File(thumbPath2)));
+                                b.compress(Bitmap.CompressFormat.JPEG,50, new FileOutputStream(new File(thumbPath2)));
                             } catch (Exception ignored) {
                             }
                             b = null;
@@ -333,6 +319,19 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
                 }
                 ImageLoader.getInstance().loadImage(plays.get(position).playPhoto, options, null);
             }
+            String winners = "";
+            List<PlayersPerPlay> players = PlayersPerPlay.getPlayers_Winners(plays.get(position));
+            float highScore = PlayersPerPlay.getHighScore(plays.get(position));
+            for(PlayersPerPlay player:players){
+                Player thisPlayer = player.player;
+                if (player.score >= highScore) {
+                    winners = winners + thisPlayer.playerName + ", ";
+                }
+            }
+            winners = winners.substring(0, winners.length()-2);
+
+            viewHolder.getPlayWinnerView().setTypeface(null, Typeface.BOLD);
+            viewHolder.getPlayWinnerView().setText(mActivity.getString(R.string.winners) + winners);
     }
     // END_INCLUDE(recyclerViewOnBindViewHolder)
 

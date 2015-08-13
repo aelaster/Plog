@@ -6,8 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
@@ -15,9 +14,11 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.ShareActionProvider;
 import android.support.v7.widget.Toolbar;
 import android.transition.Fade;
 import android.transition.Slide;
@@ -31,15 +32,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.facebook.CallbackManager;
-import com.facebook.FacebookCallback;
-import com.facebook.FacebookException;
-import com.facebook.FacebookSdk;
-import com.facebook.share.Sharer;
-import com.facebook.share.model.ShareLinkContent;
-import com.facebook.share.model.SharePhoto;
-import com.facebook.share.model.SharePhotoContent;
-import com.facebook.share.widget.ShareDialog;
 import com.lastsoft.plog.adapter.PlayAdapter;
 import com.lastsoft.plog.adapter.TransitionListenerAdapter;
 import com.lastsoft.plog.db.GamesPerPlay;
@@ -68,8 +60,6 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
     private int playListType = 0;
     private boolean fromDrawer;
 
-    CallbackManager callbackManager;
-    ShareDialog shareDialog;
     Toolbar toolbar;
 
     private static final String STATE_CURRENT_POSITION = "state_current_position";
@@ -254,33 +244,12 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
 
         setContentView(R.layout.fragment_view_play_swipe);
 
-        FacebookSdk.sdkInitialize(getApplicationContext());
-
         ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this)
                 .memoryCacheSize(41943040)
                 .diskCacheSize(104857600)
                 .threadPoolSize(10)
                 .build();
         ImageLoader.getInstance().init(config);
-        callbackManager = CallbackManager.Factory.create();
-        shareDialog = new ShareDialog(this);
-        // this part is optional
-        shareDialog.registerCallback(callbackManager, new FacebookCallback<Sharer.Result>() {
-            @Override
-            public void onSuccess(Sharer.Result result) {
-
-            }
-
-            @Override
-            public void onCancel() {
-
-            }
-
-            @Override
-            public void onError(FacebookException e) {
-
-            }
-        });
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setVisibility(View.VISIBLE);
@@ -299,8 +268,16 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
                 } else if (id == R.id.delete_play) {
                     deletePlay(menuPlayId);
                     return true;
-                }else if (id == R.id.share_play){
-                    if (ShareDialog.canShow(ShareLinkContent.class)) {
+                } else if (id == R.id.share_play) {
+                    ShareActionProvider mShareActionProvider = new ShareActionProvider(ViewPlayActivity.this);
+                    MenuItemCompat.setActionProvider(item, mShareActionProvider);
+                    Uri imageUri = Uri.parse(mPagerAdapter.getCurrentDetailsFragment().thisPlay.playPhoto);
+                    Intent shareIntent = new Intent();
+                    shareIntent.setAction(Intent.ACTION_SEND);
+                    shareIntent.putExtra(Intent.EXTRA_STREAM, imageUri);
+                    shareIntent.setType("image/*");
+                    mShareActionProvider.setShareIntent(shareIntent);
+                    /*if (ShareDialog.canShow(ShareLinkContent.class)) {
                         if (mPagerAdapter.getCurrentDetailsFragment().playImage != null) {
                             try {
                                 Bitmap bitmap = ((BitmapDrawable) mPagerAdapter.getCurrentDetailsFragment().playImage.getDrawable()).getBitmap();
@@ -315,7 +292,7 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
                             } catch (Exception ignored) {
                             }
                         }
-                    }
+                    }*/
                 }
                 return false;
             }
@@ -334,7 +311,7 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
         mPlayAdapter = new PlayAdapter(this, null, searchQuery, fromDrawer, playListType);
         // Instantiate a ViewPager and a PagerAdapter.
         mPager = (CustomViewPager) findViewById(R.id.pager);
-       //mPager.setBackgroundColor(getResources().getColor(R.color.cardview_initial_background));
+        //mPager.setBackgroundColor(getResources().getColor(R.color.cardview_initial_background));
         mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         mPager.setAdapter(mPagerAdapter);
         mPager.setCurrentItem(mCurrentPosition);
@@ -532,7 +509,7 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
                                 }
 
                                 //delete play image thumb
-                                File deleteImage_thumb = new File(deleteMe.playPhoto.substring(7, deleteMe.playPhoto.length() - 4) + "_thumb.jpg");
+                                File deleteImage_thumb = new File(deleteMe.playPhoto.substring(7, deleteMe.playPhoto.length() - 4) + "_thumb3.jpg");
                                 if (deleteImage_thumb.exists()) {
                                     deleteImage_thumb.delete();
                                 }

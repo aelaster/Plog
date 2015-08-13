@@ -20,8 +20,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Environment;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.FileProvider;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -40,10 +42,12 @@ import com.lastsoft.plog.MainActivity;
 import com.lastsoft.plog.R;
 import com.lastsoft.plog.db.Game;
 import com.lastsoft.plog.db.GameGroup;
+import com.lastsoft.plog.db.GamesPerPlay;
 import com.lastsoft.plog.db.Play;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
+import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -185,10 +189,6 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, final int position) {
         //Log.d(TAG, "Element " + position + " set.");
-        int totalPlays = Play.listPlaysNewOld(games.get(position).gameName, fromDrawer, games.get(position).expansionFlag).size();
-
-        viewHolder.getGamePlaysView().setText(mActivity.getString(R.string.plays) + totalPlays);
-
         // Get element from your dataset at this position and replace the contents of the view
         // with that element
         //if (searchQuery.equals("") || (games.get(position).gameName.toLowerCase().contains(searchQuery.toLowerCase()))) {
@@ -230,6 +230,9 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
             }else{
                 viewHolder.getOverflowLayout().setVisibility(View.GONE);
             }
+            int totalPlays = Play.listPlaysNewOld(games.get(position).gameName, fromDrawer, games.get(position).expansionFlag).size();
+
+            viewHolder.getGamePlaysView().setText(mActivity.getString(R.string.plays) + totalPlays);
         //}
 
     }
@@ -271,6 +274,12 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
         }else{
             popup.getMenu().removeItem(R.id.add_bucket_list);
         }
+
+        //check if this game has been played
+        //if so, can't delete
+        if (GamesPerPlay.hasGameBeenPlayed(games.get(position))) {
+            popup.getMenu().removeItem(R.id.delete_game);
+        }
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
@@ -288,6 +297,10 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
                             ((MainActivity) mActivity).openPlays(games.get(position).gameName, false, 0);
                         }
                         return true;
+                    case R.id.open_bgg:
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://bgg.cc/boardgame/" + games.get(position).gameBGGID));
+                        mActivity.startActivity(browserIntent);
+                        return true;
                     case R.id.update_bgg:
                         mPosition = position;
                         ((MainActivity) mActivity).searchGameViaBGG(games.get(position).gameName, false, false, -1);
@@ -296,9 +309,13 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
                         ((GamesFragment) mFragment).captureBox(games.get(position));
                         return true;
                     case R.id.view_box_photo:
+                        String[] photoParts = games.get(position).gameBoxImage.split("/");
+                        File newFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),photoParts[photoParts.length-1]);
+                        Uri contentUri = FileProvider.getUriForFile(mActivity.getApplicationContext(), "com.lastsoft.plog.fileprovider", newFile);
                         Intent intent = new Intent();
                         intent.setAction(Intent.ACTION_VIEW);
-                        intent.setDataAndType(Uri.parse(games.get(position).gameBoxImage), "image/*");
+                        intent.setDataAndType(contentUri, "image/*");
+                        intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                         mActivity.startActivity(intent);
                         return true;
                     case R.id.add_bucket_list:

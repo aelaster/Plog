@@ -9,6 +9,8 @@
         app:showAsAction="withText|ifRoom" />
     <item android:id="@+id/remove_bucket_list" android:title="@string/remove_bucket_list"
         app:showAsAction="withText|ifRoom" />
+    <item android:id="@+id/open_bgg" android:title="@string/open_bgg"
+        app:showAsAction="withText|ifRoom" />
     <item android:id="@+id/update_bgg" android:title="@string/update_bgg"
         app:showAsAction="withText|ifRoom" />
     <item android:id="@+id/add_box_photo" android:title="@string/add_box_photo"

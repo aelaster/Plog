@@ -2,7 +2,6 @@ package com.lastsoft.plog.util;
 
 import android.app.backup.BackupAgentHelper;
 import android.app.backup.FileBackupHelper;
-import android.util.Log;
 
 import java.io.File;
 
@@ -11,7 +10,6 @@ public class MyBackupAgent extends BackupAgentHelper{
 
     @Override
     public void onCreate(){
-        Log.d("V1", "Backing Up DB");
         FileBackupHelper dbs = new FileBackupHelper(this, DB_NAME);
         addHelper("dbs", dbs);
     }

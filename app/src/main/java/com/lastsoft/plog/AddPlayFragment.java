@@ -470,14 +470,14 @@ public class AddPlayFragment extends Fragment implements
 
             try {
                 String fixedPath = mCurrentPhotoPath.substring(6, mCurrentPhotoPath.length());
-                String thumbPath = fixedPath.substring(0, fixedPath.length() - 4) + "_thumb.jpg";
+                String thumbPath = fixedPath.substring(0, fixedPath.length() - 4) + "_thumb3.jpg";
                 FileInputStream fis;
                 fis = new FileInputStream(fixedPath);
                 Bitmap imageBitmap = BitmapFactory.decodeStream(fis);
-                Bitmap b = resizeImageForImageView(imageBitmap, 500);
+                Bitmap b = resizeImageForImageView(imageBitmap, 100);
                 if (b != null) {
                     try {
-                        b.compress(Bitmap.CompressFormat.JPEG, 100, new FileOutputStream(new File(thumbPath)));
+                        b.compress(Bitmap.CompressFormat.JPEG, 50, new FileOutputStream(new File(thumbPath)));
                     } catch (Exception ignored) {
                     }
                 }
@@ -748,7 +748,7 @@ public class AddPlayFragment extends Fragment implements
             //Log.d("V1", "we're gonna try and delete these pictures");
             if (mCurrentPhotoPath.length() > 0) {
                 String fixedPath = mCurrentPhotoPath.substring(6, mCurrentPhotoPath.length());
-                String thumbPath = fixedPath.substring(0, fixedPath.length() - 4) + "_thumb.jpg";
+                String thumbPath = fixedPath.substring(0, fixedPath.length() - 4) + "_thumb3.jpg";
 
                 File deleteImage = new File(fixedPath);
                 if (deleteImage.exists()) {

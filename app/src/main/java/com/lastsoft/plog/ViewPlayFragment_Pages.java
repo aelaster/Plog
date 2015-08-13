@@ -5,8 +5,10 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.FileProvider;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -161,14 +163,21 @@ public class ViewPlayFragment_Pages extends Fragment {
         playImage.setTransitionName(imageTransID);
         if (thisPlay.playPhoto != null && !thisPlay.playPhoto.equals("") && new File(thisPlay.playPhoto.substring(7, thisPlay.playPhoto.length())).exists()){
             ImageLoader.getInstance().displayImage(thisPlay.playPhoto, playImage, options);
+
             playImage.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     if (progressContainer.getVisibility() != View.VISIBLE) {
                         progressContainer.setVisibility(View.VISIBLE);
+                        String[] photoParts = thisPlay.playPhoto.split("/");
+                        File newFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),photoParts[photoParts.length-1]);
+                        Uri contentUri = FileProvider.getUriForFile(getActivity().getApplicationContext(), "com.lastsoft.plog.fileprovider", newFile);
+                        //Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI.buildUpon().appendPath("Pictures/" + photoParts[photoParts.length - 1]).build();
+                        //Log.d("V1", uri.toString());
                         Intent intent = new Intent();
                         intent.setAction(Intent.ACTION_VIEW);
-                        intent.setDataAndType(Uri.parse(thisPlay.playPhoto), "image/*");
+                        intent.setDataAndType(contentUri, "image/*");
+                        intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                         startActivity(intent);
                     }
                 }
