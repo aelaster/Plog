@@ -161,7 +161,7 @@
     <string name="stats_total_losses">Total Losses</string>
     <string name="percentage">" Percentage"</string>
     <string name="version_label">"Version: "</string>
-
+    <string name="percent_completed">"Percent Completed: "</string>
 
     <string-array name="play_rightclick">
         <item>Edit</item>

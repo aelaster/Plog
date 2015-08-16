@@ -228,26 +228,32 @@ public class StatsFragment_Wins extends Fragment {
                 }
                 for (int x = 0; x < result.size(); x++) {
                     if (theGroup == 0) {
-                        addStat(-1, result.get(x).player.playerName + " " + getString(R.string.stats_regular_wins) + getString(R.string.percentage), ((int) ((result.get(x).regularWins) * 100.0 / result.get(0).totalPlays + 0.5)) + "%", result.get(x).player.getId() + "");
+                        addStat(7, result.get(x).player.playerName + " " + getString(R.string.stats_regular_wins) + getString(R.string.percentage), roundTwoDecimals((((result.get(x).regularWins) * 100.0 / result.get(0).totalPlays))) + "%", result.get(x).player.getId() + "");
                     } else {
-                        addStat(-1, result.get(x).player.playerName + " " + getString(R.string.stats_total_wins) + getString(R.string.percentage), ((int) ((result.get(x).asteriskWins + result.get(x).regularWins) * 100.0 / result.get(0).totalPlays + 0.5)) + "%", result.get(x).player.getId() + "");
-                        addStat(-1, result.get(x).player.playerName + " " + getString(R.string.stats_regular_wins) + getString(R.string.percentage), ((int) (result.get(x).regularWins * 100.0 / result.get(0).totalPlays + 0.5)) + "%", result.get(x).player.getId() + "");
+                        addStat(-1, result.get(x).player.playerName + " " + getString(R.string.stats_total_wins) + getString(R.string.percentage), roundTwoDecimals((((result.get(x).asteriskWins + result.get(x).regularWins) * 100.0 / result.get(0).totalPlays))) + "%", result.get(x).player.getId() + "");
+                        addStat(7, result.get(x).player.playerName + " " + getString(R.string.stats_regular_wins) + getString(R.string.percentage), roundTwoDecimals(((result.get(x).regularWins * 100.0 / result.get(0).totalPlays))) + "%", result.get(x).player.getId() + "");
                         if (result.get(x).asteriskWins > 0) {
-                            addStat(-1, result.get(x).player.playerName + " " + getString(R.string.stats_asterisk_wins) + getString(R.string.percentage), ((int) ((result.get(x).asteriskWins) * 100.0 / result.get(0).totalPlays + 0.5)) + "%", result.get(x).player.getId() + "");
+                            addStat(-1, result.get(x).player.playerName + " " + getString(R.string.stats_asterisk_wins) + getString(R.string.percentage), roundTwoDecimals((((result.get(x).asteriskWins) * 100.0 / result.get(0).totalPlays))) + "%", result.get(x).player.getId() + "");
                         }
                     }
 
 
                     if (sharedCounter > 0) {
-                        addStat(-1, getString(R.string.stats_shared_wins) + getString(R.string.percentage), ((int) (sharedCounter * 100.0 / result.get(0).totalPlays + 0.5)) + "%", "");
+                        addStat(-1, getString(R.string.stats_shared_wins) + getString(R.string.percentage), roundTwoDecimals(((sharedCounter * 100.0 / result.get(0).totalPlays))) + "%", "");
                     }
                     if (loserCounter > 0) {
-                        addStat(-1, getString(R.string.stats_total_losses) + getString(R.string.percentage), ((int) (loserCounter * 100.0 / result.get(0).totalPlays + 0.5)) + "%", "");
+                        addStat(-1, getString(R.string.stats_total_losses) + getString(R.string.percentage), roundTwoDecimals(((loserCounter * 100.0 / result.get(0).totalPlays))) + "%", "");
                     }
                 }
             }
             mydialog.dismiss();
         }
+    }
+
+    double roundTwoDecimals(double d)
+    {
+        DecimalFormat twoDForm = new DecimalFormat("#.##");
+        return Double.valueOf(twoDForm.format(d));
     }
 
     private void addPieChart(String centerLabel, long regular, long asterisk, final String playerValue ){
@@ -397,6 +403,11 @@ public class StatsFragment_Wins extends Fragment {
                                 //((MainActivity) mActivity).openPlays(games.get(position).gameName, false);
                                 ((MainActivity) mActivity).openPlays(gameGroup+"", false, 6);
                                 break;
+                            case 7:
+                                //regular wins percentage
+                                //just using this to get a list of total plays for a player
+                                //using it because it's part of the "Everyone" list too
+                                ((MainActivity) mActivity).openPlays(gameGroup+"$"+playerValue, false, 8);
                         }
                     }
                 });

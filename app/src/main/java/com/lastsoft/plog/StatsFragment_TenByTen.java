@@ -110,7 +110,7 @@ public class StatsFragment_TenByTen extends Fragment {
             }
             addStat(tbt.gameName, tbt.tbtCount+"", tbt.getId()+"", year);
         }
-        addStat("Percent Completed", ((int) (tbtCounts * 100.0 / 100 + 0.5)) + "%", "", year);
+        addStat(getString(R.string.percent_completed), ((int) (tbtCounts * 100.0 / 100 + 0.5)) + "%", "", year);
     }
 
     Activity mActivity;
@@ -143,6 +143,14 @@ public class StatsFragment_TenByTen extends Fragment {
                     @Override
                     public void onClick(View view) {
                         ((MainActivity) mActivity).openPlays(gameGroup + "$" + gameValue + "$" + theYear, false, 7);
+                    }
+                });
+            }else{
+                newView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        ((MainActivity) mActivity).openPlays(gameGroup + "$" + theYear, false, 10);
+
                     }
                 });
             }

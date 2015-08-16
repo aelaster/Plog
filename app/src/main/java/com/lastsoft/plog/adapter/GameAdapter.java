@@ -70,6 +70,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
     private boolean fromDrawer;
     int mPosition;
     int playListType;
+    private String gameGroup = null;
 
     // BEGIN_INCLUDE(recyclerViewSampleViewHolder)
     /**
@@ -139,6 +140,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
                 if (mSearchQuery.equals("0")){
                     games_out = Game.getUniqueGames();
                 }else {
+                    gameGroup = mSearchQuery;
                     games_out = Game.getUniqueGames_GameGroup(GameGroup.findById(GameGroup.class, Long.parseLong(mSearchQuery)));
                 }
                 break;
@@ -230,7 +232,12 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
             }else{
                 viewHolder.getOverflowLayout().setVisibility(View.GONE);
             }
-            int totalPlays = Play.listPlaysNewOld(games.get(position).gameName, fromDrawer, games.get(position).expansionFlag).size();
+            int totalPlays;
+            if (gameGroup == null) {
+                totalPlays = Play.listPlaysNewOld(games.get(position).gameName, fromDrawer, games.get(position).expansionFlag).size();
+            }else{
+                totalPlays = Play.listPlaysNewOld_GameGroup(gameGroup, games.get(position).gameName, fromDrawer, games.get(position).expansionFlag).size();
+            }
 
             viewHolder.getGamePlaysView().setText(mActivity.getString(R.string.plays) + totalPlays);
         //}

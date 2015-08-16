@@ -135,6 +135,7 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
         7 - plays for a ten by ten game.  Group, then game, then year.
         8 - plays for a specific player
         9 - listPlaysNewOld, allowing expansions
+        10 - plays for all ten by ten games.  Group, then year.
          */
 
         List<Play> plays_out;
@@ -175,8 +176,8 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
                     wins = Play.totalWins_GameGroup_Player(GameGroup.findById(GameGroup.class, Long.parseLong(query3[0])), Player.findById(Player.class, Long.parseLong(query3[1])));
                     plays_out = Play.totalAsteriskWins_GameGroup_Player(GameGroup.findById(GameGroup.class, Long.parseLong(query3[0])), Player.findById(Player.class, Long.parseLong(query3[1])));
                 }
-                plays.addAll(wins);
-                Collections.sort(plays, new Comparator<Play>() {
+                plays_out.addAll(wins);
+                Collections.sort(plays_out, new Comparator<Play>() {
                     public int compare(Play left, Play right)  {
                         return right.playDate.compareTo(left.playDate); // The order depends on the direction of sorting.
                     }
@@ -210,6 +211,10 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
                 break;
             case 9:
                 plays_out = Play.listPlaysNewOld(mSearchQuery, fromDrawer, true);
+                break;
+            case 10:
+                String[] query10 = mSearchQuery.split("\\$");
+                plays_out = Play.totalPlays_TenByTen_GameGroup(GameGroup.findById(GameGroup.class, Long.parseLong(query10[0])), Integer.parseInt(query10[1]));
                 break;
             default:
                 plays_out = Play.listPlaysNewOld(mSearchQuery, fromDrawer, false);

@@ -71,6 +71,36 @@ public class Play extends SugarRecord<Play> {
         }
     }
 
+    public static List<Play> listPlaysNewOld_GameGroup(String gameGroup, String mSearchQuery, boolean allowLike, boolean allowExpansions){
+        String query;
+        if (mSearchQuery.contains("'")) {
+            mSearchQuery = mSearchQuery.replaceAll("'", "''");
+        }
+        if (mSearchQuery.equals("")) {
+            return listPlaysNewOld_GameGroup(gameGroup);
+        }else {
+            query = " SELECT "+ StringUtil.toSQLName("Play") +".* " +
+                    " FROM " + StringUtil.toSQLName("Play") +
+                    " INNER JOIN " + StringUtil.toSQLName("GamesPerPlay") +
+                    " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("play") + " = " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") +
+                    " INNER JOIN " + StringUtil.toSQLName("Game") +
+                    " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("game") + " = " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("id");
+            if (!allowExpansions){
+                query = query + " and " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("expansionFlag") + " = 0 ";
+            }
+            if(allowLike){
+                query = query + " and " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " LIKE '%" + mSearchQuery + "%'";
+            }else {
+                query = query + " and " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " = '" + mSearchQuery + "'";
+            }
+            query = query + " INNER JOIN " + StringUtil.toSQLName("PlaysPerGameGroup") +
+                    " ON " + StringUtil.toSQLName("PlaysPerGameGroup") + "." + StringUtil.toSQLName("play") + " = " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") +
+                    " and " + StringUtil.toSQLName("PlaysPerGameGroup") + "." + StringUtil.toSQLName("gameGroup") + " = ?";
+            query = query + " order by " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("playDate") + " DESC, "  + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " DESC";
+            return Play.findWithQuery(Play.class,query, gameGroup);
+        }
+    }
+
     public static List<Play> listPlaysNewOld_GameGroup(String gameGroup){
         String query;
         query = " SELECT "+ StringUtil.toSQLName("Play") +".* " +
@@ -106,6 +136,25 @@ public class Play extends SugarRecord<Play> {
                         " AND STRFTIME('%Y', DATETIME(SUBSTR(P." + StringUtil.toSQLName("playDate") + ",0, 11), 'unixepoch')) = ? " +
                         " GROUP BY P." + StringUtil.toSQLName("id") +
                         " ORDER BY P." + StringUtil.toSQLName("playDate") + " DESC, P." + StringUtil.toSQLName("id") + " DESC", group.getId().toString(), game.getId().toString(), year + "");
+    }
+
+    public static List<Play> totalPlays_TenByTen_GameGroup(GameGroup group, int year){
+        return Play.findWithQuery(Play.class,
+                " SELECT P.* " +
+                        " FROM " + StringUtil.toSQLName("Play") + " P " +
+                        " INNER JOIN " + StringUtil.toSQLName("PlaysPerGameGroup") + " PPGG " +
+                        " ON P." + StringUtil.toSQLName("id") + " = PPGG." + StringUtil.toSQLName("play") +
+                        " INNER JOIN " + StringUtil.toSQLName("GamesPerPlay") + " GPP " +
+                        " ON P." + StringUtil.toSQLName("id") + " = GPP." + StringUtil.toSQLName("play") +
+                        " INNER JOIN " + StringUtil.toSQLName("TenByTen") + " TBT " +
+                        " ON PPGG." + StringUtil.toSQLName("gameGroup") + " = TBT." + StringUtil.toSQLName("gameGroup") +
+                        " INNER JOIN " + StringUtil.toSQLName("Game") + " G " +
+                        " ON GPP." + StringUtil.toSQLName("game") + " = G." + StringUtil.toSQLName("id") +
+                        " WHERE PPGG. " + StringUtil.toSQLName("GameGroup") + " = ?" +
+                        " AND TBT." + StringUtil.toSQLName("game") + " = GPP." + StringUtil.toSQLName("game") +
+                        " AND STRFTIME('%Y', DATETIME(SUBSTR(P." + StringUtil.toSQLName("playDate") + ",0, 11), 'unixepoch')) = ? " +
+                        " GROUP BY P." + StringUtil.toSQLName("id") +
+                        " ORDER BY P." + StringUtil.toSQLName("playDate") + " DESC, P." + StringUtil.toSQLName("id") + " DESC", group.getId().toString(), year + "");
     }
 
     public static List<Play> totalWins_GameGroup_Player(GameGroup group, Player player) {
