@@ -45,7 +45,7 @@ import com.lastsoft.plog.db.GameGroup;
 import com.lastsoft.plog.db.GamesPerPlay;
 import com.lastsoft.plog.db.Play;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
+import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.text.DateFormat;
@@ -197,7 +197,9 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
             viewHolder.getTextView().setText(games.get(position).gameName);
             if (games.get(position).gameThumb != null  && !games.get(position).gameThumb.equals("")) {
                 //Log.d("V1", "gameThumb = " + games.get(position).gameThumb);
-                ImageLoader.getInstance().displayImage("http:" + games.get(position).gameThumb, viewHolder.getImageView(), options);
+                //ImageLoader.getInstance().displayImage("http:" + games.get(position).gameThumb, viewHolder.getImageView(), options);
+                Picasso.with(mActivity).load("http:" + games.get(position).gameThumb).into(viewHolder.getImageView());
+
             } else {
                 viewHolder.getImageView().setImageDrawable(null);
             }

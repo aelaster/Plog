@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -407,6 +408,8 @@ public class StatsFragment_Wins extends Fragment {
                                 //regular wins percentage
                                 //just using this to get a list of total plays for a player
                                 //using it because it's part of the "Everyone" list too
+                                Log.d("V1", "game group = " + gameGroup);
+                                Log.d("V1", "player value = " + playerValue);
                                 ((MainActivity) mActivity).openPlays(gameGroup+"$"+playerValue, false, 8);
                         }
                     }

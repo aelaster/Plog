@@ -181,6 +181,19 @@ public class Play extends SugarRecord<Play> {
                         " order by " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("playDate") + " DESC, "  + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " DESC", player.getId().toString());
     }
 
+    public static List<Play> totalPlays_Player_GameGroup(Player player, GameGroup group) {
+        return Play.findWithQuery(Play.class,
+                " SELECT "+ StringUtil.toSQLName("Play") +".* " +
+                        " FROM " + StringUtil.toSQLName("Play") +
+                        " INNER JOIN "+ StringUtil.toSQLName("PlayersPerPlay") +
+                        " ON " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " = " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("play") +
+                        " AND "+ StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("player") + " = ? " +
+                        " INNER JOIN " + StringUtil.toSQLName("PlaysPerGameGroup") +
+                        " ON " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("play") + " = " + StringUtil.toSQLName("PlaysPerGameGroup") + "." + StringUtil.toSQLName("play") +
+                        " AND " + StringUtil.toSQLName("GameGroup") + " = ?" +
+                        " order by " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("playDate") + " DESC, "  + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " DESC", player.getId().toString(), group.getId().toString());
+    }
+
     public static List<Play> totalWins_Player(Player player) {
         return Play.findWithQuery(Play.class,
                 " SELECT "+ StringUtil.toSQLName("Play") +".* " +

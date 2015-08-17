@@ -43,7 +43,8 @@ import com.lastsoft.plog.db.Play;
 import com.lastsoft.plog.db.Player;
 import com.lastsoft.plog.db.PlayersPerPlay;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.ImageScaleType;
+import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -206,7 +207,8 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
                 if (query8[0].equals("0")){
                     plays_out = Play.totalPlays_Player(Player.findById(Player.class, Long.parseLong(query8[1])));
                 }else {
-                    plays_out = null;
+                    plays_out = Play.totalPlays_Player_GameGroup(Player.findById(Player.class, Long.parseLong(query8[1])), GameGroup.findById(GameGroup.class, Long.parseLong(query8[0])));
+
                 }
                 break;
             case 9:
@@ -232,9 +234,10 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
 
         options = new DisplayImageOptions.Builder()
                 .cacheOnDisk(true)
-                .cacheInMemory(false)
-                .considerExifParams(true)
+                .cacheInMemory(true)
                 .resetViewBeforeLoading(true)
+                .bitmapConfig(Bitmap.Config.RGB_565)
+                .imageScaleType(ImageScaleType.EXACTLY)
                 .build();
     }
 
@@ -285,8 +288,9 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
             if(plays.get(position).playPhoto != null && (plays.get(position).playPhoto.equals("") || new File(plays.get(position).playPhoto.substring(7, plays.get(position).playPhoto.length())).exists() == false)) {
                 String gameThumb = GamesPerPlay.getBaseGame(plays.get(position)).gameThumb;
                 if (gameThumb != null && !gameThumb.equals("")) {
-                    ImageLoader.getInstance().displayImage("http:" + GamesPerPlay.getBaseGame(plays.get(position)).gameThumb, viewHolder.getImageView(), options);
-                    ImageLoader.getInstance().loadImage("http:" + GamesPerPlay.getBaseGame(plays.get(position)).gameThumb, options, null);
+                    //ImageLoader.getInstance().displayImage("http:" + GamesPerPlay.getBaseGame(plays.get(position)).gameThumb, viewHolder.getImageView(), options);
+                    //ImageLoader.getInstance().loadImage("http:" + GamesPerPlay.getBaseGame(plays.get(position)).gameThumb, options, null);
+                    Picasso.with(mActivity).load("http:" + GamesPerPlay.getBaseGame(plays.get(position)).gameThumb).into(viewHolder.getImageView());
                 }else{
                     viewHolder.getImageView().setImageDrawable(null);
                 }
@@ -294,10 +298,16 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
                 String thumbPathCheck = plays.get(position).playPhoto.substring(7, plays.get(position).playPhoto.length() - 4) + "_thumb3.jpg";
                 String thumbPath = plays.get(position).playPhoto.substring(0, plays.get(position).playPhoto.length() - 4) + "_thumb3.jpg";
                 if (new File(thumbPathCheck).exists()) {
-                    ImageLoader.getInstance().displayImage(thumbPath, viewHolder.getImageView(), options);
+                    //ImageLoader.getInstance().displayImage(thumbPath, viewHolder.getImageView(), options);
+                    Picasso.with(mActivity).load(thumbPath).into(viewHolder.getImageView());
                 }else{
-                    ImageLoader.getInstance().displayImage(plays.get(position).playPhoto, viewHolder.getImageView(), options);
-
+                    //ImageLoader.getInstance().displayImage(plays.get(position).playPhoto, viewHolder.getImageView(), options);
+                    //Picasso.with(mActivity).load(plays.get(position).playPhoto).fit().into(viewHolder.getImageView());
+                    Picasso.with(mActivity)
+                            .load(plays.get(position).playPhoto)
+                            .resize(100, 100)
+                            .centerCrop()
+                            .into(viewHolder.getImageView());
                     // make a thumb
                     String fixedPath = plays.get(position).playPhoto.substring(6, plays.get(position).playPhoto.length());
                     String thumbPath2 = fixedPath.substring(0, fixedPath.length() - 4) + "_thumb3.jpg";
@@ -322,21 +332,24 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
                     }
                     //still use the og picture.  next time there will be a thumb
                 }
-                ImageLoader.getInstance().loadImage(plays.get(position).playPhoto, options, null);
+                //Picasso.with(mActivity).load(plays.get(position).playPhoto).fetch();
+                //ImageLoader.getInstance().loadImage(plays.get(position).playPhoto, options, null);
             }
+
             String winners = "";
-            List<PlayersPerPlay> players = PlayersPerPlay.getPlayers_Winners(plays.get(position));
-            float highScore = PlayersPerPlay.getHighScore(plays.get(position));
+            List<PlayersPerPlay> players = PlayersPerPlay.getWinners(plays.get(position));
+            //float highScore = PlayersPerPlay.getHighScore(plays.get(position));
             for(PlayersPerPlay player:players){
-                Player thisPlayer = player.player;
-                if (player.score >= highScore) {
-                    winners = winners + thisPlayer.playerName + ", ";
-                }
+                //Player thisPlayer = player.player;
+                //if (player.score >= highScore) {
+                    winners = winners + player.player.playerName + ", ";
+                //}
             }
             winners = winners.substring(0, winners.length()-2);
 
             viewHolder.getPlayWinnerView().setTypeface(null, Typeface.BOLD);
             viewHolder.getPlayWinnerView().setText(mActivity.getString(R.string.winners) + winners);
+
     }
     // END_INCLUDE(recyclerViewOnBindViewHolder)
 

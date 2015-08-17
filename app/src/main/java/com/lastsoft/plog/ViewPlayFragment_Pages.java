@@ -163,6 +163,7 @@ public class ViewPlayFragment_Pages extends Fragment {
         playImage.setTransitionName(imageTransID);
         if (thisPlay.playPhoto != null && !thisPlay.playPhoto.equals("") && new File(thisPlay.playPhoto.substring(7, thisPlay.playPhoto.length())).exists()){
             ImageLoader.getInstance().displayImage(thisPlay.playPhoto, playImage, options);
+            //Picasso.with(mActivity).load(thisPlay.playPhoto).fit().into(playImage);
 
             playImage.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -186,6 +187,7 @@ public class ViewPlayFragment_Pages extends Fragment {
             String gameThumb = GamesPerPlay.getBaseGame(thisPlay).gameThumb;
             if (gameThumb != null && !gameThumb.equals("")) {
                 ImageLoader.getInstance().displayImage("http:" + GamesPerPlay.getBaseGame(thisPlay).gameThumb, playImage, options);
+                //Picasso.with(mActivity).load("http:" + GamesPerPlay.getBaseGame(thisPlay).gameThumb).fit().into(playImage);
             }else{
                 playImage.setImageDrawable(null);
             }

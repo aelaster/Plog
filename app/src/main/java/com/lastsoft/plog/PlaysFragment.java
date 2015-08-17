@@ -117,7 +117,7 @@ public class PlaysFragment extends Fragment{
         fastScroller.setRecyclerView(mRecyclerView, null);
 
         // Connect the scroller to the recycler (to let the recycler scroll the scroller's handle)
-        mRecyclerView.setOnScrollListener(fastScroller.getOnScrollListener());
+        mRecyclerView.addOnScrollListener(fastScroller.getOnScrollListener());
 
         // LinearLayoutManager is used here, this will layout the elements in a similar fashion
         // to the way ListView would layout elements. The RecyclerView.LayoutManager defines how
@@ -138,6 +138,11 @@ public class PlaysFragment extends Fragment{
         // Set CustomAdapter as the adapter for RecyclerView.
         mRecyclerView.setAdapter(mAdapter);
         // END_INCLUDE(initializeRecyclerView)
+
+        //boolean pauseOnScroll = true; // or true
+        //boolean pauseOnFling = true; // or false
+        //NewPauseOnScrollListener listener = new NewPauseOnScrollListener(ImageLoader.getInstance(), pauseOnScroll, pauseOnFling);
+        //mRecyclerView.addOnScrollListener(listener);
 
 
         if (mSearch != null) {
