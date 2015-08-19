@@ -163,10 +163,12 @@
     <string name="version_label">"Version: "</string>
     <string name="percent_completed">"Percent Completed: "</string>
 
-    <string-array name="play_rightclick">
-        <item>Edit</item>
-        <item>Delete</item>
-    </string-array>
+    <string name="sort_az">Alpha (A->Z)</string>
+    <string name="sort_za">Alpha (Z->A)</string>
+    <string name="sort_plays_x0">Plays (X->0)</string>
+    <string name="sort_plays_0x">Plays (0->X)</string>
+
+    <string name="sort">Sort</string>
 
     <string name="title_pref_behavior">App Behavior</string>
     <string name="title_solo_remove_bucket_list">Remove Solo Plays from Bucket List</string>

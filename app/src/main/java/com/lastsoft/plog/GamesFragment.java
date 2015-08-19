@@ -29,6 +29,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -97,6 +98,7 @@ public class GamesFragment extends Fragment{
     private boolean releaseFocus = false;
     private int playListType = 0;
     private int playListType_Holder = 0;
+    private int sortType = 0;
     FloatingActionButton addPlayer;
     int fabMargin;
 
@@ -201,7 +203,7 @@ public class GamesFragment extends Fragment{
         setRecyclerViewLayoutManager(mCurrentLayoutManagerType);
 
         //mAdapter = new CustomAdapter(mDataset, mDataset_Thumb);
-        mAdapter = new GameAdapter(this, mActivity,mSearchQuery, fromDrawer, playListType);
+        mAdapter = new GameAdapter(this, mActivity,mSearchQuery, fromDrawer, playListType, sortType);
         // Set CustomAdapter as the adapter for RecyclerView.
         mRecyclerView.setAdapter(mAdapter);
 
@@ -231,7 +233,7 @@ public class GamesFragment extends Fragment{
                     // When user changed the Text
                     mSearchQuery = cs.toString();
                     //initDataset();
-                    mAdapter = new GameAdapter(GamesFragment.this, mActivity, mSearchQuery, fromDrawer, playListType);
+                    mAdapter = new GameAdapter(GamesFragment.this, mActivity, mSearchQuery, fromDrawer, playListType, sortType);
                     // Set CustomAdapter as the adapter for RecyclerView.
                     mRecyclerView.setAdapter(mAdapter);
                 }
@@ -266,7 +268,7 @@ public class GamesFragment extends Fragment{
             });
         }
 
-        if (Game.findBaseGames("").size() == 0){
+        if (Game.findBaseGames("", sortType).size() == 0){
             initDataset();
         }else {
             mText.setVisibility(View.GONE);
@@ -310,8 +312,10 @@ public class GamesFragment extends Fragment{
             menuItem0 = menu.getItem(0);
             if (showExpansions) {
                 menuItem0.setTitle(getString(R.string.hide_expansions));
+                menuItem0.setIcon(R.drawable.ic_visibility_off);
             }else{
                 menuItem0.setTitle(getString(R.string.show_expansions));
+                menuItem0.setIcon(R.drawable.ic_visibility);
             }
         }
     }
@@ -324,23 +328,56 @@ public class GamesFragment extends Fragment{
                 //called when the up affordance/carat in actionbar is pressed
                 mActivity.onBackPressed();
                 return true;
+            case R.id.sort:
+                View menuItemView = mActivity.findViewById(R.id.sort);
+                PopupMenu popup = new PopupMenu(mActivity, menuItemView);
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.sort_az:
+                                sortType = 0;
+                                mAdapter.updateData(mAdapter.generateGameList(mSearchQuery, playListType, sortType));
+                                return true;
+                            case R.id.sort_za:
+                                sortType = 1;
+                                mAdapter.updateData(mAdapter.generateGameList(mSearchQuery, playListType, sortType));
+                                return true;
+                            case R.id.sort_plays_x0:
+                                sortType = 2;
+                                mAdapter.updateData(mAdapter.generateGameList(mSearchQuery, playListType, sortType));
+                                return true;
+                            case R.id.sort_plays_0x:
+                                sortType = 3;
+                                mAdapter.updateData(mAdapter.generateGameList(mSearchQuery, playListType, sortType));
+                                return true;
+                        }
+                        return false;
+                    }
+                });
+                MenuInflater inflater = popup.getMenuInflater();
+                inflater.inflate(R.menu.games_sort, popup.getMenu());
+                popup.show();
+                return true;
             case R.id.show_expansions:
                 if (showExpansions) {
                     //currently showing expansions
                     //trying to hide them
                     //make it say show expansions
                     item.setTitle(getString(R.string.show_expansions));
+                    item.setIcon(R.drawable.ic_visibility);
                     playListType = playListType_Holder;
-                    mAdapter.updateData(mAdapter.generateGameList(mSearchQuery, playListType));
+                    mAdapter.updateData(mAdapter.generateGameList(mSearchQuery, playListType, sortType));
                     showExpansions = false;
                 }else{
                     //currently hiding expansions
                     //trying to show them
                     //make it say hide expansions
                     item.setTitle(getString(R.string.hide_expansions));
+                    item.setIcon(R.drawable.ic_visibility_off);
                     playListType_Holder = playListType;
                     playListType = 3;
-                    mAdapter.updateData(mAdapter.generateGameList(mSearchQuery, playListType));
+                    mAdapter.updateData(mAdapter.generateGameList(mSearchQuery, playListType, sortType));
                     showExpansions = true;
                 }
                 return true;
@@ -350,7 +387,7 @@ public class GamesFragment extends Fragment{
 
 
     @Override
-    public void onStart() {
+    public void onStart () {
         super.onStart();
         if (fromDrawer) {
             if (mActivity != null) {
@@ -371,7 +408,7 @@ public class GamesFragment extends Fragment{
     public void onSaveInstanceState(Bundle savedInstanceState) {
         // Save currently selected layout manager.
         savedInstanceState.putSerializable(KEY_LAYOUT_MANAGER, mCurrentLayoutManagerType);
-        super.onSaveInstanceState(savedInstanceState);
+            super.onSaveInstanceState(savedInstanceState);
     }
 
     @Override
@@ -448,7 +485,7 @@ public class GamesFragment extends Fragment{
         //mAdapter = new GameAdapter(this, mActivity,mSearchQuery, fromDrawer, playListType);
         // Set CustomAdapter as the adapter for RecyclerView.
         //mRecyclerView.setAdapter(mAdapter);
-        mAdapter.updateData(mAdapter.generateGameList(mSearchQuery, playListType));
+        mAdapter.updateData(mAdapter.generateGameList(mSearchQuery, playListType, sortType));
     }
 
     protected void updateDataset(){
@@ -457,7 +494,7 @@ public class GamesFragment extends Fragment{
                 .findFirstCompletelyVisibleItemPosition();
         refreshDataset(false);
         mRecyclerView.scrollToPosition(firstVisible);*/
-        mAdapter.updateData(mAdapter.generateGameList(mSearchQuery, playListType));
+        mAdapter.updateData(mAdapter.generateGameList(mSearchQuery, playListType, sortType));
     }
 
     /**
@@ -491,7 +528,7 @@ public class GamesFragment extends Fragment{
                 myTask = null;
 
                 //mAdapter = new CustomAdapter(mDataset, mDataset_Thumb);
-                mAdapter = new GameAdapter(GamesFragment.this, mActivity, mSearchQuery, fromDrawer, playListType);
+                mAdapter = new GameAdapter(GamesFragment.this, mActivity, mSearchQuery, fromDrawer, playListType, sortType);
                 // Set CustomAdapter as the adapter for RecyclerView.
                 mRecyclerView.setAdapter(mAdapter);
 

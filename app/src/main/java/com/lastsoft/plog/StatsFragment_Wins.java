@@ -155,7 +155,7 @@ public class StatsFragment_Wins extends Fragment {
             long totalPlays, totalUnique;
             if (theGroup == 0){
                 totalPlays = ((long) Play.listPlaysNewOld().size());
-                totalUnique = Game.getUniqueGames().size();
+                totalUnique = Game.getUniqueGames(0).size();
                 try {
                     for (int i = 0; i < groupPlayers.size(); i++){
                         Player thisPlayer = Player.findById(Player.class, groupPlayers.get(i).getId());
@@ -176,7 +176,7 @@ public class StatsFragment_Wins extends Fragment {
                 }
             }else {
                 totalPlays = ((long) PlayersPerPlay.totalPlays_GameGroup(GameGroup.findById(GameGroup.class, theGroup)).size() / (long) groupPlayers.size());
-                totalUnique = Game.getUniqueGames_GameGroup(GameGroup.findById(GameGroup.class, theGroup)).size();
+                totalUnique = Game.getUniqueGames_GameGroup(GameGroup.findById(GameGroup.class, theGroup), 0).size();
                 try {
                     for (int i = 0; i < groupPlayers.size(); i++){
                         GameGroup thisGroup = GameGroup.findById(GameGroup.class, theGroup);

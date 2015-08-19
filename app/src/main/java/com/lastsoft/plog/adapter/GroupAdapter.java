@@ -126,7 +126,7 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, final int position) {
         //long totalPlays = ((long) PlayersPerPlay.totalPlays_GameGroup(GameGroup.findById(GameGroup.class, groups.get(position).getId())).size() / (long) GameGroup.getGroupPlayers(GameGroup.findById(GameGroup.class, groups.get(position).getId())).size());
-        long totalUnique = Game.getUniqueGames_GameGroup(GameGroup.findById(GameGroup.class, groups.get(position).getId())).size();
+        long totalUnique = Game.getUniqueGames_GameGroup(GameGroup.findById(GameGroup.class, groups.get(position).getId()), 0).size();
         viewHolder.getNameView().setText(groups.get(position).groupName);
         viewHolder.getWinsView().setText(mActivity.getString(R.string.unique_games) + totalUnique);
         viewHolder.getView().setOnClickListener(new View.OnClickListener() {

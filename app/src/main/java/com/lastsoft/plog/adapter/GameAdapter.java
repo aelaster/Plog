@@ -129,42 +129,51 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
         this.notifyDataSetChanged();
     }
 
-    public List<Game> generateGameList(String mSearchQuery, int playListType){
+    public List<Game> generateGameList(String mSearchQuery, int playListType, int sortType){
+        /*
+        SortType
+        0 = Alpha AZ
+        1 = Alpha ZA
+        2 = Plays X0
+        3 = Plays 0X
+         */
+
+
         List<Game> games_out;
         switch (playListType) {
             case 0:
-                games_out = Game.findBaseGames(mSearchQuery);
+                games_out = Game.findBaseGames(mSearchQuery, sortType);
                 break;
             case 1:
                 if (mSearchQuery.equals("0")){
-                    games_out = Game.getUniqueGames();
+                    games_out = Game.getUniqueGames(sortType);
                 }else {
                     gameGroup = mSearchQuery;
-                    games_out = Game.getUniqueGames_GameGroup(GameGroup.findById(GameGroup.class, Long.parseLong(mSearchQuery)));
+                    games_out = Game.getUniqueGames_GameGroup(GameGroup.findById(GameGroup.class, Long.parseLong(mSearchQuery)), sortType);
                 }
                 break;
             case 2:
                 games_out = Game.getBucketList();
                 break;
             case 3:
-                games_out = Game.findAllGames(mSearchQuery);
+                games_out = Game.findAllGames(mSearchQuery, sortType);
                 break;
             default:
-                games_out = Game.findBaseGames(mSearchQuery);
+                games_out = Game.findBaseGames(mSearchQuery, sortType);
                 break;
         }
 
         return games_out;
     }
 
-    public GameAdapter(Fragment theFragment, Activity theActivity, String mSearchQuery, boolean mFromDrawer, int mPlayListType) {
+    public GameAdapter(Fragment theFragment, Activity theActivity, String mSearchQuery, boolean mFromDrawer, int mPlayListType, int mSortType) {
         //games = Game.listAll(Game.class);
         //find(Class<T> type, String whereClause, String[] whereArgs, String groupBy, String orderBy, String limit)
         mFragment = theFragment;
         mActivity = theActivity;
         playListType = mPlayListType;
 
-        games = generateGameList(mSearchQuery, mPlayListType);
+        games = generateGameList(mSearchQuery, mPlayListType, mSortType);
 
         options = new DisplayImageOptions.Builder()
                 .cacheOnDisk(true)
