@@ -15,4 +15,11 @@
 
 
     </PreferenceCategory>
+    <PreferenceCategory
+        android:title="@string/title_pref_behavior">
+        <CheckBoxPreference
+            android:key="solo_remove_bucket_list"
+            android:title="@string/title_solo_remove_bucket_list"
+            android:defaultValue="true" />
+    </PreferenceCategory>
 </PreferenceScreen>

@@ -43,7 +43,6 @@ import com.lastsoft.plog.R;
 import com.lastsoft.plog.db.Game;
 import com.lastsoft.plog.db.GameGroup;
 import com.lastsoft.plog.db.GamesPerPlay;
-import com.lastsoft.plog.db.Play;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.squareup.picasso.Picasso;
 
@@ -234,14 +233,8 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
             }else{
                 viewHolder.getOverflowLayout().setVisibility(View.GONE);
             }
-            int totalPlays;
-            if (gameGroup == null) {
-                totalPlays = Play.listPlaysNewOld(games.get(position).gameName, fromDrawer, games.get(position).expansionFlag).size();
-            }else{
-                totalPlays = Play.listPlaysNewOld_GameGroup(gameGroup, games.get(position).gameName, fromDrawer, games.get(position).expansionFlag).size();
-            }
 
-            viewHolder.getGamePlaysView().setText(mActivity.getString(R.string.plays) + totalPlays);
+            viewHolder.getGamePlaysView().setText(mActivity.getString(R.string.plays) + games.get(position).playCount);
         //}
 
     }
@@ -274,6 +267,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
         }
         if(games.get(position).gameBGGID == null || games.get(position).gameBGGID.equals("")) {
             popup.getMenu().removeItem(R.id.update_bgg);
+            popup.getMenu().removeItem(R.id.open_bgg);
         }
         if (games.get(position).gameBoxImage == null || games.get(position).gameBoxImage.equals("")){
             popup.getMenu().removeItem(R.id.view_box_photo);

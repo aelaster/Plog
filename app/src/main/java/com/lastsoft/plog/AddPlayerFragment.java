@@ -155,6 +155,8 @@ public class AddPlayerFragment extends Fragment {
             }
             if (app_preferences.getLong("defaultPlayer", -1) == playerID){
                 defaultSwitch.setChecked(true);
+            }else{
+                defaultSwitch.setVisibility(View.GONE);
             }
 
 
@@ -172,7 +174,7 @@ public class AddPlayerFragment extends Fragment {
                 groupsLabel.setVisibility(View.GONE);
             }
 
-        }else{
+        }else {
             groupsLabel.setVisibility(View.GONE);
         }
         deleteButton.setOnClickListener(new View.OnClickListener() {

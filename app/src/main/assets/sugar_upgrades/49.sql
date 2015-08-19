@@ -1,0 +1,1 @@
+alter table GAME add PLAY_COUNT INTEGER;

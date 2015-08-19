@@ -167,6 +167,9 @@
         <item>Edit</item>
         <item>Delete</item>
     </string-array>
-    <string name="title_activity_add_play">AddPlayActivity</string>
-    <string name="hello_world">Hello world!</string>
+
+    <string name="title_pref_behavior">App Behavior</string>
+    <string name="title_solo_remove_bucket_list">Remove Solo Plays from Bucket List</string>
+
+
 </resources>

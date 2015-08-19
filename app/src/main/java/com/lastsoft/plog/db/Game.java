@@ -2,10 +2,7 @@ package com.lastsoft.plog.db;
 
 import com.orm.StringUtil;
 import com.orm.SugarRecord;
-import com.orm.query.Condition;
-import com.orm.query.Select;
 
-import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 /**
@@ -21,6 +18,7 @@ public class Game extends SugarRecord<Game> {
     public boolean expansionFlag;
     public int tbtCount;
     public int taggedToPlay;
+    public int playCount;
 
     public Game(){ }
 
@@ -101,45 +99,44 @@ public class Game extends SugarRecord<Game> {
     }
 
     public static List<Game> findBaseGames(String mSearchQuery){
-        //return Game.find(Game.class, StringUtil.toSQLName("expansionFlag") + " = 0");
+        String query;
         if (mSearchQuery.contains("'")) {
             mSearchQuery = mSearchQuery.replaceAll("'", "''");
         }
-        Select findBaseGames = Select.from(Game.class);
+        query = " SELECT G.*, COUNT(P." + StringUtil.toSQLName("id") + ") AS " + StringUtil.toSQLName("playCount") +
+                " FROM " + StringUtil.toSQLName("Game") + " G " +
+                " INNER JOIN " + StringUtil.toSQLName("GamesPerPlay") + " GPP " +
+                " ON G." + StringUtil.toSQLName("id") + " = GPP." + StringUtil.toSQLName("game") +
+                " INNER JOIN " + StringUtil.toSQLName("Play") + " P " +
+                " ON GPP." + StringUtil.toSQLName("play") + " = P." + StringUtil.toSQLName("id");
         if (!mSearchQuery.equals("")) {
-            findBaseGames.where(Condition.prop(StringUtil.toSQLName("gameName")).like("%" + mSearchQuery + "%"), Condition.prop(StringUtil.toSQLName("expansionFlag")).eq("0"));
+            query = query + " WHERE G. " + StringUtil.toSQLName("expansionFlag") + " = 0" +
+                   " AND G." + StringUtil.toSQLName("gameName") + " LIKE '%" + mSearchQuery + "%'";
         }else {
-            findBaseGames.where(Condition.prop(StringUtil.toSQLName("expansionFlag")).eq("0"));
+            query = query + " WHERE G. " + StringUtil.toSQLName("expansionFlag") + " = 0";
         }
-        findBaseGames.orderBy(StringUtil.toSQLName("gameName") + " ASC");
-        return findBaseGames.list();
+        query = query + " GROUP BY G." + StringUtil.toSQLName("gameName") +
+                " ORDER BY G." + StringUtil.toSQLName("gameName") + " ASC";
+        return Game.findWithQuery(Game.class,query);
     }
 
     public static List<Game> findAllGames(String mSearchQuery){
-        //return Game.find(Game.class, StringUtil.toSQLName("expansionFlag") + " = 0");
+        String query;
         if (mSearchQuery.contains("'")) {
             mSearchQuery = mSearchQuery.replaceAll("'", "''");
         }
-        Select findBaseGames = Select.from(Game.class);
+        query = " SELECT G.*, COUNT(P." + StringUtil.toSQLName("id") + ") AS " + StringUtil.toSQLName("playCount") +
+                " FROM " + StringUtil.toSQLName("Game") + " G " +
+                " INNER JOIN " + StringUtil.toSQLName("GamesPerPlay") + " GPP " +
+                " ON G." + StringUtil.toSQLName("id") + " = GPP." + StringUtil.toSQLName("game") +
+                " INNER JOIN " + StringUtil.toSQLName("Play") + " P " +
+                " ON GPP." + StringUtil.toSQLName("play") + " = P." + StringUtil.toSQLName("id");
         if (!mSearchQuery.equals("")) {
-            findBaseGames.where(Condition.prop(StringUtil.toSQLName("gameName")).like("%" + mSearchQuery + "%"));
+            query = query + " WHERE G." + StringUtil.toSQLName("gameName") + " LIKE '%" + mSearchQuery + "%'";
         }
-        findBaseGames.orderBy(StringUtil.toSQLName("gameName") + " ASC");
-        return findBaseGames.list();
-    }
-
-    public static List<Game> findExpansionsFor(String name) throws UnsupportedEncodingException {
-        if (name.contains("'")) {
-            name = name.replaceAll("'", "''");
-        }
-        Select expansionsFor = Select.from(Game.class);
-        //todo Just changed this back to contains.  Must have made it starts with for a reason
-        //contains
-        expansionsFor.where(Condition.prop(StringUtil.toSQLName("gameName")).like("%" + name + "%"), Condition.prop(StringUtil.toSQLName("expansionFlag")).eq("1"));
-        //starts with
-        //expansionsFor.where(Condition.prop(StringUtil.toSQLName("gameName")).like(name + "%"), Condition.prop(StringUtil.toSQLName("expansionFlag")).eq("1"));
-        expansionsFor.orderBy(StringUtil.toSQLName("gameName") + " ASC");
-        return expansionsFor.list();
+        query = query + " GROUP BY G." + StringUtil.toSQLName("gameName") +
+                " ORDER BY G." + StringUtil.toSQLName("gameName") + " ASC";
+        return Game.findWithQuery(Game.class, query);
     }
 
     public static List<Game> totalTenByTen_GameGroup(GameGroup group, int year){
@@ -165,7 +162,7 @@ public class Game extends SugarRecord<Game> {
 
     public static List<Game> getUniqueGames_GameGroup(GameGroup group){
         return Game.findWithQuery(Game.class,
-                " SELECT "+ StringUtil.toSQLName("Game") + ".*" +
+                " SELECT "+ StringUtil.toSQLName("Game") + ".*, COUNT(" + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + ") AS " + StringUtil.toSQLName("playCount") +
                         " FROM " + StringUtil.toSQLName("Game") +
                         " INNER JOIN " + StringUtil.toSQLName("GamesPerPlay") +
                         " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("game") + " = " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("id") +
@@ -174,42 +171,37 @@ public class Game extends SugarRecord<Game> {
                         " INNER JOIN " + StringUtil.toSQLName("PlaysPerGameGroup") +
                         " ON " + StringUtil.toSQLName("PlaysPerGameGroup") + "." + StringUtil.toSQLName("play") + " = " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") +
                         " and " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("expansionFlag") + " = 0 " +
-                        " and " + StringUtil.toSQLName("GameGroup") + " = ? group by " + StringUtil.toSQLName("game") +
+                        " and " + StringUtil.toSQLName("GameGroup") + " = ? " +
+                        " GROUP BY " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") +
                         " order by " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " ASC, "  + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " DESC", group.getId().toString());
     }
 
     public static List<Game> getUniqueGames(){
         return Game.findWithQuery(Game.class,
-                " SELECT "+ StringUtil.toSQLName("Game") + ".*" +
+                " SELECT "+ StringUtil.toSQLName("Game") + ".*, COUNT(" + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + ") AS " + StringUtil.toSQLName("playCount") +
                         " FROM " + StringUtil.toSQLName("Game") +
                         " INNER JOIN " + StringUtil.toSQLName("GamesPerPlay") +
                         " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("game") + " = " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("id") +
                         " INNER JOIN " + StringUtil.toSQLName("Play") +
                         " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("play") + " = " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") +
-                        " and " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("expansionFlag") + " = 0 group by " + StringUtil.toSQLName("game") +
+                        " and " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("expansionFlag") + " = 0 " +
+                        " GROUP BY " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") +
                         " order by " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " ASC, "  + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " DESC");
     }
 
-    public static List<Game> isFirstPlay(GameGroup group){
-        return Game.findWithQuery(Game.class,
-                " SELECT "+ StringUtil.toSQLName("Game") + ".*" +
-                        " FROM " + StringUtil.toSQLName("Game") +
-                        " INNER JOIN " + StringUtil.toSQLName("GamesPerPlay") +
-                        " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("game") + " = " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("id") +
-                        " INNER JOIN " + StringUtil.toSQLName("Play") +
-                        " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("play") + " = " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") +
-                        " INNER JOIN " + StringUtil.toSQLName("PlaysPerGameGroup") +
-                        " ON " + StringUtil.toSQLName("PlaysPerGameGroup") + "." + StringUtil.toSQLName("play") + " = " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") +
-                        " and " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("expansionFlag") + " = 0 " +
-                        " and " + StringUtil.toSQLName("GameGroup") + " = ? group by " + StringUtil.toSQLName("game") +
-                        " order by " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " ASC, "  + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " DESC", group.getId().toString());
-    }
-
     public static List<Game> getBucketList(){
-        //return Game.find(Game.class, StringUtil.toSQLName("expansionFlag") + " = 0");
-        Select findBaseGames = Select.from(Game.class);
-        findBaseGames.where(Condition.prop(StringUtil.toSQLName("taggedToPlay")).notEq("0"), Condition.prop(StringUtil.toSQLName("taggedToPlay")).notEq(""), Condition.prop(StringUtil.toSQLName("expansionFlag")).eq("0"));
-        findBaseGames.orderBy(StringUtil.toSQLName("taggedToPlay") + " DESC");
-        return findBaseGames.list();
+        String query;
+        query = " SELECT G.*, COUNT(P." + StringUtil.toSQLName("id") + ") AS " + StringUtil.toSQLName("playCount") +
+                " FROM " + StringUtil.toSQLName("Game") + " G " +
+                " INNER JOIN " + StringUtil.toSQLName("GamesPerPlay") + " GPP " +
+                " ON G." + StringUtil.toSQLName("id") + " = GPP." + StringUtil.toSQLName("game") +
+                " INNER JOIN " + StringUtil.toSQLName("Play") + " P " +
+                " ON GPP." + StringUtil.toSQLName("play") + " = P." + StringUtil.toSQLName("id") +
+                " WHERE G. " + StringUtil.toSQLName("taggedToPlay") + " != 0" +
+                " AND G. " + StringUtil.toSQLName("taggedToPlay") + " != \"\"" +
+                " AND G. " + StringUtil.toSQLName("expansionFlag") + " = 0" +
+                " GROUP BY G." + StringUtil.toSQLName("gameName") +
+                " ORDER BY G." + StringUtil.toSQLName("taggedToPlay") + " DESC";
+        return Game.findWithQuery(Game.class,query);
     }
 }

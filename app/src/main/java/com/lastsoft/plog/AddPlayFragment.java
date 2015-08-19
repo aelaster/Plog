@@ -552,6 +552,7 @@ public class AddPlayFragment extends Fragment implements
                 if (adapter.getCount()>0) {
                     //first, add the play
                     try {
+                        SharedPreferences app_preferences = PreferenceManager.getDefaultSharedPreferences(mActivity);
                         Play thePlay;
 
                         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -661,19 +662,22 @@ public class AddPlayFragment extends Fragment implements
                         }
 
                         //remove from bucket list if it's there
-                        Game baseGame = Game.findGameByName(gameName);
-                        if (baseGame != null && baseGame.taggedToPlay > 0){
-                            baseGame.taggedToPlay = 0;
-                            baseGame.save();
-                            if (mActivity instanceof MainActivity) {
-                                onButtonPressed("refresh_games");
+                        //only do this if there are more than one players...or the remove solo plays setting is enabled
+                        if (adapter.getCount() > 1 || app_preferences.getBoolean("solo_remove_bucket_list", true) == true){
+                            Game baseGame = Game.findGameByName(gameName);
+                            if (baseGame != null && baseGame.taggedToPlay > 0) {
+                                baseGame.taggedToPlay = 0;
+                                baseGame.save();
+                                if (mActivity instanceof MainActivity) {
+                                    onButtonPressed("refresh_games");
+                                }
                             }
                         }
 
                         savedThis = true;
                         //if (playID <= 0){
                             //if (((MainActivity)mActivity).mLogInHelper.canLogIn()) {
-                                SharedPreferences app_preferences = PreferenceManager.getDefaultSharedPreferences(mActivity);
+
                                 long currentDefaultPlayer = app_preferences.getLong("defaultPlayer", -1);
                                 if (currentDefaultPlayer >= 0) {
                                     Player defaultPlayer = Player.findById(Player.class, currentDefaultPlayer);
