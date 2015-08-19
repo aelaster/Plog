@@ -133,17 +133,54 @@ public class Game extends SugarRecord<Game> {
         return Game.findWithQuery(Game.class,query);
     }
 
-    public static List<Game> findAllGames(String mSearchQuery, int sortType){
+    public static List<Game> findAllGames_GameGroup(GameGroup group, int sortType){
         String query;
-        if (mSearchQuery.contains("'")) {
-            mSearchQuery = mSearchQuery.replaceAll("'", "''");
-        }
         query = " SELECT G.*, COUNT(P." + StringUtil.toSQLName("id") + ") AS " + StringUtil.toSQLName("playCount") +
                 " FROM " + StringUtil.toSQLName("Game") + " G " +
                 " LEFT JOIN " + StringUtil.toSQLName("GamesPerPlay") + " GPP " +
                 " ON G." + StringUtil.toSQLName("id") + " = GPP." + StringUtil.toSQLName("game") +
                 " LEFT JOIN " + StringUtil.toSQLName("Play") + " P " +
-                " ON GPP." + StringUtil.toSQLName("play") + " = P." + StringUtil.toSQLName("id");
+                " ON GPP." + StringUtil.toSQLName("play") + " = P." + StringUtil.toSQLName("id") +
+                " INNER JOIN " + StringUtil.toSQLName("PlaysPerGameGroup") + " PPG " +
+                " ON PPG." + StringUtil.toSQLName("play") + " = P." + StringUtil.toSQLName("id") +
+                " WHERE PPG." + StringUtil.toSQLName("GameGroup") + " = ? ";
+        query = query + " GROUP BY G." + StringUtil.toSQLName("gameName");
+        switch (sortType) {
+            case 0:
+                query = query + " ORDER BY G." + StringUtil.toSQLName("gameName") + " ASC";
+                break;
+            case 1:
+                query = query + " ORDER BY G." + StringUtil.toSQLName("gameName") + " DESC";
+                break;
+            case 2:
+                query = query + " ORDER BY COUNT(P." + StringUtil.toSQLName("id") + ") DESC, G." + StringUtil.toSQLName("gameName") + " ASC";
+                break;
+            case 3:
+                query = query + " ORDER BY COUNT(P." + StringUtil.toSQLName("id") + ") ASC, G." + StringUtil.toSQLName("gameName") + " ASC";
+                break;
+        }
+        return Game.findWithQuery(Game.class, query, group.getId().toString());
+    }
+
+    public static List<Game> findAllGames(String mSearchQuery, int sortType, boolean includeZero){
+        String query;
+        if (mSearchQuery.contains("'")) {
+            mSearchQuery = mSearchQuery.replaceAll("'", "''");
+        }
+        query = " SELECT G.*, COUNT(P." + StringUtil.toSQLName("id") + ") AS " + StringUtil.toSQLName("playCount") +
+                " FROM " + StringUtil.toSQLName("Game") + " G ";
+        if (includeZero) {
+            query = query + " LEFT JOIN " + StringUtil.toSQLName("GamesPerPlay") + " GPP ";
+        }else{
+            query = query + " INNER JOIN " + StringUtil.toSQLName("GamesPerPlay") + " GPP ";
+        }
+        query = query + " ON G." + StringUtil.toSQLName("id") + " = GPP." + StringUtil.toSQLName("game");
+        if (includeZero) {
+            query = query + " LEFT JOIN " + StringUtil.toSQLName("Play") + " P ";
+        }else{
+            query = query + " INNER JOIN " + StringUtil.toSQLName("Play") + " P ";
+        }
+        query = query + " ON GPP." + StringUtil.toSQLName("play") + " = P." + StringUtil.toSQLName("id");
         if (!mSearchQuery.equals("")) {
             query = query + " WHERE G." + StringUtil.toSQLName("gameName") + " LIKE '%" + mSearchQuery + "%'";
         }

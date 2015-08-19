@@ -33,7 +33,6 @@ import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -68,7 +67,7 @@ public class GamesFragment extends Fragment{
     private static final int SPAN_COUNT = 2;
     private static final int DATASET_COUNT = 60;
     private float x,y;
-    private boolean fromDrawer;
+    public boolean fromDrawer;
     Uri photoUri;
     File photoFile;
     String mCurrentPhotoPath = "";
@@ -101,6 +100,7 @@ public class GamesFragment extends Fragment{
     private int sortType = 0;
     FloatingActionButton addPlayer;
     int fabMargin;
+    VerticalRecyclerViewFastScroller fastScroller;
 
 
     public static GamesFragment newInstance(boolean fromDrawer, String searchQuery, int playListType) {
@@ -158,7 +158,7 @@ public class GamesFragment extends Fragment{
             }
         });
 
-        VerticalRecyclerViewFastScroller fastScroller = (VerticalRecyclerViewFastScroller) rootView.findViewById(R.id.fastscroller);
+        fastScroller = (VerticalRecyclerViewFastScroller) rootView.findViewById(R.id.fastscroller);
 
         // Connect the recycler to the scroller (to let the scroller scroll the list)
         //fastScroller.setRecyclerView(mRecyclerView, pullToRefreshView);
@@ -255,6 +255,8 @@ public class GamesFragment extends Fragment{
                         //mActivity.onBackPressed();
                     }
 
+                    fastScroller.scrollHider();
+
                     InputMethodManager inputManager = (InputMethodManager)
                             mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
 
@@ -306,8 +308,7 @@ public class GamesFragment extends Fragment{
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        Log.d("V1", "games fragment create menu");
-        if (fromDrawer && playListType != 2 && !((MainActivity) mActivity).mNavigationDrawerFragment.isDrawerOpen() && ((MainActivity) mActivity).currentFragmentCode != 0) {
+        if (playListType != 2 && !((MainActivity) mActivity).mNavigationDrawerFragment.isDrawerOpen() && ((MainActivity) mActivity).currentFragmentCode != 0) {
             inflater.inflate(R.menu.games, menu);
             menuItem0 = menu.getItem(0);
             if (showExpansions) {

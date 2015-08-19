@@ -156,7 +156,17 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
                 games_out = Game.getBucketList();
                 break;
             case 3:
-                games_out = Game.findAllGames(mSearchQuery, sortType);
+                if (mSearchQuery.equals("0") && !fromDrawer){
+                    games_out = Game.findAllGames("", sortType, false);
+                } else if (mSearchQuery.equals("")) {
+                    games_out = Game.findAllGames("", sortType, true);
+                }else if (fromDrawer) {
+                    games_out = Game.findAllGames(mSearchQuery, sortType, true);
+                }else{
+                    long groupId =  Long.parseLong(mSearchQuery);
+                    gameGroup = mSearchQuery;
+                    games_out = Game.findAllGames_GameGroup(GameGroup.findById(GameGroup.class, groupId), sortType);
+                }
                 break;
             default:
                 games_out = Game.findBaseGames(mSearchQuery, sortType);
@@ -166,12 +176,13 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
         return games_out;
     }
 
-    public GameAdapter(Fragment theFragment, Activity theActivity, String mSearchQuery, boolean mFromDrawer, int mPlayListType, int mSortType) {
+    public GameAdapter(Fragment theFragment, Activity theActivity, String mSearchQuery, boolean theFromDrawer, int mPlayListType, int mSortType) {
         //games = Game.listAll(Game.class);
         //find(Class<T> type, String whereClause, String[] whereArgs, String groupBy, String orderBy, String limit)
         mFragment = theFragment;
         mActivity = theActivity;
         playListType = mPlayListType;
+        fromDrawer = theFromDrawer;
 
         games = generateGameList(mSearchQuery, mPlayListType, mSortType);
 
@@ -202,48 +213,48 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
         // Get element from your dataset at this position and replace the contents of the view
         // with that element
         //if (searchQuery.equals("") || (games.get(position).gameName.toLowerCase().contains(searchQuery.toLowerCase()))) {
-            viewHolder.getTextView().setText(games.get(position).gameName);
-            if (games.get(position).gameThumb != null  && !games.get(position).gameThumb.equals("")) {
-                //Log.d("V1", "gameThumb = " + games.get(position).gameThumb);
-                //ImageLoader.getInstance().displayImage("http:" + games.get(position).gameThumb, viewHolder.getImageView(), options);
-                Picasso.with(mActivity).load("http:" + games.get(position).gameThumb).into(viewHolder.getImageView());
+        viewHolder.getTextView().setText(games.get(position).gameName);
+        if (games.get(position).gameThumb != null  && !games.get(position).gameThumb.equals("")) {
+            //Log.d("V1", "gameThumb = " + games.get(position).gameThumb);
+            //ImageLoader.getInstance().displayImage("http:" + games.get(position).gameThumb, viewHolder.getImageView(), options);
+            Picasso.with(mActivity).load("http:" + games.get(position).gameThumb).into(viewHolder.getImageView());
 
-            } else {
-                viewHolder.getImageView().setImageDrawable(null);
-            }
+        } else {
+            viewHolder.getImageView().setImageDrawable(null);
+        }
 
-            if (games.get(position).taggedToPlay > 0 && playListType == 2){
-                Date theDate = new Date(((long)games.get(position).taggedToPlay)*1000L);
-                DateFormat outputFormatter = new SimpleDateFormat("MM/dd/yyyy");
-                String output_date = outputFormatter.format(theDate); // Output : 01/20/2012
-                viewHolder.getBucketDateView().setText(output_date);
-                viewHolder.getBucketDateView().setVisibility(View.VISIBLE);
-            }else{
-                viewHolder.getBucketDateView().setVisibility(View.GONE);
-            }
+        if (games.get(position).taggedToPlay > 0 && playListType == 2){
+            Date theDate = new Date(((long)games.get(position).taggedToPlay)*1000L);
+            DateFormat outputFormatter = new SimpleDateFormat("MM/dd/yyyy");
+            String output_date = outputFormatter.format(theDate); // Output : 01/20/2012
+            viewHolder.getBucketDateView().setText(output_date);
+            viewHolder.getBucketDateView().setVisibility(View.VISIBLE);
+        }else{
+            viewHolder.getBucketDateView().setVisibility(View.GONE);
+        }
 
-            if (playListType != 1) {
-                viewHolder.getOverflowLayout().setOnClickListener(new View.OnClickListener() {
+        if (playListType != 1) {
+            viewHolder.getOverflowLayout().setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    playPopup(view, position);
+                }
+            });
+            if (games.get(position).expansionFlag == false) {
+                viewHolder.getClickLayout().setOnClickListener(new View.OnClickListener() {
                     @Override
-                    public void onClick(View view) {
-                        playPopup(view, position);
+                    public void onClick(View v) {
+                        ((MainActivity) mActivity).openAddPlay(mFragment, games.get(position).gameName, -1);
                     }
                 });
-                if (games.get(position).expansionFlag == false) {
-                    viewHolder.getClickLayout().setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            ((MainActivity) mActivity).openAddPlay(mFragment, games.get(position).gameName, -1);
-                        }
-                    });
-                }else{
-                    viewHolder.getClickLayout().setOnClickListener(null);
-                }
             }else{
-                viewHolder.getOverflowLayout().setVisibility(View.GONE);
+                viewHolder.getClickLayout().setOnClickListener(null);
             }
+        }else{
+            viewHolder.getOverflowLayout().setVisibility(View.GONE);
+        }
 
-            viewHolder.getGamePlaysView().setText(mActivity.getString(R.string.plays) + games.get(position).playCount);
+        viewHolder.getGamePlaysView().setText(mActivity.getString(R.string.plays) + games.get(position).playCount);
         //}
 
     }
@@ -264,7 +275,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
             inputManager.hideSoftInputFromWindow(mActivity.getCurrentFocus().getWindowToken(),
                     InputMethodManager.HIDE_NOT_ALWAYS);
         }catch (Exception ignored){}
-        
+
         PopupMenu popup = new PopupMenu(mActivity, v);
 
         MenuInflater inflater = popup.getMenuInflater();
@@ -293,99 +304,99 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
             popup.getMenu().removeItem(R.id.delete_game);
         }
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.delete_game:
-                        ((MainActivity) mActivity).deleteGame(games.get(position).getId());
-                        return true;
-                    case R.id.add_tenbyten:
-                        ((MainActivity) mActivity).addToTenXTen(games.get(position).getId());
-                        return true;
-                    case R.id.view_plays:
-                        if (games.get(position).expansionFlag == true) {
-                            ((MainActivity) mActivity).openPlays(games.get(position).gameName, false, 9);
-                        }else{
-                            ((MainActivity) mActivity).openPlays(games.get(position).gameName, false, 0);
-                        }
-                        return true;
-                    case R.id.open_bgg:
-                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://bgg.cc/boardgame/" + games.get(position).gameBGGID));
-                        mActivity.startActivity(browserIntent);
-                        return true;
-                    case R.id.update_bgg:
-                        mPosition = position;
-                        ((MainActivity) mActivity).searchGameViaBGG(games.get(position).gameName, false, false, -1);
-                        return true;
-                    case R.id.add_box_photo:
-                        ((GamesFragment) mFragment).captureBox(games.get(position));
-                        return true;
-                    case R.id.view_box_photo:
-                        String[] photoParts = games.get(position).gameBoxImage.split("/");
-                        File newFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),photoParts[photoParts.length-1]);
-                        Uri contentUri = FileProvider.getUriForFile(mActivity.getApplicationContext(), "com.lastsoft.plog.fileprovider", newFile);
-                        Intent intent = new Intent();
-                        intent.setAction(Intent.ACTION_VIEW);
-                        intent.setDataAndType(contentUri, "image/*");
-                        intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                        mActivity.startActivity(intent);
-                        return true;
-                    case R.id.add_bucket_list:
-                        String[] ids = TimeZone.getAvailableIDs(-5 * 60 * 60 * 1000);
-                        // if no ids were returned, something is wrong. get out.
-                        if (ids.length == 0)
-                            System.exit(0);
+                                             @Override
+                                             public boolean onMenuItemClick(MenuItem item) {
+                                                 switch (item.getItemId()) {
+                                                     case R.id.delete_game:
+                                                         ((MainActivity) mActivity).deleteGame(games.get(position).getId());
+                                                         return true;
+                                                     case R.id.add_tenbyten:
+                                                         ((MainActivity) mActivity).addToTenXTen(games.get(position).getId());
+                                                         return true;
+                                                     case R.id.view_plays:
+                                                         if (games.get(position).expansionFlag == true) {
+                                                             ((MainActivity) mActivity).openPlays(games.get(position).gameName, false, 9);
+                                                         }else{
+                                                             ((MainActivity) mActivity).openPlays(games.get(position).gameName, false, 0);
+                                                         }
+                                                         return true;
+                                                     case R.id.open_bgg:
+                                                         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://bgg.cc/boardgame/" + games.get(position).gameBGGID));
+                                                         mActivity.startActivity(browserIntent);
+                                                         return true;
+                                                     case R.id.update_bgg:
+                                                         mPosition = position;
+                                                         ((MainActivity) mActivity).searchGameViaBGG(games.get(position).gameName, false, false, -1);
+                                                         return true;
+                                                     case R.id.add_box_photo:
+                                                         ((GamesFragment) mFragment).captureBox(games.get(position));
+                                                         return true;
+                                                     case R.id.view_box_photo:
+                                                         String[] photoParts = games.get(position).gameBoxImage.split("/");
+                                                         File newFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),photoParts[photoParts.length-1]);
+                                                         Uri contentUri = FileProvider.getUriForFile(mActivity.getApplicationContext(), "com.lastsoft.plog.fileprovider", newFile);
+                                                         Intent intent = new Intent();
+                                                         intent.setAction(Intent.ACTION_VIEW);
+                                                         intent.setDataAndType(contentUri, "image/*");
+                                                         intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                                         mActivity.startActivity(intent);
+                                                         return true;
+                                                     case R.id.add_bucket_list:
+                                                         String[] ids = TimeZone.getAvailableIDs(-5 * 60 * 60 * 1000);
+                                                         // if no ids were returned, something is wrong. get out.
+                                                         if (ids.length == 0)
+                                                             System.exit(0);
 
-                        // begin output
-                        //System.out.println("Current Time");
+                                                         // begin output
+                                                         //System.out.println("Current Time");
 
-                        // create a Eastern Standard Time time zone
-                        SimpleTimeZone pdt = new SimpleTimeZone(-5 * 60 * 60 * 1000, ids[0]);
+                                                         // create a Eastern Standard Time time zone
+                                                         SimpleTimeZone pdt = new SimpleTimeZone(-5 * 60 * 60 * 1000, ids[0]);
 
-                        // set up rules for daylight savings time
-                        pdt.setStartRule(Calendar.APRIL, 1, Calendar.SUNDAY, 2 * 60 * 60 * 1000);
-                        pdt.setEndRule(Calendar.OCTOBER, -1, Calendar.SUNDAY, 2 * 60 * 60 * 1000);
+                                                         // set up rules for daylight savings time
+                                                         pdt.setStartRule(Calendar.APRIL, 1, Calendar.SUNDAY, 2 * 60 * 60 * 1000);
+                                                         pdt.setEndRule(Calendar.OCTOBER, -1, Calendar.SUNDAY, 2 * 60 * 60 * 1000);
 
-                        // create a GregorianCalendar with the Pacific Daylight time zone
-                        // and the current date and time
-                        Calendar calendar = new GregorianCalendar(pdt);
-                        Date trialTime = new Date();
-                        calendar.setTime(trialTime);
-                        int i = (int) (calendar.getTime().getTime()/1000);
-                        games.get(position).taggedToPlay = i;
-                        games.get(position).save();
+                                                         // create a GregorianCalendar with the Pacific Daylight time zone
+                                                         // and the current date and time
+                                                         Calendar calendar = new GregorianCalendar(pdt);
+                                                         Date trialTime = new Date();
+                                                         calendar.setTime(trialTime);
+                                                         int i = (int) (calendar.getTime().getTime()/1000);
+                                                         games.get(position).taggedToPlay = i;
+                                                         games.get(position).save();
 
-                        Snackbar
-                                .make(((GamesFragment) mFragment).mCoordinatorLayout,
-                                        games.get(position).gameName + mActivity.getString(R.string.added_to_bl),
-                                        Snackbar.LENGTH_LONG)
-                                .setAction(mActivity.getString(R.string.undo), new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View view) {
-                                        games.get(position).taggedToPlay = 0;
-                                        games.get(position).save();
-                                        if (playListType == 2) {
-                                            ((MainActivity) mActivity).onFragmentInteraction("refresh_games");
-                                        }
-                                    }
-                                })
-                                .show(); // Do not forget to show!
+                                                         Snackbar
+                                                                 .make(((GamesFragment) mFragment).mCoordinatorLayout,
+                                                                         games.get(position).gameName + mActivity.getString(R.string.added_to_bl),
+                                                                         Snackbar.LENGTH_LONG)
+                                                                 .setAction(mActivity.getString(R.string.undo), new View.OnClickListener() {
+                                                                     @Override
+                                                                     public void onClick(View view) {
+                                                                         games.get(position).taggedToPlay = 0;
+                                                                         games.get(position).save();
+                                                                         if (playListType == 2) {
+                                                                             ((MainActivity) mActivity).onFragmentInteraction("refresh_games");
+                                                                         }
+                                                                     }
+                                                                 })
+                                                                 .show(); // Do not forget to show!
 
-                        return true;
-                    case R.id.remove_bucket_list:
-                        games.get(position).taggedToPlay = 0;
-                        games.get(position).save();
-                        if (playListType == 2) {
-                            ((MainActivity) mActivity).onFragmentInteraction("refresh_games");
-                        }
-                        return true;
-                    default:
-                        return false;
-                    }
-                }
-            }
+                                                         return true;
+                                                     case R.id.remove_bucket_list:
+                                                         games.get(position).taggedToPlay = 0;
+                                                         games.get(position).save();
+                                                         if (playListType == 2) {
+                                                             ((MainActivity) mActivity).onFragmentInteraction("refresh_games");
+                                                         }
+                                                         return true;
+                                                     default:
+                                                         return false;
+                                                 }
+                                             }
+                                         }
 
-            );
-            popup.show();
-        }
+        );
+        popup.show();
     }
+}
