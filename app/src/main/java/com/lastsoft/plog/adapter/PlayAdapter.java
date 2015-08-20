@@ -152,7 +152,7 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
                 }
                 break;
             case 2:
-                String[] query = mSearchQuery.split("\\$");
+                String[] query = mSearchQuery.split("\\^");
                 if (query[0].equals("0")){
                     plays_out = Play.totalWins_Player(Player.findById(Player.class, Long.parseLong(query[1])));
                 }else {
@@ -160,7 +160,7 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
                 }
                 break;
             case 3:
-                String[] query2 = mSearchQuery.split("\\$");
+                String[] query2 = mSearchQuery.split("\\^");
                 if (query2[0].equals("0")){
                     plays_out = Play.totalAsteriskWins_Player(Player.findById(Player.class, Long.parseLong(query2[1])));
                 }else {
@@ -168,7 +168,7 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
                 }
                 break;
             case 4:
-                String[] query3 = mSearchQuery.split("\\$");
+                String[] query3 = mSearchQuery.split("\\^");
                 List<Play> wins;
                 if (query3[0].equals("0")){
                     wins = Play.totalWins_Player(Player.findById(Player.class, Long.parseLong(query3[1])));
@@ -199,11 +199,11 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
                 }
                 break;
             case 7:
-                String[] query4 = mSearchQuery.split("\\$");
+                String[] query4 = mSearchQuery.split("\\^");
                 plays_out = Play.gameTenByTen_GameGroup(GameGroup.findById(GameGroup.class, Long.parseLong(query4[0])), Game.findById(Game.class, Long.parseLong(query4[1])), Integer.parseInt(query4[2]));
                 break;
             case 8:
-                String[] query8 = mSearchQuery.split("\\$");
+                String[] query8 = mSearchQuery.split("\\^");
                 if (query8[0].equals("0")){
                     plays_out = Play.totalPlays_Player(Player.findById(Player.class, Long.parseLong(query8[1])));
                 }else {
@@ -215,7 +215,7 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
                 plays_out = Play.listPlaysNewOld(mSearchQuery, fromDrawer, true);
                 break;
             case 10:
-                String[] query10 = mSearchQuery.split("\\$");
+                String[] query10 = mSearchQuery.split("\\^");
                 plays_out = Play.totalPlays_TenByTen_GameGroup(GameGroup.findById(GameGroup.class, Long.parseLong(query10[0])), Integer.parseInt(query10[1]));
                 break;
             default:

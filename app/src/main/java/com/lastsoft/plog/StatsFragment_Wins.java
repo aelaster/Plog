@@ -282,10 +282,10 @@ public class StatsFragment_Wins extends Fragment {
                 public void onValueSelected(Entry e, int dataSetIndex, Highlight h) {
                     switch (e.getXIndex()) {
                         case 0:
-                            ((MainActivity) mActivity).openPlays(gameGroup + "$" + playerValue, false, 2);
+                            ((MainActivity) mActivity).openPlays(gameGroup + "^" + playerValue, false, 2);
                             break;
                         case 1:
-                            ((MainActivity) mActivity).openPlays(gameGroup + "$" + playerValue, false, 3);
+                            ((MainActivity) mActivity).openPlays(gameGroup + "^" + playerValue, false, 3);
                             break;
                     }
                 }
@@ -385,15 +385,15 @@ public class StatsFragment_Wins extends Fragment {
                                 break;
                             case 2:
                                 //((MainActivity) mActivity).openPlays(games.get(position).gameName, false);
-                                ((MainActivity) mActivity).openPlays(gameGroup+"$"+playerValue, false, 2);
+                                ((MainActivity) mActivity).openPlays(gameGroup+"^"+playerValue, false, 2);
                                 break;
                             case 3:
                                 //((MainActivity) mActivity).openPlays(games.get(position).gameName, false);
-                                ((MainActivity) mActivity).openPlays(gameGroup+"$"+playerValue, false, 3);
+                                ((MainActivity) mActivity).openPlays(gameGroup+"^"+playerValue, false, 3);
                                 break;
                             case 4:
                                 //((MainActivity) mActivity).openPlays(games.get(position).gameName, false);
-                                ((MainActivity) mActivity).openPlays(gameGroup+"$"+playerValue, false, 4);
+                                ((MainActivity) mActivity).openPlays(gameGroup+"^"+playerValue, false, 4);
                                 break;
                             case 5:
                                 //((MainActivity) mActivity).openPlays(games.get(position).gameName, false);
@@ -407,7 +407,7 @@ public class StatsFragment_Wins extends Fragment {
                                 //regular wins percentage
                                 //just using this to get a list of total plays for a player
                                 //using it because it's part of the "Everyone" list too
-                                ((MainActivity) mActivity).openPlays(gameGroup+"$"+playerValue, false, 8);
+                                ((MainActivity) mActivity).openPlays(gameGroup+"^"+playerValue, false, 8);
                         }
                     }
                 });
