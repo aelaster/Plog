@@ -3,7 +3,6 @@ package com.lastsoft.plog.util;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import com.lastsoft.plog.R;
 import com.lastsoft.plog.db.Game;
@@ -121,7 +120,7 @@ public class UpdateBGGTask extends AsyncTask<String, Void, String> {
             //if (!bggID.equals("")) {
                 // then we go through and flag every expansion in my collection
 
-            Log.d("V1", "https://www.boardgamegeek.com/xmlapi2/thing?id=" + bggID);
+            //Log.d("V1", "https://www.boardgamegeek.com/xmlapi2/thing?id=" + bggID);
             URL url;
             url = new URL("https://www.boardgamegeek.com/xmlapi2/thing?id=" + bggID);
             URLConnection ucon = url.openConnection();

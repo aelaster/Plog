@@ -19,8 +19,18 @@ public class Game extends SugarRecord<Game> {
     public int tbtCount;
     public int taggedToPlay;
     public int playCount;
+    public boolean collectionFlag;
 
     public Game(){ }
+
+    public Game(String gameName, String gameBGGID, String gameImage, String gameThumb, boolean expansionFlag, boolean collectionFlag) {
+        this.gameName = gameName;
+        this.gameBGGID = gameBGGID;
+        this.gameImage = gameImage;
+        this.gameThumb = gameThumb;
+        this.expansionFlag = expansionFlag;
+        this.collectionFlag = collectionFlag;
+    }
 
     public Game(String gameName, String gameBGGID, String gameImage, String gameThumb, boolean expansionFlag) {
         this.gameName = gameName;

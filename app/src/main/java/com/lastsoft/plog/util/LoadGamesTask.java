@@ -120,16 +120,14 @@ public class LoadGamesTask extends AsyncTask<String, Void, String> {
             URL url;
 
             SharedPreferences app_preferences;
-            SharedPreferences.Editor editor;
             app_preferences = PreferenceManager.getDefaultSharedPreferences(theContext);
-            editor = app_preferences.edit();
             long currentDefaultPlayer = app_preferences.getLong("defaultPlayer", -1);
             if (currentDefaultPlayer >=0 ) {
                 Player defaultPlayer = Player.findById(Player.class, currentDefaultPlayer);
                 if (defaultPlayer != null) {
                     //Log.d("V1", "https://www.boardgamegeek.com/xmlapi2/collection?username=" + defaultPlayer.bggUsername);
                     myString = getGamesCollection(defaultPlayer.bggUsername);
-                   // Log.d("V1", myString);
+                    //Log.d("V1", myString);
                     if (myString != null && myString.contains("will be processed")){
                         //do it again
                         bggProcess = "true";
@@ -254,6 +252,12 @@ public class LoadGamesTask extends AsyncTask<String, Void, String> {
                 List<Game> finders = null;
                 finders = Game.find(Game.class, StringUtil.toSQLName("gameName") + " = ?", gameName);
                 if (finders.size() != 0){
+                    for(Game game:finders){
+                        if (!game.collectionFlag) {
+                            game.collectionFlag = true;
+                            game.save();
+                        }
+                    }
                     return null;
                 }
             } else if (name.equals("status")) {
@@ -271,7 +275,7 @@ public class LoadGamesTask extends AsyncTask<String, Void, String> {
 
         parser.require(XmlPullParser.END_TAG, null, "item");
         if (gameOwn.equals("1")) {
-            Game game = new Game(gameName, gameBGGID, gameImage, gameThumb, false);
+            Game game = new Game(gameName, gameBGGID, gameImage, gameThumb, false, true);
             game.save();
             return game;
         }else{
@@ -303,12 +307,16 @@ public class LoadGamesTask extends AsyncTask<String, Void, String> {
             }
         }
         parser.require(XmlPullParser.END_TAG, null, "item");
+
         if (gameOwn.equals("1")) {
             Game updateMe = Game.findGameByName(gameName);
             if (updateMe != null && !updateMe.expansionFlag) {
+                updateMe.collectionFlag = true;
                 updateMe.expansionFlag = true;
                 updateMe.save();
-            }
+            }else if (updateMe != null && !updateMe.collectionFlag){
+                updateMe.collectionFlag = true;
+                updateMe.save();            }
         }
     }
 

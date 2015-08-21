@@ -40,6 +40,7 @@
     <string name="add_tenbyten">Add to 10x10</string>
     <string name="update_bgg">Update Info via BGG</string>
     <string name="open_bgg">Open on BGG</string>
+    <string name="add_bgg">Add to BGG Collection</string>
     <string name="groups">Groups:</string>
     <string name="groups_header">Groups</string>
     <string name="removeGroup">"Removing Group: "</string>

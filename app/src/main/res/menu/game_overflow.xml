@@ -13,6 +13,8 @@
         app:showAsAction="withText|ifRoom" />
     <item android:id="@+id/update_bgg" android:title="@string/update_bgg"
         app:showAsAction="withText|ifRoom" />
+    <item android:id="@+id/add_bgg" android:title="@string/add_bgg"
+        app:showAsAction="withText|ifRoom" />
     <item android:id="@+id/add_box_photo" android:title="@string/add_box_photo"
         app:showAsAction="withText|ifRoom" />
     <item android:id="@+id/view_box_photo" android:title="@string/view_box_photo"
