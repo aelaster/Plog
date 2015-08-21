@@ -164,10 +164,10 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.ViewHolder
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.view_plays:
-                        ((MainActivity) mActivity).openPlays("0$" + players.get(position).getId(), false, 8);
+                        ((MainActivity) mActivity).openPlays("0^" + players.get(position).getId(), false, 8);
                         return true;
                     case R.id.view_wins:
-                        ((MainActivity) mActivity).openPlays("0$" + players.get(position).getId(), false, 2);
+                        ((MainActivity) mActivity).openPlays("0^" + players.get(position).getId(), false, 2);
                         return true;
                     default:
                         return false;
