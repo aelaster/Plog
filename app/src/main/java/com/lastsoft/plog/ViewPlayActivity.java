@@ -58,6 +58,7 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
     PlayAdapter mPlayAdapter;
     String searchQuery = "";
     private int playListType = 0;
+    private int sortType = 0;
     private boolean fromDrawer;
 
     Toolbar toolbar;
@@ -234,12 +235,14 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
             mCurrentPosition =  getIntent().getExtras().getInt("adapterPosition");
             fromDrawer =  getIntent().getExtras().getBoolean("fromDrawer");
             playListType =  getIntent().getExtras().getInt("playListType");
+            sortType =  getIntent().getExtras().getInt("sortType");
             mOriginalPosition = mCurrentPosition;
         } else {
             mCurrentPosition = savedInstanceState.getInt(STATE_CURRENT_POSITION);
             mOriginalPosition = savedInstanceState.getInt(STATE_OLD_POSITION);
             searchQuery = savedInstanceState.getString("searchQuery");
             playListType = savedInstanceState.getInt("playListType");
+            sortType =  savedInstanceState.getInt("sortType");
         }
 
         setContentView(R.layout.fragment_view_play_swipe);
@@ -308,7 +311,7 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
 
 
         //setBackgroundColor(getResources().getColor(R.color.cardview_initial_background));
-        mPlayAdapter = new PlayAdapter(this, null, searchQuery, fromDrawer, playListType);
+        mPlayAdapter = new PlayAdapter(this, null, searchQuery, fromDrawer, playListType, sortType);
         // Instantiate a ViewPager and a PagerAdapter.
         mPager = (CustomViewPager) findViewById(R.id.pager);
         //mPager.setBackgroundColor(getResources().getColor(R.color.cardview_initial_background));
@@ -372,6 +375,7 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
         outState.putInt(STATE_OLD_POSITION, mOriginalPosition);
         outState.putString("searchQuery", searchQuery);
         outState.putInt("playListType", playListType);
+        outState.putInt("sortType", sortType);
     }
 
     @Override
@@ -383,6 +387,7 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
         data.putExtra(EXTRA_CURRENT_ITEM_POSITION, mCurrentPosition);
         data.putExtra("mSearchQuery", searchQuery);
         data.putExtra("playListType", playListType);
+        data.putExtra("sortType", sortType);
         setResult(RESULT_OK, data);
         super.finishAfterTransition();
     }
@@ -528,7 +533,7 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
                             //delete play
                             deleteMe.delete();
 
-                            mPlayAdapter = new PlayAdapter(getActivity(), null, searchQuery, fromDrawer, playListType);
+                            mPlayAdapter = new PlayAdapter(getActivity(), null, searchQuery, fromDrawer, playListType, sortType);
                             mPagerAdapter.notifyDataSetChanged();
                             if (mPlayAdapter.getItemCount() == 0){
                                 onBackPressed();

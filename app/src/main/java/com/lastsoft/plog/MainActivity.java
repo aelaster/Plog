@@ -244,7 +244,7 @@ public class MainActivity extends AppCompatActivity
     private String mSearchQuery;
     public PlayAdapter initPlayAdapter(String searchQuery, boolean fromDrawer, int playListType){
         mSearchQuery = searchQuery;
-        mPlayAdapter = new PlayAdapter(this, mPlaysFragment, searchQuery, fromDrawer, playListType);
+        mPlayAdapter = new PlayAdapter(this, mPlaysFragment, searchQuery, fromDrawer, playListType, 0);
         return mPlayAdapter;
     }
 
@@ -681,7 +681,7 @@ public class MainActivity extends AppCompatActivity
 
 
     int firstVisible, lastVisible;
-    public void onPlayClicked(Play clickedPlay, Fragment mFragment, final View view, final View nameView, final View dateView, int position, boolean fromDrawer, int playListType){
+    public void onPlayClicked(Play clickedPlay, Fragment mFragment, final View view, final View nameView, final View dateView, int position, boolean fromDrawer, int playListType, int sortType){
 
         mIsReentering = false;
 
@@ -700,6 +700,7 @@ public class MainActivity extends AppCompatActivity
         intent.putExtra("adapterPosition", position);
         intent.putExtra("fromDrawer", fromDrawer);
         intent.putExtra("playListType", playListType);
+        intent.putExtra("sortType", sortType);
 
         ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(this,
                 Pair.create(view, view.getTransitionName()));

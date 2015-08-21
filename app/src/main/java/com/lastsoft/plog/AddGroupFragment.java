@@ -288,7 +288,7 @@ public class AddGroupFragment extends Fragment {
             }
 
             //now go through existing plays and determine if this group should have plays logged in the plays per game group table
-            List<Play> plays = Play.listPlaysNewOld("", true, false);
+            List<Play> plays = Play.listPlaysNewOld("", true, false, 0);
             for (Play play:plays){
                 List<Player> players = Player.getPlayersIDs(play);
                 boolean included = true;

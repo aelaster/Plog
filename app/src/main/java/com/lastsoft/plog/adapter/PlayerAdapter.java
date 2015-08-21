@@ -124,7 +124,7 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.ViewHolder
     // Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, final int position) {
-        int regularWins = Play.totalWins_Player(players.get(position)).size();
+        int regularWins = Play.totalWins_Player(players.get(position), 0).size();
         viewHolder.getNameView().setText(players.get(position).playerName);
         viewHolder.getWinsView().setText(mActivity.getString(R.string.wins) + regularWins);
 

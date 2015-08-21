@@ -166,6 +166,8 @@
 
     <string name="sort_az">Alpha (A->Z)</string>
     <string name="sort_za">Alpha (Z->A)</string>
+    <string name="sort_date_newold">Date (New->Old)</string>
+    <string name="sort_date_oldnew">Date (Old->New)</string>
     <string name="sort_plays_x0">Plays (X->0)</string>
     <string name="sort_plays_0x">Plays (0->X)</string>
 

@@ -23,10 +23,13 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,6 +48,7 @@ public class PlaysFragment extends Fragment{
     private static final int SPAN_COUNT = 2;
     private static final int DATASET_COUNT = 60;
     private float x,y;
+    private int sortType = 0;
 
 
 
@@ -97,9 +101,8 @@ public class PlaysFragment extends Fragment{
                 }
             } catch (Exception ignored) {
             }
-        }else{
-            setHasOptionsMenu(true);
         }
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -195,6 +198,15 @@ public class PlaysFragment extends Fragment{
         return rootView;
     }
 
+    private MenuItem menuItem0;
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        if (!((MainActivity) mActivity).mNavigationDrawerFragment.isDrawerOpen()) {
+            inflater.inflate(R.menu.plays, menu);
+        }
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Get item selected and deal with it
@@ -202,6 +214,37 @@ public class PlaysFragment extends Fragment{
             case android.R.id.home:
                 //called when the up affordance/carat in actionbar is pressed
                 mActivity.onBackPressed();
+                return true;
+            case R.id.sort:
+                View menuItemView = mActivity.findViewById(R.id.sort);
+                PopupMenu popup = new PopupMenu(mActivity, menuItemView);
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.sort_date_newold:
+                                sortType = 0;
+                                mAdapter.updateData(mAdapter.generatePlayData(mSearchQuery, playListType, sortType));
+                                return true;
+                            case R.id.sort_date_oldnew:
+                                sortType = 1;
+                                mAdapter.updateData(mAdapter.generatePlayData(mSearchQuery, playListType, sortType));
+                                return true;
+                            case R.id.sort_az:
+                                sortType = 2;
+                                mAdapter.updateData(mAdapter.generatePlayData(mSearchQuery, playListType, sortType));
+                                return true;
+                            case R.id.sort_za:
+                                sortType = 3;
+                                mAdapter.updateData(mAdapter.generatePlayData(mSearchQuery, playListType, sortType));
+                                return true;
+                        }
+                        return false;
+                    }
+                });
+                MenuInflater inflater = popup.getMenuInflater();
+                inflater.inflate(R.menu.plays_sort, popup.getMenu());
+                popup.show();
                 return true;
         }
         return false;
@@ -292,7 +335,7 @@ public class PlaysFragment extends Fragment{
         // Set CustomAdapter as the adapter for RecyclerView.
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.scrollToPosition(firstVisible);*/
-        mAdapter.updateData(mAdapter.generatePlayData(mSearchQuery, playListType));
+        mAdapter.updateData(mAdapter.generatePlayData(mSearchQuery, playListType, sortType));
     }
 
 }

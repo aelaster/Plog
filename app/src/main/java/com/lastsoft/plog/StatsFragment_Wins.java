@@ -153,15 +153,15 @@ public class StatsFragment_Wins extends Fragment {
             //plus two because we put total and unique plays on the top
             long totalPlays, totalUnique;
             if (theGroup == 0){
-                totalPlays = ((long) Play.listPlaysNewOld().size());
+                totalPlays = ((long) Play.listPlaysNewOld(0).size());
                 totalUnique = Game.getUniqueGames(0).size();
                 try {
                     for (int i = 0; i < groupPlayers.size(); i++){
                         Player thisPlayer = Player.findById(Player.class, groupPlayers.get(i).getId());
                         //regular wins
-                        int regularWins = Play.totalWins_Player(thisPlayer).size();
+                        int regularWins = Play.totalWins_Player(thisPlayer, 0).size();
                         //asterisk wins
-                        int asteriskWins = Play.totalAsteriskWins_Player(thisPlayer).size();
+                        int asteriskWins = Play.totalAsteriskWins_Player(thisPlayer, 0).size();
                         //output[arrayBounds+1] = (long)(regularWins + asteriskWins);
                         output.add(new WinStats(thisPlayer, regularWins, asteriskWins, totalPlays, totalUnique));
                     }
@@ -181,9 +181,9 @@ public class StatsFragment_Wins extends Fragment {
                         GameGroup thisGroup = GameGroup.findById(GameGroup.class, theGroup);
                         Player thisPlayer = Player.findById(Player.class, groupPlayers.get(i).getId());
                         //regular wins
-                        int regularWins = Play.totalWins_GameGroup_Player(thisGroup, thisPlayer).size();
+                        int regularWins = Play.totalWins_GameGroup_Player(thisGroup, thisPlayer, 0).size();
                         //asterisk wins
-                        int asteriskWins = Play.totalAsteriskWins_GameGroup_Player(thisGroup, thisPlayer).size();
+                        int asteriskWins = Play.totalAsteriskWins_GameGroup_Player(thisGroup, thisPlayer, 0).size();
                         //output[arrayBounds+1] = (long)(regularWins + asteriskWins);
                         output.add(new WinStats(thisPlayer, regularWins, asteriskWins, totalPlays, totalUnique));
                     }
@@ -220,8 +220,8 @@ public class StatsFragment_Wins extends Fragment {
                     //sharedCounter = Play.totalSharedWins().size();
                     //loserCounter = Play.totalGroupLosses().size();
                 }else {
-                    sharedCounter = Play.totalSharedWins(GameGroup.findById(GameGroup.class, theGroup)).size();
-                    loserCounter = Play.totalGroupLosses(GameGroup.findById(GameGroup.class, theGroup)).size();
+                    sharedCounter = Play.totalSharedWins(GameGroup.findById(GameGroup.class, theGroup), 0).size();
+                    loserCounter = Play.totalGroupLosses(GameGroup.findById(GameGroup.class, theGroup), 0).size();
 
                     addStat(5, getString(R.string.stats_shared_wins), sharedCounter + "", "");
                     addStat(6, getString(R.string.stats_total_losses), loserCounter + "", "");
