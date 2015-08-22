@@ -695,6 +695,7 @@ public class AddPlayFragment extends Fragment implements
 
                     if (mActivity instanceof MainActivity) {
                         onButtonPressed("refresh_plays");
+                        onButtonPressed("refresh_games");
                     }
                     //}
                     mActivity.onBackPressed();
@@ -770,7 +771,6 @@ public class AddPlayFragment extends Fragment implements
         mListener = null;
         if (mActivity != null) {
             if (mActivity instanceof MainActivity) {
-                Log.d("V1", "mActivity is main");
                 if (((MainActivity) mActivity).mPlaysFragment != null) {
                     if (((MainActivity) mActivity).forceBack) {
                         ((MainActivity) mActivity).setUpActionBar(10);
