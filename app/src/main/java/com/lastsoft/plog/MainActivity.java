@@ -429,6 +429,10 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    public void setTitle(String title){
+        mTitle = title;
+    }
+
     public int currentFragmentCode = 4;
     public void setUpActionBar(int fragmentCode){
 
@@ -478,6 +482,7 @@ public class MainActivity extends AppCompatActivity
                 actionBar.setDisplayShowCustomEnabled(false);
                 actionBar.setDisplayShowTitleEnabled(true);
                 actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+                actionBar.setTitle(mTitle);
             } else if (fragmentCode == 4) {
                 //games
                 mNavigationDrawerFragment.mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);

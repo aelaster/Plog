@@ -42,7 +42,8 @@ public class Play extends SugarRecord<Play> {
                 " INNER JOIN " + StringUtil.toSQLName("GamesPerPlay") +
                 " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("play") + " = " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") +
                 " INNER JOIN " + StringUtil.toSQLName("Game") +
-                " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("game") + " = " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("id");
+                " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("game") + " = " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("id") +
+                " and " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("expansionFlag") + " = 0 ";
         switch (sortType) {
             case 0:
                 query = query + " ORDER BY " +StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("playDate") + " DESC";
@@ -189,19 +190,19 @@ public class Play extends SugarRecord<Play> {
                 " GROUP BY P." + StringUtil.toSQLName("id");
         switch (sortType) {
             case 0:
-                query = query + " ORDER BY " +StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("playDate") + " DESC";
+                query = query + " ORDER BY P." + StringUtil.toSQLName("playDate") + " DESC";
                 break;
             case 1:
-                query = query + " ORDER BY " +StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("playDate") + " ASC";
+                query = query + " ORDER BY P." + StringUtil.toSQLName("playDate") + " ASC";
                 break;
             case 2:
-                query = query + " ORDER BY " +StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " ASC";
+                query = query + " ORDER BY G." + StringUtil.toSQLName("gameName") + " ASC";
                 break;
             case 3:
-                query = query + " ORDER BY " +StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " DESC";
+                query = query + " ORDER BY G." + StringUtil.toSQLName("gameName") + " DESC";
                 break;
         }
-        query = query + ", " +StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("ID") + " DESC";
+        query = query + ", P." + StringUtil.toSQLName("ID") + " DESC";
         return Play.findWithQuery(Play.class,query, group.getId().toString(), game.getId().toString(), year + "");
     }
 
@@ -223,19 +224,19 @@ public class Play extends SugarRecord<Play> {
                 " GROUP BY P." + StringUtil.toSQLName("id");
         switch (sortType) {
             case 0:
-                query = query + " ORDER BY " +StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("playDate") + " DESC";
+                query = query + " ORDER BY P." + StringUtil.toSQLName("playDate") + " DESC";
                 break;
             case 1:
-                query = query + " ORDER BY " +StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("playDate") + " ASC";
+                query = query + " ORDER BY P." + StringUtil.toSQLName("playDate") + " ASC";
                 break;
             case 2:
-                query = query + " ORDER BY " +StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " ASC";
+                query = query + " ORDER BY G." + StringUtil.toSQLName("gameName") + " ASC";
                 break;
             case 3:
-                query = query + " ORDER BY " +StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " DESC";
+                query = query + " ORDER BY G." + StringUtil.toSQLName("gameName") + " DESC";
                 break;
         }
-        query = query + ", " +StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("ID") + " DESC";
+        query = query + ", P." + StringUtil.toSQLName("ID") + " DESC";
         return Play.findWithQuery(Play.class, query, group.getId().toString(), year + "");
     }
 
@@ -243,6 +244,10 @@ public class Play extends SugarRecord<Play> {
         String query;
         query = " SELECT "+ StringUtil.toSQLName("Play") +".* " +
                 " FROM " + StringUtil.toSQLName("Play") +
+                " INNER JOIN " + StringUtil.toSQLName("GamesPerPlay") +
+                " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("play") + " = " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") +
+                " INNER JOIN " + StringUtil.toSQLName("Game") +
+                " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("game") + " = " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("id") +
                 " INNER JOIN "+ StringUtil.toSQLName("PlayersPerPlay") +
                 " ON " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " = " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("play") +
                 " INNER JOIN " + StringUtil.toSQLName("PlaysPerGameGroup") +
@@ -271,6 +276,10 @@ public class Play extends SugarRecord<Play> {
         String query;
         query = " SELECT "+ StringUtil.toSQLName("Play") +".* " +
                 " FROM " + StringUtil.toSQLName("Play") +
+                " INNER JOIN " + StringUtil.toSQLName("GamesPerPlay") +
+                " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("play") + " = " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") +
+                " INNER JOIN " + StringUtil.toSQLName("Game") +
+                " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("game") + " = " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("id") +
                 " INNER JOIN "+ StringUtil.toSQLName("PlayersPerPlay") +
                 " ON " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " = " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("play") +
                 " AND "+ StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("player") + " = ? ";
@@ -295,6 +304,10 @@ public class Play extends SugarRecord<Play> {
         String query;
         query = " SELECT "+ StringUtil.toSQLName("Play") +".* " +
                 " FROM " + StringUtil.toSQLName("Play") +
+                " INNER JOIN " + StringUtil.toSQLName("GamesPerPlay") +
+                " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("play") + " = " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") +
+                " INNER JOIN " + StringUtil.toSQLName("Game") +
+                " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("game") + " = " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("id") +
                 " INNER JOIN "+ StringUtil.toSQLName("PlayersPerPlay") +
                 " ON " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " = " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("play") +
                 " AND "+ StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("player") + " = ? " +
@@ -322,6 +335,10 @@ public class Play extends SugarRecord<Play> {
         String query;
         query = " SELECT "+ StringUtil.toSQLName("Play") +".* " +
                 " FROM " + StringUtil.toSQLName("Play") +
+                " INNER JOIN " + StringUtil.toSQLName("GamesPerPlay") +
+                " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("play") + " = " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") +
+                " INNER JOIN " + StringUtil.toSQLName("Game") +
+                " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("game") + " = " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("id") +
                 " INNER JOIN "+ StringUtil.toSQLName("PlayersPerPlay") +
                 " ON " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " = " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("play") +
                 " AND "+ StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("player") + " = ? " +
@@ -347,6 +364,10 @@ public class Play extends SugarRecord<Play> {
         String query;
         query = " SELECT "+ StringUtil.toSQLName("Play") +".* " +
                 " FROM " + StringUtil.toSQLName("Play") +
+                " INNER JOIN " + StringUtil.toSQLName("GamesPerPlay") +
+                " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("play") + " = " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") +
+                " INNER JOIN " + StringUtil.toSQLName("Game") +
+                " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("game") + " = " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("id") +
                 " INNER JOIN "+ StringUtil.toSQLName("PlayersPerPlay") + " P " +
                 " ON " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " = P." + StringUtil.toSQLName("play") +
                 " WHERE P." + StringUtil.toSQLName("player") + " = ? " +
@@ -395,6 +416,10 @@ public class Play extends SugarRecord<Play> {
         String query;
         query = " SELECT "+ StringUtil.toSQLName("Play") +".* " +
                 " FROM " + StringUtil.toSQLName("Play") +
+                " INNER JOIN " + StringUtil.toSQLName("GamesPerPlay") +
+                " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("play") + " = " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") +
+                " INNER JOIN " + StringUtil.toSQLName("Game") +
+                " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("game") + " = " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("id") +
                 " INNER JOIN "+ StringUtil.toSQLName("PlayersPerPlay") + " P " +
                 " ON " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " = P." + StringUtil.toSQLName("play") +
                 " WHERE P." + StringUtil.toSQLName("player") + " = ? " +
@@ -432,6 +457,10 @@ public class Play extends SugarRecord<Play> {
         String query;
         query = " SELECT "+ StringUtil.toSQLName("Play") +".* " +
                 " FROM " + StringUtil.toSQLName("Play") +
+                " INNER JOIN " + StringUtil.toSQLName("GamesPerPlay") +
+                " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("play") + " = " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") +
+                " INNER JOIN " + StringUtil.toSQLName("Game") +
+                " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("game") + " = " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("id") +
                 " INNER JOIN "+ StringUtil.toSQLName("PlayersPerPlay") + " P " +
                 " ON " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " = P." + StringUtil.toSQLName("play") +
                 " WHERE P." + StringUtil.toSQLName("score") + " < P." + StringUtil.toSQLName("playHighScore") +
@@ -478,6 +507,10 @@ public class Play extends SugarRecord<Play> {
         String query;
         query = " SELECT "+ StringUtil.toSQLName("Play") +".* " +
                 " FROM " + StringUtil.toSQLName("Play") +
+                " INNER JOIN " + StringUtil.toSQLName("GamesPerPlay") +
+                " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("play") + " = " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") +
+                " INNER JOIN " + StringUtil.toSQLName("Game") +
+                " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("game") + " = " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("id") +
                 " INNER JOIN "+ StringUtil.toSQLName("PlayersPerPlay") + " P " +
                 " ON " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " = P." + StringUtil.toSQLName("play") +
                 " WHERE P." + StringUtil.toSQLName("score") + " < P." + StringUtil.toSQLName("playHighScore") +
@@ -515,6 +548,10 @@ public class Play extends SugarRecord<Play> {
         String query;
         query = " SELECT "+ StringUtil.toSQLName("Play") +".* " +
                 " FROM " + StringUtil.toSQLName("Play") +
+                " INNER JOIN " + StringUtil.toSQLName("GamesPerPlay") +
+                " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("play") + " = " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") +
+                " INNER JOIN " + StringUtil.toSQLName("Game") +
+                " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("game") + " = " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("id") +
                 " INNER JOIN "+ StringUtil.toSQLName("PlayersPerPlay") + " P " +
                 " ON " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " = P." + StringUtil.toSQLName("play") +
                 " WHERE P." + StringUtil.toSQLName("score") + " != 0" +
@@ -565,6 +602,10 @@ public class Play extends SugarRecord<Play> {
         String query;
         query = " SELECT "+ StringUtil.toSQLName("Play") +".* " +
                 " FROM " + StringUtil.toSQLName("Play") +
+                " INNER JOIN " + StringUtil.toSQLName("GamesPerPlay") +
+                " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("play") + " = " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") +
+                " INNER JOIN " + StringUtil.toSQLName("Game") +
+                " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("game") + " = " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("id") +
                 " INNER JOIN "+ StringUtil.toSQLName("PlayersPerPlay") + " P " +
                 " ON " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " = P." + StringUtil.toSQLName("play") +
                 " WHERE P." + StringUtil.toSQLName("score") + " != 0" +

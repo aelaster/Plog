@@ -48,6 +48,7 @@ import com.lastsoft.plog.db.Player;
 import com.lastsoft.plog.db.PlayersPerPlay;
 import com.lastsoft.plog.db.PlaysPerGameGroup;
 import com.lastsoft.plog.util.DeletePlayTask;
+import com.lastsoft.plog.util.FileUtils;
 import com.lastsoft.plog.util.LoadExpansionsTask;
 import com.lastsoft.plog.util.PostPlayTask;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -465,9 +466,6 @@ public class AddPlayFragment extends Fragment implements
         if (requestCode == 0 && resultCode == -1) {
             ImageLoader.getInstance().displayImage(mCurrentPhotoPath, playPhoto, options);
 
-
-
-
             try {
                 String fixedPath = mCurrentPhotoPath.substring(6, mCurrentPhotoPath.length());
                 String thumbPath = fixedPath.substring(0, fixedPath.length() - 4) + "_thumb3.jpg";
@@ -739,6 +737,7 @@ public class AddPlayFragment extends Fragment implements
         super.onStart();
         if (mActivity != null) {
             if (mActivity instanceof MainActivity) {
+                ((MainActivity) mActivity).setTitle(gameName);
                 ((MainActivity) mActivity).setUpActionBar(3);
             }
         }
@@ -839,8 +838,21 @@ public class AddPlayFragment extends Fragment implements
                             .cacheInMemory(false)
                             .considerExifParams(true)
                             .build();
-                    mCurrentPhotoPath = "file://" + chosenImage.getFilePathOriginal();
-                    ImageLoader.getInstance().displayImage(mCurrentPhotoPath, playPhoto, options);
+
+                    try {
+                        String[] splitMe = chosenImage.getFilePathOriginal().split("/");
+                        File src = new File(chosenImage.getFilePathOriginal());
+                        File dest = new File(Environment.getExternalStoragePublicDirectory(
+                                Environment.DIRECTORY_PICTURES) + "/" + splitMe[splitMe.length-1]);
+                        FileUtils.copy(src, dest);
+                        mCurrentPhotoPath = "file://" + dest.getAbsolutePath();
+                        ImageLoader.getInstance().displayImage(mCurrentPhotoPath, playPhoto, options);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    // Save a file: path for use with ACTION_VIEW intents
+
                 }
             }
         });
