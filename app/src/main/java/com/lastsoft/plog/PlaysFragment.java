@@ -225,18 +225,22 @@ public class PlaysFragment extends Fragment{
                             case R.id.sort_date_newold:
                                 sortType = 0;
                                 mAdapter.updateData(mAdapter.generatePlayData(mSearchQuery, playListType, sortType));
+                                mRecyclerView.scrollToPosition(0);
                                 return true;
                             case R.id.sort_date_oldnew:
                                 sortType = 1;
                                 mAdapter.updateData(mAdapter.generatePlayData(mSearchQuery, playListType, sortType));
+                                mRecyclerView.scrollToPosition(0);
                                 return true;
                             case R.id.sort_az:
                                 sortType = 2;
                                 mAdapter.updateData(mAdapter.generatePlayData(mSearchQuery, playListType, sortType));
+                                mRecyclerView.scrollToPosition(0);
                                 return true;
                             case R.id.sort_za:
                                 sortType = 3;
                                 mAdapter.updateData(mAdapter.generatePlayData(mSearchQuery, playListType, sortType));
+                                mRecyclerView.scrollToPosition(0);
                                 return true;
                         }
                         return false;

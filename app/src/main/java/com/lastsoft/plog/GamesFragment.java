@@ -339,18 +339,22 @@ public class GamesFragment extends Fragment{
                             case R.id.sort_az:
                                 sortType = 0;
                                 mAdapter.updateData(mAdapter.generateGameList(mSearchQuery, playListType, sortType));
+                                mRecyclerView.scrollToPosition(0);
                                 return true;
                             case R.id.sort_za:
                                 sortType = 1;
                                 mAdapter.updateData(mAdapter.generateGameList(mSearchQuery, playListType, sortType));
+                                mRecyclerView.scrollToPosition(0);
                                 return true;
                             case R.id.sort_plays_x0:
                                 sortType = 2;
                                 mAdapter.updateData(mAdapter.generateGameList(mSearchQuery, playListType, sortType));
+                                mRecyclerView.scrollToPosition(0);
                                 return true;
                             case R.id.sort_plays_0x:
                                 sortType = 3;
                                 mAdapter.updateData(mAdapter.generateGameList(mSearchQuery, playListType, sortType));
+                                mRecyclerView.scrollToPosition(0);
                                 return true;
                         }
                         return false;
