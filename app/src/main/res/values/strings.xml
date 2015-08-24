@@ -152,17 +152,21 @@
     </string-array>
 
     <string name="unique_games">"Unique Games: "</string>
+    <string name="unplayed_games">"Unplayed Games: "</string>
     <string name="wins">"Wins: "</string>
     <string name="stats_regular_wins">Regular Wins</string>
     <string name="stats_asterisk_wins">Asterisk Wins</string>
     <string name="stats_total_plays">Total Plays</string>
     <string name="stats_unique_plays">Unique Games</string>
+    <string name="stats_unplayed_games">Unplayed Games</string>
     <string name="stats_total_wins">Total Wins</string>
     <string name="stats_shared_wins">Shared Wins</string>
     <string name="stats_total_losses">Total Losses</string>
     <string name="percentage">" Percentage"</string>
     <string name="version_label">"Version: "</string>
     <string name="percent_completed">"Percent Completed: "</string>
+    <string name="random_game">Random Game</string>
+    <string name="random_game_to_play">"You should play "</string>
 
     <string name="sort_az">Alpha (A->Z)</string>
     <string name="sort_za">Alpha (Z->A)</string>

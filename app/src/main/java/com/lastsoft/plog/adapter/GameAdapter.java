@@ -170,6 +170,22 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
                     games_out = Game.findAllGames_GameGroup(GameGroup.findById(GameGroup.class, groupId), sortType);
                 }
                 break;
+            case 4:
+                if (mSearchQuery.equals("0")){
+                    games_out = Game.getUnplayedGames(sortType, false);
+                }else {
+                    gameGroup = mSearchQuery;
+                    games_out = Game.getUnplayedGames_GameGroup(GameGroup.findById(GameGroup.class, Long.parseLong(mSearchQuery)), sortType, false);
+                }
+                break;
+            case 5:
+                if (mSearchQuery.equals("0")){
+                    games_out = Game.getUnplayedGames(sortType, true);
+                }else {
+                    gameGroup = mSearchQuery;
+                    games_out = Game.getUnplayedGames_GameGroup(GameGroup.findById(GameGroup.class, Long.parseLong(mSearchQuery)), sortType, true);
+                }
+                break;
             default:
                 games_out = Game.findBaseGames(mSearchQuery, sortType);
                 break;
@@ -204,6 +220,10 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
                 .inflate(R.layout.game_row_item, viewGroup, false);
 
         return new ViewHolder(v);
+    }
+
+    public List<Game> getGames(){
+        return games;
     }
     // END_INCLUDE(recyclerViewOnCreateViewHolder)
 

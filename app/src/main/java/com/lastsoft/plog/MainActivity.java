@@ -108,37 +108,40 @@ public class MainActivity extends AppCompatActivity
     private final SharedElementCallback mCallback = new SharedElementCallback() {
         @Override
         public void onMapSharedElements(List<String> names, Map<String, View> sharedElements) {
-            if (mIsReentering) {
-                int oldPosition = mTmpState.getInt(EXTRA_OLD_ITEM_POSITION);
-                int currentPosition = mTmpState.getInt(EXTRA_CURRENT_ITEM_POSITION);
+            try {
+                if (mIsReentering) {
+                    int oldPosition = mTmpState.getInt(EXTRA_OLD_ITEM_POSITION);
+                    int currentPosition = mTmpState.getInt(EXTRA_CURRENT_ITEM_POSITION);
 
-                if (currentPosition != oldPosition) {
-                    // If currentPosition != oldPosition the user must have swiped to a different
-                    // page in the DetailsActivity. We must update the shared element so that the
-                    // correct one falls into place.
-                    String newImageTransitionName = "imageTrans" + currentPosition;
-                    String newNameTransitionName = "nameTrans" + currentPosition;
-                    String newDateTransitionName = "dateTrans" + currentPosition;
-                    View newImageSharedView = mPlaysFragment.mRecyclerView.findViewWithTag(newImageTransitionName);
-                    //View newNameSharedView = mPlaysFragment.mRecyclerView.findViewWithTag(newNameTransitionName);
-                    //View newDateSharedView = mPlaysFragment.mRecyclerView.findViewWithTag(newDateTransitionName);
-                    if (newImageSharedView != null) {
-                        names.clear();
-                        names.add(newImageTransitionName);
-                        //names.add(newNameTransitionName);
-                        //names.add(newDateTransitionName);
-                        sharedElements.clear();
-                        sharedElements.put(newImageTransitionName, newImageSharedView);
-                        //sharedElements.put(newNameTransitionName, newNameSharedView);
-                        //sharedElements.put(newDateTransitionName, newDateSharedView);
+                    if (currentPosition != oldPosition) {
+                        // If currentPosition != oldPosition the user must have swiped to a different
+                        // page in the DetailsActivity. We must update the shared element so that the
+                        // correct one falls into place.
+                        String newImageTransitionName = "imageTrans" + currentPosition;
+                        String newNameTransitionName = "nameTrans" + currentPosition;
+                        String newDateTransitionName = "dateTrans" + currentPosition;
+                        View newImageSharedView = mPlaysFragment.mRecyclerView.findViewWithTag(newImageTransitionName);
+                        //View newNameSharedView = mPlaysFragment.mRecyclerView.findViewWithTag(newNameTransitionName);
+                        //View newDateSharedView = mPlaysFragment.mRecyclerView.findViewWithTag(newDateTransitionName);
+                        if (newImageSharedView != null) {
+                            names.clear();
+                            names.add(newImageTransitionName);
+                            //names.add(newNameTransitionName);
+                            //names.add(newDateTransitionName);
+                            sharedElements.clear();
+                            sharedElements.put(newImageTransitionName, newImageSharedView);
+                            //sharedElements.put(newNameTransitionName, newNameSharedView);
+                            //sharedElements.put(newDateTransitionName, newDateSharedView);
+                        }
+                        //if (newNameSharedView == null ){ Log.d("V1", "newNameSharedView is null");}
+                        //if (newDateSharedView == null ){ Log.d("V1", "newDateSharedView is null");}
                     }
-                    //if (newNameSharedView == null ){ Log.d("V1", "newNameSharedView is null");}
-                    //if (newDateSharedView == null ){ Log.d("V1", "newDateSharedView is null");}
+                    mTmpState = null;
                 }
-                mTmpState = null;
+            }catch (Exception ignored){
+                //we don't care if you can't see the transition once
             }
         }
-
     };
 
     @Override

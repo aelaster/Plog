@@ -232,6 +232,72 @@ public class Game extends SugarRecord<Game> {
                         " ORDER BY COUNT(G." + StringUtil.toSQLName("gameName") + ") DESC, G." + StringUtil.toSQLName("gameName"), group.getId().toString(), year + "");
     }
 
+    public static List<Game> getUnplayedGames(int sortType, boolean showExpansions){
+        String query;
+        query = " SELECT "+ StringUtil.toSQLName("Game") + ".*, COUNT(" + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + ") AS " + StringUtil.toSQLName("playCount") +
+                " FROM " + StringUtil.toSQLName("Game") +
+                " LEFT JOIN " + StringUtil.toSQLName("GamesPerPlay") +
+                " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("game") + " = " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("id") +
+                " LEFT JOIN " + StringUtil.toSQLName("Play") +
+                " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("play") + " = " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id");
+        if (!showExpansions) {
+            query = query + " and " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("expansionFlag") + " = 0 " +
+                    " WHERE " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("expansionFlag") + " = 0";
+        }
+        query = query + " GROUP BY " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") +
+                " HAVING COUNT(" + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + ") = 0 ";
+        switch (sortType) {
+            case 0:
+                query = query + " order by " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " ASC, "  + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " DESC";
+                break;
+            case 1:
+                query = query + " order by " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " DESC, "  + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " DESC";
+                break;
+            case 2:
+                query = query + " order BY COUNT(" + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + ") DESC, " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " ASC, "  + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " DESC";
+                break;
+            case 3:
+                query = query + " order BY COUNT(" + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + ") ASC, " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " ASC, "  + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " DESC";
+                break;
+        }
+        return Game.findWithQuery(Game.class,query);
+    }
+
+
+    public static List<Game> getUnplayedGames_GameGroup(GameGroup group, int sortType, boolean showExpansions){
+        String query;
+        query = " SELECT "+ StringUtil.toSQLName("Game") + ".*" +
+                " FROM " + StringUtil.toSQLName("Game") +
+                " WHERE " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("id") + " NOT IN" +
+                " ( " +
+                " SELECT "+ StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("id") +
+                " FROM " + StringUtil.toSQLName("Game") +
+                " LEFT JOIN " + StringUtil.toSQLName("GamesPerPlay") +
+                " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("game") + " = " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("id") +
+                " LEFT JOIN " + StringUtil.toSQLName("Play") +
+                " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("play") + " = " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") +
+                " LEFT JOIN " + StringUtil.toSQLName("PlaysPerGameGroup") +
+                " ON " + StringUtil.toSQLName("PlaysPerGameGroup") + "." + StringUtil.toSQLName("play") + " = " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id");
+        query = query + " WHERE " + StringUtil.toSQLName("PlaysPerGameGroup") + "." + StringUtil.toSQLName("GameGroup") + " = ? ";
+        query = query + " GROUP BY " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") +
+                " HAVING COUNT(" + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + ") > 0 ";
+        query = query + " ) ";
+        if (!showExpansions) {
+            query = query + " AND " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("expansionFlag") + " = 0";
+        }
+        switch (sortType) {
+            case 0:
+                query = query + " order by " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " ASC";
+                break;
+            case 1:
+                query = query + " order by " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " DESC";
+                break;
+        }
+
+        //Log.d("V1", query);
+
+        return Game.findWithQuery(Game.class,query,group.getId().toString());
+    }
 
     public static List<Game> getUniqueGames_GameGroup(GameGroup group, int sortType){
         String query;
@@ -290,6 +356,7 @@ public class Game extends SugarRecord<Game> {
         }
         return Game.findWithQuery(Game.class,query);
     }
+
 
     public static List<Game> getBucketList(){
         String query;

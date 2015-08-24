@@ -106,13 +106,15 @@ public class StatsFragment_Wins extends Fragment {
         public int asteriskWins;
         public long totalPlays;
         public long totalUnique;
+        public long totalUnplayed;
 
-        public WinStats(Player player, int regularWins, int asteriskWins, long totalPlays, long totalUnique) {
+        public WinStats(Player player, int regularWins, int asteriskWins, long totalPlays, long totalUnique, long totalUnplayed) {
             this.player = player;
             this.regularWins = regularWins;
             this.asteriskWins = asteriskWins;
             this.totalPlays = totalPlays;
             this.totalUnique = totalUnique;
+            this.totalUnplayed = totalUnplayed;
         }
     }
 
@@ -151,10 +153,11 @@ public class StatsFragment_Wins extends Fragment {
             //Long[] output = new Long[outputBounds];
             //times 2 because each player needs regular and asterisk totals
             //plus two because we put total and unique plays on the top
-            long totalPlays, totalUnique;
+            long totalPlays, totalUnique, totalUnplayed;
             if (theGroup == 0){
                 totalPlays = ((long) Play.listPlaysNewOld(0).size());
                 totalUnique = Game.getUniqueGames(0).size();
+                totalUnplayed = Game.getUnplayedGames(0, false).size();
                 try {
                     for (int i = 0; i < groupPlayers.size(); i++){
                         Player thisPlayer = Player.findById(Player.class, groupPlayers.get(i).getId());
@@ -163,7 +166,7 @@ public class StatsFragment_Wins extends Fragment {
                         //asterisk wins
                         int asteriskWins = Play.totalAsteriskWins_Player(thisPlayer, 0).size();
                         //output[arrayBounds+1] = (long)(regularWins + asteriskWins);
-                        output.add(new WinStats(thisPlayer, regularWins, asteriskWins, totalPlays, totalUnique));
+                        output.add(new WinStats(thisPlayer, regularWins, asteriskWins, totalPlays, totalUnique, totalUnplayed));
                     }
                     Collections.sort(output, new Comparator<WinStats>() {
                         public int compare(WinStats left, WinStats right) {
@@ -176,6 +179,7 @@ public class StatsFragment_Wins extends Fragment {
             }else {
                 totalPlays = ((long) PlayersPerPlay.totalPlays_GameGroup(GameGroup.findById(GameGroup.class, theGroup)).size() / (long) groupPlayers.size());
                 totalUnique = Game.getUniqueGames_GameGroup(GameGroup.findById(GameGroup.class, theGroup), 0).size();
+                totalUnplayed = Game.getUnplayedGames_GameGroup(GameGroup.findById(GameGroup.class, theGroup), 0, false).size();
                 try {
                     for (int i = 0; i < groupPlayers.size(); i++){
                         GameGroup thisGroup = GameGroup.findById(GameGroup.class, theGroup);
@@ -185,7 +189,7 @@ public class StatsFragment_Wins extends Fragment {
                         //asterisk wins
                         int asteriskWins = Play.totalAsteriskWins_GameGroup_Player(thisGroup, thisPlayer, 0).size();
                         //output[arrayBounds+1] = (long)(regularWins + asteriskWins);
-                        output.add(new WinStats(thisPlayer, regularWins, asteriskWins, totalPlays, totalUnique));
+                        output.add(new WinStats(thisPlayer, regularWins, asteriskWins, totalPlays, totalUnique, totalUnplayed));
                     }
                     Collections.sort(output, new Comparator<WinStats>() {
                         public int compare(WinStats left, WinStats right) {
@@ -205,6 +209,7 @@ public class StatsFragment_Wins extends Fragment {
             if (result.size() > 0) {
                 addStat(0, getString(R.string.stats_total_plays), result.get(0).totalPlays + "", "");
                 addStat(1, getString(R.string.stats_unique_plays), result.get(0).totalUnique + "", "");
+                addStat(8, getString(R.string.stats_unplayed_games), result.get(0).totalUnplayed + "", "");
                 for (int x = 0; x < result.size(); x++) {
 
                     if (theGroup == 0){
@@ -407,7 +412,11 @@ public class StatsFragment_Wins extends Fragment {
                                 //regular wins percentage
                                 //just using this to get a list of total plays for a player
                                 //using it because it's part of the "Everyone" list too
-                                ((MainActivity) mActivity).openPlays(gameGroup+"^"+playerValue, false, 8);
+                                ((MainActivity) mActivity).openGames(gameGroup+"^"+playerValue, false, 8);
+                                break;
+                            case 8:
+                                ((MainActivity) mActivity).openGames(gameGroup + "", false, 4);
+                                break;
                         }
                     }
                 });

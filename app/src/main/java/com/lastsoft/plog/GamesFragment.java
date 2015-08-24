@@ -25,6 +25,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
@@ -57,6 +58,8 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
+import java.util.Random;
 
 import xyz.danoz.recyclerviewfastscroller.vertical.VerticalRecyclerViewFastScroller;
 
@@ -308,16 +311,18 @@ public class GamesFragment extends Fragment{
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        if (playListType != 2 && !((MainActivity) mActivity).mNavigationDrawerFragment.isDrawerOpen() && ((MainActivity) mActivity).currentFragmentCode != 0) {
+        if (playListType != 2  && !((MainActivity) mActivity).mNavigationDrawerFragment.isDrawerOpen() && ((MainActivity) mActivity).currentFragmentCode != 0) {
             inflater.inflate(R.menu.games, menu);
             menuItem0 = menu.getItem(0);
             if (showExpansions) {
                 menuItem0.setTitle(getString(R.string.hide_expansions));
                 menuItem0.setIcon(R.drawable.ic_visibility_off);
-            }else{
+            } else {
                 menuItem0.setTitle(getString(R.string.show_expansions));
                 menuItem0.setIcon(R.drawable.ic_visibility);
             }
+        }else if (playListType == 2  && !((MainActivity) mActivity).mNavigationDrawerFragment.isDrawerOpen() && ((MainActivity) mActivity).currentFragmentCode != 0) {
+            inflater.inflate(R.menu.bucketlist, menu);
         }
     }
 
@@ -328,6 +333,19 @@ public class GamesFragment extends Fragment{
             case android.R.id.home:
                 //called when the up affordance/carat in actionbar is pressed
                 mActivity.onBackPressed();
+                return true;
+            case R.id.random_game:
+                //select random bucket list game
+                List<Game> theGames = mAdapter.getGames();
+                int min = 0;
+                int max = theGames.size();
+                Random r = new Random();
+                int randomGame = r.nextInt(max - min) + min;
+                Snackbar
+                        .make(mCoordinatorLayout,
+                                getString(R.string.random_game_to_play) + theGames.get(randomGame).gameName,
+                                Snackbar.LENGTH_LONG)
+                    .show(); // Do not forget to show!
                 return true;
             case R.id.sort:
                 View menuItemView = mActivity.findViewById(R.id.sort);
@@ -362,6 +380,11 @@ public class GamesFragment extends Fragment{
                 });
                 MenuInflater inflater = popup.getMenuInflater();
                 inflater.inflate(R.menu.games_sort, popup.getMenu());
+                if (playListType == 4){
+                    //remove sort by plays
+                    popup.getMenu().getItem(2).setVisible(false);;
+                    popup.getMenu().getItem(3).setVisible(false);;
+                }
                 popup.show();
                 return true;
             case R.id.show_expansions:
@@ -381,7 +404,11 @@ public class GamesFragment extends Fragment{
                     item.setTitle(getString(R.string.hide_expansions));
                     item.setIcon(R.drawable.ic_visibility_off);
                     playListType_Holder = playListType;
-                    playListType = 3;
+                    if (playListType == 4) {
+                        playListType = 5;
+                    }else {
+                        playListType = 3;
+                    }
                     mAdapter.updateData(mAdapter.generateGameList(mSearchQuery, playListType, sortType));
                     showExpansions = true;
                 }
@@ -413,7 +440,7 @@ public class GamesFragment extends Fragment{
     public void onSaveInstanceState(Bundle savedInstanceState) {
         // Save currently selected layout manager.
         savedInstanceState.putSerializable(KEY_LAYOUT_MANAGER, mCurrentLayoutManagerType);
-            super.onSaveInstanceState(savedInstanceState);
+        super.onSaveInstanceState(savedInstanceState);
     }
 
     @Override
