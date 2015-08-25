@@ -131,6 +131,7 @@
 
     <string name="undo">Undo</string>
     <string name="added_to_bl">" added to Bucket List"</string>
+    <string name="removed_from_bl">" removed from Bucket List"</string>
 
     <string name="error">Error</string>
     <string name="notify_0_text">You must have at least one player in a play.</string>

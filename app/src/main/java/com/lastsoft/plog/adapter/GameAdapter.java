@@ -382,8 +382,8 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
                      case R.id.add_bucket_list:
                          String[] ids = TimeZone.getAvailableIDs(-5 * 60 * 60 * 1000);
                          // if no ids were returned, something is wrong. get out.
-                         if (ids.length == 0)
-                             System.exit(0);
+                         //if (ids.length == 0)
+                         //    System.exit(0);
 
                          // begin output
                          //System.out.println("Current Time");
@@ -422,8 +422,26 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
 
                          return true;
                      case R.id.remove_bucket_list:
+                         final int taggedToPlay = games.get(position).taggedToPlay;
+                         final Game gameToUndo = games.get(position);
                          games.get(position).taggedToPlay = 0;
                          games.get(position).save();
+
+                         Snackbar
+                                 .make(((GamesFragment) mFragment).mCoordinatorLayout,
+                                         games.get(position).gameName + mActivity.getString(R.string.removed_from_bl),
+                                         Snackbar.LENGTH_LONG)
+                                 .setAction(mActivity.getString(R.string.undo), new View.OnClickListener() {
+                                     @Override
+                                     public void onClick(View view) {
+                                         gameToUndo.taggedToPlay = taggedToPlay;
+                                         gameToUndo.save();
+                                         if (playListType == 2) {
+                                             ((MainActivity) mActivity).onFragmentInteraction("refresh_games");
+                                         }
+                                     }
+                                 })
+                                 .show(); // Do not forget to show!
                          if (playListType == 2) {
                              ((MainActivity) mActivity).onFragmentInteraction("refresh_games");
                          }
