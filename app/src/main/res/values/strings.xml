@@ -179,6 +179,8 @@
 
     <string name="title_pref_behavior">App Behavior</string>
     <string name="title_solo_remove_bucket_list">Remove Solo Plays from Bucket List</string>
+    <string name="title_bucket_list_weight">Weigh Random Bucket List Games</string>
+    <string name="summary_bucket_list_weight">Games are weighted according to how long ago they were added</string>
 
 
 </resources>

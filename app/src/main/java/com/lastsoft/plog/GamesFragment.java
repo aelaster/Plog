@@ -19,9 +19,11 @@ package com.lastsoft.plog;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -336,11 +338,46 @@ public class GamesFragment extends Fragment{
                 return true;
             case R.id.random_game:
                 //select random bucket list game
+                SharedPreferences app_preferences = PreferenceManager.getDefaultSharedPreferences(mActivity);
+
                 List<Game> theGames = mAdapter.getGames();
                 int min = 0;
                 int max = theGames.size();
                 Random r = new Random();
-                int randomGame = r.nextInt(max - min) + min;
+                int randomGame;
+
+                if (!app_preferences.getBoolean("bucket_list_weight", false)) {
+                    randomGame = r.nextInt(max - min) + min;
+                }else{
+                    //build weights
+                    int[] weightHash = new int[max];
+                    int weightedMax = 0;
+                    for (int i = 1; i <= max; i++) {
+                        weightedMax = weightedMax + i;
+                        weightHash[i - 1] = weightedMax;
+                    }
+
+                    randomGame = r.nextInt(weightedMax - min) + min;
+
+                    for (int j = max - 1; j >= 0; j--) {
+                        if (randomGame < weightHash[j]) {
+                            //it may fall in this range
+                            //see if it's larger than the next one
+                            //if this one is zero, we found it
+                            if (j == 0) {
+                                randomGame = j;
+                                break;
+                            } else if (randomGame > weightHash[j - 1]) {
+                                randomGame = j;
+                                break;
+                            } else if (randomGame == weightHash[j - 1]) {
+                                randomGame = j - 1;
+                                break;
+                            }
+                        }
+                    }
+                }
+
                 Snackbar
                         .make(mCoordinatorLayout,
                                 getString(R.string.random_game_to_play) + theGames.get(randomGame).gameName,

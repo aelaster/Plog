@@ -21,5 +21,10 @@
             android:key="solo_remove_bucket_list"
             android:title="@string/title_solo_remove_bucket_list"
             android:defaultValue="true" />
+        <CheckBoxPreference
+            android:key="bucket_list_weight"
+            android:title="@string/title_bucket_list_weight"
+            android:summary="@string/summary_bucket_list_weight"
+            android:defaultValue="false" />
     </PreferenceCategory>
 </PreferenceScreen>
