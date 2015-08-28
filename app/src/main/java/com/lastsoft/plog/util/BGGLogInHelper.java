@@ -95,6 +95,8 @@ public class BGGLogInHelper {
                 //return mContext.getResources().getString(R.string.setUsernamePassword);
             }
 
+
+
             final DefaultHttpClient client = (DefaultHttpClient) HttpUtils.createHttpClient(mContext, false);
             final HttpPost post = new HttpPost("http://www.boardgamegeek.com/login");
             List<NameValuePair> pair = new ArrayList<NameValuePair>();

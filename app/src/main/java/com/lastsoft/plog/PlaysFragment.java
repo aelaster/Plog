@@ -154,12 +154,14 @@ public class PlaysFragment extends Fragment{
                 @Override
                 public void onTextChanged(CharSequence cs, int arg1, int arg2, int arg3) {
                     // When user changed the Text
-                    mSearchQuery = cs.toString();
-                    //initDataset();
-                    //mAdapter = new GameAdapter(PlaysFragment.this, mActivity,mSearchQuery);
-                    mAdapter = ((MainActivity) mActivity).initPlayAdapter(mSearchQuery, fromDrawer, playListType);
-                    // Set CustomAdapter as the adapter for RecyclerView.
-                    mRecyclerView.setAdapter(mAdapter);
+                    if (mActivity != null) {
+                        mSearchQuery = cs.toString();
+                        //initDataset();
+                        //mAdapter = new GameAdapter(PlaysFragment.this, mActivity,mSearchQuery);
+                        mAdapter = ((MainActivity) mActivity).initPlayAdapter(mSearchQuery, fromDrawer, playListType);
+                        // Set CustomAdapter as the adapter for RecyclerView.
+                        mRecyclerView.setAdapter(mAdapter);
+                    }
                 }
 
                 @Override

@@ -153,9 +153,11 @@ public class AddPlayerFragment extends Fragment {
                 int spinnerPostion = colorSpinnerArrayAdapter.getPosition(editPlayer.defaultColor);
                 color.setSelection(spinnerPostion);
             }
-            if (app_preferences.getLong("defaultPlayer", -1) == playerID){
+
+            long defaultPlayer = app_preferences.getLong("defaultPlayer", -1);
+            if (defaultPlayer == playerID){
                 defaultSwitch.setChecked(true);
-            }else{
+            }else if (defaultPlayer >= 0){
                 defaultSwitch.setVisibility(View.GONE);
             }
 
@@ -321,10 +323,12 @@ public class AddPlayerFragment extends Fragment {
                             //set app preference
                             editor.putLong("defaultPlayer", playerID);
                             editor.commit();
+                            ((MainActivity) mActivity).logIntoBGG();
                         } else {
                             //check to see if the pref is this bggusername.  if so, clear it.
                             long currentDefaultPlayer = app_preferences.getLong("defaultPlayer", -1);
                             if (currentDefaultPlayer == playerID){
+                                ((MainActivity) mActivity).logOutOfBGG();
                                 editor.putLong("defaultPlayer", -1);
                                 editor.commit();
                             }

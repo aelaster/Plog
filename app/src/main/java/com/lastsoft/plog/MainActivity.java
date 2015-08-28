@@ -80,6 +80,7 @@ public class MainActivity extends AppCompatActivity
 
     static final String EXTRA_CURRENT_ITEM_POSITION = "extra_current_item_position";
     static final String EXTRA_OLD_ITEM_POSITION = "extra_old_item_position";
+    static final String CURRENT_FRAGMENT_CODE = "current_fragment_code";
 
     private Boolean fragUp = false;
     private AddPlayerFragment mAddPlayerFragment;
@@ -104,6 +105,7 @@ public class MainActivity extends AppCompatActivity
     private Bundle mTmpState;
     private boolean mIsReentering;
     public BGGLogInHelper mLogInHelper;
+    public int currentFragmentCode = 4;
 
     private final SharedElementCallback mCallback = new SharedElementCallback() {
         @Override
@@ -157,6 +159,10 @@ public class MainActivity extends AppCompatActivity
 
         BackupManager bm = new BackupManager(this);
         bm.dataChanged();
+
+        if (savedInstanceState != null) {
+            currentFragmentCode = savedInstanceState.getInt(CURRENT_FRAGMENT_CODE);
+        }
 
 
         //List<Game> winses = Game.totalTenByTen_GameGroup(GameGroup.findById(GameGroup.class, (long) 1), 2015);
@@ -223,11 +229,25 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(CURRENT_FRAGMENT_CODE, currentFragmentCode);
+    }
+
+    @Override
     protected void onResume() {
+        logIntoBGG();
+        super.onResume();
+    }
+
+    public void logIntoBGG(){
+        logOutOfBGG();
+        mLogInHelper.logIn();
+    }
+
+    public void logOutOfBGG(){
         Cookies mCookies = new Cookies(this);
         mCookies.clearCookies();
-        mLogInHelper.logIn();
-        super.onResume();
     }
 
     @Override
@@ -436,7 +456,7 @@ public class MainActivity extends AppCompatActivity
         mTitle = title;
     }
 
-    public int currentFragmentCode = 4;
+
     public void setUpActionBar(int fragmentCode){
 
         try{

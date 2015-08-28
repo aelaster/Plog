@@ -233,9 +233,12 @@ public class NavigationDrawerFragment extends Fragment {
         mDrawerLayout.closeDrawer(mFragmentContainerView);
     }
 
-    private void selectItem(int position) {
+    private void selectItem(final int position) {
         try {
-            mCurrentSelectedPosition = position;
+            if (position != 5) {
+                //don't save the settings position, because that's a new activity.  save the rest.
+                mCurrentSelectedPosition = position;
+            }
             if (mDrawerLayout != null) {
                 mDrawerLayout.closeDrawer(mFragmentContainerView);
             }
@@ -243,10 +246,10 @@ public class NavigationDrawerFragment extends Fragment {
                 @Override
                 public void run() {
                     if (mDrawerListView != null) {
-                        mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
+                        mDrawerListView.setItemChecked(position, true);
                     }
                     if (mCallbacks != null) {
-                        mCallbacks.onNavigationDrawerItemSelected(mCurrentSelectedPosition);
+                        mCallbacks.onNavigationDrawerItemSelected(position);
                     }
                 }
             }, 300);
