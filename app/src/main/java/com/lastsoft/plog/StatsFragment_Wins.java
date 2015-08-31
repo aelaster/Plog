@@ -287,10 +287,10 @@ public class StatsFragment_Wins extends Fragment {
                 public void onValueSelected(Entry e, int dataSetIndex, Highlight h) {
                     switch (e.getXIndex()) {
                         case 0:
-                            ((MainActivity) mActivity).openPlays(gameGroup + "^" + playerValue, false, 2);
+                            ((MainActivity) mActivity).openPlays(gameGroup + "^" + playerValue, false, 2, getString(R.string.title_statistics));
                             break;
                         case 1:
-                            ((MainActivity) mActivity).openPlays(gameGroup + "^" + playerValue, false, 3);
+                            ((MainActivity) mActivity).openPlays(gameGroup + "^" + playerValue, false, 3, getString(R.string.title_statistics));
                             break;
                     }
                 }
@@ -382,40 +382,40 @@ public class StatsFragment_Wins extends Fragment {
                         switch (statType) {
                             case 0:
                                 //((MainActivity) mActivity).openPlays(games.get(position).gameName, false);
-                                ((MainActivity) mActivity).openPlays(gameGroup+"", false, 1);
+                                ((MainActivity) mActivity).openPlays(gameGroup+"", false, 1, getString(R.string.title_statistics));
                                 break;
                             case 1:
                                 //((MainActivity) mActivity).openPlays(games.get(position).gameName, false);
-                                ((MainActivity) mActivity).openGames(gameGroup+"", false, 1);
+                                ((MainActivity) mActivity).openGames(gameGroup+"", false, 1, getString(R.string.title_statistics));
                                 break;
                             case 2:
                                 //((MainActivity) mActivity).openPlays(games.get(position).gameName, false);
-                                ((MainActivity) mActivity).openPlays(gameGroup+"^"+playerValue, false, 2);
+                                ((MainActivity) mActivity).openPlays(gameGroup+"^"+playerValue, false, 2, getString(R.string.title_statistics));
                                 break;
                             case 3:
                                 //((MainActivity) mActivity).openPlays(games.get(position).gameName, false);
-                                ((MainActivity) mActivity).openPlays(gameGroup+"^"+playerValue, false, 3);
+                                ((MainActivity) mActivity).openPlays(gameGroup+"^"+playerValue, false, 3, getString(R.string.title_statistics));
                                 break;
                             case 4:
                                 //((MainActivity) mActivity).openPlays(games.get(position).gameName, false);
-                                ((MainActivity) mActivity).openPlays(gameGroup+"^"+playerValue, false, 4);
+                                ((MainActivity) mActivity).openPlays(gameGroup+"^"+playerValue, false, 4, getString(R.string.title_statistics));
                                 break;
                             case 5:
                                 //((MainActivity) mActivity).openPlays(games.get(position).gameName, false);
-                                ((MainActivity) mActivity).openPlays(gameGroup+"", false, 5);
+                                ((MainActivity) mActivity).openPlays(gameGroup+"", false, 5, getString(R.string.title_statistics));
                                 break;
                             case 6:
                                 //((MainActivity) mActivity).openPlays(games.get(position).gameName, false);
-                                ((MainActivity) mActivity).openPlays(gameGroup+"", false, 6);
+                                ((MainActivity) mActivity).openPlays(gameGroup+"", false, 6, getString(R.string.title_statistics));
                                 break;
                             case 7:
                                 //regular wins percentage
-                                //just using this to get a list of total plays for a player
+                                //just using this to get a list of total games played for a player
                                 //using it because it's part of the "Everyone" list too
-                                ((MainActivity) mActivity).openGames(gameGroup+"^"+playerValue, false, 8);
+                                ((MainActivity) mActivity).openPlays(gameGroup + "^" + playerValue, false, 8, getString(R.string.title_statistics));
                                 break;
                             case 8:
-                                ((MainActivity) mActivity).openGames(gameGroup + "", false, 4);
+                                ((MainActivity) mActivity).openGames(gameGroup + "", false, 4, getString(R.string.title_statistics));
                                 break;
                         }
                     }

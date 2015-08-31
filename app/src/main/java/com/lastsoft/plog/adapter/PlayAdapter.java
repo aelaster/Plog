@@ -129,9 +129,9 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
         playListType:
         0 - listPlaysNewOld
         1 - list total plays for groupID, which is passed in via mSearchQuery
-        2 - a players total regular wins, passed in the search query.  it is group and then player id, split with a dollar sign
-        3 - a players total asterisk wins, passed in the search query.  it is group and then player id, split with a dollar sign
-        4 - a players total wins, passed in the search query.  it is group and then player id, split with a dollar sign
+        2 - a players total regular wins, passed in the search query.  it is group and then player id, split with a caret
+        3 - a players total asterisk wins, passed in the search query.  it is group and then player id, split with a caret
+        4 - a players total wins, passed in the search query.  it is group and then player id, split with a caret
         5 - total group shared wins
         6 - total group losses
         7 - plays for a ten by ten game.  Group, then game, then year.

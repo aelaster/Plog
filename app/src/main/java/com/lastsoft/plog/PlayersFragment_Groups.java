@@ -194,14 +194,4 @@ public class PlayersFragment_Groups extends Fragment{
         }
     }
 
-    protected void refreshDataset(){
-        initDataset();
-        mAdapter = new GroupAdapter(mActivity, this);
-        // Set CustomAdapter as the adapter for RecyclerView.
-        mRecyclerView.setAdapter(mAdapter);
-    }
-
-    protected void updateDataset(){
-        mAdapter.notifyDataSetChanged();
-    }
 }

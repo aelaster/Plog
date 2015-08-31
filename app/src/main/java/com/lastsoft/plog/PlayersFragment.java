@@ -155,15 +155,6 @@ public class PlayersFragment extends Fragment {
             addFlag = addDropFlag;
         }
 
-        public void refreshPages(){
-            if (this.getItem(0) instanceof PlayersFragment_Players) {
-                ((PlayersFragment_Players)this.getItem(0)).updateDataset();
-            }
-            if (this.getItem(1) instanceof PlayersFragment_Groups) {
-                ((PlayersFragment_Groups)this.getItem(1)).updateDataset();
-            }
-        }
-
         @Override
         public Fragment getItem(int position) {
             if (position == 0){

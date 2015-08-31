@@ -15,10 +15,15 @@
  limitations under the License.
 -->
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/coordinatorLayout"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_width="match_parent">
+    <RelativeLayout
+        android:id="@+id/playsLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
     <!--<android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/pull_to_refresh_listview"
@@ -38,4 +43,5 @@
         android:layout_alignParentRight="true"
         />
     <!--</android.support.v4.widget.SwipeRefreshLayout>-->
-</RelativeLayout>
+    </RelativeLayout>
+</android.support.design.widget.CoordinatorLayout>

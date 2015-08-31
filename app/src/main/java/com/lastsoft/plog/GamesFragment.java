@@ -28,7 +28,9 @@ import android.provider.MediaStore;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.design.widget.SwipeDismissBehavior;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
@@ -48,6 +50,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.lastsoft.plog.adapter.GameAdapter;
@@ -104,16 +107,18 @@ public class GamesFragment extends Fragment{
     private int playListType_Holder = 0;
     private int sortType = 0;
     FloatingActionButton addPlayer;
+    private String fragmentName = "";
     int fabMargin;
     VerticalRecyclerViewFastScroller fastScroller;
 
 
-    public static GamesFragment newInstance(boolean fromDrawer, String searchQuery, int playListType) {
+    public static GamesFragment newInstance(boolean fromDrawer, String searchQuery, int playListType, String fragmentName) {
         GamesFragment fragment = new GamesFragment();
         Bundle args = new Bundle();
         args.putBoolean("fromDrawer", fromDrawer);
         args.putString("searchQuery", searchQuery);
         args.putInt("playListType", playListType);
+        args.putString("fragmentName", fragmentName);
         fragment.setArguments(args);
         return fragment;
     }
@@ -125,6 +130,7 @@ public class GamesFragment extends Fragment{
         if (getArguments() != null) {
             fromDrawer = getArguments().getBoolean("fromDrawer");
             mSearchQuery = getArguments().getString("searchQuery");
+            fragmentName = getArguments().getString("fragmentName");
             playListType = getArguments().getInt("playListType");
         }
         if (fromDrawer && playListType != 2) {
@@ -148,12 +154,13 @@ public class GamesFragment extends Fragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.fragment_games, container, false);
-        rootView.setBackgroundColor(getResources().getColor(R.color.cardview_initial_background));
+
         rootView.setTag(TAG);
 
         // BEGIN_INCLUDE(initializeRecyclerView)
         mCoordinatorLayout = (CoordinatorLayout) rootView.findViewById(R.id.coordinatorLayout);
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerView);
+        mRecyclerView.setBackgroundColor(getResources().getColor(R.color.cardview_initial_background));
         pullToRefreshView = (SwipeRefreshLayout) rootView.findViewById(R.id.pull_to_refresh_listview);
         pullToRefreshView.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
 
@@ -185,9 +192,35 @@ public class GamesFragment extends Fragment{
                 }
             });
         }else{
+
+            RelativeLayout gamesLayout = (RelativeLayout) rootView.findViewById(R.id.gamesLayout);
+            final SwipeDismissBehavior<LinearLayout> behavior = new SwipeDismissBehavior();
+            behavior.setSwipeDirection(SwipeDismissBehavior.SWIPE_DIRECTION_START_TO_END);
+            behavior.setListener(new SwipeDismissBehavior.OnDismissListener() {
+                @Override
+                public void onDismiss(final View view) {
+                    GamesFragment myFragC1 = (GamesFragment) getFragmentManager().findFragmentByTag("games");
+                    FragmentTransaction transaction = getFragmentManager().beginTransaction();
+                    transaction.remove(myFragC1);
+                    transaction.commitAllowingStateLoss();
+                    getFragmentManager().executePendingTransactions();
+                    mActivity.onBackPressed();
+                }
+
+                @Override
+                public void onDragStateChanged(int i) {
+
+                }
+            });
+
+            CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) gamesLayout.getLayoutParams();
+            params.setBehavior(behavior);
+
+
             fastScroller.setRecyclerView(mRecyclerView, null);
             pullToRefreshView.setEnabled(false);
             addPlayer.setVisibility(View.GONE);
+
         }
 
         mProgress = (LinearLayout) rootView.findViewById(R.id.progressContainer);
@@ -208,7 +241,7 @@ public class GamesFragment extends Fragment{
         setRecyclerViewLayoutManager(mCurrentLayoutManagerType);
 
         //mAdapter = new CustomAdapter(mDataset, mDataset_Thumb);
-        mAdapter = new GameAdapter(this, mActivity,mSearchQuery, fromDrawer, playListType, sortType);
+        mAdapter = new GameAdapter(this, mActivity,mSearchQuery, fromDrawer, playListType, sortType, fragmentName);
         // Set CustomAdapter as the adapter for RecyclerView.
         mRecyclerView.setAdapter(mAdapter);
 
@@ -238,7 +271,7 @@ public class GamesFragment extends Fragment{
                     // When user changed the Text
                     mSearchQuery = cs.toString();
                     //initDataset();
-                    mAdapter = new GameAdapter(GamesFragment.this, mActivity, mSearchQuery, fromDrawer, playListType, sortType);
+                    mAdapter = new GameAdapter(GamesFragment.this, mActivity, mSearchQuery, fromDrawer, playListType, sortType, fragmentName);
                     // Set CustomAdapter as the adapter for RecyclerView.
                     mRecyclerView.setAdapter(mAdapter);
                 }
@@ -295,6 +328,7 @@ public class GamesFragment extends Fragment{
     public String getQuery(){
         return mSearchQuery;
     }
+
 
     Activity mActivity;
     @Override
@@ -493,6 +527,9 @@ public class GamesFragment extends Fragment{
         }catch (Exception e){}
         if (mActivity != null) {
             //((MainActivity) mActivity).getSupportActionBar().setDisplayShowCustomEnabled(false);
+            if (!fromDrawer){
+                ((MainActivity) mActivity).setUpActionBar(7);
+            }
             mActivity = null;
         }
     }
@@ -597,7 +634,7 @@ public class GamesFragment extends Fragment{
                 myTask = null;
 
                 //mAdapter = new CustomAdapter(mDataset, mDataset_Thumb);
-                mAdapter = new GameAdapter(GamesFragment.this, mActivity, mSearchQuery, fromDrawer, playListType, sortType);
+                mAdapter = new GameAdapter(GamesFragment.this, mActivity, mSearchQuery, fromDrawer, playListType, sortType, fragmentName);
                 // Set CustomAdapter as the adapter for RecyclerView.
                 mRecyclerView.setAdapter(mAdapter);
 

@@ -19,62 +19,72 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/coordinatorLayout"
     android:layout_height="match_parent"
-    android:layout_width="match_parent">
-    <LinearLayout
-        android:id="@+id/progressContainer"
+    android:layout_width="match_parent"
+    >
+    <RelativeLayout
+        android:id="@+id/gamesLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
         android:orientation="vertical"
         android:visibility="visible" >
-
-        <ProgressBar
-            style="?android:attr/progressBarStyleLarge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <TextView
-            android:id="@+id/LoadingText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="20dp" >
-        </TextView>
-    </LinearLayout>
-    <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/pull_to_refresh_listview"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        >
-        <RelativeLayout
+        <LinearLayout
+            android:id="@+id/progressContainer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical">
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/recyclerView"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="visible" >
+
+            <ProgressBar
+                style="?android:attr/progressBarStyleLarge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/LoadingText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20dp" >
+            </TextView>
+        </LinearLayout>
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/pull_to_refresh_listview"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            >
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:visibility="gone"
-                />
-        </RelativeLayout>
-    </android.support.v4.widget.SwipeRefreshLayout>
-    <xyz.danoz.recyclerviewfastscroller.vertical.VerticalRecyclerViewFastScroller
-        android:id="@+id/fastscroller"
-        android:layout_width="10dp"
-        android:layout_height="match_parent"
-        android:layout_alignParentRight="true"
-        android:layout_gravity="right"
-        />
+                android:orientation="vertical">
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/recyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="gone"
+                    />
+            </RelativeLayout>
+        </android.support.v4.widget.SwipeRefreshLayout>
+        <xyz.danoz.recyclerviewfastscroller.vertical.VerticalRecyclerViewFastScroller
+            android:id="@+id/fastscroller"
+            android:layout_width="10dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:layout_gravity="right"
+            />
+    </RelativeLayout>
+
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/add_game"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_add"
-        android:layout_gravity="bottom|end"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginBottom="@dimen/fab_margin"
-        android:layout_marginEnd="@dimen/fab_margin"
-        app:elevation="4dp"
-        app:borderWidth="0dp"/>
+            android:id="@+id/add_game"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_add"
+            android:layout_gravity="bottom|end"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginBottom="@dimen/fab_margin"
+            android:layout_marginEnd="@dimen/fab_margin"
+            app:elevation="4dp"
+            app:borderWidth="0dp"/>
 
 </android.support.design.widget.CoordinatorLayout>

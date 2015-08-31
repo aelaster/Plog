@@ -19,7 +19,10 @@ package com.lastsoft.plog;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.SwipeDismissBehavior;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
@@ -27,6 +30,7 @@ import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -36,6 +40,8 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import com.lastsoft.plog.adapter.PlayAdapter;
 
@@ -66,15 +72,17 @@ public class PlaysFragment extends Fragment{
     private ImageView mCancel;
     private EditText mSearch;
     private String mSearchQuery = "";
+    private String fragmentName = "";
     private int playListType = 0;
     private boolean fromDrawer;
 
-    public static PlaysFragment newInstance(boolean fromDrawer, String searchQuery, int playListType) {
+    public static PlaysFragment newInstance(boolean fromDrawer, String searchQuery, int playListType, String fragmentName) {
         PlaysFragment fragment = new PlaysFragment();
         Bundle args = new Bundle();
         args.putBoolean("fromDrawer", fromDrawer);
         args.putString("searchQuery", searchQuery);
         args.putInt("playListType", playListType);
+        args.putString("fragmentName", fragmentName);
         fragment.setArguments(args);
         return fragment;
     }
@@ -85,6 +93,7 @@ public class PlaysFragment extends Fragment{
         if (getArguments() != null) {
             fromDrawer = getArguments().getBoolean("fromDrawer");
             mSearchQuery = getArguments().getString("searchQuery");
+            fragmentName = getArguments().getString("fragmentName");
             playListType = getArguments().getInt("playListType");
         }
         ActionBar actionBar = ((MainActivity) mActivity).getSupportActionBar();
@@ -109,11 +118,12 @@ public class PlaysFragment extends Fragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.fragment_plays, container, false);
-        rootView.setBackgroundColor(getResources().getColor(R.color.cardview_initial_background));
+
         rootView.setTag(TAG);
 
         // BEGIN_INCLUDE(initializeRecyclerView)
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerView);
+        mRecyclerView.setBackgroundColor(getResources().getColor(R.color.cardview_initial_background));
         VerticalRecyclerViewFastScroller fastScroller = (VerticalRecyclerViewFastScroller) rootView.findViewById(R.id.fastscroller);
 
         // Connect the recycler to the scroller (to let the scroller scroll the list)
@@ -146,6 +156,31 @@ public class PlaysFragment extends Fragment{
         //boolean pauseOnFling = true; // or false
         //NewPauseOnScrollListener listener = new NewPauseOnScrollListener(ImageLoader.getInstance(), pauseOnScroll, pauseOnFling);
         //mRecyclerView.addOnScrollListener(listener);
+
+        if (!fromDrawer){
+            RelativeLayout playsLayout = (RelativeLayout) rootView.findViewById(R.id.playsLayout);
+            final SwipeDismissBehavior<LinearLayout> behavior = new SwipeDismissBehavior();
+            behavior.setSwipeDirection(SwipeDismissBehavior.SWIPE_DIRECTION_START_TO_END);
+            behavior.setListener(new SwipeDismissBehavior.OnDismissListener() {
+                @Override
+                public void onDismiss(final View view) {
+                    PlaysFragment myFragC1 = (PlaysFragment) getFragmentManager().findFragmentByTag("plays");
+                    FragmentTransaction transaction = getFragmentManager().beginTransaction();
+                    transaction.remove(myFragC1);
+                    transaction.commitAllowingStateLoss();
+                    getFragmentManager().executePendingTransactions();
+                    mActivity.onBackPressed();
+                }
+
+                @Override
+                public void onDragStateChanged(int i) {
+
+                }
+            });
+
+            CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) playsLayout.getLayoutParams();
+            params.setBehavior(behavior);
+        }
 
 
         if (mSearch != null) {
@@ -282,6 +317,35 @@ public class PlaysFragment extends Fragment{
     public void onDetach() {
         super.onDetach();
         if (mActivity != null) {
+
+            /*
+              playListType:
+        0 - listPlaysNewOld
+        1 - list total plays for groupID, which is passed in via mSearchQuery
+        2 - a players total regular wins, passed in the search query.  it is group and then player id, split with a caret
+        3 - a players total asterisk wins, passed in the search query.  it is group and then player id, split with a caret
+        4 - a players total wins, passed in the search query.  it is group and then player id, split with a caret
+        5 - total group shared wins
+        6 - total group losses
+        7 - plays for a ten by ten game.  Group, then game, then year.
+        8 - plays for a specific player
+        9 - listPlaysNewOld, allowing expansions
+        10 - plays for all ten by ten games.  Group, then year.
+         */
+            Log.d("V1", "fragmentName = " + fragmentName);
+
+            if (fragmentName.equals(getString(R.string.title_bucket_list))){
+                ((MainActivity) mActivity).setUpActionBar(12);
+            }else if (fragmentName.equals(getString(R.string.title_players))){
+                ((MainActivity) mActivity).setUpActionBar(5);
+            }else if (fragmentName.equals(getString(R.string.title_games))){
+                ((MainActivity) mActivity).setUpActionBar(4);
+            }else if (fragmentName.equals(getString(R.string.title_statistics))){
+                ((MainActivity) mActivity).setUpActionBar(7);
+            }else if (fragmentName.equals(getString(R.string.title_plays))){
+                ((MainActivity) mActivity).setUpActionBar(6);
+            }
+
             mActivity = null;
         }
     }

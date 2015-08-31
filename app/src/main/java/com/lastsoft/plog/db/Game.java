@@ -362,9 +362,9 @@ public class Game extends SugarRecord<Game> {
         String query;
         query = " SELECT G.*, COUNT(P." + StringUtil.toSQLName("id") + ") AS " + StringUtil.toSQLName("playCount") +
                 " FROM " + StringUtil.toSQLName("Game") + " G " +
-                " INNER JOIN " + StringUtil.toSQLName("GamesPerPlay") + " GPP " +
+                " LEFT JOIN " + StringUtil.toSQLName("GamesPerPlay") + " GPP " +
                 " ON G." + StringUtil.toSQLName("id") + " = GPP." + StringUtil.toSQLName("game") +
-                " INNER JOIN " + StringUtil.toSQLName("Play") + " P " +
+                " LEFT JOIN " + StringUtil.toSQLName("Play") + " P " +
                 " ON GPP." + StringUtil.toSQLName("play") + " = P." + StringUtil.toSQLName("id") +
                 " WHERE G. " + StringUtil.toSQLName("taggedToPlay") + " != 0" +
                 " AND G. " + StringUtil.toSQLName("taggedToPlay") + " != \"\"" +

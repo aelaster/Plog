@@ -290,15 +290,15 @@ public class MainActivity extends AppCompatActivity
             String positionName = mNavigationDrawerFragment.getPositionHeading(position);
 
             if (positionName.equals(getString(R.string.title_plays))) {
-                openPlays("", true, 0);
+                openPlays("", true, 0, getString(R.string.title_plays));
             } else if (positionName.equals(getString(R.string.title_players))) {
                 fragmentManager.beginTransaction()
                         .replace(R.id.container, new PlayersFragment(), "players")
                         .commitAllowingStateLoss();
             } else if (positionName.equals(getString(R.string.title_games))) {
-                openGames("", true, 0);
+                openGames("", true, 0, getString(R.string.title_games));
             } else if (positionName.equals(getString(R.string.title_bucket_list))) {
-                openGames("BucketList", true, 2);
+                openGames("BucketList", true, 2, getString(R.string.title_bucket_list));
             } else if (positionName.equals(getString(R.string.title_statistics))) {
                 openStats();
             } else if (positionName.equals(getString(R.string.title_export_db))) {
@@ -381,7 +381,7 @@ public class MainActivity extends AppCompatActivity
                 .commitAllowingStateLoss();
     }
 
-    public void openGames(String searchQuery, boolean fromDrawer, int playListType){
+    public void openGames(String searchQuery, boolean fromDrawer, int playListType, String fragmentName){
         if(!fromDrawer){
             mNavigationDrawerFragment.mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
             mNavigationDrawerFragment.mDrawerToggle.setDrawerIndicatorEnabled(false);
@@ -393,14 +393,15 @@ public class MainActivity extends AppCompatActivity
             mGamesFragment = null;
         }
 
-        mGamesFragment = GamesFragment.newInstance(fromDrawer, searchQuery, playListType);
+        mGamesFragment = GamesFragment.newInstance(fromDrawer, searchQuery, playListType, fragmentName);
         FragmentTransaction ft = fragmentManager.beginTransaction();
         if (!fromDrawer){
             ft.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right);
             ft.addToBackStack("games");
         }
-        if (mStatsFragment != null && mStatsFragment.isVisible() && !fromDrawer) {
-            ft.hide(mStatsFragment);
+        //if (mStatsFragment != null && mStatsFragment.isVisible() && !fromDrawer) {
+        if (!fromDrawer){
+            //ft.hide(mStatsFragment);
             ft.add(R.id.container, mGamesFragment, "games");
         }else {
             ft.replace(R.id.container, mGamesFragment, "games");
@@ -409,7 +410,7 @@ public class MainActivity extends AppCompatActivity
         fragmentManager.executePendingTransactions();
     }
 
-    public void openPlays(String searchQuery, boolean fromDrawer, int playListType){
+    public void openPlays(String searchQuery, boolean fromDrawer, int playListType, String fragmentName){
         if(!fromDrawer){
             mNavigationDrawerFragment.mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
             mNavigationDrawerFragment.mDrawerToggle.setDrawerIndicatorEnabled(false);
@@ -421,7 +422,7 @@ public class MainActivity extends AppCompatActivity
             mPlaysFragment = null;
         }
 
-        mPlaysFragment = PlaysFragment.newInstance(fromDrawer, searchQuery, playListType);
+        mPlaysFragment = PlaysFragment.newInstance(fromDrawer, searchQuery, playListType, fragmentName);
         mPlayAdapter = initPlayAdapter(searchQuery, fromDrawer, playListType);
         //initPlayAdapter();
         FragmentTransaction ft = fragmentManager.beginTransaction();
@@ -430,8 +431,9 @@ public class MainActivity extends AppCompatActivity
             ft.addToBackStack("plays");
         }
 
-        if (mStatsFragment != null && mStatsFragment.isVisible() && !fromDrawer) {
-            ft.hide(mStatsFragment);
+        //if (mStatsFragment != null && mStatsFragment.isVisible() && !fromDrawer) {
+        if (!fromDrawer) {
+            //ft.hide(mStatsFragment);
             ft.add(R.id.container, mPlaysFragment, "plays");
         }else {
             ft.replace(R.id.container, mPlaysFragment, "plays");

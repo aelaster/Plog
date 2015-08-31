@@ -157,13 +157,13 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
         PopupMenu popup = new PopupMenu(mActivity, v);
 
         MenuInflater inflater = popup.getMenuInflater();
-        inflater.inflate(R.menu.player_overflow, popup.getMenu());
+        inflater.inflate(R.menu.group_overflow, popup.getMenu());
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.view_plays:
-                        ((MainActivity) mActivity).openPlays(groups.get(position).getId()+"", false, 1);
+                        ((MainActivity) mActivity).openPlays(groups.get(position).getId()+"", false, 1, mActivity.getString(R.string.title_players));
                         return true;
                     default:
                         return false;

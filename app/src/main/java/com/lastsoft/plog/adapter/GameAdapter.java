@@ -72,6 +72,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
     int mPosition;
     int playListType;
     private String gameGroup = null;
+    private String fragmentName = "";
 
     // BEGIN_INCLUDE(recyclerViewSampleViewHolder)
     /**
@@ -194,13 +195,14 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
         return games_out;
     }
 
-    public GameAdapter(Fragment theFragment, Activity theActivity, String mSearchQuery, boolean theFromDrawer, int mPlayListType, int mSortType) {
+    public GameAdapter(Fragment theFragment, Activity theActivity, String mSearchQuery, boolean theFromDrawer, int mPlayListType, int mSortType, String mFragmentName) {
         //games = Game.listAll(Game.class);
         //find(Class<T> type, String whereClause, String[] whereArgs, String groupBy, String orderBy, String limit)
         mFragment = theFragment;
         mActivity = theActivity;
         playListType = mPlayListType;
         fromDrawer = theFromDrawer;
+        fragmentName = mFragmentName;
 
         games = generateGameList(mSearchQuery, mPlayListType, mSortType);
 
@@ -345,9 +347,9 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
                          return true;
                      case R.id.view_plays:
                          if (games.get(position).expansionFlag == true) {
-                             ((MainActivity) mActivity).openPlays(games.get(position).gameName, false, 9);
+                             ((MainActivity) mActivity).openPlays(games.get(position).gameName, false, 9, fragmentName);
                          }else{
-                             ((MainActivity) mActivity).openPlays(games.get(position).gameName, false, 0);
+                             ((MainActivity) mActivity).openPlays(games.get(position).gameName, false, 0, fragmentName);
                          }
                          return true;
                      case R.id.open_bgg:
