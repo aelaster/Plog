@@ -27,4 +27,14 @@
             android:summary="@string/summary_bucket_list_weight"
             android:defaultValue="false" />
     </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/title_pref_support">
+
+        <Preference
+            android:key="send_debug"
+            android:title="@string/title_pref_send_debug">
+        </Preference>
+
+    </PreferenceCategory>
 </PreferenceScreen>

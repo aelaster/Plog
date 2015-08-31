@@ -16,6 +16,8 @@
 
 package com.lastsoft.plog;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.Preference;
@@ -23,15 +25,19 @@ import android.preference.PreferenceFragment;
 import android.util.Log;
 
 import com.lastsoft.plog.util.NotificationFragment;
+import com.lastsoft.plog.util.PostMortemReportExceptionHandler;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.channels.FileChannel;
 
 public class SettingsFragment extends PreferenceFragment {
 
-    private Preference mImportPreference, mExportPreference;
+    private Preference mImportPreference, mExportPreference, mSendDebugPreference;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -59,6 +65,73 @@ public class SettingsFragment extends PreferenceFragment {
         }else{
             mImportPreference.setEnabled(false);
         }
+
+        mSendDebugPreference = getPreferenceManager().findPreference("send_debug");
+        mSendDebugPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                sendDebug();
+                return false;
+            }
+        });
+    }
+
+    public void sendDebug(){
+        String ss = "\n\n\n\n-------- The following information is used to aid our support technicians in helping you --------\n\n";
+        ss = ss + PostMortemReportExceptionHandler.getDeviceEnvironment();
+        String t = "";
+        t = "--------- Activity Stack Trace ---------\n";
+        Process mLogcatProc = null;
+        BufferedReader reader = null;
+        try
+        {
+            mLogcatProc = Runtime.getRuntime().exec(new String[]
+                    {"logcat", "-d", "AndroidRuntime:E *:V" });
+
+            reader = new BufferedReader(new InputStreamReader(mLogcatProc.getInputStream()));
+            String line;
+            final StringBuilder log = new StringBuilder();
+            String separator = System.getProperty("line.separator");
+            int ids= android.os.Process.myPid();
+            while ((line = reader.readLine()) != null)
+            {
+                if (line.contains(""+ids)){
+                    log.append(line);
+                    log.append(separator);
+                }
+
+            }
+            t += log;
+            // do whatever you want with the log.  I'd recommend using Intents to create an email
+        }
+
+        catch (IOException e)
+        {
+        }
+
+        finally
+        {
+            if (reader != null)
+                try
+                {
+                    reader.close();
+                }
+                catch (IOException e)
+                {
+                }
+        }
+
+        t += "----------------------------------------\n\n";
+        t += ss;
+
+        //send feedback
+        Intent prefIntent44 = new Intent();
+        prefIntent44.setAction(Intent.ACTION_SENDTO);
+        prefIntent44.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+        prefIntent44.setData(Uri.parse("mailto:aelaster@gmail.com"));
+        prefIntent44.putExtra("android.intent.extra.SUBJECT", getString(R.string.app_name) + " Android App Version " + PostMortemReportExceptionHandler.getVersion() + " - Debug");
+        prefIntent44.putExtra("android.intent.extra.TEXT", t);
+        startActivity(prefIntent44);
     }
 
     public void importDB(){

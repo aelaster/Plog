@@ -161,6 +161,8 @@ public class PlaysFragment extends Fragment{
             RelativeLayout playsLayout = (RelativeLayout) rootView.findViewById(R.id.playsLayout);
             final SwipeDismissBehavior<LinearLayout> behavior = new SwipeDismissBehavior();
             behavior.setSwipeDirection(SwipeDismissBehavior.SWIPE_DIRECTION_START_TO_END);
+            behavior.setStartAlphaSwipeDistance(1.0f);
+            behavior.setSensitivity (0.1f);
             behavior.setListener(new SwipeDismissBehavior.OnDismissListener() {
                 @Override
                 public void onDismiss(final View view) {

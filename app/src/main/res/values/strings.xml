@@ -12,6 +12,8 @@
     <string name="title_play_detail">Play Detail</string>
     <string name="title_bucket_list">Bucket List</string>
 
+    <string name="title_pref_support">Support</string>
+    <string name="title_pref_send_debug">Send Debug Information</string>
     <string name="title_pref_backup">Backup</string>
     <string name="title_export_db">Export Database</string>
     <string name="title_import_db">Import Database</string>
