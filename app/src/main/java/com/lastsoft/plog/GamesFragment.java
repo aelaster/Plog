@@ -347,6 +347,7 @@ public class GamesFragment extends Fragment{
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
+        menu.clear();
         if (playListType != 2  && !((MainActivity) mActivity).mNavigationDrawerFragment.isDrawerOpen() && ((MainActivity) mActivity).currentFragmentCode != 0) {
             inflater.inflate(R.menu.games, menu);
             menuItem0 = menu.getItem(0);

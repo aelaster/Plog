@@ -239,6 +239,7 @@ public class PlaysFragment extends Fragment{
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
+        menu.clear();
         if (!((MainActivity) mActivity).mNavigationDrawerFragment.isDrawerOpen()) {
             inflater.inflate(R.menu.plays, menu);
         }
