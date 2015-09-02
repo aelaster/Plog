@@ -1,0 +1,1 @@
+alter table PLAYERS_PER_PLAY add PERSONAL_BEST FLOAT;

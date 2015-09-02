@@ -32,11 +32,12 @@
                 android:layout_gravity="center"
                 />
 
-            <RelativeLayout
+            <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:padding="8dp"
+                android:orientation="vertical"
                 android:layout_gravity="center"
                 >
 
@@ -48,23 +49,37 @@
                     android:layout_alignParentTop="true"
                     android:textSize="20sp"
                     />
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/gamePlays"
-                    android:textColor="@color/black"
-                    android:layout_below="@+id/gameName"
-                    />
+
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/bucketDate"
                     android:textColor="@color/black"
-                    android:layout_below="@+id/gamePlays"
                     android:visibility="gone"
                     />
+                <LinearLayout
+                    android:id="@+id/playsLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/gameName"
+                    android:orientation="horizontal"
+                    android:layout_gravity="center">
 
-            </RelativeLayout>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/recentPlay"
+                        android:layout_weight="1"
+                        android:textColor="@color/black"
+                        />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/gamePlays"
+                        android:textColor="@color/black"
+                        />
+                </LinearLayout>
+            </LinearLayout>
 
 
 
@@ -77,7 +92,7 @@
             android:padding="8dp"
             android:orientation="horizontal"
             android:layout_gravity="center"
-            >
+            android:layout_marginRight="10dp">
             <ImageView
                 android:id="@+id/overflowMenu"
                 android:layout_width="wrap_content"

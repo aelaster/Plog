@@ -197,7 +197,7 @@ public class GamesFragment extends Fragment{
             final SwipeDismissBehavior<LinearLayout> behavior = new SwipeDismissBehavior();
             behavior.setSwipeDirection(SwipeDismissBehavior.SWIPE_DIRECTION_START_TO_END);
             behavior.setStartAlphaSwipeDistance(1.0f);
-            behavior.setSensitivity (0.1f);
+            behavior.setSensitivity (0.25f);
             behavior.setListener(new SwipeDismissBehavior.OnDismissListener() {
                 @Override
                 public void onDismiss(final View view) {
@@ -445,6 +445,16 @@ public class GamesFragment extends Fragment{
                                 return true;
                             case R.id.sort_plays_0x:
                                 sortType = 3;
+                                mAdapter.updateData(mAdapter.generateGameList(mSearchQuery, playListType, sortType));
+                                mRecyclerView.scrollToPosition(0);
+                                return true;
+                            case R.id.sort_last_played_newold:
+                                sortType = 4;
+                                mAdapter.updateData(mAdapter.generateGameList(mSearchQuery, playListType, sortType));
+                                mRecyclerView.scrollToPosition(0);
+                                return true;
+                            case R.id.sort_last_played_oldnew:
+                                sortType = 5;
                                 mAdapter.updateData(mAdapter.generateGameList(mSearchQuery, playListType, sortType));
                                 mRecyclerView.scrollToPosition(0);
                                 return true;

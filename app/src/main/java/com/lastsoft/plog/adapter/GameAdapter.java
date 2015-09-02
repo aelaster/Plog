@@ -28,7 +28,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -57,6 +56,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.SimpleTimeZone;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Provide views to RecyclerView with data from mDataSet.
@@ -79,7 +79,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
      * Provide a reference to the type of views that you are using (custom ViewHolder)
      */
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        private final TextView textView, bucketDateView, gamePlaysView;
+        private final TextView textView, bucketDateView, gamePlaysView, recentPlayView;
         private final ImageView imageView;
         private final LinearLayout overflowLayout;
         private final LinearLayout clickLayout;
@@ -87,15 +87,9 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
 
         public ViewHolder(View v) {
             super(v);
-            // Define click listener for the ViewHolder's View.
-            v.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Log.d(TAG, "Element " + getPosition() + " clicked.");
-                }
-            });
             textView = (TextView) v.findViewById(R.id.gameName);
             gamePlaysView = (TextView) v.findViewById(R.id.gamePlays);
+            recentPlayView = (TextView) v.findViewById(R.id.recentPlay);
             bucketDateView = (TextView) v.findViewById(R.id.bucketDate);
             imageView = (ImageView) v.findViewById(R.id.imageView1);
             overflowLayout = (LinearLayout) v.findViewById(R.id.overflowLayout);
@@ -111,6 +105,9 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
         }
         public TextView getBucketDateView() {
             return bucketDateView;
+        }
+        public TextView getRecentPlayView() {
+            return recentPlayView;
         }
         public TextView getGamePlaysView() {
             return gamePlaysView;
@@ -237,6 +234,9 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
         // Get element from your dataset at this position and replace the contents of the view
         // with that element
         //if (searchQuery.equals("") || (games.get(position).gameName.toLowerCase().contains(searchQuery.toLowerCase()))) {
+
+        DateFormat outputFormatter = new SimpleDateFormat("MM/dd/yyyy");
+
         viewHolder.getTextView().setText(games.get(position).gameName);
         if (games.get(position).gameThumb != null  && !games.get(position).gameThumb.equals("")) {
             //Log.d("V1", "gameThumb = " + games.get(position).gameThumb);
@@ -247,10 +247,36 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
             viewHolder.getImageView().setImageDrawable(null);
         }
 
+        if (games.get(position).recentPlay != null) {
+            long diff = new Date().getTime() - games.get(position).recentPlay.getTime();
+            long days = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
+            String output_date2;
+            if (days == 0){
+                output_date2 = mActivity.getString( R.string.less_than_a_day_ago);
+            }else if (days <= 7){
+                output_date2 = mActivity.getString( R.string.last_play_label) + days + mActivity.getString( R.string.days_ago_label);
+            }else {
+                output_date2 = mActivity.getString( R.string.last_play_label) + outputFormatter.format(games.get(position).recentPlay); // Output : 01/20/2012
+            }
+            viewHolder.getRecentPlayView().setText(output_date2);
+            viewHolder.getRecentPlayView().setVisibility(View.VISIBLE);
+        }else{
+            viewHolder.getRecentPlayView().setVisibility(View.GONE);
+        }
+
         if (games.get(position).taggedToPlay > 0 && playListType == 2){
             Date theDate = new Date(((long)games.get(position).taggedToPlay)*1000L);
-            DateFormat outputFormatter = new SimpleDateFormat("MM/dd/yyyy");
-            String output_date = outputFormatter.format(theDate); // Output : 01/20/2012
+            long diff = new Date().getTime() - theDate.getTime();
+            long days = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
+            String output_date;
+            if (days == 0){
+                output_date = mActivity.getString( R.string.added) + mActivity.getString(R.string.less_than_a_day_ago);
+            }else if (days <= 7){
+                output_date = mActivity.getString( R.string.added) + days + mActivity.getString( R.string.days_ago_label);
+            }else {
+                output_date = mActivity.getString( R.string.added) + outputFormatter.format(theDate); // Output : 01/20/2012
+            }
+            //String output_date = outputFormatter.format(theDate); // Output : 01/20/2012
             viewHolder.getBucketDateView().setText(output_date);
             viewHolder.getBucketDateView().setVisibility(View.VISIBLE);
         }else{

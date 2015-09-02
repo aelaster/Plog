@@ -117,16 +117,18 @@ public class ViewPlayFragment_Pages extends Fragment {
         return viewPlayLayout;
     }
 
-    private void addPlayer(String playerName, String score, boolean winnerFlag) {
+    private void addPlayer(String playerName, String score, boolean winnerFlag, String personalBest) {
         // Instantiate a new "row" view.
         final ViewGroup newView = (ViewGroup) LayoutInflater.from(mActivity).inflate(
                 R.layout.play_viewplayer_item, mContainerView_Players, false);
 
         TextView playerView = (TextView) newView.findViewById(R.id.player);
         TextView scoreView = (TextView) newView.findViewById(R.id.score);
+        TextView personalBestView = (TextView) newView.findViewById(R.id.personalBest);
         NumberFormat nf = new DecimalFormat("###.#");
         playerView.setText(playerName);
         scoreView.setText(nf.format(Float.parseFloat(score)));
+        personalBestView.setText(getString(R.string.personal_best_label) + nf.format(Float.parseFloat(personalBest)));
         if (winnerFlag){
             playerView.setTextSize(20);
             scoreView.setTextSize(20);
@@ -222,10 +224,12 @@ public class ViewPlayFragment_Pages extends Fragment {
         float highScore = PlayersPerPlay.getHighScore(thisPlay);
         for(PlayersPerPlay player:players){
             Player thisPlayer = player.player;
+            float personalBest;
+            personalBest = PlayersPerPlay.personalBest(thisBaseGame, thisPlayer);
             if (player.score < highScore) {
-                addPlayer(thisPlayer.playerName, "" + player.score, false);
+                addPlayer(thisPlayer.playerName, "" + player.score, false, ""+personalBest);
             } else {
-                addPlayer(thisPlayer.playerName, "" + player.score, true);
+                addPlayer(thisPlayer.playerName, "" + player.score, true, ""+personalBest);
             }
         }
 

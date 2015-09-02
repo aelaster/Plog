@@ -17,6 +17,7 @@ public class PlayersPerPlay extends SugarRecord<PlayersPerPlay> {
     public float score;
     public String color;
     public float playHighScore;
+    public float personalBest;
 
     public PlayersPerPlay() {
     }
@@ -76,6 +77,17 @@ public class PlayersPerPlay extends SugarRecord<PlayersPerPlay> {
         getPlayers.where(Condition.prop(StringUtil.toSQLName("play")).eq(play.getId()));
         getPlayers.orderBy(StringUtil.toSQLName("score") + " DESC");
         return getPlayers.list();
+    }
+
+    public static float personalBest(Game game, Player player){
+        List<PlayersPerPlay> query = PlayersPerPlay.findWithQuery(PlayersPerPlay.class,
+                " SELECT " + StringUtil.toSQLName("PlayersPerPlay") + "." + "*, MAX(" + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("score") + ") AS " + StringUtil.toSQLName("personalBest") +
+                " FROM " + StringUtil.toSQLName("PlayersPerPlay") +
+                        " INNER JOIN " + StringUtil.toSQLName("GamesPerPlay") +
+                        " ON " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("play") + " = " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("play") +
+                        " WHERE " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("game") + " = ? " +
+                        " and " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("player") + " = ? ", game.getId().toString(), player.getId().toString());
+        return query.get(0).personalBest;
     }
 
 

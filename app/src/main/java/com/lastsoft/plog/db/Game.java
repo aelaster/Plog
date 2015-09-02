@@ -3,6 +3,7 @@ package com.lastsoft.plog.db;
 import com.orm.StringUtil;
 import com.orm.SugarRecord;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -19,6 +20,7 @@ public class Game extends SugarRecord<Game> {
     public int tbtCount;
     public int taggedToPlay;
     public int playCount;
+    public Date recentPlay;
     public boolean collectionFlag;
 
     public Game(){ }
@@ -113,7 +115,7 @@ public class Game extends SugarRecord<Game> {
         if (mSearchQuery.contains("'")) {
             mSearchQuery = mSearchQuery.replaceAll("'", "''");
         }
-        query = " SELECT G.*, COUNT(P." + StringUtil.toSQLName("id") + ") AS " + StringUtil.toSQLName("playCount") +
+        query = " SELECT G.*, COUNT(P." + StringUtil.toSQLName("id") + ") AS " + StringUtil.toSQLName("playCount") + ", MAX(P." + StringUtil.toSQLName("playDate") + ") AS " + StringUtil.toSQLName("recentPlay") +
                 " FROM " + StringUtil.toSQLName("Game") + " G " +
                 " LEFT JOIN " + StringUtil.toSQLName("GamesPerPlay") + " GPP " +
                 " ON G." + StringUtil.toSQLName("id") + " = GPP." + StringUtil.toSQLName("game") +
@@ -139,13 +141,19 @@ public class Game extends SugarRecord<Game> {
             case 3:
                 query = query + " ORDER BY COUNT(P." + StringUtil.toSQLName("id") + ") ASC, G." + StringUtil.toSQLName("gameName") + " ASC";
                 break;
+            case 4:
+                query = query + " ORDER BY MAX(P." + StringUtil.toSQLName("playDate") + ") DESC, G." + StringUtil.toSQLName("gameName") + " ASC";
+                break;
+            case 5:
+                query = query + " ORDER BY MAX(P." + StringUtil.toSQLName("playDate") + ") ASC, G." + StringUtil.toSQLName("gameName") + " ASC";
+                break;
         }
         return Game.findWithQuery(Game.class,query);
     }
 
     public static List<Game> findAllGames_GameGroup(GameGroup group, int sortType){
         String query;
-        query = " SELECT G.*, COUNT(P." + StringUtil.toSQLName("id") + ") AS " + StringUtil.toSQLName("playCount") +
+        query = " SELECT G.*, COUNT(P." + StringUtil.toSQLName("id") + ") AS " + StringUtil.toSQLName("playCount") + ", MAX(P." + StringUtil.toSQLName("playDate") + ") AS " + StringUtil.toSQLName("recentPlay") +
                 " FROM " + StringUtil.toSQLName("Game") + " G " +
                 " LEFT JOIN " + StringUtil.toSQLName("GamesPerPlay") + " GPP " +
                 " ON G." + StringUtil.toSQLName("id") + " = GPP." + StringUtil.toSQLName("game") +
@@ -168,6 +176,12 @@ public class Game extends SugarRecord<Game> {
             case 3:
                 query = query + " ORDER BY COUNT(P." + StringUtil.toSQLName("id") + ") ASC, G." + StringUtil.toSQLName("gameName") + " ASC";
                 break;
+            case 4:
+                query = query + " ORDER BY MAX(P." + StringUtil.toSQLName("playDate") + ") DESC, G." + StringUtil.toSQLName("gameName") + " ASC";
+                break;
+            case 5:
+                query = query + " ORDER BY MAX(P." + StringUtil.toSQLName("playDate") + ") ASC, G." + StringUtil.toSQLName("gameName") + " ASC";
+                break;
         }
         return Game.findWithQuery(Game.class, query, group.getId().toString());
     }
@@ -177,7 +191,7 @@ public class Game extends SugarRecord<Game> {
         if (mSearchQuery.contains("'")) {
             mSearchQuery = mSearchQuery.replaceAll("'", "''");
         }
-        query = " SELECT G.*, COUNT(P." + StringUtil.toSQLName("id") + ") AS " + StringUtil.toSQLName("playCount") +
+        query = " SELECT G.*, COUNT(P." + StringUtil.toSQLName("id") + ") AS " + StringUtil.toSQLName("playCount") + ", MAX(P." + StringUtil.toSQLName("playDate") + ") AS " + StringUtil.toSQLName("recentPlay") +
                 " FROM " + StringUtil.toSQLName("Game") + " G ";
         if (includeZero) {
             query = query + " LEFT JOIN " + StringUtil.toSQLName("GamesPerPlay") + " GPP ";
@@ -208,6 +222,12 @@ public class Game extends SugarRecord<Game> {
             case 3:
                 query = query + " ORDER BY COUNT(P." + StringUtil.toSQLName("id") + ") ASC, G." + StringUtil.toSQLName("gameName") + " ASC";
                 break;
+            case 4:
+                query = query + " ORDER BY MAX(P." + StringUtil.toSQLName("playDate") + ") DESC, G." + StringUtil.toSQLName("gameName") + " ASC";
+                break;
+            case 5:
+                query = query + " ORDER BY MAX(P." + StringUtil.toSQLName("playDate") + ") ASC, G." + StringUtil.toSQLName("gameName") + " ASC";
+                break;
         }
         return Game.findWithQuery(Game.class, query);
     }
@@ -234,7 +254,7 @@ public class Game extends SugarRecord<Game> {
 
     public static List<Game> getUnplayedGames(int sortType, boolean showExpansions){
         String query;
-        query = " SELECT "+ StringUtil.toSQLName("Game") + ".*, COUNT(" + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + ") AS " + StringUtil.toSQLName("playCount") +
+        query = " SELECT "+ StringUtil.toSQLName("Game") + ".*, COUNT(" + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + ") AS " + StringUtil.toSQLName("playCount") + ", MAX(" + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("playDate") + ") AS " + StringUtil.toSQLName("recentPlay") +
                 " FROM " + StringUtil.toSQLName("Game") +
                 " LEFT JOIN " + StringUtil.toSQLName("GamesPerPlay") +
                 " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("game") + " = " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("id") +
@@ -258,6 +278,12 @@ public class Game extends SugarRecord<Game> {
                 break;
             case 3:
                 query = query + " order BY COUNT(" + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + ") ASC, " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " ASC, "  + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " DESC";
+                break;
+            case 4:
+                query = query + " order BY MAX(" + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("playDate") + ") DESC, " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " ASC, "  + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " DESC";
+                break;
+            case 5:
+                query = query + " order BY MAX(" + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("playDate") + ") ASC, " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " ASC, "  + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " DESC";
                 break;
         }
         return Game.findWithQuery(Game.class,query);
@@ -301,7 +327,7 @@ public class Game extends SugarRecord<Game> {
 
     public static List<Game> getUniqueGames_GameGroup(GameGroup group, int sortType){
         String query;
-        query = " SELECT "+ StringUtil.toSQLName("Game") + ".*, COUNT(" + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + ") AS " + StringUtil.toSQLName("playCount") +
+        query = " SELECT "+ StringUtil.toSQLName("Game") + ".*, COUNT(" + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + ") AS " + StringUtil.toSQLName("playCount") + ", MAX(" + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("playDate") + ") AS " + StringUtil.toSQLName("recentPlay") +
                 " FROM " + StringUtil.toSQLName("Game") +
                 " INNER JOIN " + StringUtil.toSQLName("GamesPerPlay") +
                 " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("game") + " = " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("id") +
@@ -325,6 +351,12 @@ public class Game extends SugarRecord<Game> {
             case 3:
                 query = query + " order BY COUNT(" + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + ") ASC, " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " ASC, "  + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " DESC";
                 break;
+            case 4:
+                query = query + " order BY MAX(" + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("playDate") + ") DESC, " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " ASC, "  + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " DESC";
+                break;
+            case 5:
+                query = query + " order BY MAX(" + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("playDate") + ") ASC, " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " ASC, "  + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " DESC";
+                break;
         }
 
         return Game.findWithQuery(Game.class,query,group.getId().toString());
@@ -332,7 +364,7 @@ public class Game extends SugarRecord<Game> {
 
     public static List<Game> getUniqueGames(int sortType){
         String query;
-        query = " SELECT "+ StringUtil.toSQLName("Game") + ".*, COUNT(" + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + ") AS " + StringUtil.toSQLName("playCount") +
+        query = " SELECT "+ StringUtil.toSQLName("Game") + ".*, COUNT(" + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + ") AS " + StringUtil.toSQLName("playCount") + ", MAX(" + StringUtil.toSQLName("Play") +"."+ StringUtil.toSQLName("playDate") + ") AS " + StringUtil.toSQLName("recentPlay") +
                 " FROM " + StringUtil.toSQLName("Game") +
                 " INNER JOIN " + StringUtil.toSQLName("GamesPerPlay") +
                 " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("game") + " = " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("id") +
@@ -353,6 +385,12 @@ public class Game extends SugarRecord<Game> {
             case 3:
                 query = query + " order BY COUNT(" + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + ") ASC, " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " ASC, "  + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " DESC";
                 break;
+            case 4:
+                query = query + " order BY MAX(" + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("playDate") + ") DESC, " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " ASC, "  + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " DESC";
+                break;
+            case 5:
+                query = query + " order BY MAX(" + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("playDate") + ") ASC, " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " ASC, "  + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " DESC";
+                break;
         }
         return Game.findWithQuery(Game.class,query);
     }
@@ -360,7 +398,7 @@ public class Game extends SugarRecord<Game> {
 
     public static List<Game> getBucketList(){
         String query;
-        query = " SELECT G.*, COUNT(P." + StringUtil.toSQLName("id") + ") AS " + StringUtil.toSQLName("playCount") +
+        query = " SELECT G.*, COUNT(P." + StringUtil.toSQLName("id") + ") AS " + StringUtil.toSQLName("playCount") + ", MAX(P." + StringUtil.toSQLName("playDate") + ") AS " + StringUtil.toSQLName("recentPlay") +
                 " FROM " + StringUtil.toSQLName("Game") + " G " +
                 " LEFT JOIN " + StringUtil.toSQLName("GamesPerPlay") + " GPP " +
                 " ON G." + StringUtil.toSQLName("id") + " = GPP." + StringUtil.toSQLName("game") +

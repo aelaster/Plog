@@ -642,4 +642,5 @@ public class Play extends SugarRecord<Play> {
         }
         return Play.findWithQuery(Play.class, query);
     }
+
 }

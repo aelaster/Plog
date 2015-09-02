@@ -4,4 +4,6 @@
     <item android:id="@+id/sort_za" android:title="@string/sort_za" />
     <item android:id="@+id/sort_plays_x0" android:title="@string/sort_plays_x0" />
     <item android:id="@+id/sort_plays_0x" android:title="@string/sort_plays_0x" />
+    <item android:id="@+id/sort_last_played_newold" android:title="@string/sort_last_played_newold" />
+    <item android:id="@+id/sort_last_played_oldnew" android:title="@string/sort_last_played_oldnew" />
 </menu>

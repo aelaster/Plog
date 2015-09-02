@@ -21,7 +21,12 @@
     <string name="db_exported_1">"Database has been exported to "</string>
     <string name="db_exported_2">".  Place it in the same directory on your new device to import."</string>
 
+    <string name="less_than_a_day_ago">Less than a day ago</string>
+    <string name="days_ago_label">" days ago"</string>
+    <string name="added">"Added: "</string>
     <string name="year_label">Year:</string>
+    <string name="personal_best_label">"Best: "</string>
+    <string name="last_play_label">"Last Played: "</string>
     <string name="add_bucket_list">Add to Bucket List</string>
     <string name="remove_bucket_list">Remove from Bucket List</string>
     <string name="add_player">Add Player</string>
@@ -177,6 +182,8 @@
     <string name="sort_date_oldnew">Date (Old->New)</string>
     <string name="sort_plays_x0">Plays (X->0)</string>
     <string name="sort_plays_0x">Plays (0->X)</string>
+    <string name="sort_last_played_newold">Last Played (New->Old)</string>
+    <string name="sort_last_played_oldnew">Last Played (Old->New)</string>
 
     <string name="sort">Sort</string>
 

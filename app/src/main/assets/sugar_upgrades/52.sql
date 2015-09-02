@@ -1,0 +1,1 @@
+alter table GAME add RECENT_PLAY INTEGER;

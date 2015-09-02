@@ -68,7 +68,7 @@
             android:padding="8dp"
             android:orientation="horizontal"
             android:layout_gravity="center"
-            >
+            android:layout_marginRight="10dp">
             <ImageView
                 android:id="@+id/overflowMenu"
                 android:layout_width="wrap_content"
