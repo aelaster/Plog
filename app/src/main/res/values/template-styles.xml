@@ -138,4 +138,8 @@
         <item name="android:overlapAnchor">true</item>
     </style>
 
+    <style name="CardMain">
+        <item name="android:textStyle">bold</item>
+    </style>
+
 </resources>

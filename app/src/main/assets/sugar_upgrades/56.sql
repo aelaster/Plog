@@ -1,0 +1,1 @@
+alter table PLAY add WINNERS TEXT;

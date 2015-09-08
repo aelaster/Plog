@@ -41,7 +41,6 @@ import com.lastsoft.plog.db.GameGroup;
 import com.lastsoft.plog.db.GamesPerPlay;
 import com.lastsoft.plog.db.Play;
 import com.lastsoft.plog.db.Player;
-import com.lastsoft.plog.db.PlayersPerPlay;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.squareup.picasso.Picasso;
@@ -356,19 +355,9 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
                 //ImageLoader.getInstance().loadImage(plays.get(position).playPhoto, options, null);
             }
 
-            String winners = "";
-            List<PlayersPerPlay> players = PlayersPerPlay.getWinners(plays.get(position));
-            //float highScore = PlayersPerPlay.getHighScore(plays.get(position));
-            for(PlayersPerPlay player:players){
-                //Player thisPlayer = player.player;
-                //if (player.score >= highScore) {
-                    winners = winners + player.player.playerName + ", ";
-                //}
-            }
-            winners = winners.substring(0, winners.length()-2);
 
-            viewHolder.getPlayWinnerView().setTypeface(null, Typeface.BOLD);
-            viewHolder.getPlayWinnerView().setText(mActivity.getString(R.string.winners) + winners);
+            viewHolder.getPlayWinnerView().setTypeface(null, Typeface.ITALIC);
+            viewHolder.getPlayWinnerView().setText(mActivity.getString(R.string.winners) + plays.get(position).winners);
             viewHolder.getPlayWinnerView().setSelected(true);
 
     }
