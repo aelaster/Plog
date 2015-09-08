@@ -77,42 +77,6 @@ public class LoadGamesTask extends AsyncTask<String, Void, String> {
 
         String myString = "";
         String bggProcess = "false";
-        /*
-        BGGLogInHelper helper = new BGGLogInHelper(theContext, null);
-        if (helper.checkCookies()) {
-            UrlEncodedFormEntity entity;
-            List<NameValuePair> nvps = new ArrayList<NameValuePair>();
-            nvps.add(new BasicNameValuePair("ajax", "1"));
-            nvps.add(new BasicNameValuePair("action", "save"));
-            nvps.add(new BasicNameValuePair("version", "2"));
-            nvps.add(new BasicNameValuePair("objecttype", "thing"));
-            nvps.add(new BasicNameValuePair("objectid", String.valueOf(145659)));
-            nvps.add(new BasicNameValuePair("playdate", "2015-06-15"));
-            // TODO: ask Aldie what this is
-            nvps.add(new BasicNameValuePair("dateinput", "2015-06-15"));
-            nvps.add(new BasicNameValuePair("length", String.valueOf(60)));
-            nvps.add(new BasicNameValuePair("location", "Mi Casa"));
-            nvps.add(new BasicNameValuePair("quantity", String.valueOf(1)));
-            nvps.add(new BasicNameValuePair("incomplete", "0"));
-            nvps.add(new BasicNameValuePair("nowinstats", "0"));
-            nvps.add(new BasicNameValuePair("comments", "TESTIE!"));
-
-            try {
-                entity = new UrlEncodedFormEntity(nvps, HTTP.UTF_8);
-                HttpPost post = new HttpPost("http://www.boardgamegeek.com/geekplay.php");
-                post.setEntity(entity);
-                HttpClient mClient = HttpUtils.createHttpClient(theContext, helper.getCookieStore());
-                HttpResponse response = mClient.execute(post);
-            } catch (UnsupportedEncodingException e) {
-            } catch (ClientProtocolException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-
-        }*/
-
 
         try {
 
@@ -336,16 +300,6 @@ public class LoadGamesTask extends AsyncTask<String, Void, String> {
             total = parser.getAttributeValue(null, "totalitems");
         }
         return total;
-    }
-
-    private String readOwn(XmlPullParser parser) throws IOException, XmlPullParserException {
-        String own = "";
-        String tag = parser.getName();
-        if (tag.equals("status")) {
-            own = parser.getAttributeValue(null, "own");
-        }
-        Log.d("V1", "own = " + own);
-        return own;
     }
 
     private String readName(XmlPullParser parser) throws IOException, XmlPullParserException {

@@ -24,6 +24,7 @@ import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.util.Log;
 
+import com.lastsoft.plog.util.LoadPlaysTask;
 import com.lastsoft.plog.util.NotificationFragment;
 import com.lastsoft.plog.util.PostMortemReportExceptionHandler;
 
@@ -37,7 +38,7 @@ import java.nio.channels.FileChannel;
 
 public class SettingsFragment extends PreferenceFragment {
 
-    private Preference mImportPreference, mExportPreference, mSendDebugPreference;
+    private Preference mImportPreference, mExportPreference, mSendDebugPreference, mSyncPlays;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -74,6 +75,24 @@ public class SettingsFragment extends PreferenceFragment {
                 return false;
             }
         });
+
+        mSyncPlays = getPreferenceManager().findPreference("sync_plays");
+        mSyncPlays.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                syncPlays();
+                return false;
+            }
+        });
+    }
+
+    public void syncPlays(){
+        LoadPlaysTask loadPlays = new LoadPlaysTask(getActivity());
+        try {
+            loadPlays.execute();
+        } catch (Exception ignored) {
+
+        }
     }
 
     public void sendDebug(){

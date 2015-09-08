@@ -192,38 +192,38 @@ public class GamesFragment extends Fragment{
                 }
             });
         }else{
+            if (!fromDrawer) {
+                RelativeLayout gamesLayout = (RelativeLayout) rootView.findViewById(R.id.gamesLayout);
+                final SwipeDismissBehavior<LinearLayout> behavior = new SwipeDismissBehavior();
+                behavior.setSwipeDirection(SwipeDismissBehavior.SWIPE_DIRECTION_START_TO_END);
+                behavior.setStartAlphaSwipeDistance(1.0f);
+                behavior.setSensitivity(0.15f);
+                behavior.setListener(new SwipeDismissBehavior.OnDismissListener() {
+                    @Override
+                    public void onDismiss(final View view) {
+                        GamesFragment myFragC1 = (GamesFragment) getFragmentManager().findFragmentByTag("games");
+                        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+                        transaction.remove(myFragC1);
+                        transaction.commitAllowingStateLoss();
+                        getFragmentManager().executePendingTransactions();
+                        mActivity.onBackPressed();
+                    }
 
-            RelativeLayout gamesLayout = (RelativeLayout) rootView.findViewById(R.id.gamesLayout);
-            final SwipeDismissBehavior<LinearLayout> behavior = new SwipeDismissBehavior();
-            behavior.setSwipeDirection(SwipeDismissBehavior.SWIPE_DIRECTION_START_TO_END);
-            behavior.setStartAlphaSwipeDistance(1.0f);
-            behavior.setSensitivity (0.25f);
-            behavior.setListener(new SwipeDismissBehavior.OnDismissListener() {
-                @Override
-                public void onDismiss(final View view) {
-                    GamesFragment myFragC1 = (GamesFragment) getFragmentManager().findFragmentByTag("games");
-                    FragmentTransaction transaction = getFragmentManager().beginTransaction();
-                    transaction.remove(myFragC1);
-                    transaction.commitAllowingStateLoss();
-                    getFragmentManager().executePendingTransactions();
-                    mActivity.onBackPressed();
-                }
+                    @Override
+                    public void onDragStateChanged(int i) {
 
-                @Override
-                public void onDragStateChanged(int i) {
+                    }
+                });
 
-                }
-            });
+                CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) gamesLayout.getLayoutParams();
+                params.setBehavior(behavior);
 
-            CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) gamesLayout.getLayoutParams();
-            params.setBehavior(behavior);
-
-
+            }
             fastScroller.setRecyclerView(mRecyclerView, null);
             pullToRefreshView.setEnabled(false);
             addPlayer.setVisibility(View.GONE);
-
         }
+
 
         mProgress = (LinearLayout) rootView.findViewById(R.id.progressContainer);
         mText = (TextView) rootView.findViewById(R.id.LoadingText);

@@ -3,7 +3,6 @@ package com.lastsoft.plog.db;
 import com.orm.StringUtil;
 import com.orm.SugarRecord;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -20,7 +19,7 @@ public class Game extends SugarRecord<Game> {
     public int tbtCount;
     public int taggedToPlay;
     public int playCount;
-    public Date recentPlay;
+    public long recentPlay;
     public boolean collectionFlag;
 
     public Game(){ }

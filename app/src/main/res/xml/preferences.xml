@@ -36,5 +36,10 @@
             android:title="@string/title_pref_send_debug">
         </Preference>
 
+        <Preference
+            android:key="sync_plays"
+            android:title="@string/title_pref_sync_plays">
+        </Preference>
+
     </PreferenceCategory>
 </PreferenceScreen>

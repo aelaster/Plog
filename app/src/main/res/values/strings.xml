@@ -14,6 +14,7 @@
 
     <string name="title_pref_support">Support</string>
     <string name="title_pref_send_debug">Send Debug Information</string>
+    <string name="title_pref_sync_plays">Sync Plays</string>
     <string name="title_pref_backup">Backup</string>
     <string name="title_export_db">Export Database</string>
     <string name="title_import_db">Import Database</string>
@@ -156,6 +157,9 @@
         <item>Natural</item>
         <item>Grey</item>
         <item>Brown</item>
+        <item>Gold</item>
+        <item>Silver</item>
+        <item>Bronze</item>
         <item>None</item>
     </string-array>
 

@@ -2,7 +2,6 @@ package com.lastsoft.plog.util;
 
 import android.content.Context;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import com.lastsoft.plog.db.Game;
 
@@ -180,52 +179,10 @@ public class LoadExpansionsTask extends AsyncTask<String, Void, List<Game>> {
         }
     }
 
-    private String readBGGID(XmlPullParser parser) throws IOException, XmlPullParserException {
-        String bggid = "";
-        String tag = parser.getName();
-        if (tag.equals("item")) {
-            bggid = parser.getAttributeValue(null, "objectid");
-        }
-        return bggid;
-    }
-
-    private String readTotal(XmlPullParser parser) throws IOException, XmlPullParserException {
-        String total = "";
-        String tag = parser.getName();
-        if (tag.equals("items")) {
-            total = parser.getAttributeValue(null, "totalitems");
-        }
-        return total;
-    }
-
-    private String readOwn(XmlPullParser parser) throws IOException, XmlPullParserException {
-        String own = "";
-        String tag = parser.getName();
-        if (tag.equals("status")) {
-            own = parser.getAttributeValue(null, "own");
-        }
-        Log.d("V1", "own = " + own);
-        return own;
-    }
-
     private String readName(XmlPullParser parser) throws IOException, XmlPullParserException {
         parser.require(XmlPullParser.START_TAG, null, "name");
         String title = readText(parser);
         parser.require(XmlPullParser.END_TAG, null, "name");
-        return title;
-    }
-
-    private String readThumbnail(XmlPullParser parser) throws IOException, XmlPullParserException {
-        parser.require(XmlPullParser.START_TAG, null, "thumbnail");
-        String title = readText(parser);
-        parser.require(XmlPullParser.END_TAG, null, "thumbnail");
-        return title;
-    }
-
-    private String readImage(XmlPullParser parser) throws IOException, XmlPullParserException {
-        parser.require(XmlPullParser.START_TAG, null, "image");
-        String title = readText(parser);
-        parser.require(XmlPullParser.END_TAG, null, "image");
         return title;
     }
 

@@ -247,8 +247,9 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
             viewHolder.getImageView().setImageDrawable(null);
         }
 
-        if (games.get(position).recentPlay != null) {
-            long diff = new Date().getTime() - games.get(position).recentPlay.getTime();
+        if (games.get(position).recentPlay > 0) {
+            Date theDate = new Date((long)games.get(position).recentPlay);
+            long diff = new Date().getTime() - theDate.getTime();
             long days = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
             String output_date2;
             if (days == 0){
@@ -256,7 +257,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
             }else if (days <= 7){
                 output_date2 = mActivity.getString( R.string.last_play_label) + days + mActivity.getString( R.string.days_ago_label);
             }else {
-                output_date2 = mActivity.getString( R.string.last_play_label) + outputFormatter.format(games.get(position).recentPlay); // Output : 01/20/2012
+                output_date2 = mActivity.getString( R.string.last_play_label) + outputFormatter.format(theDate); // Output : 01/20/2012
             }
             viewHolder.getRecentPlayView().setText(output_date2);
             viewHolder.getRecentPlayView().setVisibility(View.VISIBLE);
