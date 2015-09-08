@@ -21,11 +21,11 @@ import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.Highlight;
 import com.github.mikephil.charting.utils.ValueFormatter;
+import com.google.gson.Gson;
 import com.lastsoft.plog.db.Game;
 import com.lastsoft.plog.db.GameGroup;
 import com.lastsoft.plog.db.Play;
 import com.lastsoft.plog.db.Player;
-import com.lastsoft.plog.db.PlayersPerPlay;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -38,12 +38,12 @@ public class StatsFragment_Wins extends Fragment {
     List<Player> groupPlayers;
     View statsView;
     private ViewGroup mContainerView_Players;
-    long gameGroup;
+    GameGroup gameGroup;
 
-    public static StatsFragment_Wins newInstance(long gameGroup) {
+    public static StatsFragment_Wins newInstance(String gameGroup) {
         StatsFragment_Wins fragment = new StatsFragment_Wins();
         Bundle args = new Bundle();
-        args.putLong("gameGroup", gameGroup);
+        args.putString("gameGroup", gameGroup);
         fragment.setArguments(args);
         return fragment;
     }
@@ -56,7 +56,7 @@ public class StatsFragment_Wins extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            gameGroup = getArguments().getLong("gameGroup");
+            gameGroup = new Gson().fromJson( getArguments().getString("gameGroup"), GameGroup.class);
         }
     }
 
@@ -67,9 +67,9 @@ public class StatsFragment_Wins extends Fragment {
         if (savedInstanceState == null) {
             statsView = inflater.inflate(R.layout.fragment_statistics, container, false);
             mContainerView_Players = (ViewGroup) statsView.findViewById(R.id.container_players);
-            if (gameGroup >= 0) {
-                if (gameGroup > 0) {
-                    groupPlayers = GameGroup.getGroupPlayers(GameGroup.findById(GameGroup.class, gameGroup));
+            if (gameGroup.getId() >= 0) {
+                if (gameGroup.getId() > 0) {
+                    groupPlayers = GameGroup.getGroupPlayers(GameGroup.findById(GameGroup.class, gameGroup.getId()));
                 } else {
                     //errybody
                     groupPlayers = Player.listPlayersAZ();
@@ -123,13 +123,13 @@ public class StatsFragment_Wins extends Fragment {
         Context theContext;
         int sharedCounter = 0;
         int loserCounter = 0;
-        long theGroup;
+        GameGroup theGroup;
         ArrayList<WinStats> theStats;
 
 
         private final ProgressDialog mydialog = new ProgressDialog(mActivity);
 
-        public LoadStatsTask(Context context, long gameGroup) {
+        public LoadStatsTask(Context context, GameGroup gameGroup) {
             this.theGroup = gameGroup;
             this.theContext = context;
         }
@@ -154,7 +154,7 @@ public class StatsFragment_Wins extends Fragment {
             //times 2 because each player needs regular and asterisk totals
             //plus two because we put total and unique plays on the top
             long totalPlays, totalUnique, totalUnplayed;
-            if (theGroup == 0){
+            if (theGroup.getId() == 0){
                 totalPlays = ((long) Play.listPlaysNewOld(0).size());
                 totalUnique = Game.getUniqueGames(0).size();
                 totalUnplayed = Game.getUnplayedGames(0, false).size();
@@ -162,11 +162,12 @@ public class StatsFragment_Wins extends Fragment {
                     for (int i = 0; i < groupPlayers.size(); i++){
                         Player thisPlayer = Player.findById(Player.class, groupPlayers.get(i).getId());
                         //regular wins
-                        int regularWins = Play.totalWins_Player(thisPlayer, 0).size();
-                        //asterisk wins
-                        int asteriskWins = Play.totalAsteriskWins_Player(thisPlayer, 0).size();
+                        //int regularWins = Play.totalWins_Player(thisPlayer, 0).size();
+                        int regularWins = groupPlayers.get(i).totalWins;
+                        //asterisk wins - NOT BEING USED RIGHT NOW
+                        //int asteriskWins = Play.totalAsteriskWins_Player(thisPlayer, 0).size();
                         //output[arrayBounds+1] = (long)(regularWins + asteriskWins);
-                        output.add(new WinStats(thisPlayer, regularWins, asteriskWins, totalPlays, totalUnique, totalUnplayed));
+                        output.add(new WinStats(thisPlayer, regularWins, 0, totalPlays, totalUnique, totalUnplayed));
                     }
                     Collections.sort(output, new Comparator<WinStats>() {
                         public int compare(WinStats left, WinStats right) {
@@ -177,17 +178,16 @@ public class StatsFragment_Wins extends Fragment {
                     e.printStackTrace();
                 }
             }else {
-                totalPlays = ((long) PlayersPerPlay.totalPlays_GameGroup(GameGroup.findById(GameGroup.class, theGroup)).size() / (long) groupPlayers.size());
-                totalUnique = Game.getUniqueGames_GameGroup(GameGroup.findById(GameGroup.class, theGroup), 0).size();
-                totalUnplayed = Game.getUnplayedGames_GameGroup(GameGroup.findById(GameGroup.class, theGroup), 0, false).size();
+                totalPlays = theGroup.totalPlays;
+                totalUnique = theGroup.uniqueGames;
+                totalUnplayed = Game.getUnplayedGames_GameGroup(GameGroup.findById(GameGroup.class, theGroup.getId()), 0, false).size();
                 try {
                     for (int i = 0; i < groupPlayers.size(); i++){
-                        GameGroup thisGroup = GameGroup.findById(GameGroup.class, theGroup);
                         Player thisPlayer = Player.findById(Player.class, groupPlayers.get(i).getId());
                         //regular wins
-                        int regularWins = Play.totalWins_GameGroup_Player(thisGroup, thisPlayer, 0).size();
+                        int regularWins = Play.totalWins_GameGroup_Player(theGroup, thisPlayer, 0).size();
                         //asterisk wins
-                        int asteriskWins = Play.totalAsteriskWins_GameGroup_Player(thisGroup, thisPlayer, 0).size();
+                        int asteriskWins = Play.totalAsteriskWins_GameGroup_Player(theGroup, thisPlayer, 0).size();
                         //output[arrayBounds+1] = (long)(regularWins + asteriskWins);
                         output.add(new WinStats(thisPlayer, regularWins, asteriskWins, totalPlays, totalUnique, totalUnplayed));
                     }
@@ -212,7 +212,7 @@ public class StatsFragment_Wins extends Fragment {
                 addStat(8, getString(R.string.stats_unplayed_games), result.get(0).totalUnplayed + "", "");
                 for (int x = 0; x < result.size(); x++) {
 
-                    if (theGroup == 0){
+                    if (theGroup.getId() == 0){
                         addStat(4, result.get(x).player.playerName + " " + getString(R.string.stats_regular_wins), (result.get(x).regularWins) + "", result.get(x).player.getId() + "");
                         //addStat(2, result.get(x).player.playerName + " " + getString(R.string.stats_regular_wins), result.get(x).regularWins + "", result.get(x).player.getId() + "");
                         //addStat(3, result.get(x).player.playerName + " " + getString(R.string.stats_asterisk_wins), result.get(x).asteriskWins + "", result.get(x).player.getId() + "");
@@ -221,18 +221,18 @@ public class StatsFragment_Wins extends Fragment {
                         addPieChart(result.get(x).player.playerName, result.get(x).regularWins, result.get(x).asteriskWins, result.get(x).player.getId() + "");
                     }
                 }
-                if (theGroup == 0){
+                if (theGroup.getId() == 0){
                     //sharedCounter = Play.totalSharedWins().size();
                     //loserCounter = Play.totalGroupLosses().size();
                 }else {
-                    sharedCounter = Play.totalSharedWins(GameGroup.findById(GameGroup.class, theGroup), 0).size();
-                    loserCounter = Play.totalGroupLosses(GameGroup.findById(GameGroup.class, theGroup), 0).size();
+                    sharedCounter = Play.totalSharedWins(theGroup, 0).size();
+                    loserCounter = Play.totalGroupLosses(theGroup, 0).size();
 
                     addStat(5, getString(R.string.stats_shared_wins), sharedCounter + "", "");
                     addStat(6, getString(R.string.stats_total_losses), loserCounter + "", "");
                 }
                 for (int x = 0; x < result.size(); x++) {
-                    if (theGroup == 0) {
+                    if (theGroup.getId() == 0) {
                         addStat(7, result.get(x).player.playerName + " " + getString(R.string.stats_regular_wins) + getString(R.string.percentage), roundTwoDecimals((((result.get(x).regularWins) * 100.0 / result.get(0).totalPlays))) + "%", result.get(x).player.getId() + "");
                     } else {
                         addStat(-1, result.get(x).player.playerName + " " + getString(R.string.stats_total_wins) + getString(R.string.percentage), roundTwoDecimals((((result.get(x).asteriskWins + result.get(x).regularWins) * 100.0 / result.get(0).totalPlays))) + "%", result.get(x).player.getId() + "");
@@ -287,10 +287,10 @@ public class StatsFragment_Wins extends Fragment {
                 public void onValueSelected(Entry e, int dataSetIndex, Highlight h) {
                     switch (e.getXIndex()) {
                         case 0:
-                            ((MainActivity) mActivity).openPlays(gameGroup + "^" + playerValue, false, 2, getString(R.string.title_statistics));
+                            ((MainActivity) mActivity).openPlays(gameGroup.getId() + "^" + playerValue, false, 2, getString(R.string.title_statistics));
                             break;
                         case 1:
-                            ((MainActivity) mActivity).openPlays(gameGroup + "^" + playerValue, false, 3, getString(R.string.title_statistics));
+                            ((MainActivity) mActivity).openPlays(gameGroup.getId() + "^" + playerValue, false, 3, getString(R.string.title_statistics));
                             break;
                     }
                 }
@@ -382,40 +382,40 @@ public class StatsFragment_Wins extends Fragment {
                         switch (statType) {
                             case 0:
                                 //((MainActivity) mActivity).openPlays(games.get(position).gameName, false);
-                                ((MainActivity) mActivity).openPlays(gameGroup+"", false, 1, getString(R.string.title_statistics));
+                                ((MainActivity) mActivity).openPlays(gameGroup.getId()+"", false, 1, getString(R.string.title_statistics));
                                 break;
                             case 1:
                                 //((MainActivity) mActivity).openPlays(games.get(position).gameName, false);
-                                ((MainActivity) mActivity).openGames(gameGroup+"", false, 1, getString(R.string.title_statistics));
+                                ((MainActivity) mActivity).openGames(gameGroup.getId()+"", false, 1, getString(R.string.title_statistics));
                                 break;
                             case 2:
                                 //((MainActivity) mActivity).openPlays(games.get(position).gameName, false);
-                                ((MainActivity) mActivity).openPlays(gameGroup+"^"+playerValue, false, 2, getString(R.string.title_statistics));
+                                ((MainActivity) mActivity).openPlays(gameGroup.getId()+"^"+playerValue, false, 2, getString(R.string.title_statistics));
                                 break;
                             case 3:
                                 //((MainActivity) mActivity).openPlays(games.get(position).gameName, false);
-                                ((MainActivity) mActivity).openPlays(gameGroup+"^"+playerValue, false, 3, getString(R.string.title_statistics));
+                                ((MainActivity) mActivity).openPlays(gameGroup.getId()+"^"+playerValue, false, 3, getString(R.string.title_statistics));
                                 break;
                             case 4:
                                 //((MainActivity) mActivity).openPlays(games.get(position).gameName, false);
-                                ((MainActivity) mActivity).openPlays(gameGroup+"^"+playerValue, false, 4, getString(R.string.title_statistics));
+                                ((MainActivity) mActivity).openPlays(gameGroup.getId()+"^"+playerValue, false, 4, getString(R.string.title_statistics));
                                 break;
                             case 5:
                                 //((MainActivity) mActivity).openPlays(games.get(position).gameName, false);
-                                ((MainActivity) mActivity).openPlays(gameGroup+"", false, 5, getString(R.string.title_statistics));
+                                ((MainActivity) mActivity).openPlays(gameGroup.getId()+"", false, 5, getString(R.string.title_statistics));
                                 break;
                             case 6:
                                 //((MainActivity) mActivity).openPlays(games.get(position).gameName, false);
-                                ((MainActivity) mActivity).openPlays(gameGroup+"", false, 6, getString(R.string.title_statistics));
+                                ((MainActivity) mActivity).openPlays(gameGroup.getId()+"", false, 6, getString(R.string.title_statistics));
                                 break;
                             case 7:
                                 //regular wins percentage
                                 //just using this to get a list of total games played for a player
                                 //using it because it's part of the "Everyone" list too
-                                ((MainActivity) mActivity).openPlays(gameGroup + "^" + playerValue, false, 8, getString(R.string.title_statistics));
+                                ((MainActivity) mActivity).openPlays(gameGroup.getId() + "^" + playerValue, false, 8, getString(R.string.title_statistics));
                                 break;
                             case 8:
-                                ((MainActivity) mActivity).openGames(gameGroup + "", false, 4, getString(R.string.title_statistics));
+                                ((MainActivity) mActivity).openGames(gameGroup.getId() + "", false, 4, getString(R.string.title_statistics));
                                 break;
                         }
                     }

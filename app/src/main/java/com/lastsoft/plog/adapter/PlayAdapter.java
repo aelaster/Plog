@@ -53,7 +53,9 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Provide views to RecyclerView with data from mDataSet.
@@ -267,8 +269,23 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
         //if (searchQuery.equals("") || (games.get(position).gameName.toLowerCase().contains(searchQuery.toLowerCase()))) {
 
             DateFormat outputFormatter = new SimpleDateFormat("MM/dd/yyyy");
-            String output_date = outputFormatter.format(plays.get(position).playDate); // Output : 01/20/2012
+            Date theDate = plays.get(position).playDate;
+            long diff = new Date().getTime() - theDate.getTime();
+            long days = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
+            String output_date;
+            if (days == 0){
+                output_date = mActivity.getString( R.string.played_label) + mActivity.getString(R.string.less_than_a_day_ago);
+            }else if (days == 1){
+                output_date = mActivity.getString( R.string.played_label) + days + mActivity.getString(R.string.day_ago_label);
+            }else if (days <= 6){
+                output_date = mActivity.getString( R.string.played_label) + days + mActivity.getString( R.string.days_ago_label);
+            }else {
+                output_date = mActivity.getString( R.string.played_label) + outputFormatter.format(theDate); // Output : 01/20/2012
+            }
+            //String output_date = outputFormatter.format(theDate); // Output : 01/20/2012
+
             viewHolder.getGameNameView().setText(GamesPerPlay.getBaseGame(plays.get(position)).gameName);
+            viewHolder.getGameNameView().setSelected(true);
             viewHolder.getPlayDateView().setText(output_date);
             viewHolder.getImageView().setTransitionName("imageTrans" + position);
             viewHolder.getImageView().setTag("imageTrans" + position);
@@ -352,6 +369,7 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
 
             viewHolder.getPlayWinnerView().setTypeface(null, Typeface.BOLD);
             viewHolder.getPlayWinnerView().setText(mActivity.getString(R.string.winners) + winners);
+            viewHolder.getPlayWinnerView().setSelected(true);
 
     }
     // END_INCLUDE(recyclerViewOnBindViewHolder)

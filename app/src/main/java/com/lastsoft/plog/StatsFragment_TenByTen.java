@@ -11,6 +11,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
 import com.lastsoft.plog.db.Game;
 import com.lastsoft.plog.db.GameGroup;
 
@@ -22,14 +23,14 @@ public class StatsFragment_TenByTen extends Fragment {
 
     View statsView;
     private ViewGroup mContainerView_Players;
-    long gameGroup;
+    GameGroup gameGroup;
     int year;
     boolean boot = true;
 
-    public static StatsFragment_TenByTen newInstance(long gameGroup) {
+    public static StatsFragment_TenByTen newInstance(String gameGroup) {
         StatsFragment_TenByTen fragment = new StatsFragment_TenByTen();
         Bundle args = new Bundle();
-        args.putLong("gameGroup", gameGroup);
+        args.putString("gameGroup", gameGroup);
         fragment.setArguments(args);
         return fragment;
     }
@@ -42,7 +43,7 @@ public class StatsFragment_TenByTen extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            gameGroup = getArguments().getLong("gameGroup");
+            gameGroup = new Gson().fromJson(getArguments().getString("gameGroup"), GameGroup.class);
         }
     }
 
@@ -51,7 +52,7 @@ public class StatsFragment_TenByTen extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         statsView = inflater.inflate(R.layout.fragment_statistics, container, false);
-        if (gameGroup > 0) {
+        if (gameGroup.getId() > 0) {
             mContainerView_Players = (ViewGroup) statsView.findViewById(R.id.container_players);
             //create dropdown
 
@@ -100,7 +101,7 @@ public class StatsFragment_TenByTen extends Fragment {
     }
 
     private void getTenByTen(int year){
-        List<Game> tbts = Game.totalTenByTen_GameGroup(GameGroup.findById(GameGroup.class, gameGroup), year);
+        List<Game> tbts = Game.totalTenByTen_GameGroup(gameGroup, year);
         int tbtCounts = 0;
         for (Game tbt : tbts){
             if (tbt.tbtCount <= 10) { //count only uses the value if it's less than or equal to 10
@@ -142,14 +143,14 @@ public class StatsFragment_TenByTen extends Fragment {
                 newView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        ((MainActivity) mActivity).openPlays(gameGroup + "^" + gameValue + "^" + theYear, false, 7, mActivity.getString(R.string.title_statistics));
+                        ((MainActivity) mActivity).openPlays(gameGroup.getId() + "^" + gameValue + "^" + theYear, false, 7, mActivity.getString(R.string.title_statistics));
                     }
                 });
             }else{
                 newView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        ((MainActivity) mActivity).openPlays(gameGroup + "^" + theYear, false, 10, mActivity.getString(R.string.title_statistics));
+                        ((MainActivity) mActivity).openPlays(gameGroup.getId() + "^" + theYear, false, 10, mActivity.getString(R.string.title_statistics));
 
                     }
                 });

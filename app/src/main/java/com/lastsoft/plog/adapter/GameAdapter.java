@@ -238,6 +238,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
         DateFormat outputFormatter = new SimpleDateFormat("MM/dd/yyyy");
 
         viewHolder.getTextView().setText(games.get(position).gameName);
+        viewHolder.getTextView().setSelected(true);
         if (games.get(position).gameThumb != null  && !games.get(position).gameThumb.equals("")) {
             //Log.d("V1", "gameThumb = " + games.get(position).gameThumb);
             //ImageLoader.getInstance().displayImage("http:" + games.get(position).gameThumb, viewHolder.getImageView(), options);
@@ -254,7 +255,9 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
             String output_date2;
             if (days == 0){
                 output_date2 = mActivity.getString( R.string.less_than_a_day_ago);
-            }else if (days <= 7){
+            }else if (days == 1){
+                output_date2 = mActivity.getString( R.string.last_play_label) + days +  mActivity.getString(R.string.day_ago_label);
+            }else if (days <= 6){
                 output_date2 = mActivity.getString( R.string.last_play_label) + days + mActivity.getString( R.string.days_ago_label);
             }else {
                 output_date2 = mActivity.getString( R.string.last_play_label) + outputFormatter.format(theDate); // Output : 01/20/2012
@@ -262,7 +265,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
             viewHolder.getRecentPlayView().setText(output_date2);
             viewHolder.getRecentPlayView().setVisibility(View.VISIBLE);
         }else{
-            viewHolder.getRecentPlayView().setVisibility(View.GONE);
+            viewHolder.getRecentPlayView().setVisibility(View.INVISIBLE);
         }
 
         if (games.get(position).taggedToPlay > 0 && playListType == 2){
@@ -272,7 +275,9 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
             String output_date;
             if (days == 0){
                 output_date = mActivity.getString( R.string.added) + mActivity.getString(R.string.less_than_a_day_ago);
-            }else if (days <= 7){
+            }else if (days == 1){
+                output_date = mActivity.getString( R.string.added) + days +  mActivity.getString(R.string.day_ago_label);
+            }else if (days <= 6){
                 output_date = mActivity.getString( R.string.added) + days + mActivity.getString( R.string.days_ago_label);
             }else {
                 output_date = mActivity.getString( R.string.added) + outputFormatter.format(theDate); // Output : 01/20/2012

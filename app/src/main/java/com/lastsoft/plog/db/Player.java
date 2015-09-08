@@ -2,7 +2,6 @@ package com.lastsoft.plog.db;
 
 import com.orm.StringUtil;
 import com.orm.SugarRecord;
-import com.orm.query.Select;
 
 import java.util.List;
 
@@ -13,6 +12,7 @@ public class Player extends SugarRecord<Player> {
     public String playerPhoto;
     public String defaultColor;
     public String bggPassword;
+    public int totalWins;
 
     public Player() {
     }
@@ -48,10 +48,18 @@ public class Player extends SugarRecord<Player> {
     }
 
     public static List listPlayersAZ(){
-        Select alphaSort_AZ = Select.from(Player.class);
-        alphaSort_AZ.orderBy(StringUtil.toSQLName("playerName") + " ASC");
-
-        return alphaSort_AZ.list();
+        String query;
+        query = " SELECT " + StringUtil.toSQLName("Player") + ".*, COUNT("+ StringUtil.toSQLName("Play") +"." + StringUtil.toSQLName("id") + ") as " + StringUtil.toSQLName("totalWins") +
+                " FROM " + StringUtil.toSQLName("Player") +
+                " LEFT JOIN "+ StringUtil.toSQLName("PlayersPerPlay") +
+                " ON " + StringUtil.toSQLName("Player") + "." + StringUtil.toSQLName("id") + " = " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("player") +
+                " LEFT JOIN "+ StringUtil.toSQLName("Play") +
+                " ON " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " = " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("play") +
+                " AND "+ StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("player") + " = " + StringUtil.toSQLName("Player") + "." + StringUtil.toSQLName("id") +
+                " AND "+ StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("score") + " >= " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("playHighScore") +
+                " GROUP BY " + StringUtil.toSQLName("Player") + "." + StringUtil.toSQLName("id") +
+                " ORDER BY " + StringUtil.toSQLName("Player") + "." + StringUtil.toSQLName("playerName") + " ASC";
+        return Player.findWithQuery(Player.class, query);
     }
 
     public static boolean playerExists(String playerName){

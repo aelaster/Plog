@@ -47,13 +47,26 @@
                     android:textColor="@color/black"
                     android:layout_alignParentTop="true"
                     android:textSize="20sp"
+                    android:singleLine="true"
+                    android:ellipsize="marquee"
+                    android:marqueeRepeatLimit="marquee_forever"
+                    android:scrollHorizontally="true"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
                     />
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/groupWins"
+                    android:id="@+id/totalPlays"
                     android:textColor="@color/black"
                     android:layout_below="@+id/groupName"
+                    />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/uniqueGames"
+                    android:textColor="@color/black"
+                    android:layout_below="@+id/totalPlays"
                     />
 
             </RelativeLayout>

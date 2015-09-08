@@ -33,7 +33,6 @@ import android.widget.TextView;
 
 import com.lastsoft.plog.MainActivity;
 import com.lastsoft.plog.R;
-import com.lastsoft.plog.db.Play;
 import com.lastsoft.plog.db.Player;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -124,8 +123,9 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.ViewHolder
     // Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, final int position) {
-        int regularWins = Play.totalWins_Player(players.get(position), 0).size();
+        int regularWins = players.get(position).totalWins;
         viewHolder.getNameView().setText(players.get(position).playerName);
+        viewHolder.getNameView().setSelected(true);
         viewHolder.getWinsView().setText(mActivity.getString(R.string.wins) + regularWins);
 
         if (players.get(position).playerPhoto != null) {

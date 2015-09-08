@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 
+import com.google.gson.Gson;
 import com.lastsoft.plog.db.GameGroup;
 
 import java.util.ArrayList;
@@ -63,6 +64,7 @@ public class StatsFragment extends Fragment {
     private PagerAdapter mPagerAdapter;
     View viewPlayLayout;
     long groupToPoll = 0;
+    GameGroup theGroup = new GameGroup();
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -74,7 +76,7 @@ public class StatsFragment extends Fragment {
         ActionBar mActionBar = ((MainActivity)mActivity).getSupportActionBar();
 
         List<String> gameGroupNames = new ArrayList<>();
-        final List<GameGroup> gameGroups = GameGroup.listAll(GameGroup.class);
+        final List<GameGroup> gameGroups = GameGroup.listAll_AZ(true);
         int i = 0;
         gameGroupNames.add(getString(R.string.select_group));
         gameGroupNames.add(getString(R.string.everyone));
@@ -94,16 +96,18 @@ public class StatsFragment extends Fragment {
                     if (position > 0) {
 
                         if (position - 2 == -2) {
-                            groupToPoll = -1; //dont do anything
+                            theGroup.setId((long)-1);
+                            //groupToPoll = -1; //dont do anything
                         }else if (position - 2 == -1) {
-                            groupToPoll = 0; //this is the everyone group
+                            //groupToPoll = 0; //this is the everyone group
+                            theGroup.setId((long)0);
                         } else {
-                            GameGroup checker = gameGroups.get(position - 2);
-                            groupToPoll = checker.getId();
+                            theGroup = gameGroups.get(position - 2);
+                           // groupToPoll = theGroup.getId();
                         }
 
 
-                        mPagerAdapter = new ScreenSlidePagerAdapter(getChildFragmentManager(), groupToPoll);
+                        mPagerAdapter = new ScreenSlidePagerAdapter(getChildFragmentManager(), theGroup);
                         mPager.setAdapter(mPagerAdapter);
                     }
                     return true;
@@ -111,9 +115,11 @@ public class StatsFragment extends Fragment {
             });
         }
 
+        GameGroup init = new GameGroup();
+        init.setId((long)-1);
         // Instantiate a ViewPager and a PagerAdapter.
         mPager = (ViewPager) viewPlayLayout.findViewById(R.id.pager);
-        mPagerAdapter = new ScreenSlidePagerAdapter(getChildFragmentManager(), -1);
+        mPagerAdapter = new ScreenSlidePagerAdapter(getChildFragmentManager(), init);
         mPager.setAdapter(mPagerAdapter);
         mPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
@@ -162,18 +168,20 @@ public class StatsFragment extends Fragment {
     }
 
     private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
-        long theGroup;
-        public ScreenSlidePagerAdapter(FragmentManager fm, long theGroup) {
+        GameGroup theGroup;
+        public ScreenSlidePagerAdapter(FragmentManager fm, GameGroup theGroup) {
             super(fm);
             this.theGroup = theGroup;
         }
 
         @Override
         public Fragment getItem(int position) {
+            Gson gson = new Gson();
+            String json = gson.toJson(theGroup);
             if (position == 0){
-                return StatsFragment_Wins.newInstance(theGroup);
+                return StatsFragment_Wins.newInstance(json);
             }else {
-                return StatsFragment_TenByTen.newInstance(theGroup);
+                return StatsFragment_TenByTen.newInstance(json);
             }
         }
 

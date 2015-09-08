@@ -48,6 +48,12 @@
                     android:textColor="@color/black"
                     android:layout_alignParentTop="true"
                     android:textSize="20sp"
+                    android:singleLine="true"
+                    android:ellipsize="marquee"
+                    android:marqueeRepeatLimit="marquee_forever"
+                    android:scrollHorizontally="true"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
                     />
 
                 <TextView

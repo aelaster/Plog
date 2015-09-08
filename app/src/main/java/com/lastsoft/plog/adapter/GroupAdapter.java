@@ -33,7 +33,6 @@ import android.widget.TextView;
 
 import com.lastsoft.plog.MainActivity;
 import com.lastsoft.plog.R;
-import com.lastsoft.plog.db.Game;
 import com.lastsoft.plog.db.GameGroup;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 
@@ -57,7 +56,8 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
      */
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private final TextView nameView;
-        private final TextView winsView;
+        private final TextView totalPlaysView;
+        private final TextView uniqueGamesView;
         private final ImageView imageView;
         private final LinearLayout overflowLayout;
         private final View myView;
@@ -73,7 +73,8 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
             });
             myView = v;
             nameView = (TextView) v.findViewById(R.id.groupName);
-            winsView = (TextView) v.findViewById(R.id.groupWins);
+            totalPlaysView = (TextView) v.findViewById(R.id.totalPlays);
+            uniqueGamesView = (TextView) v.findViewById(R.id.uniqueGames);
             overflowLayout = (LinearLayout) v.findViewById(R.id.overflowLayout);
             imageView = (ImageView) v.findViewById(R.id.imageView1);
         }
@@ -84,8 +85,11 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
         public TextView getNameView() {
             return nameView;
         }
-        public TextView getWinsView() {
-            return winsView;
+        public TextView getPlaysView() {
+            return totalPlaysView;
+        }
+        public TextView getGamesView() {
+            return uniqueGamesView;
         }
         public LinearLayout getOverflowLayout() {
             return overflowLayout;
@@ -100,7 +104,7 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
         mActivity = theActivity;
         mFragment = theFragment;
 
-        groups = GameGroup.listAll_AZ();
+        groups = GameGroup.listAll_AZ(false);
 
         options = new DisplayImageOptions.Builder()
                 .cacheOnDisk(true)
@@ -126,9 +130,10 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, final int position) {
         //long totalPlays = ((long) PlayersPerPlay.totalPlays_GameGroup(GameGroup.findById(GameGroup.class, groups.get(position).getId())).size() / (long) GameGroup.getGroupPlayers(GameGroup.findById(GameGroup.class, groups.get(position).getId())).size());
-        long totalUnique = Game.getUniqueGames_GameGroup(GameGroup.findById(GameGroup.class, groups.get(position).getId()), 0).size();
         viewHolder.getNameView().setText(groups.get(position).groupName);
-        viewHolder.getWinsView().setText(mActivity.getString(R.string.unique_games) + totalUnique);
+        viewHolder.getNameView().setSelected(true);
+        viewHolder.getPlaysView().setText(mActivity.getString(R.string.total_plays) + groups.get(position).totalPlays);
+        viewHolder.getGamesView().setText(mActivity.getString(R.string.unique_games) + groups.get(position).uniqueGames);
         viewHolder.getView().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
