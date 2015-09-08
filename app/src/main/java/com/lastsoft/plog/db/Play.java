@@ -304,7 +304,7 @@ public class Play extends SugarRecord<Play> {
                 " INNER JOIN " + StringUtil.toSQLName("Game") +
                 " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("game") + " = " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("id") +
                 " INNER JOIN "+ StringUtil.toSQLName("PlayersPerPlay") +
-                " ON " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " = " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("play") +
+                " ON P." + StringUtil.toSQLName("id") + " = " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("play") +
                 " INNER JOIN " + StringUtil.toSQLName("PlaysPerGameGroup") +
                 " ON " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("play") + " = " + StringUtil.toSQLName("PlaysPerGameGroup") + "." + StringUtil.toSQLName("play") +
                 " AND " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("expansionFlag") + " = 0 " +
@@ -313,7 +313,7 @@ public class Play extends SugarRecord<Play> {
                 " AND "+ StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("score") + " >= " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("playHighScore");
         switch (sortType) {
             case 0:
-                query = query + " ORDER BYP." + StringUtil.toSQLName("playDate") + " DESC";
+                query = query + " ORDER BY P." + StringUtil.toSQLName("playDate") + " DESC";
                 break;
             case 1:
                 query = query + " ORDER BY P." + StringUtil.toSQLName("playDate") + " ASC";
@@ -465,7 +465,7 @@ public class Play extends SugarRecord<Play> {
                 " from " + StringUtil.toSQLName("PlayersPerPlay") +
                 " INNER JOIN " + StringUtil.toSQLName("Player") +
                 " ON " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("Player") + " = "+ StringUtil.toSQLName("Player") + "." + StringUtil.toSQLName("id") +
-                " where " + StringUtil.toSQLName("play") + " = P2." + StringUtil.toSQLName("id") +
+                " where " + StringUtil.toSQLName("play") + " = PP." + StringUtil.toSQLName("id") +
                 " and " + StringUtil.toSQLName("score") + " = " +
                 " (" +
                 "Select Max(" + StringUtil.toSQLName("score") + ") " +
