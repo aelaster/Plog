@@ -357,7 +357,11 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
 
 
             viewHolder.getPlayWinnerView().setTypeface(null, Typeface.ITALIC);
-            viewHolder.getPlayWinnerView().setText(mActivity.getString(R.string.winners) + plays.get(position).winners);
+            if (plays.get(position).winners != null) {
+                viewHolder.getPlayWinnerView().setText(mActivity.getString(R.string.winners) + plays.get(position).winners);
+            }else{
+                viewHolder.getPlayWinnerView().setText(mActivity.getString(R.string.winners) + mActivity.getString(R.string.none));
+            }
             viewHolder.getPlayWinnerView().setSelected(true);
 
     }

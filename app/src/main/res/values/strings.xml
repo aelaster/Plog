@@ -181,6 +181,7 @@
     <string name="version_label">"Version: "</string>
     <string name="percent_completed">"Percent Completed: "</string>
     <string name="random_game">Random Game</string>
+    <string name="none">None</string>
     <string name="random_game_to_play">"You should play "</string>
 
     <string name="sort_az">Alpha (A->Z)</string>

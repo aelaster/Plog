@@ -226,7 +226,7 @@ public class ViewPlayFragment_Pages extends Fragment {
             Player thisPlayer = player.player;
             float personalBest;
             personalBest = PlayersPerPlay.personalBest(thisBaseGame, thisPlayer);
-            if (player.score < highScore) {
+            if (player.score < highScore || highScore == 0) {
                 addPlayer(thisPlayer.playerName, "" + player.score, false, ""+personalBest);
             } else {
                 addPlayer(thisPlayer.playerName, "" + player.score, true, ""+personalBest);
