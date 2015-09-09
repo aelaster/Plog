@@ -43,8 +43,9 @@
     <string name="edit_group">Edit Group</string>
     <string name="delete_group">Delete Group</string>
     <string name="add_game">Add Game</string>
-    <string name="filter_games">Filter Games</string>
-    <string name="filter_plays">Filter Plays</string>
+    <string name="filter">"Filter "</string>
+    <string name="filter_games">" Games"</string>
+    <string name="filter_plays">" Plays"</string>
     <string name="calculating">Calculating...</string>
     <string name="initGroup">Initializing Group...</string>
     <string name="add_tenbyten">Add to 10x10</string>

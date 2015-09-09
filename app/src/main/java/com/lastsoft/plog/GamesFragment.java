@@ -247,6 +247,10 @@ public class GamesFragment extends Fragment{
         // Set CustomAdapter as the adapter for RecyclerView.
         mRecyclerView.setAdapter(mAdapter);
 
+        if (mSearch != null) {
+            mSearch.setHint(getString(R.string.filter) + mAdapter.getItemCount() + getString(R.string.filter_games));
+        }
+
         fabMargin = getResources().getDimensionPixelSize(R.dimen.fab_margin);
         mRecyclerView.addOnScrollListener(new MyRecyclerScroll() {
             @Override
@@ -432,6 +436,9 @@ public class GamesFragment extends Fragment{
                                 sortType = 0;
                                 mAdapter.updateData(mAdapter.generateGameList(mSearchQuery, playListType, sortType));
                                 mRecyclerView.scrollToPosition(0);
+                                if (mSearch != null) {
+                                    mSearch.setHint(getString(R.string.filter) + mAdapter.getItemCount() + getString(R.string.filter_games));
+                                }
                                 return true;
                             case R.id.sort_za:
                                 sortType = 1;
@@ -480,6 +487,9 @@ public class GamesFragment extends Fragment{
                     item.setIcon(R.drawable.ic_visibility);
                     playListType = playListType_Holder;
                     mAdapter.updateData(mAdapter.generateGameList(mSearchQuery, playListType, sortType));
+                    if (mSearch != null) {
+                        mSearch.setHint(getString(R.string.filter) + mAdapter.getItemCount() + getString(R.string.filter_games));
+                    }
                     showExpansions = false;
                 }else{
                     //currently hiding expansions
@@ -494,6 +504,9 @@ public class GamesFragment extends Fragment{
                         playListType = 3;
                     }
                     mAdapter.updateData(mAdapter.generateGameList(mSearchQuery, playListType, sortType));
+                    if (mSearch != null) {
+                        mSearch.setHint(getString(R.string.filter) + mAdapter.getItemCount() + getString(R.string.filter_games));
+                    }
                     showExpansions = true;
                 }
                 return true;
@@ -605,6 +618,9 @@ public class GamesFragment extends Fragment{
         // Set CustomAdapter as the adapter for RecyclerView.
         //mRecyclerView.setAdapter(mAdapter);
         mAdapter.updateData(mAdapter.generateGameList(mSearchQuery, playListType, sortType));
+        if (mSearch != null) {
+            mSearch.setHint(getString(R.string.filter) + mAdapter.getItemCount() + getString(R.string.filter_games));
+        }
     }
 
     protected void updateDataset(){
@@ -614,6 +630,9 @@ public class GamesFragment extends Fragment{
         refreshDataset(false);
         mRecyclerView.scrollToPosition(firstVisible);*/
         mAdapter.updateData(mAdapter.generateGameList(mSearchQuery, playListType, sortType));
+        if (mSearch != null) {
+            mSearch.setHint(getString(R.string.filter) + mAdapter.getItemCount() + getString(R.string.filter_games));
+        }
     }
 
     /**

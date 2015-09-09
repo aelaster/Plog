@@ -151,6 +151,10 @@ public class PlaysFragment extends Fragment{
         mRecyclerView.setAdapter(mAdapter);
         // END_INCLUDE(initializeRecyclerView)
 
+        if (mSearch != null) {
+            mSearch.setHint(getString(R.string.filter) + mAdapter.getItemCount() + getString(R.string.filter_plays));
+        }
+
         //boolean pauseOnScroll = true; // or true
         //boolean pauseOnFling = true; // or false
         //NewPauseOnScrollListener listener = new NewPauseOnScrollListener(ImageLoader.getInstance(), pauseOnScroll, pauseOnFling);
@@ -408,6 +412,9 @@ public class PlaysFragment extends Fragment{
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.scrollToPosition(firstVisible);*/
         mAdapter.updateData(mAdapter.generatePlayData(mSearchQuery, playListType, sortType));
+        if (mSearch != null) {
+            mSearch.setHint(getString(R.string.filter) + mAdapter.getItemCount() + getString(R.string.filter_plays));
+        }
     }
 
 }
