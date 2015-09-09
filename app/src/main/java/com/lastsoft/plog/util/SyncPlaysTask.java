@@ -1,12 +1,19 @@
 package com.lastsoft.plog.util;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
+import com.lastsoft.plog.R;
+import com.lastsoft.plog.db.Game;
+import com.lastsoft.plog.db.GameGroup;
+import com.lastsoft.plog.db.GamesPerPlay;
+import com.lastsoft.plog.db.Play;
 import com.lastsoft.plog.db.Player;
+import com.lastsoft.plog.db.PlayersPerPlay;
+import com.lastsoft.plog.db.PlaysPerGameGroup;
 
 import org.apache.http.util.ByteArrayBuffer;
 import org.xmlpull.v1.XmlPullParser;
@@ -24,15 +31,21 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by TheFlash on 5/25/2015.
  */
-public class LoadPlaysTask extends AsyncTask<String, Void, String> {
-
+public class SyncPlaysTask extends AsyncTask<String, String, String> {
+    private ProgressDialog mydialog;
     public Context theContext;
-    public LoadPlaysTask(Context context){
+    int syncCounter = 0;
+    int totalCount = 0;
+    int pageCounter = 1;
+    SharedPreferences app_preferences;
+    public SyncPlaysTask(Context context){
         this.theContext = context;
+        app_preferences = PreferenceManager.getDefaultSharedPreferences(theContext);
     }
 
     private class AddPlay {
@@ -77,21 +90,17 @@ public class LoadPlaysTask extends AsyncTask<String, Void, String> {
         }
     }
 
-    private String getPlays(String bggUsername){
+    private String getPlays(String bggUsername, int pageNumber){
         try {
             URL url = null;
             URLConnection ucon = null;
-            url = new URL("https://www.boardgamegeek.com/xmlapi2/plays?username=" + bggUsername);
+            url = new URL("https://www.boardgamegeek.com/xmlapi2/plays?username=" + bggUsername + "&page=" + pageNumber);
             ucon = url.openConnection();
             ucon.setConnectTimeout(3000);
             ucon.setReadTimeout(30000);
-                     /* Define InputStreams to read
-                        * from the URLConnection. */
             InputStream is = ucon.getInputStream();
             BufferedInputStream bis = new BufferedInputStream(is, 1024);
 
-                       /* Read bytes to the Buffer until
-                        * there is nothing more to read(-1). */
             ByteArrayBuffer baf = new ByteArrayBuffer(1024);
             int current = 0;
             while ((current = bis.read()) != -1) {
@@ -112,73 +121,38 @@ public class LoadPlaysTask extends AsyncTask<String, Void, String> {
         }
     }
 
+    // can use UI thread here
+    @Override
+    protected void onPreExecute() {
+        mydialog = new ProgressDialog(theContext);
+        mydialog.setMessage(theContext.getString(R.string.syncing_plays));
+        mydialog.setCancelable(false);
+        try {
+            mydialog.show();
+        } catch (Exception ignored) {
+        }
+    }
+
     // automatically done on worker thread (separate from UI thread)
     @Override
     protected String doInBackground(final String... args) {
-
-        String myString = "";
-
         try {
-
             // first we go through and add every game in the collection
             URL url;
-
-            SharedPreferences app_preferences;
-            app_preferences = PreferenceManager.getDefaultSharedPreferences(theContext);
             long currentDefaultPlayer = app_preferences.getLong("defaultPlayer", -1);
             if (currentDefaultPlayer >=0 ) {
                 Player defaultPlayer = Player.findById(Player.class, currentDefaultPlayer);
                 if (defaultPlayer != null) {
                     //Log.d("V1", "https://www.boardgamegeek.com/xmlapi2/collection?username=" + defaultPlayer.bggUsername);
-                    myString = getPlays(defaultPlayer.bggUsername);
-                    //Log.d("V1", myString);
-
-                    if (myString != null) {
-                        XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
-                        factory.setNamespaceAware(true);
-                        XmlPullParser parser = factory.newPullParser();
-                        parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
-                        parser.setInput(new StringReader(myString));
-                        //parser.nextTag();
-                        // parser.require(XmlPullParser.START_TAG, null, "items");
-
-                        long plogPlayID;
-
-                        while (parser.next() != XmlPullParser.END_DOCUMENT) {
-                            if (parser.getEventType() != XmlPullParser.START_TAG) {
-                                continue;
-                            }
-                            String name = parser.getName();
-                            Log.d("V1", "name = " + name);
-                            // Starts by looking for the entry tag
-                            if (name.equals("plays")) {
-                                //entries.add(readEntry(parser));
-                                int total = 0;
-                                total = Integer.parseInt(readTotal(parser));
-
-                                //mDataset = new String[total];
-                                //mDataset_Thumb = new String[total];
-                            } else if (name.equals("play")) {
-                                //Log.d("V1", "name = " + mDataset[i]);
-                                AddPlay playToAdd = readEntry(parser, readPlayID(parser), readPlayDate(parser));
-                                //TEST THIS BIA
-                                /*Log.d("V1", "*****START PLAY*****");
-                                Log.d("V1", "playID = " + playToAdd.playID);
-                                Log.d("V1", "playDate = " + playToAdd.playDate);
-                                Log.d("V1", "playComment = " + playToAdd.playComment);
-                                Log.d("V1", "theGame.gameId = " + playToAdd.theGame.gameId);
-                                Log.d("V1", "theGame.gameName = " + playToAdd.theGame.gameName);
-                                Log.d("V1", "theGame.expansionFlag = " + playToAdd.theGame.expansionFlag);
-                                for (AddPlayer thePlayer: playToAdd.thePlayers){
-                                    Log.d("V1", "thePlayer.playerName = " + thePlayer.playerName);
-                                    Log.d("V1", "thePlayer.userName = " + thePlayer.userName);
-                                    Log.d("V1", "thePlayer.color = " + thePlayer.color);
-                                    Log.d("V1", "thePlayer.score = " + thePlayer.score);
-                                }
-                                Log.d("V1", "*****END PLAY*****");*/
-                            } else {
-                                skip(parser);
-                            }
+                    boolean stopLooping = false;
+                    while(!stopLooping) {
+                        parsePlaysXML(pageCounter, defaultPlayer.bggUsername);
+                        if (totalCount > syncCounter){
+                            //more to go!
+                            totalCount = totalCount - 100;
+                            pageCounter++;
+                        }else{
+                            stopLooping = true;
                         }
                     }
                 }
@@ -190,9 +164,169 @@ public class LoadPlaysTask extends AsyncTask<String, Void, String> {
     }
 
     @Override
-    protected void onPostExecute(final String result) {
-        Log.d("V1", result);
+    protected void onProgressUpdate(String... args) {
+        if (args.length == 2){
+            mydialog.setMessage(theContext.getString(R.string.syncing_plays) + " (" + args[0] + "/" + args[1] + ")");
+        }else {
+            updateGameViaBGG(args[2], args[3]);
+        }
+    }
 
+    @Override
+    protected void onPostExecute(final String result) {
+        //Log.d("V1", result);
+        mydialog.dismiss();
+    }
+
+    private void parsePlaysXML(int pageNumber, String bggUsername){
+        try {
+            String myString = getPlays(bggUsername, pageNumber);
+            if (myString != null) {
+                XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
+                factory.setNamespaceAware(true);
+                XmlPullParser parser = factory.newPullParser();
+                parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
+                parser.setInput(new StringReader(myString));
+
+                Play newPlay = null;
+
+                while (parser.next() != XmlPullParser.END_DOCUMENT) {
+                    if (parser.getEventType() != XmlPullParser.START_TAG) {
+                        continue;
+                    }
+                    String name = parser.getName();
+                    //Log.d("V1", "name = " + name);
+                    // Starts by looking for the entry tag
+                    if (name.equals("plays")) {
+                        //entries.add(readEntry(parser));
+                        if (totalCount == 0) {
+                            totalCount = Integer.parseInt(readTotal(parser));
+                        }else{
+                            Integer.parseInt(readTotal(parser));
+                        }
+
+                        //mDataset = new String[total];
+                        //mDataset_Thumb = new String[total];
+                    } else if (name.equals("play")) {
+                        //Log.d("V1", "name = " + mDataset[i]);
+                        //build play to add, read from BGG
+                        ArrayList<Long> addedUsers = new ArrayList<Long>();
+                        AddPlay playToAdd = readEntry(parser, readPlayID(parser), readPlayDate(parser));
+
+                        publishProgress("" + syncCounter, "" + totalCount);
+
+                        //make sure this play doesn't already exist in Db
+                        if (Play.findPlayByBGGID(playToAdd.playID) == null) {
+
+                            if (playToAdd.theGame.expansionFlag == false) {
+                                //Log.d("V1", "Adding Base Game");
+                                //this is the base game
+                                //we create a new play
+
+                                //add the play
+                                newPlay = new Play(playToAdd.playDate, playToAdd.playComment, "", playToAdd.playID);
+                                newPlay.save();
+
+                                //determine high score
+                                float highScore = -99999;
+                                for (AddPlayer thePlayer : playToAdd.thePlayers) {
+                                    if (thePlayer.score > highScore) {
+                                        highScore = thePlayer.score;
+                                    }
+                                }
+
+                                //add players to the play
+                                for (AddPlayer thePlayer : playToAdd.thePlayers) {
+                                    Player thisPlayer = Player.findPlayerByName(thePlayer.playerName);
+                                    if (thisPlayer == null) {
+                                        //player doesn't exist.
+                                        Player player = new Player(thePlayer.playerName, thePlayer.userName, "", "");
+                                        player.save();
+                                        thisPlayer = player;
+                                    }
+                                    addedUsers.add(thisPlayer.getId());
+                                    PlayersPerPlay newPlayer = new PlayersPerPlay(thisPlayer, newPlay, thePlayer.score, thePlayer.color, highScore);
+                                    newPlayer.save();
+                                }
+
+                                //add base game to new play
+                                Game theGame = Game.findGameByName(playToAdd.theGame.gameName);
+                                if (theGame == null) {
+                                    //game does not exist
+                                    Game game = new Game(playToAdd.theGame.gameName, playToAdd.theGame.gameId, "", false);
+                                    game.save();
+                                    theGame = game;
+                                    //updateGameViaBGG(playToAdd.theGame.gameId, playToAdd.theGame.gameName);
+                                    publishProgress("", "", playToAdd.theGame.gameId, playToAdd.theGame.gameName);
+                                }
+                                GamesPerPlay newBaseGame = new GamesPerPlay(newPlay, theGame, false);
+                                newBaseGame.save();
+
+                                //check for a group
+                                List<GameGroup> gameGroups = GameGroup.listAll(GameGroup.class);
+                                for (GameGroup thisGroup : gameGroups) {
+                                    List<Player> players = GameGroup.getGroupPlayers(thisGroup);
+                                    boolean included = true;
+                                    for (Player playa : players) {
+                                        if (!addedUsers.contains(playa.getId())) {
+                                            included = false;
+                                            break;
+                                        }
+                                    }
+                                    if (included) {
+                                        //add this to PlaysPerGameGroup
+                                        PlaysPerGameGroup newGroupPlay = new PlaysPerGameGroup(newPlay, thisGroup);
+                                        newGroupPlay.save();
+                                    }
+                                }
+
+                                //remove from bucket list if it's there
+                                //only do this if there are more than one players...or the remove solo plays setting is enabled
+                                if (playToAdd.thePlayers.length > 1 || app_preferences.getBoolean("solo_remove_bucket_list", true) == true) {
+                                    if (theGame != null && theGame.taggedToPlay > 0) {
+                                        theGame.taggedToPlay = 0;
+                                        theGame.save();
+                                    }
+                                }
+                                //Log.d("V1", "Added " + playToAdd.theGame.gameName + " to play " + newPlay.getId());
+                            } else {
+                                //Log.d("V1", "Adding Expansion");
+                                //this is an expansion, so we add it to the previous play
+                                if (newPlay != null) {
+                                    Game theGame = Game.findGameByName(playToAdd.theGame.gameName);
+                                    if (theGame == null) {
+                                        //game does not exist
+                                        Game game = new Game(playToAdd.theGame.gameName, playToAdd.theGame.gameId, "", true);
+                                        game.save();
+                                        theGame = game;
+                                        //updateGameViaBGG(playToAdd.theGame.gameId, playToAdd.theGame.gameName);
+                                        publishProgress("", "", playToAdd.theGame.gameId, playToAdd.theGame.gameName);
+                                    }
+                                    GamesPerPlay newBaseGame = new GamesPerPlay(newPlay, theGame, true);
+                                    newBaseGame.save();
+                                    //Log.d("V1", "Added " + playToAdd.theGame.gameName + " to play " + newPlay.getId());
+                                }
+                            }
+
+                        }
+                        syncCounter++;
+                    } else {
+                        skip(parser);
+                    }
+                }
+            }
+        }catch (Exception ignored){
+            ignored.printStackTrace();
+        }
+    }
+
+    private void updateGameViaBGG(String bggID, String gameName){
+        UpdateBGGTask gameUpdate = new UpdateBGGTask(theContext, false, true);
+        try {
+            gameUpdate.execute(bggID, gameName);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private AddPlay readEntry(XmlPullParser parser, String playID, String playDate) throws XmlPullParserException, IOException {

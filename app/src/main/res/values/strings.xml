@@ -21,6 +21,7 @@
     <string name="db_exported">Database Exported</string>
     <string name="db_exported_1">"Database has been exported to "</string>
     <string name="db_exported_2">".  Place it in the same directory on your new device to import."</string>
+    <string name="syncing_plays">Syncing Plays</string>
 
     <string name="less_than_a_day_ago">Less than a day ago</string>
     <string name="days_ago_label">" days ago"</string>

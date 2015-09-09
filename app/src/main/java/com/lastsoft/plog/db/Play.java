@@ -18,6 +18,13 @@ public class Play extends SugarRecord<Play> {
     public Play() {
     }
 
+    public Play(Date playDate, String playNotes, String playPhoto, String bggPlayID) {
+        this.playDate = playDate;
+        this.playNotes = playNotes;
+        this.playPhoto = playPhoto;
+        this.bggPlayID = bggPlayID;
+    }
+
     public Play(Date playDate, String playNotes, String playPhoto) {
         this.playDate = playDate;
         this.playNotes = playNotes;
@@ -37,7 +44,14 @@ public class Play extends SugarRecord<Play> {
     }
 
 
-
+    public static Play findPlayByBGGID(String bggPlayID){
+        List<Play> returnMe = Play.find(Play.class, StringUtil.toSQLName("bggPlayID") + " = ?", bggPlayID);
+        if (returnMe.isEmpty()){
+            return null;
+        }else {
+            return returnMe.get(0);
+        }
+    }
 
 
     public static List listPlaysNewOld(int sortType){

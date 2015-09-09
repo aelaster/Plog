@@ -126,7 +126,7 @@ public class BGGLogInHelper {
                 //return createErrorMessage(R.string.logInErrorSuffixNoResponse);
             }
 
-            Log.i(TAG, response.toString());
+            //Log.i(TAG, response.toString());
             if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
                 //return createErrorMessage(R.string.logInErrorSuffixBadResponse);
             }

@@ -66,6 +66,15 @@ public class Player extends SugarRecord<Player> {
         return (Player.find(Player.class, StringUtil.toSQLName("playerName") + " = ?", playerName).size() > 0);
     }
 
+    public static Player findPlayerByName(String playerName){
+        List<Player> returnMe = Player.find(Player.class, StringUtil.toSQLName("playerName") + " = ?", playerName);
+        if (returnMe.isEmpty()){
+            return null;
+        }else{
+            return returnMe.get(0);
+        }
+    }
+
     public static long playerExists_ID(String playerName){
         List<Player> thePlayer = Player.find(Player.class, StringUtil.toSQLName("playerName") + " = ?", playerName);
         if (thePlayer.size() == 0){

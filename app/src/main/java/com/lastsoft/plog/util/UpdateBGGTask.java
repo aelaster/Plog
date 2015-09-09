@@ -38,21 +38,25 @@ public class UpdateBGGTask extends AsyncTask<String, Void, String> {
     private final ProgressDialog mydialog;
     Context theContext;
     boolean addMe;
-    public UpdateBGGTask(Context context, boolean addToCollection){
+    boolean suppressDialog;
+    public UpdateBGGTask(Context context, boolean addToCollection, boolean suppressDialog){
         this.theContext = context;
         this.addMe = addToCollection;
+        this.suppressDialog = suppressDialog;
         mydialog = new ProgressDialog(theContext);
     }
 
     // can use UI thread here
     @Override
     protected void onPreExecute() {
-
-        mydialog.setMessage(theContext.getString(R.string.contacting_the_geek));
-        mydialog.setCancelable(false);
-        try{
-            mydialog.show();
-        }catch (Exception e){}
+        if (!suppressDialog) {
+            mydialog.setMessage(theContext.getString(R.string.contacting_the_geek));
+            mydialog.setCancelable(false);
+            try {
+                mydialog.show();
+            } catch (Exception ignored) {
+            }
+        }
     }
     // automatically done on worker thread (separate from UI thread)
     @Override
@@ -213,7 +217,9 @@ public class UpdateBGGTask extends AsyncTask<String, Void, String> {
 
     @Override
     protected void onPostExecute(final String result) {
-        mydialog.dismiss();
+        if (!suppressDialog){
+            mydialog.dismiss();
+        }
     }
 
 

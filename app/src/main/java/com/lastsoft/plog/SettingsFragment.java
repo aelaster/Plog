@@ -24,9 +24,9 @@ import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.util.Log;
 
-import com.lastsoft.plog.util.LoadPlaysTask;
 import com.lastsoft.plog.util.NotificationFragment;
 import com.lastsoft.plog.util.PostMortemReportExceptionHandler;
+import com.lastsoft.plog.util.SyncPlaysTask;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -87,7 +87,7 @@ public class SettingsFragment extends PreferenceFragment {
     }
 
     public void syncPlays(){
-        LoadPlaysTask loadPlays = new LoadPlaysTask(getActivity());
+        SyncPlaysTask loadPlays = new SyncPlaysTask(getActivity());
         try {
             loadPlays.execute();
         } catch (Exception ignored) {

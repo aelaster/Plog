@@ -236,6 +236,8 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onResume() {
+        onFragmentInteraction("refresh_games");
+        onFragmentInteraction("refresh_plays");
         logIntoBGG();
         super.onResume();
     }
@@ -245,7 +247,7 @@ public class MainActivity extends AppCompatActivity
         mLogInHelper.logIn();
     }
 
-    public void logOutOfBGG(){
+    public void logOutOfBGG() {
         Cookies mCookies = new Cookies(this);
         mCookies.clearCookies();
     }
@@ -620,6 +622,7 @@ public class MainActivity extends AppCompatActivity
 
         return super.onOptionsItemSelected(item);
     }
+
 
     @Override
     public void onFragmentInteraction(String id) {
@@ -1290,7 +1293,7 @@ public class MainActivity extends AppCompatActivity
 
     public class GameUpdater extends UpdateBGGTask {
         public GameUpdater(Context context, boolean addToCollection) {
-            super(context, addToCollection);
+            super(context, addToCollection, false);
         }
 
         @Override
