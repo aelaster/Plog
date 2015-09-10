@@ -8,6 +8,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -77,12 +78,10 @@ public class StatsFragment extends Fragment {
 
         List<String> gameGroupNames = new ArrayList<>();
         final List<GameGroup> gameGroups = GameGroup.listAll_AZ(true);
-        int i = 0;
         gameGroupNames.add(getString(R.string.select_group));
         gameGroupNames.add(getString(R.string.everyone));
         for(GameGroup group:gameGroups){
             gameGroupNames.add(group.groupName);
-            i++;
         }
 
         ArrayAdapter<String> mSpinnerAdapter = null;
@@ -93,20 +92,26 @@ public class StatsFragment extends Fragment {
             mActionBar.setListNavigationCallbacks(mSpinnerAdapter, new ActionBar.OnNavigationListener() {
                 @Override
                 public boolean onNavigationItemSelected(int position, long itemId) {
+                    List<GameGroup> gameGroups2 = GameGroup.listAll_AZ(true);
                     if (position > 0) {
 
                         if (position - 2 == -2) {
-                            theGroup.setId((long)-1);
+                            theGroup.setId((long) -1);
                             //groupToPoll = -1; //dont do anything
-                        }else if (position - 2 == -1) {
+                        } else if (position - 2 == -1) {
                             //groupToPoll = 0; //this is the everyone group
-                            theGroup.setId((long)0);
+                            theGroup.setId((long) 0);
                         } else {
-                            theGroup = gameGroups.get(position - 2);
-                           // groupToPoll = theGroup.getId();
+                            theGroup = null;
+                            theGroup = gameGroups2.get(position - 2);
+                            // groupToPoll = theGroup.getId();
                         }
 
+                        for (GameGroup testGroup : gameGroups2) {
+                            Log.d("V1", "thegroups = " + testGroup.getId());
+                        }
 
+                        Log.d("V1", "the group passed in = " + theGroup.getId());
                         mPagerAdapter = new ScreenSlidePagerAdapter(getChildFragmentManager(), theGroup);
                         mPager.setAdapter(mPagerAdapter);
                     }

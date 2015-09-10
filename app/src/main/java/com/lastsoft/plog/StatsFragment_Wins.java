@@ -107,14 +107,16 @@ public class StatsFragment_Wins extends Fragment {
         public long totalPlays;
         public long totalUnique;
         public long totalUnplayed;
+        public long playerPlayed;
 
-        public WinStats(Player player, int regularWins, int asteriskWins, long totalPlays, long totalUnique, long totalUnplayed) {
+        public WinStats(Player player, int regularWins, int asteriskWins, long totalPlays, long totalUnique, long totalUnplayed, long playerPlayed) {
             this.player = player;
             this.regularWins = regularWins;
             this.asteriskWins = asteriskWins;
             this.totalPlays = totalPlays;
             this.totalUnique = totalUnique;
             this.totalUnplayed = totalUnplayed;
+            this.playerPlayed = playerPlayed;
         }
     }
 
@@ -167,7 +169,8 @@ public class StatsFragment_Wins extends Fragment {
                         //asterisk wins - NOT BEING USED RIGHT NOW
                         //int asteriskWins = Play.totalAsteriskWins_Player(thisPlayer, 0).size();
                         //output[arrayBounds+1] = (long)(regularWins + asteriskWins);
-                        output.add(new WinStats(thisPlayer, regularWins, 0, totalPlays, totalUnique, totalUnplayed));
+
+                        output.add(new WinStats(thisPlayer, regularWins, 0, totalPlays, totalUnique, totalUnplayed, Play.totalPlays_Player(thisPlayer, 1).size()));
                     }
                     Collections.sort(output, new Comparator<WinStats>() {
                         public int compare(WinStats left, WinStats right) {
@@ -189,7 +192,7 @@ public class StatsFragment_Wins extends Fragment {
                         //asterisk wins
                         int asteriskWins = Play.totalAsteriskWins_GameGroup_Player(theGroup, thisPlayer, 0).size();
                         //output[arrayBounds+1] = (long)(regularWins + asteriskWins);
-                        output.add(new WinStats(thisPlayer, regularWins, asteriskWins, totalPlays, totalUnique, totalUnplayed));
+                        output.add(new WinStats(thisPlayer, regularWins, asteriskWins, totalPlays, totalUnique, totalUnplayed, 0));
                     }
                     Collections.sort(output, new Comparator<WinStats>() {
                         public int compare(WinStats left, WinStats right) {
@@ -222,6 +225,11 @@ public class StatsFragment_Wins extends Fragment {
                     }
                 }
                 if (theGroup.getId() == 0){
+                    for (int x = 0; x < result.size(); x++) {
+                            addStat(7, result.get(x).player.playerName + getString(R.string.filter_plays), result.get(x).playerPlayed + "", result.get(x).player.getId() + "");
+                    }
+                }
+                if (theGroup.getId() == 0){
                     //sharedCounter = Play.totalSharedWins().size();
                     //loserCounter = Play.totalGroupLosses().size();
                 }else {
@@ -233,7 +241,7 @@ public class StatsFragment_Wins extends Fragment {
                 }
                 for (int x = 0; x < result.size(); x++) {
                     if (theGroup.getId() == 0) {
-                        addStat(7, result.get(x).player.playerName + " " + getString(R.string.stats_regular_wins) + getString(R.string.percentage), roundTwoDecimals((((result.get(x).regularWins) * 100.0 / result.get(0).totalPlays))) + "%", result.get(x).player.getId() + "");
+                        addStat(-1, result.get(x).player.playerName + " " + getString(R.string.stats_regular_wins) + getString(R.string.percentage), roundTwoDecimals((((result.get(x).regularWins) * 100.0 / result.get(0).totalPlays))) + "%", result.get(x).player.getId() + "");
                     } else {
                         addStat(-1, result.get(x).player.playerName + " " + getString(R.string.stats_total_wins) + getString(R.string.percentage), roundTwoDecimals((((result.get(x).asteriskWins + result.get(x).regularWins) * 100.0 / result.get(0).totalPlays))) + "%", result.get(x).player.getId() + "");
                         addStat(7, result.get(x).player.playerName + " " + getString(R.string.stats_regular_wins) + getString(R.string.percentage), roundTwoDecimals(((result.get(x).regularWins * 100.0 / result.get(0).totalPlays))) + "%", result.get(x).player.getId() + "");
