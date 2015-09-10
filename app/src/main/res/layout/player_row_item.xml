@@ -18,7 +18,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:padding="8dp"
+            android:padding="@dimen/card_padding"
             android:orientation="horizontal"
             android:layout_gravity="center"
             >
@@ -27,7 +27,7 @@
                 android:layout_width="70dp"
                 android:layout_height="70dp"
                 android:id="@+id/imageView1"
-                android:layout_marginRight="16dp"
+                android:layout_marginRight="@dimen/thumb_margin_right"
                 android:scaleType="centerCrop"
                 android:layout_gravity="center"
                 />
@@ -36,7 +36,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:padding="8dp"
+                android:padding="@dimen/card_padding"
                 android:layout_gravity="center"
                 >
 
