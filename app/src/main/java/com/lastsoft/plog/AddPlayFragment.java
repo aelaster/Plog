@@ -811,12 +811,6 @@ public class AddPlayFragment extends Fragment implements
         // can use UI thread here
         @Override
         protected void onPreExecute() {
-
-            /*mydialog.setMessage(theContext.getString(R.string.posting_play));
-            mydialog.setCancelable(false);
-            try{
-                mydialog.show();
-            }catch (Exception e){}*/
         }
 
 
@@ -918,13 +912,6 @@ public class AddPlayFragment extends Fragment implements
     public void removeYourself(){
         try {
             final AddPlayFragment mfragment = this;
-            /*if (playID < 0) {
-                //((MainActivity) mActivity).getSupportActionBar().setDisplayShowCustomEnabled(true);
-            } else {
-                //onButtonPressed("refresh_plays");
-            }*/
-
-
             getFragmentManager().popBackStack();
             getFragmentManager().beginTransaction().remove(mfragment).commitAllowingStateLoss();
             getFragmentManager().executePendingTransactions(); //Prevents the flashing.

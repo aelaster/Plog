@@ -238,7 +238,6 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
         DateFormat outputFormatter = new SimpleDateFormat("MM/dd/yyyy");
 
         viewHolder.getTextView().setText(games.get(position).gameName);
-        viewHolder.getTextView().setSelected(true);
         if (games.get(position).gameThumb != null  && !games.get(position).gameThumb.equals("")) {
             //Log.d("V1", "gameThumb = " + games.get(position).gameThumb);
             //ImageLoader.getInstance().displayImage("http:" + games.get(position).gameThumb, viewHolder.getImageView(), options);

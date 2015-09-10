@@ -27,14 +27,12 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 import android.util.Pair;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.lastsoft.plog.adapter.PlayAdapter;
 import com.lastsoft.plog.db.Game;
@@ -75,7 +73,6 @@ public class MainActivity extends AppCompatActivity
         PlayersFragment.OnFragmentInteractionListener,
         GamesFragment.OnFragmentInteractionListener,
         StatsFragment.OnFragmentInteractionListener,
-        View.OnClickListener,
         BGGLogInHelper.LogInListener {
 
     static final String EXTRA_CURRENT_ITEM_POSITION = "extra_current_item_position";
@@ -120,23 +117,13 @@ public class MainActivity extends AppCompatActivity
                         // page in the DetailsActivity. We must update the shared element so that the
                         // correct one falls into place.
                         String newImageTransitionName = "imageTrans" + currentPosition;
-                        String newNameTransitionName = "nameTrans" + currentPosition;
-                        String newDateTransitionName = "dateTrans" + currentPosition;
                         View newImageSharedView = mPlaysFragment.mRecyclerView.findViewWithTag(newImageTransitionName);
-                        //View newNameSharedView = mPlaysFragment.mRecyclerView.findViewWithTag(newNameTransitionName);
-                        //View newDateSharedView = mPlaysFragment.mRecyclerView.findViewWithTag(newDateTransitionName);
                         if (newImageSharedView != null) {
                             names.clear();
-                            names.add(newImageTransitionName);
-                            //names.add(newNameTransitionName);
-                            //names.add(newDateTransitionName);
+                            names.add(newImageTransitionName);;
                             sharedElements.clear();
                             sharedElements.put(newImageTransitionName, newImageSharedView);
-                            //sharedElements.put(newNameTransitionName, newNameSharedView);
-                            //sharedElements.put(newDateTransitionName, newDateSharedView);
                         }
-                        //if (newNameSharedView == null ){ Log.d("V1", "newNameSharedView is null");}
-                        //if (newDateSharedView == null ){ Log.d("V1", "newDateSharedView is null");}
                     }
                     mTmpState = null;
                 }
@@ -165,8 +152,6 @@ public class MainActivity extends AppCompatActivity
         }
 
 
-        //List<Game> winses = Game.totalTenByTen_GameGroup(GameGroup.findById(GameGroup.class, (long) 1), 2015);
-        //Log.d("V1", "TBT count = " + winses.size());
         if (!doesDatabaseExist(this, "SRX.db")) {
             setContentView(R.layout.activity_main0);
             mTitle = "Welcome!";
@@ -209,22 +194,6 @@ public class MainActivity extends AppCompatActivity
 
             TextView versionNumber = (TextView) findViewById(R.id.version_label);
             versionNumber.setText(getString(R.string.version_label) + pi.versionName);
-
-
-            //ActionBarDrawerToggle mDrawerToggle = new ActionBarDrawerToggle(
-            //        this, mDrawerLayout, R.string.navigation_drawer_open, R.string.navigation_drawer_close
-            //);
-            /*new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    if (mDrawerListView != null) {
-                        mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
-                    }
-                    if (mCallbacks != null) {
-                        mCallbacks.onNavigationDrawerItemSelected(mCurrentSelectedPosition);
-                    }
-                }
-            }, 300);*/
         }
     }
 
@@ -281,9 +250,7 @@ public class MainActivity extends AppCompatActivity
         try {
             FragmentManager fragmentManager = getSupportFragmentManager();
             if (fragmentManager.getBackStackEntryCount() > 0) {
-                //int backStackCount = manager.getBackStackEntryCount();
                 fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-                //fragmentManager.popBackStack(fragmentManager.getBackStackEntryAt(0).getId(), FragmentManager.POP_BACK_STACK_INCLUSIVE);
                 fragUp = false;
             }
 
@@ -401,9 +368,7 @@ public class MainActivity extends AppCompatActivity
             ft.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right);
             ft.addToBackStack("games");
         }
-        //if (mStatsFragment != null && mStatsFragment.isVisible() && !fromDrawer) {
         if (!fromDrawer){
-            //ft.hide(mStatsFragment);
             ft.add(R.id.container, mGamesFragment, "games");
         }else {
             ft.replace(R.id.container, mGamesFragment, "games");
@@ -609,22 +574,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        /*if (id == R.id.action_settings) {
-            return true;
-        }*/
-
-        return super.onOptionsItemSelected(item);
-    }
-
-
-    @Override
     public void onFragmentInteraction(String id) {
         if (id.contains("refresh_players_add")){
             PlayersFragment playersFrag = (PlayersFragment)
@@ -659,14 +608,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    @Override
-    public void onClick(View view) {
-        Toast.makeText(this, "Floating Action Clicked in " + mTitle, Toast.LENGTH_SHORT).show();
-    }
-
-    public void onListItemClicked(String id){
-        Toast.makeText(this, id + " List Item Clicked", Toast.LENGTH_SHORT).show();
-    }
 
     public void hidePlayerFAB(){
         PlayersFragment playersFrag = (PlayersFragment)
@@ -737,9 +678,6 @@ public class MainActivity extends AppCompatActivity
 
         ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(this,
                 Pair.create(view, view.getTransitionName()));
-                //Pair.create(nameView,  nameView.getTransitionName()),
-                //Pair.create(dateView,  dateView.getTransitionName()));
-
         startActivity(intent, options.toBundle());
     }
 
@@ -975,7 +913,6 @@ public class MainActivity extends AppCompatActivity
 
     GameUpdater gameUpdate;
     public void updateGameViaBGG(String gameName, String bggID, boolean addToCollection){
-        Log.d("V1", "updateGame = " + gameName);
         gameUpdate = new GameUpdater(this, addToCollection);
         try {
             gameUpdate.execute(bggID, gameName);
@@ -1148,8 +1085,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onFragmentInteraction(String id, float x, float y) {
-        //Log.d("V1", "x = " + x);
-        //Log.d("V1", "y = " + y);
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction ft = fragmentManager.beginTransaction();
         if (id.equals("add_player")) {
@@ -1158,35 +1093,19 @@ public class MainActivity extends AppCompatActivity
             ft.add(R.id.container, mAddPlayerFragment, id);
             ft.addToBackStack(id);
             ft.commitAllowingStateLoss();
-            //mTitle = getString(R.string.add_player);
-            //restoreActionBar();
-        }else if (id.equals("add_play")) {
-            //no longer used
-            /*fragUp = true;
-            mAddPlayFragment = AddPlayFragment.newInstance((int) x, (int) y, true, "", -1);
-            ft.add(R.id.container, mAddPlayFragment, id);
-            ft.addToBackStack(id);
-            ft.commitAllowingStateLoss();
-            //mTitle = getString(R.string.add_player);
-            //restoreActionBar();*/
         }else if (id.equals("add_group")) {
             fragUp = true;
             mAddGroupFragment = AddGroupFragment.newInstance((int) x, (int) y, true, -1);
             ft.add(R.id.container, mAddGroupFragment, id);
             ft.addToBackStack(id);
             ft.commitAllowingStateLoss();
-            //mTitle = getString(R.string.add_player);
-            //restoreActionBar();
         }else if (id.equals("add_game")) {
             fragUp = true;
             mAddGameFragment = AddGameFragment.newInstance((int) x, (int) y, true);
             ft.add(R.id.container, mAddGameFragment, id);
             ft.addToBackStack(id);
             ft.commitAllowingStateLoss();
-            //mTitle = getString(R.string.add_player);
-            //restoreActionBar();
         }
-        //Log.d("V1", id);
     }
 
     public void scrollPlays(int position){
@@ -1214,14 +1133,8 @@ public class MainActivity extends AppCompatActivity
             } else {
                 if (forceBack){
                     forceBack = false;
-
-                    /*FragmentManager fragmentManager = getSupportFragmentManager();
-                    if (fragmentManager.getBackStackEntryCount() > 0) {
-                        fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-                    }*/
                     super.onBackPressed();
                 }else {
-                    //super.onBackPressed();
                     PlayersFragment playersFrag = (PlayersFragment)
                             getSupportFragmentManager().findFragmentByTag("players");
                     if (playersFrag != null) {
@@ -1394,8 +1307,6 @@ public class MainActivity extends AppCompatActivity
                                     } else {
                                         addedGroups.remove(checked);
                                     }
-                                    //Log.d("V1", checked.gameName);
-                                    //Log.d("V1", "isChecked="+isChecked);
                                 }
                             })
                             // Set the action buttons
@@ -1466,19 +1377,6 @@ public class MainActivity extends AppCompatActivity
                                     updateGameViaBGG(gameName, BGGID, addToCollection);
                                 }
                             })
-                            // Set the action buttons
-                    /*.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int id) {
-                            TenByTen.deleteTenByTen(gameId);
-                            Calendar calendar = Calendar.getInstance();
-                            int year = calendar.get(Calendar.YEAR);
-                            for (int i = 0; i < addedGroups.size(); i++) {
-                                TenByTen addMe = new TenByTen(theGame, addedGroups.get(i), year);
-                                addMe.save();
-                            }
-                        }
-                    })*/
                     .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int id) {

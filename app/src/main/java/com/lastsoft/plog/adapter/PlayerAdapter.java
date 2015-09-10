@@ -125,7 +125,6 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.ViewHolder
     public void onBindViewHolder(ViewHolder viewHolder, final int position) {
         int regularWins = players.get(position).totalWins;
         viewHolder.getNameView().setText(players.get(position).playerName);
-        viewHolder.getNameView().setSelected(true);
         viewHolder.getWinsView().setText(mActivity.getString(R.string.wins) + regularWins);
 
         if (players.get(position).playerPhoto != null) {

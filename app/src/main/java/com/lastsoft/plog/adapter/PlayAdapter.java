@@ -284,7 +284,6 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
             //String output_date = outputFormatter.format(theDate); // Output : 01/20/2012
 
             viewHolder.getGameNameView().setText(GamesPerPlay.getBaseGame(plays.get(position)).gameName);
-            viewHolder.getGameNameView().setSelected(true);
             viewHolder.getPlayDateView().setText(output_date);
             viewHolder.getImageView().setTransitionName("imageTrans" + position);
             viewHolder.getImageView().setTag("imageTrans" + position);
@@ -362,7 +361,6 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
             }else{
                 viewHolder.getPlayWinnerView().setText(mActivity.getString(R.string.winners) + mActivity.getString(R.string.none));
             }
-            viewHolder.getPlayWinnerView().setSelected(true);
 
     }
     // END_INCLUDE(recyclerViewOnBindViewHolder)

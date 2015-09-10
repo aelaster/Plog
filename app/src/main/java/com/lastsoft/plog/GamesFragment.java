@@ -57,7 +57,6 @@ import com.lastsoft.plog.adapter.GameAdapter;
 import com.lastsoft.plog.db.Game;
 import com.lastsoft.plog.util.LoadGamesTask;
 import com.lastsoft.plog.util.MyRecyclerScroll;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
 
 import java.io.File;
 import java.io.IOException;
@@ -326,11 +325,6 @@ public class GamesFragment extends Fragment{
         return rootView;
     }
 
-    public void clearQuery(){
-        mSearchQuery = "";
-        mSearch.setText(mSearchQuery);
-    }
-
     public String getQuery(){
         return mSearchQuery;
     }
@@ -552,7 +546,6 @@ public class GamesFragment extends Fragment{
                     InputMethodManager.HIDE_NOT_ALWAYS);
         }catch (Exception e){}
         if (mActivity != null) {
-            //((MainActivity) mActivity).getSupportActionBar().setDisplayShowCustomEnabled(false);
             if (!fromDrawer){
                 ((MainActivity) mActivity).setUpActionBar(7);
             }
@@ -595,10 +588,6 @@ public class GamesFragment extends Fragment{
     }
 
 
-    /**
-     * Generates Strings for RecyclerView's adapter. This data would usually come
-     * from a local content provider or remote server.
-     */
     GamesLoader myTask;
     private void initDataset() {
         myTask = new GamesLoader(mActivity);
@@ -614,37 +603,16 @@ public class GamesFragment extends Fragment{
         if (reInit) {
             initDataset();
         }
-        //mAdapter = new GameAdapter(this, mActivity,mSearchQuery, fromDrawer, playListType);
-        // Set CustomAdapter as the adapter for RecyclerView.
-        //mRecyclerView.setAdapter(mAdapter);
-        mAdapter.updateData(mAdapter.generateGameList(mSearchQuery, playListType, sortType));
-        if (mSearch != null) {
-            mSearch.setHint(getString(R.string.filter) + mAdapter.getItemCount() + getString(R.string.filter_games));
-        }
+        updateDataset();
     }
 
     protected void updateDataset(){
-        //int current = ((GameAdapter)mRecyclerView.getAdapter()).mPosition;
-        /*int firstVisible = ((LinearLayoutManager) mRecyclerView.getLayoutManager())
-                .findFirstCompletelyVisibleItemPosition();
-        refreshDataset(false);
-        mRecyclerView.scrollToPosition(firstVisible);*/
         mAdapter.updateData(mAdapter.generateGameList(mSearchQuery, playListType, sortType));
         if (mSearch != null) {
             mSearch.setHint(getString(R.string.filter) + mAdapter.getItemCount() + getString(R.string.filter_games));
         }
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
     public interface OnFragmentInteractionListener {
         void onFragmentInteraction(String id, float x, float y);
     }
@@ -728,11 +696,6 @@ public class GamesFragment extends Fragment{
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        DisplayImageOptions options = new DisplayImageOptions.Builder()
-                .cacheOnDisk(true)
-                .cacheInMemory(false)
-                .considerExifParams(true)
-                .build();
         if (requestCode == 0 && resultCode == -1) {
             //captured
             theGame.gameBoxImage = mCurrentPhotoPath;
