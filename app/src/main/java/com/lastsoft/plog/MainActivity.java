@@ -1122,6 +1122,9 @@ public class MainActivity extends AppCompatActivity
     public boolean forceBack = false;
     @Override
     public void onBackPressed(){
+        onFragmentInteraction("refresh_games");
+        onFragmentInteraction("refresh_plays");
+
         mNavigationDrawerFragment.mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
         mNavigationDrawerFragment.mDrawerToggle.setDrawerIndicatorEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

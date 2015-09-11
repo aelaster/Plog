@@ -23,6 +23,13 @@ public class GamesPerPlay extends SugarRecord<GamesPerPlay> {
         this.expansionFlag = expansionFlag;
     }
 
+    public GamesPerPlay(Play play, Game game, boolean expansionFlag, String bggPlayId) {
+        this.play = play;
+        this.game = game;
+        this.expansionFlag = expansionFlag;
+        this.bggPlayId = bggPlayId;
+    }
+
 
     public static Game getBaseGame(Play play){
         //Log.d("V1", "playID = " + play.getId());

@@ -39,8 +39,9 @@ import java.util.List;
 public class SyncPlaysTask extends AsyncTask<String, String, String> {
     private ProgressDialog mydialog;
     public Context theContext;
-    int syncCounter = 0;
+    int syncCounter = 1;
     int totalCount = 0;
+    int totalCount_out = 0;
     int pageCounter = 1;
     SharedPreferences app_preferences;
     public SyncPlaysTask(Context context){
@@ -167,8 +168,13 @@ public class SyncPlaysTask extends AsyncTask<String, String, String> {
     protected void onProgressUpdate(String... args) {
         if (args.length == 2){
             mydialog.setMessage(theContext.getString(R.string.syncing_plays) + " (" + args[0] + "/" + args[1] + ")");
-        }else {
+        }else if (args.length == 4){
             updateGameViaBGG(args[2], args[3]);
+        }else{
+            DeletePlayTask deletePlay = new DeletePlayTask(theContext);
+            try {
+                deletePlay.execute(args[4]);
+            } catch (Exception ignored) {}
         }
     }
 
@@ -189,6 +195,8 @@ public class SyncPlaysTask extends AsyncTask<String, String, String> {
                 parser.setInput(new StringReader(myString));
 
                 Play newPlay = null;
+                Play existingPlay = null;
+                AddPlay outOfOrderPlay = null;
 
                 while (parser.next() != XmlPullParser.END_DOCUMENT) {
                     if (parser.getEventType() != XmlPullParser.START_TAG) {
@@ -200,7 +208,9 @@ public class SyncPlaysTask extends AsyncTask<String, String, String> {
                     if (name.equals("plays")) {
                         //entries.add(readEntry(parser));
                         if (totalCount == 0) {
-                            totalCount = Integer.parseInt(readTotal(parser));
+                            int holder = Integer.parseInt(readTotal(parser));
+                            totalCount = holder;
+                            totalCount_out = holder;
                         }else{
                             Integer.parseInt(readTotal(parser));
                         }
@@ -213,101 +223,156 @@ public class SyncPlaysTask extends AsyncTask<String, String, String> {
                         ArrayList<Long> addedUsers = new ArrayList<Long>();
                         AddPlay playToAdd = readEntry(parser, readPlayID(parser), readPlayDate(parser));
 
-                        publishProgress("" + syncCounter, "" + totalCount);
+                        publishProgress("" + syncCounter, "" + totalCount_out);
 
                         //make sure this play doesn't already exist in Db
-                        if (Play.findPlayByBGGID(playToAdd.playID) == null) {
+                        if (playToAdd.theGame.expansionFlag == false) {
+                            //Log.d("V1", "Adding Base Game");
+                            existingPlay = Play.findPlayByBGGID(playToAdd.playID);
+                            //this is the base game
+                            //we create a new play
 
-                            if (playToAdd.theGame.expansionFlag == false) {
-                                //Log.d("V1", "Adding Base Game");
-                                //this is the base game
-                                //we create a new play
-
-                                //add the play
+                            //add the play
+                            if (existingPlay == null) {
                                 newPlay = new Play(playToAdd.playDate, playToAdd.playComment, "", playToAdd.playID);
                                 newPlay.save();
+                            }else{
+                                existingPlay.playDate = playToAdd.playDate;
+                                existingPlay.playNotes = playToAdd.playComment;
+                                existingPlay.save();
+                            }
 
-                                //determine high score
-                                float highScore = -99999;
-                                for (AddPlayer thePlayer : playToAdd.thePlayers) {
-                                    if (thePlayer.score > highScore) {
-                                        highScore = thePlayer.score;
-                                    }
-                                }
-
-                                //add players to the play
-                                for (AddPlayer thePlayer : playToAdd.thePlayers) {
-                                    Player thisPlayer = Player.findPlayerByName(thePlayer.playerName);
-                                    if (thisPlayer == null) {
-                                        //player doesn't exist.
-                                        Player player = new Player(thePlayer.playerName, thePlayer.userName, "", "");
-                                        player.save();
-                                        thisPlayer = player;
-                                    }
-                                    addedUsers.add(thisPlayer.getId());
-                                    PlayersPerPlay newPlayer = new PlayersPerPlay(thisPlayer, newPlay, thePlayer.score, thePlayer.color, highScore);
-                                    newPlayer.save();
-                                }
-
-                                //add base game to new play
-                                Game theGame = Game.findGameByName(playToAdd.theGame.gameName);
-                                if (theGame == null) {
-                                    //game does not exist
-                                    Game game = new Game(playToAdd.theGame.gameName, playToAdd.theGame.gameId, "", false);
-                                    game.save();
-                                    theGame = game;
-                                    //updateGameViaBGG(playToAdd.theGame.gameId, playToAdd.theGame.gameName);
-                                    publishProgress("", "", playToAdd.theGame.gameId, playToAdd.theGame.gameName);
-                                }
-                                GamesPerPlay newBaseGame = new GamesPerPlay(newPlay, theGame, false);
-                                newBaseGame.save();
-
-                                //check for a group
-                                List<GameGroup> gameGroups = GameGroup.listAll(GameGroup.class);
-                                for (GameGroup thisGroup : gameGroups) {
-                                    List<Player> players = GameGroup.getGroupPlayers(thisGroup);
-                                    boolean included = true;
-                                    for (Player playa : players) {
-                                        if (!addedUsers.contains(playa.getId())) {
-                                            included = false;
-                                            break;
-                                        }
-                                    }
-                                    if (included) {
-                                        //add this to PlaysPerGameGroup
-                                        PlaysPerGameGroup newGroupPlay = new PlaysPerGameGroup(newPlay, thisGroup);
-                                        newGroupPlay.save();
-                                    }
-                                }
-
-                                //remove from bucket list if it's there
-                                //only do this if there are more than one players...or the remove solo plays setting is enabled
-                                if (playToAdd.thePlayers.length > 1 || app_preferences.getBoolean("solo_remove_bucket_list", true) == true) {
-                                    if (theGame != null && theGame.taggedToPlay > 0) {
-                                        theGame.taggedToPlay = 0;
-                                        theGame.save();
-                                    }
-                                }
-                                //Log.d("V1", "Added " + playToAdd.theGame.gameName + " to play " + newPlay.getId());
-                            } else {
-                                //Log.d("V1", "Adding Expansion");
-                                //this is an expansion, so we add it to the previous play
-                                if (newPlay != null) {
-                                    Game theGame = Game.findGameByName(playToAdd.theGame.gameName);
-                                    if (theGame == null) {
-                                        //game does not exist
-                                        Game game = new Game(playToAdd.theGame.gameName, playToAdd.theGame.gameId, "", true);
-                                        game.save();
-                                        theGame = game;
-                                        //updateGameViaBGG(playToAdd.theGame.gameId, playToAdd.theGame.gameName);
-                                        publishProgress("", "", playToAdd.theGame.gameId, playToAdd.theGame.gameName);
-                                    }
-                                    GamesPerPlay newBaseGame = new GamesPerPlay(newPlay, theGame, true);
-                                    newBaseGame.save();
-                                    //Log.d("V1", "Added " + playToAdd.theGame.gameName + " to play " + newPlay.getId());
+                            //add players to the play
+                            if (existingPlay != null) {
+                                //delete old playaz before adding the new ones
+                                List<PlayersPerPlay> playaz = PlayersPerPlay.getPlayers(existingPlay);
+                                for(PlayersPerPlay player:playaz){
+                                    player.delete();
                                 }
                             }
 
+                            //determine high score
+                            float highScore = -99999;
+                            for (AddPlayer thePlayer : playToAdd.thePlayers) {
+                                if (thePlayer.score > highScore) {
+                                    highScore = thePlayer.score;
+                                }
+                            }
+
+                            for (AddPlayer thePlayer : playToAdd.thePlayers) {
+                                Player thisPlayer = Player.findPlayerByName(thePlayer.playerName);
+                                if (thisPlayer == null) {
+                                    //player doesn't exist.
+                                    Player player = new Player(thePlayer.playerName, thePlayer.userName, "", "");
+                                    player.save();
+                                    thisPlayer = player;
+                                }
+                                addedUsers.add(thisPlayer.getId());
+                                PlayersPerPlay newPlayer;
+                                if (existingPlay == null) {
+                                    newPlayer = new PlayersPerPlay(thisPlayer, newPlay, thePlayer.score, thePlayer.color, highScore);
+                                }else{
+                                    newPlayer = new PlayersPerPlay(thisPlayer, existingPlay, thePlayer.score, thePlayer.color, highScore);
+                                }
+                                newPlayer.save();
+                            }
+
+                            //add base game to new play
+                            if (existingPlay != null) {
+                                //otherwise, delete the old expansions
+                                List<GamesPerPlay> gamez = GamesPerPlay.getExpansions(existingPlay);
+                                for(GamesPerPlay game:gamez){
+                                    /*if (game.expansionFlag == true){
+                                        if (game.bggPlayId != null && !game.bggPlayId.equals("")){
+                                            publishProgress("", "", "", "", game.bggPlayId);
+                                        }
+                                    }*/
+                                    game.delete();
+                                }
+                            }
+
+                            Game theGame = Game.findGameByName(playToAdd.theGame.gameName);
+                            if (theGame == null) {
+                                //game does not exist
+                                Game game = new Game(playToAdd.theGame.gameName, playToAdd.theGame.gameId, "", false);
+                                game.save();
+                                theGame = game;
+                                //updateGameViaBGG(playToAdd.theGame.gameId, playToAdd.theGame.gameName);
+                                publishProgress("", "", playToAdd.theGame.gameId, playToAdd.theGame.gameName);
+                            }
+
+                            if (existingPlay == null) {
+                                GamesPerPlay newBaseGame = new GamesPerPlay(newPlay, theGame, false, playToAdd.theGame.gameId);
+                                newBaseGame.save();
+                            }
+
+                            //check for a group
+                            if (existingPlay != null) {
+                                //delete the existing plays_per_game_group
+                                //delete plays_per_game_group
+                                List<PlaysPerGameGroup> plays = PlaysPerGameGroup.getPlays(existingPlay);
+                                for(PlaysPerGameGroup play:plays){
+                                    play.delete();
+                                }
+                            }
+
+                            List<GameGroup> gameGroups = GameGroup.listAll(GameGroup.class);
+                            for (GameGroup thisGroup : gameGroups) {
+                                List<Player> players = GameGroup.getGroupPlayers(thisGroup);
+                                boolean included = true;
+                                for (Player playa : players) {
+                                    if (!addedUsers.contains(playa.getId())) {
+                                        included = false;
+                                        break;
+                                    }
+                                }
+                                if (included) {
+                                    //add this to PlaysPerGameGroup
+                                    PlaysPerGameGroup newGroupPlay;
+                                    if (existingPlay == null) {
+                                        newGroupPlay = new PlaysPerGameGroup(newPlay, thisGroup);
+                                    }else{
+                                        newGroupPlay = new PlaysPerGameGroup(existingPlay, thisGroup);
+                                    }
+                                    newGroupPlay.save();
+                                }
+                            }
+
+                            //remove from bucket list if it's there
+                            //only do this if there are more than one players...or the remove solo plays setting is enabled
+                            if (playToAdd.thePlayers.length > 1 || app_preferences.getBoolean("solo_remove_bucket_list", true) == true) {
+                                if (theGame != null && theGame.taggedToPlay > 0) {
+                                    theGame.taggedToPlay = 0;
+                                    theGame.save();
+                                }
+                            }
+                            //Log.d("V1", "Added " + playToAdd.theGame.gameName + " to play " + newPlay.getId());
+
+                            //added the base game, check for out of order expansion
+                            if (outOfOrderPlay != null) {
+                                //add expansion
+                                if (existingPlay == null){
+                                    addExpansion(outOfOrderPlay, newPlay);
+                                }else {
+                                    addExpansion(outOfOrderPlay, existingPlay);
+                                }
+                                outOfOrderPlay = null;
+                            }
+                        } else {
+                            //Log.d("V1", "Adding Expansion");
+                            //this is an expansion, so we add it to the previous play
+                            if (newPlay != null) {
+                                addExpansion(playToAdd, newPlay);
+                                //Log.d("V1", "Added " + playToAdd.theGame.gameName + " to play " + newPlay.getId());
+                            }else{
+                                if (existingPlay != null){
+                                    addExpansion(playToAdd, existingPlay);
+                                }else{
+                                    // we have an out of order expansion
+                                    // save it and, when we add the next game, add the expansion
+                                    outOfOrderPlay = playToAdd;
+                                }
+                            }
                         }
                         syncCounter++;
                     } else {
@@ -318,6 +383,20 @@ public class SyncPlaysTask extends AsyncTask<String, String, String> {
         }catch (Exception ignored){
             ignored.printStackTrace();
         }
+    }
+
+    private void addExpansion(AddPlay playToAdd, Play thePlay){
+        Game theGame = Game.findGameByName(playToAdd.theGame.gameName);
+        if (theGame == null) {
+            //game does not exist
+            Game game = new Game(playToAdd.theGame.gameName, playToAdd.theGame.gameId, "", true);
+            game.save();
+            theGame = game;
+            //updateGameViaBGG(playToAdd.theGame.gameId, playToAdd.theGame.gameName);
+            publishProgress("", "", playToAdd.theGame.gameId, playToAdd.theGame.gameName);
+        }
+        GamesPerPlay newExpansion = new GamesPerPlay(thePlay, theGame, true, playToAdd.theGame.gameId);
+        newExpansion.save();
     }
 
     private void updateGameViaBGG(String bggID, String gameName){

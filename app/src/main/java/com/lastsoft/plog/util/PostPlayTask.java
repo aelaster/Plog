@@ -3,7 +3,6 @@ package com.lastsoft.plog.util;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.text.TextUtils;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.lastsoft.plog.R;
@@ -53,7 +52,7 @@ public class PostPlayTask extends AsyncTask<Play, Void, String> {
 
         String bggProcess = "false";
 
-        Log.d("V1", "trying to post a play to bgg");
+        //Log.d("V1", "trying to post a play to bgg");
 
         helper = new BGGLogInHelper(theContext, null);
         if (helper.canLogIn() && helper.checkCookies()) {
@@ -78,9 +77,11 @@ public class PostPlayTask extends AsyncTask<Play, Void, String> {
         UrlEncodedFormEntity entity;
         if (expansionGame == null) {
             //this is the base game
-            Log.d("V1", "play to log in bsae game is " + playToLog);
+
 
             Game theGame = GamesPerPlay.getBaseGame(playToLog);
+
+//            Log.d("V1", "play to log in bsae game is " + theGame.gameName);
 
             nvps = new ArrayList<NameValuePair>();
             nvps.add(new BasicNameValuePair("ajax", "1"));

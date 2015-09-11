@@ -17,11 +17,13 @@
 package com.lastsoft.plog;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.lastsoft.plog.util.NotificationFragment;
@@ -77,13 +79,19 @@ public class SettingsFragment extends PreferenceFragment {
         });
 
         mSyncPlays = getPreferenceManager().findPreference("sync_plays");
-        mSyncPlays.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                syncPlays();
-                return false;
-            }
-        });
+        SharedPreferences app_preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        long defaultPlayer = app_preferences.getLong("defaultPlayer", -1);
+        if (defaultPlayer >= 0) {
+            mSyncPlays.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    syncPlays();
+                    return false;
+                }
+            });
+        }else{
+            mSyncPlays.setEnabled(false);
+        }
     }
 
     public void syncPlays(){
