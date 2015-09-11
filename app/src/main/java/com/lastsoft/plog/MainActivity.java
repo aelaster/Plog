@@ -8,11 +8,13 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -45,7 +47,6 @@ import com.lastsoft.plog.db.PlayersPerPlay;
 import com.lastsoft.plog.db.PlaysPerGameGroup;
 import com.lastsoft.plog.db.TenByTen;
 import com.lastsoft.plog.util.BGGLogInHelper;
-import com.lastsoft.plog.util.Cookies;
 import com.lastsoft.plog.util.DeletePlayTask;
 import com.lastsoft.plog.util.NotificationFragment;
 import com.lastsoft.plog.util.PostMortemReportExceptionHandler;
@@ -217,8 +218,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void logOutOfBGG() {
-        Cookies mCookies = new Cookies(this);
-        mCookies.clearCookies();
+        mLogInHelper.logOut();
     }
 
     @Override
@@ -765,7 +765,14 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onLogInError(String errorMessage) {
-
+        if (errorMessage.equals("credentials")) {
+            SharedPreferences app_preferences = PreferenceManager.getDefaultSharedPreferences(this);
+            SharedPreferences.Editor editor = app_preferences.edit();
+            editor.putLong("defaultPlayer", -1);
+            editor.commit();
+            logOutOfBGG();
+            notifyUser(2);
+        }
     }
 
     @Override
@@ -1124,45 +1131,46 @@ public class MainActivity extends AppCompatActivity
     public void onBackPressed(){
         onFragmentInteraction("refresh_games");
         onFragmentInteraction("refresh_plays");
+        if (mNavigationDrawerFragment != null) {
+            mNavigationDrawerFragment.mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+            mNavigationDrawerFragment.mDrawerToggle.setDrawerIndicatorEnabled(true);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        mNavigationDrawerFragment.mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
-        mNavigationDrawerFragment.mDrawerToggle.setDrawerIndicatorEnabled(true);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        if (mNavigationDrawerFragment != null && !mNavigationDrawerFragment.isDrawerOpen()) {
-            if (fragUp) {
-                if (mAddPlayerFragment != null) removeFragment(mAddPlayerFragment.getView());
-                if (mAddGameFragment != null) removeFragment(mAddGameFragment.getView());
-                if (mAddPlayFragment != null) removeFragment(mAddPlayFragment.getView());
-                if (mAddGroupFragment != null) removeFragment(mAddGroupFragment.getView());
-            } else {
-                if (forceBack){
-                    forceBack = false;
-                    super.onBackPressed();
-                }else {
-                    PlayersFragment playersFrag = (PlayersFragment)
-                            getSupportFragmentManager().findFragmentByTag("players");
-                    if (playersFrag != null) {
-                        if (playersFrag.fabMenu.isExpanded()) {
-                            playersFrag.fabMenu.collapse();
+            if (mNavigationDrawerFragment != null && !mNavigationDrawerFragment.isDrawerOpen()) {
+                if (fragUp) {
+                    if (mAddPlayerFragment != null) removeFragment(mAddPlayerFragment.getView());
+                    if (mAddGameFragment != null) removeFragment(mAddGameFragment.getView());
+                    if (mAddPlayFragment != null) removeFragment(mAddPlayFragment.getView());
+                    if (mAddGroupFragment != null) removeFragment(mAddGroupFragment.getView());
+                } else {
+                    if (forceBack) {
+                        forceBack = false;
+                        super.onBackPressed();
+                    } else {
+                        PlayersFragment playersFrag = (PlayersFragment)
+                                getSupportFragmentManager().findFragmentByTag("players");
+                        if (playersFrag != null) {
+                            if (playersFrag.fabMenu.isExpanded()) {
+                                playersFrag.fabMenu.collapse();
+                            } else {
+                                mNavigationDrawerFragment.openDrawer();
+                            }
                         } else {
                             mNavigationDrawerFragment.openDrawer();
                         }
-                    } else {
-                        mNavigationDrawerFragment.openDrawer();
                     }
+
                 }
-
-            }
-        } else {
-            if (mNavigationDrawerFragment != null) {
-                mNavigationDrawerFragment.closeDrawer();
             } else {
-                Log.d("V1", "in here 2");
-                super.onBackPressed();
+                if (mNavigationDrawerFragment != null) {
+                    mNavigationDrawerFragment.closeDrawer();
+                } else {
+                    super.onBackPressed();
+                }
             }
+        }else{
+            super.onBackPressed();
         }
-
     }
 
     /*

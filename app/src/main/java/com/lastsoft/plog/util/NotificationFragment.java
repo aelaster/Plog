@@ -29,6 +29,7 @@ public class NotificationFragment extends DialogFragment {
             /*
             0 = didn't add a player to a play
             1 = database exported
+            2 = cannot log into bgg - creds
              */
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -45,6 +46,15 @@ public class NotificationFragment extends DialogFragment {
             case 1:
                 builder.setTitle(R.string.db_exported);
                 builder.setMessage(getString(R.string.db_exported_1) + Environment.getExternalStorageDirectory().getAbsolutePath() + "/SRX_export.db" + getString(R.string.db_exported_2))
+                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dismiss();
+                            }
+                        });
+                break;
+            case 2:
+                builder.setTitle(R.string.error);
+                builder.setMessage(getString(R.string.error_bgg_login))
                         .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 dismiss();

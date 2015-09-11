@@ -138,8 +138,17 @@ public class SetupWizardFragment extends Fragment implements
                                                 if (nameTakenFlag) {
                                                     Toast.makeText(mActivity, getString(R.string.name_taken), Toast.LENGTH_SHORT).show();
                                                 } else {
-                                                    Player player = new Player(userName, bggInfo, bggInfo_pw);
-                                                    player.save();
+                                                    Player player;
+                                                    player = Player.findPlayerByName(userName);
+                                                    if (player == null){
+                                                        player = new Player(userName, bggInfo, bggInfo_pw);
+                                                        player.save();
+                                                    }else{
+                                                        player.bggUsername = bggInfo;
+                                                        player.bggPassword = bggInfo_pw;
+                                                        player.save();
+                                                    }
+
                                                     if (bggInfo != null) {
                                                         //set app preference
                                                         SharedPreferences app_preferences;

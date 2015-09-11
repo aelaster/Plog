@@ -2,11 +2,9 @@ package com.lastsoft.plog.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.lastsoft.plog.db.Player;
 
@@ -46,6 +44,15 @@ public class BGGLogInHelper {
         return mCookies.getCookieStore();
     }
 
+    public void logOut(){
+        if (mCookies != null){
+            mCookies.clearCookies();
+            if (mCookies.getCookieStore() != null) {
+                mCookies.setCookieStore(null);
+            }
+        }
+    }
+
     public void logIn() {
         if (checkCookies()) {
             if (mListener != null) {
@@ -59,7 +66,6 @@ public class BGGLogInHelper {
             }
             return;
         }
-
         new LogInTask().execute();
     }
 
@@ -123,37 +129,48 @@ public class BGGLogInHelper {
             }
 
             if (response == null) {
-                //return createErrorMessage(R.string.logInErrorSuffixNoResponse);
+                return createErrorMessage(0);
             }
 
-            //Log.i(TAG, response.toString());
+
             if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
-                //return createErrorMessage(R.string.logInErrorSuffixBadResponse);
+                return createErrorMessage(0);
             }
 
             List<Cookie> cookies = client.getCookieStore().getCookies();
             if (cookies == null || cookies.isEmpty()) {
-                //return createErrorMessage(R.string.logInErrorSuffixMissingCookies);
+                return createErrorMessage(0);
             }
 
+            boolean foundPW = false;
             for (Cookie cookie : cookies) {
                 if (cookie.getName().equals("bggpassword")) {
+                    foundPW = true;
                     mCookies.setCookieStore(client.getCookieStore());
                     break;
                 }
             }
+
+            if (!foundPW){
+                logOut();
+            }
+
             if (mCookies.getCookieStore() == null) {
-                //return createErrorMessage(R.string.logInErrorSuffixBadCookies);
+                return createErrorMessage(1);
             }
 
             mCookies.saveCookies();
             return null;
         }
 
-        private String createErrorMessage(int resId) {
-            Resources r = mContext.getResources();
-            String message = "errorrrrrrrrr";
-            //message = r.getString(R.string.logInError) + "\n(" + r.getString(resId) + ")";
+        private String createErrorMessage(int type) {
+            String message = "error";
+            if (type == 0){
+                //connection error
+                message = "connection";
+            }else{
+                message = "credentials";
+            }
             return message;
         }
 
@@ -161,7 +178,7 @@ public class BGGLogInHelper {
         protected void onPostExecute(String result) {
             if (mListener != null) {
                 if (!TextUtils.isEmpty(result)) {
-                    Log.w(TAG, result);
+               //     Log.w(TAG, result);
                     mListener.onLogInError(result);
                 } else {
                     mListener.onLogInSuccess();

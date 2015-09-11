@@ -321,6 +321,7 @@ public class AddPlayerFragment extends Fragment {
 
                         if (defaultSwitch.isChecked()) {
                             //set app preference
+                            ((MainActivity) mActivity).logOutOfBGG();
                             editor.putLong("defaultPlayer", playerID);
                             editor.commit();
                             ((MainActivity) mActivity).logIntoBGG();

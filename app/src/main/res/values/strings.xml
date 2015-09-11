@@ -58,6 +58,7 @@
     <string name="removeGroup">"Removing Group: "</string>
     <string name="plays_for">"Plays for: "</string>
     <string name="select_group">" - Select a Group - "</string>
+    <string name="error_bgg_login">Cannot log into BGG.  Please confirm that your log-in credientals are correct for the currently selected default player within the \"Players\" subsection</string>
 
     <string name="show_expansions">Show Expansions</string>
     <string name="hide_expansions">Hide Expansions</string>
