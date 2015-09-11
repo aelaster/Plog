@@ -107,9 +107,9 @@ public class StatsFragment_Wins extends Fragment {
         public long totalPlays;
         public long totalUnique;
         public long totalUnplayed;
-        public long playerPlayed;
+        public int playerPlayed;
 
-        public WinStats(Player player, int regularWins, int asteriskWins, long totalPlays, long totalUnique, long totalUnplayed, long playerPlayed) {
+        public WinStats(Player player, int regularWins, int asteriskWins, long totalPlays, long totalUnique, long totalUnplayed, int playerPlayed) {
             this.player = player;
             this.regularWins = regularWins;
             this.asteriskWins = asteriskWins;
@@ -213,6 +213,8 @@ public class StatsFragment_Wins extends Fragment {
                 addStat(0, getString(R.string.stats_total_plays), result.get(0).totalPlays + "", "");
                 addStat(1, getString(R.string.stats_unique_plays), result.get(0).totalUnique + "", "");
                 addStat(8, getString(R.string.stats_unplayed_games), result.get(0).totalUnplayed + "", "");
+
+
                 for (int x = 0; x < result.size(); x++) {
 
                     if (theGroup.getId() == 0){
@@ -225,6 +227,11 @@ public class StatsFragment_Wins extends Fragment {
                     }
                 }
                 if (theGroup.getId() == 0){
+                    Collections.sort(result, new Comparator<WinStats>() {
+                        public int compare(WinStats left, WinStats right) {
+                            return Integer.compare(right.playerPlayed, left.playerPlayed); // The order depends on the direction of sorting.
+                        }
+                    });
                     for (int x = 0; x < result.size(); x++) {
                             addStat(7, result.get(x).player.playerName + getString(R.string.filter_plays), result.get(x).playerPlayed + "", result.get(x).player.getId() + "");
                     }

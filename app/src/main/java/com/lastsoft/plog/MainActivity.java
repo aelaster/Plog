@@ -351,6 +351,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void openGames(String searchQuery, boolean fromDrawer, int playListType, String fragmentName){
+        invalidateOptionsMenu();
         if(!fromDrawer){
             mNavigationDrawerFragment.mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
             mNavigationDrawerFragment.mDrawerToggle.setDrawerIndicatorEnabled(false);
@@ -378,6 +379,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void openPlays(String searchQuery, boolean fromDrawer, int playListType, String fragmentName){
+        invalidateOptionsMenu();
         if(!fromDrawer){
             mNavigationDrawerFragment.mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
             mNavigationDrawerFragment.mDrawerToggle.setDrawerIndicatorEnabled(false);

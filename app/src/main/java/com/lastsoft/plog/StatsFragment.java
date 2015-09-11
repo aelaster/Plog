@@ -8,7 +8,6 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -107,11 +106,7 @@ public class StatsFragment extends Fragment {
                             // groupToPoll = theGroup.getId();
                         }
 
-                        for (GameGroup testGroup : gameGroups2) {
-                            Log.d("V1", "thegroups = " + testGroup.getId());
-                        }
 
-                        Log.d("V1", "the group passed in = " + theGroup.getId());
                         mPagerAdapter = new ScreenSlidePagerAdapter(getChildFragmentManager(), theGroup);
                         mPager.setAdapter(mPagerAdapter);
                     }

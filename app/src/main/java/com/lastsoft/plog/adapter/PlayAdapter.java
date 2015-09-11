@@ -35,6 +35,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.lastsoft.plog.MainActivity;
+import com.lastsoft.plog.PlaysFragment;
 import com.lastsoft.plog.R;
 import com.lastsoft.plog.db.Game;
 import com.lastsoft.plog.db.GameGroup;
@@ -410,11 +411,19 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
 
         MenuInflater inflater = popup.getMenuInflater();
         inflater.inflate(R.menu.play_overflow, popup.getMenu());
+
+        if (!fromDrawer){
+            popup.getMenu().removeItem(R.id.view_plays);
+        }
+
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 mPosition = position;
                 switch (item.getItemId()) {
+                    case R.id.view_plays:
+                        ((PlaysFragment)mFragment).setSearchText(GamesPerPlay.getBaseGame(plays.get(position)).gameName);
+                        return true;
                     case R.id.edit_play:
                         ((MainActivity) mActivity).openAddPlay(mFragment, GamesPerPlay.getBaseGame(plays.get(position)).gameName, plays.get(position).getId());
                         return true;

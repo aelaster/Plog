@@ -240,6 +240,14 @@ public class PlaysFragment extends Fragment{
         return rootView;
     }
 
+    public void setSearchText(String theText){
+        if (mSearch.getText().toString().equals(theText)){
+            mSearch.setText("");
+        }else {
+            mSearch.setText(theText);
+        }
+    }
+
     private MenuItem menuItem0;
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -258,8 +266,8 @@ public class PlaysFragment extends Fragment{
                 //called when the up affordance/carat in actionbar is pressed
                 mActivity.onBackPressed();
                 return true;
-            case R.id.sort:
-                View menuItemView = mActivity.findViewById(R.id.sort);
+            case R.id.sort_plays:
+                View menuItemView = mActivity.findViewById(R.id.sort_plays);
                 PopupMenu popup = new PopupMenu(mActivity, menuItemView);
                 popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
@@ -298,6 +306,7 @@ public class PlaysFragment extends Fragment{
     }
 
     Activity mActivity;
+
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
