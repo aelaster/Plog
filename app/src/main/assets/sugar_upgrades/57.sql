@@ -1,0 +1,1 @@
+alter table PLAYER add TOTAL_PLAYS TEXT;

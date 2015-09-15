@@ -26,7 +26,7 @@
             android:value="SRX.db" />
         <meta-data
             android:name="VERSION"
-            android:value="56" />
+            android:value="57" />
         <meta-data
             android:name="QUERY_LOG"
             android:value="false" />

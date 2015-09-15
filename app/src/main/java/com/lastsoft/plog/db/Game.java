@@ -135,10 +135,10 @@ public class Game extends SugarRecord<Game> {
                 query = query + " ORDER BY G." + StringUtil.toSQLName("gameName") + " DESC";
                 break;
             case 2:
-                query = query + " ORDER BY COUNT(P." + StringUtil.toSQLName("id") + ") DESC, G." + StringUtil.toSQLName("gameName") + " ASC";
+                query = query + " ORDER BY COUNT(P." + StringUtil.toSQLName("id") + ") DESC, MAX(P." + StringUtil.toSQLName("playDate") + ") DESC";
                 break;
             case 3:
-                query = query + " ORDER BY COUNT(P." + StringUtil.toSQLName("id") + ") ASC, G." + StringUtil.toSQLName("gameName") + " ASC";
+                query = query + " ORDER BY COUNT(P." + StringUtil.toSQLName("id") + ") ASC, MAX(P." + StringUtil.toSQLName("playDate") + ") DESC";
                 break;
             case 4:
                 query = query + " ORDER BY MAX(P." + StringUtil.toSQLName("playDate") + ") DESC, G." + StringUtil.toSQLName("gameName") + " ASC";
@@ -170,10 +170,10 @@ public class Game extends SugarRecord<Game> {
                 query = query + " ORDER BY G." + StringUtil.toSQLName("gameName") + " DESC";
                 break;
             case 2:
-                query = query + " ORDER BY COUNT(P." + StringUtil.toSQLName("id") + ") DESC, G." + StringUtil.toSQLName("gameName") + " ASC";
+                query = query + " ORDER BY COUNT(P." + StringUtil.toSQLName("id") + ") DESC, MAX(P." + StringUtil.toSQLName("playDate") + ") DESC";
                 break;
             case 3:
-                query = query + " ORDER BY COUNT(P." + StringUtil.toSQLName("id") + ") ASC, G." + StringUtil.toSQLName("gameName") + " ASC";
+                query = query + " ORDER BY COUNT(P." + StringUtil.toSQLName("id") + ") ASC, MAX(P." + StringUtil.toSQLName("playDate") + ") DESC";
                 break;
             case 4:
                 query = query + " ORDER BY MAX(P." + StringUtil.toSQLName("playDate") + ") DESC, G." + StringUtil.toSQLName("gameName") + " ASC";
@@ -216,10 +216,10 @@ public class Game extends SugarRecord<Game> {
                 query = query + " ORDER BY G." + StringUtil.toSQLName("gameName") + " DESC";
                 break;
             case 2:
-                query = query + " ORDER BY COUNT(P." + StringUtil.toSQLName("id") + ") DESC, G." + StringUtil.toSQLName("gameName") + " ASC";
+                query = query + " ORDER BY COUNT(P." + StringUtil.toSQLName("id") + ") DESC, MAX(P." + StringUtil.toSQLName("playDate") + ") DESC";
                 break;
             case 3:
-                query = query + " ORDER BY COUNT(P." + StringUtil.toSQLName("id") + ") ASC, G." + StringUtil.toSQLName("gameName") + " ASC";
+                query = query + " ORDER BY COUNT(P." + StringUtil.toSQLName("id") + ") ASC, MAX(P." + StringUtil.toSQLName("playDate") + ") DESC";
                 break;
             case 4:
                 query = query + " ORDER BY MAX(P." + StringUtil.toSQLName("playDate") + ") DESC, G." + StringUtil.toSQLName("gameName") + " ASC";
@@ -273,10 +273,10 @@ public class Game extends SugarRecord<Game> {
                 query = query + " order by " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " DESC, "  + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " DESC";
                 break;
             case 2:
-                query = query + " order BY COUNT(" + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + ") DESC, " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " ASC, "  + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " DESC";
+                query = query + " order BY COUNT(" + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + ") DESC, MAX(" + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("playDate") + ") DESC";
                 break;
             case 3:
-                query = query + " order BY COUNT(" + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + ") ASC, " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " ASC, "  + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " DESC";
+                query = query + " order BY COUNT(" + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + ") ASC, MAX(" + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("playDate") + ") DESC";
                 break;
             case 4:
                 query = query + " order BY MAX(" + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("playDate") + ") DESC, " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " ASC, "  + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " DESC";
@@ -345,10 +345,10 @@ public class Game extends SugarRecord<Game> {
                 query = query + " order by " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " DESC, "  + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " DESC";
                 break;
             case 2:
-                query = query + " order BY  COUNT(" + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + ") DESC, " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " ASC, "  + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " DESC";
+                query = query + " order BY COUNT(" + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + ") DESC, MAX(" + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("playDate") + ") DESC";
                 break;
             case 3:
-                query = query + " order BY COUNT(" + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + ") ASC, " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " ASC, "  + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " DESC";
+                query = query + " order BY COUNT(" + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + ") ASC, MAX(" + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("playDate") + ") DESC";
                 break;
             case 4:
                 query = query + " order BY MAX(" + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("playDate") + ") DESC, " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " ASC, "  + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " DESC";
@@ -379,10 +379,10 @@ public class Game extends SugarRecord<Game> {
                 query = query + " order by " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " DESC, "  + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " DESC";
                 break;
             case 2:
-                query = query + " order BY COUNT(" + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + ") DESC, " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " ASC, "  + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " DESC";
+                query = query + " order BY COUNT(" + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + ") DESC, MAX(" + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("playDate") + ") DESC";
                 break;
             case 3:
-                query = query + " order BY COUNT(" + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + ") ASC, " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " ASC, "  + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " DESC";
+                query = query + " order BY COUNT(" + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + ") ASC, MAX(" + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("playDate") + ") DESC";
                 break;
             case 4:
                 query = query + " order BY MAX(" + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("playDate") + ") DESC, " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " ASC, "  + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " DESC";

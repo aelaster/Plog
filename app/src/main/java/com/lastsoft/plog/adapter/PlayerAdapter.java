@@ -58,6 +58,7 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.ViewHolder
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private final TextView nameView;
         private final TextView winsView;
+        private final TextView playsView;
         private final ImageView imageView;
         private final LinearLayout overflowLayout;
         private final View myView;
@@ -74,6 +75,7 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.ViewHolder
             myView = v;
             nameView = (TextView) v.findViewById(R.id.playerName);
             winsView = (TextView) v.findViewById(R.id.playerWins);
+            playsView = (TextView) v.findViewById(R.id.playerPlays);
             overflowLayout = (LinearLayout) v.findViewById(R.id.overflowLayout);
             imageView = (ImageView) v.findViewById(R.id.imageView1);
         }
@@ -86,6 +88,9 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.ViewHolder
         }
         public TextView getWinsView() {
             return winsView;
+        }
+        public TextView getPlaysView() {
+            return playsView;
         }
         public LinearLayout getOverflowLayout() {
             return overflowLayout;
@@ -123,9 +128,9 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.ViewHolder
     // Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, final int position) {
-        int regularWins = players.get(position).totalWins;
         viewHolder.getNameView().setText(players.get(position).playerName);
-        viewHolder.getWinsView().setText(mActivity.getString(R.string.wins) + regularWins);
+        viewHolder.getWinsView().setText(mActivity.getString(R.string.wins) + players.get(position).totalWins);
+        viewHolder.getPlaysView().setText(mActivity.getString(R.string.plays) + players.get(position).totalPlays);
 
         if (players.get(position).playerPhoto != null) {
             ImageLoader.getInstance().displayImage(players.get(position).playerPhoto, viewHolder.getImageView(), options);

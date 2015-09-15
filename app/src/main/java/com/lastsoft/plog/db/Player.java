@@ -13,6 +13,7 @@ public class Player extends SugarRecord<Player> {
     public String defaultColor;
     public String bggPassword;
     public int totalWins;
+    public int totalPlays;
 
     public Player() {
     }
@@ -49,7 +50,17 @@ public class Player extends SugarRecord<Player> {
 
     public static List listPlayersAZ(){
         String query;
-        query = " SELECT " + StringUtil.toSQLName("Player") + ".*, COUNT("+ StringUtil.toSQLName("Play") +"." + StringUtil.toSQLName("id") + ") as " + StringUtil.toSQLName("totalWins") +
+        query = " SELECT " + StringUtil.toSQLName("Player") + ".*, " +
+                "("+
+                " Select COUNT(" + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + ") " +
+                " from " + StringUtil.toSQLName("Play") +
+                " INNER JOIN " + StringUtil.toSQLName("PlayersPerPlay") +
+                " ON " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("Play") + " = "+ StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") +
+                " INNER JOIN " + StringUtil.toSQLName("Player") + " P " +
+                " ON " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("Player") + " = P." + StringUtil.toSQLName("id") +
+                " where " + StringUtil.toSQLName("Player") + "." + StringUtil.toSQLName("id") + " = P." + StringUtil.toSQLName("id") +
+                ") as " + StringUtil.toSQLName("totalPlays") +
+                ", COUNT("+ StringUtil.toSQLName("Play") +"." + StringUtil.toSQLName("id") + ") as " + StringUtil.toSQLName("totalWins") +
                 " FROM " + StringUtil.toSQLName("Player") +
                 " LEFT JOIN "+ StringUtil.toSQLName("PlayersPerPlay") +
                 " ON " + StringUtil.toSQLName("Player") + "." + StringUtil.toSQLName("id") + " = " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("player") +
