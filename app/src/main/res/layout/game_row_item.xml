@@ -22,7 +22,7 @@
             android:orientation="horizontal"
             android:layout_gravity="center"
             >
-
+            <FrameLayout android:id="@+id/gameView" android:layout_width="wrap_content" android:layout_height="wrap_content">
             <ImageView
                 android:layout_width="70dp"
                 android:layout_height="70dp"
@@ -31,7 +31,18 @@
                 android:scaleType="centerCrop"
                 android:layout_gravity="center"
                 />
-
+            <TextView
+                android:id="@+id/alert_bubble"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:text="123"
+                android:textSize="10dp"
+                android:textColor="#fff"
+                android:background="@drawable/nickdime_circle"
+                android:gravity="center_vertical|center_horizontal"
+                android:layout_gravity="top|left"
+                />
+            </FrameLayout>
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

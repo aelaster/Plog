@@ -79,7 +79,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
      * Provide a reference to the type of views that you are using (custom ViewHolder)
      */
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        private final TextView textView, bucketDateView, gamePlaysView, recentPlayView;
+        private final TextView textView, bucketDateView, gamePlaysView, recentPlayView, nickDimeView;
         private final ImageView imageView;
         private final LinearLayout overflowLayout;
         private final LinearLayout clickLayout;
@@ -87,7 +87,9 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
 
         public ViewHolder(View v) {
             super(v);
+
             textView = (TextView) v.findViewById(R.id.gameName);
+            nickDimeView = (TextView) v.findViewById(R.id.alert_bubble);
             gamePlaysView = (TextView) v.findViewById(R.id.gamePlays);
             recentPlayView = (TextView) v.findViewById(R.id.recentPlay);
             bucketDateView = (TextView) v.findViewById(R.id.bucketDate);
@@ -102,6 +104,9 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
         }
         public TextView getTextView() {
             return textView;
+        }
+        public TextView getNickDimeView() {
+            return nickDimeView;
         }
         public TextView getBucketDateView() {
             return bucketDateView;
@@ -138,11 +143,13 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
         3 = Plays 0X
          */
 
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
 
         List<Game> games_out;
         switch (playListType) {
             case 0:
-                games_out = Game.findBaseGames(mSearchQuery, sortType);
+                games_out = Game.findBaseGames(mSearchQuery, sortType, year);
                 break;
             case 1:
                 if (mSearchQuery.equals("0")){
@@ -185,7 +192,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
                 }
                 break;
             default:
-                games_out = Game.findBaseGames(mSearchQuery, sortType);
+                games_out = Game.findBaseGames(mSearchQuery, sortType, year);
                 break;
         }
 
@@ -237,6 +244,16 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
 
         DateFormat outputFormatter = new SimpleDateFormat("MM/dd/yyyy");
 
+        if (games.get(position).tbtCount >= 5){
+            viewHolder.getNickDimeView().setVisibility(View.VISIBLE);
+            if (games.get(position).tbtCount >= 10){
+                viewHolder.getNickDimeView().setText("10¢");
+            }else{
+                viewHolder.getNickDimeView().setText("5¢");
+            }
+        }else{
+            viewHolder.getNickDimeView().setVisibility(View.GONE);
+        }
         viewHolder.getTextView().setText(games.get(position).gameName);
         if (games.get(position).gameThumb != null  && !games.get(position).gameThumb.equals("")) {
             //Log.d("V1", "gameThumb = " + games.get(position).gameThumb);

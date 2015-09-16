@@ -109,12 +109,33 @@ public class Game extends SugarRecord<Game> {
         }
     }
 
-    public static List<Game> findBaseGames(String mSearchQuery, int sortType){
+    public static Game yearsPlays(Game game, int year){
+
+        String query = "Select "  + StringUtil.toSQLName("Game") + ".*, COUNT(" + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + ") as " + StringUtil.toSQLName("tbtCount") +
+                " from " + StringUtil.toSQLName("Play") +
+                " INNER JOIN " + StringUtil.toSQLName("GamesPerPlay") +
+                " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("Play") + " = "+ StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") +
+                " where " + StringUtil.toSQLName("GamesPerPlay") + "." +  StringUtil.toSQLName("game") + " = ? " +
+                " AND STRFTIME('%Y', DATETIME(SUBSTR(" + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("playDate") + ",0, 11), 'unixepoch')) = ? ";
+
+        //Log.d("V1", query);
+        return Game.findWithQuery(Game.class, query, game.getId().toString(), year + "").get(0);
+    }
+
+    public static List<Game> findBaseGames(String mSearchQuery, int sortType, int year){
         String query;
         if (mSearchQuery.contains("'")) {
             mSearchQuery = mSearchQuery.replaceAll("'", "''");
         }
         query = " SELECT G.*, COUNT(P." + StringUtil.toSQLName("id") + ") AS " + StringUtil.toSQLName("playCount") + ", MAX(P." + StringUtil.toSQLName("playDate") + ") AS " + StringUtil.toSQLName("recentPlay") +
+                ", ("+
+                " Select COUNT(" + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + ") " +
+                " from " + StringUtil.toSQLName("Play") +
+                " INNER JOIN " + StringUtil.toSQLName("GamesPerPlay") +
+                " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("Play") + " = "+ StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") +
+                " where " + StringUtil.toSQLName("GamesPerPlay") + "." +  StringUtil.toSQLName("game") + " = G." + StringUtil.toSQLName("id") +
+                " AND STRFTIME('%Y', DATETIME(SUBSTR(" + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("playDate") + ",0, 11), 'unixepoch')) = ? " +
+                " ) as " + StringUtil.toSQLName("tbtCount") +
                 " FROM " + StringUtil.toSQLName("Game") + " G " +
                 " LEFT JOIN " + StringUtil.toSQLName("GamesPerPlay") + " GPP " +
                 " ON G." + StringUtil.toSQLName("id") + " = GPP." + StringUtil.toSQLName("game") +
@@ -147,7 +168,7 @@ public class Game extends SugarRecord<Game> {
                 query = query + " ORDER BY MAX(P." + StringUtil.toSQLName("playDate") + ") ASC, G." + StringUtil.toSQLName("gameName") + " ASC";
                 break;
         }
-        return Game.findWithQuery(Game.class,query);
+        return Game.findWithQuery(Game.class, query, year + "");
     }
 
     public static List<Game> findAllGames_GameGroup(GameGroup group, int sortType){

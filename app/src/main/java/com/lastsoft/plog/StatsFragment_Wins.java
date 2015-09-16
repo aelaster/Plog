@@ -262,10 +262,10 @@ public class StatsFragment_Wins extends Fragment {
                     if (theGroup.getId() == 0) {
                         addStat(-1, result.get(x).player.playerName + " " + getString(R.string.stats_regular_wins) + getString(R.string.percentage), roundTwoDecimals((((result.get(x).regularWins) * 100.0 / result.get(x).playerPlayed))) + "%", result.get(x).player.getId() + "");
                     } else {
-                        addStat(-1, result.get(x).player.playerName + " " + getString(R.string.stats_total_wins) + getString(R.string.percentage), roundTwoDecimals((((result.get(x).asteriskWins + result.get(x).regularWins) * 100.0 / result.get(x).playerPlayed))) + "%", result.get(x).player.getId() + "");
-                        addStat(7, result.get(x).player.playerName + " " + getString(R.string.stats_regular_wins) + getString(R.string.percentage), roundTwoDecimals(((result.get(x).regularWins * 100.0 / result.get(x).playerPlayed))) + "%", result.get(x).player.getId() + "");
+                        addStat(-1, result.get(x).player.playerName + " " + getString(R.string.stats_total_wins) + getString(R.string.percentage), roundTwoDecimals((((result.get(x).asteriskWins + result.get(x).regularWins) * 100.0 / result.get(x).totalPlays))) + "%", result.get(x).player.getId() + "");
+                        addStat(7, result.get(x).player.playerName + " " + getString(R.string.stats_regular_wins) + getString(R.string.percentage), roundTwoDecimals(((result.get(x).regularWins * 100.0 / result.get(x).totalPlays))) + "%", result.get(x).player.getId() + "");
                         if (result.get(x).asteriskWins > 0) {
-                            addStat(-1, result.get(x).player.playerName + " " + getString(R.string.stats_asterisk_wins) + getString(R.string.percentage), roundTwoDecimals((((result.get(x).asteriskWins) * 100.0 / result.get(x).playerPlayed))) + "%", result.get(x).player.getId() + "");
+                            addStat(-1, result.get(x).player.playerName + " " + getString(R.string.stats_asterisk_wins) + getString(R.string.percentage), roundTwoDecimals((((result.get(x).asteriskWins) * 100.0 / result.get(x).totalPlays))) + "%", result.get(x).player.getId() + "");
                         }
                     }
 

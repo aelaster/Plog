@@ -61,6 +61,7 @@ import com.lastsoft.plog.util.MyRecyclerScroll;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
@@ -313,7 +314,9 @@ public class GamesFragment extends Fragment{
             });
         }
 
-        if (Game.findBaseGames("", sortType).size() == 0){
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        if (Game.findBaseGames("", sortType, year).size() == 0){
             initDataset();
         }else {
             mText.setVisibility(View.GONE);
