@@ -712,7 +712,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public void openAddPlay(Fragment mFragment, String game_name, long playID){
+    public void openAddPlay(Fragment mFragment, String game_name, long playID, boolean copyPlay){
 
         mTitle = game_name;
         ActionBar actionBar = getSupportActionBar();
@@ -725,7 +725,7 @@ public class MainActivity extends AppCompatActivity
 
         fragUp = true;
 
-        mAddPlayFragment = AddPlayFragment.newInstance( 0,  0, true, game_name, playID);
+        mAddPlayFragment = AddPlayFragment.newInstance( 0,  0, true, game_name, playID, copyPlay);
         //mAddPlayFragment.setEnterTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.slide_bottom));
         //mAddPlayFragment.setExitTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.slide_top));
         ft.setCustomAnimations(R.anim.slide_in_bottom, R.anim.slide_out_top, R.anim.slide_in_top, R.anim.slide_out_bottom);

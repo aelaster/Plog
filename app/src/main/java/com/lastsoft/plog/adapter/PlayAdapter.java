@@ -425,7 +425,10 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
                         ((PlaysFragment)mFragment).setSearchText(GamesPerPlay.getBaseGame(plays.get(position)).gameName);
                         return true;
                     case R.id.edit_play:
-                        ((MainActivity) mActivity).openAddPlay(mFragment, GamesPerPlay.getBaseGame(plays.get(position)).gameName, plays.get(position).getId());
+                        ((MainActivity) mActivity).openAddPlay(mFragment, GamesPerPlay.getBaseGame(plays.get(position)).gameName, plays.get(position).getId(), false);
+                        return true;
+                    case R.id.copy_play:
+                        ((MainActivity) mActivity).openAddPlay(mFragment, GamesPerPlay.getBaseGame(plays.get(position)).gameName, plays.get(position).getId(), true);
                         return true;
                     case R.id.delete_play:
                         //delete the play

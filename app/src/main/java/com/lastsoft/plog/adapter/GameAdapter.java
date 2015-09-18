@@ -316,7 +316,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
                 viewHolder.getClickLayout().setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        ((MainActivity) mActivity).openAddPlay(mFragment, games.get(position).gameName, -1);
+                        ((MainActivity) mActivity).openAddPlay(mFragment, games.get(position).gameName, -1, false);
                     }
                 });
             }else{

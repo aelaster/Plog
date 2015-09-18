@@ -88,33 +88,10 @@ public class AddPlayFragment extends Fragment implements
     AddPlayerAdapter adapter;
     String gameName;
     long playID;
+    long copyPlayID;
     TextView textViewDate;
     View expansionButton;
-
-    private ViewGroup mContainerView_Players;
-    private ViewGroup mContainerView_Expansions;
-
-    List<Game> expansions;
-
-    public static AddPlayFragment newInstance(int centerX, int centerY, boolean doAccelerate, String mGameName, long playID) {
-        AddPlayFragment fragment = new AddPlayFragment();
-        Bundle args = new Bundle();
-        args.putInt("cx", centerX);
-        args.putInt("cy", centerY);
-        args.putString("gameName", mGameName);
-        args.putBoolean("doAccelerate", doAccelerate);
-        args.putLong("playID", playID);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    public AddPlayFragment() {
-        // Required empty public constructor
-    }
-
-
     static boolean[] checkedItems;
-
     ArrayList<Integer> playersID;
     ArrayList<String> playersName;
     static String gameDate;
@@ -125,6 +102,32 @@ public class AddPlayFragment extends Fragment implements
     ImageChooserManager imageChooserManager;
     ArrayAdapter<CharSequence> colorSpinnerArrayAdapter;
     boolean savedThis = false;
+    boolean copyPlay = false;
+
+    private ViewGroup mContainerView_Players;
+    private ViewGroup mContainerView_Expansions;
+
+    List<Game> expansions;
+
+    public static AddPlayFragment newInstance(int centerX, int centerY, boolean doAccelerate, String mGameName, long playID, boolean copyPlay) {
+        AddPlayFragment fragment = new AddPlayFragment();
+        Bundle args = new Bundle();
+        args.putInt("cx", centerX);
+        args.putInt("cy", centerY);
+        args.putString("gameName", mGameName);
+        args.putBoolean("doAccelerate", doAccelerate);
+        args.putLong("playID", playID);
+        args.putBoolean("copyPlay", copyPlay);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public AddPlayFragment() {
+        // Required empty public constructor
+    }
+
+
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -132,6 +135,10 @@ public class AddPlayFragment extends Fragment implements
         if (getArguments() != null) {
             gameName = getArguments().getString("gameName");
             playID = getArguments().getLong("playID");
+            copyPlay = getArguments().getBoolean("copyPlay");
+            if (copyPlay){
+                copyPlayID = playID;
+            }
         }
 
         colorSpinnerArrayAdapter = ArrayAdapter.createFromResource(mActivity, R.array.color_choices, android.R.layout.simple_spinner_item);
@@ -175,11 +182,11 @@ public class AddPlayFragment extends Fragment implements
         rootView.setBackgroundColor(getResources().getColor(R.color.cardview_initial_background));
 
         if (mActivity instanceof ViewPlayActivity) {
-            Toolbar toolbar = (Toolbar)rootView.findViewById(R.id.toolbar);
+            Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
             toolbar.setVisibility(View.VISIBLE);
             toolbar.setTitle(gameName);
             toolbar.setNavigationIcon(R.drawable.ic_action_back);
-            ((ViewPlayActivity)mActivity).setSupportActionBar(toolbar);
+            ((ViewPlayActivity) mActivity).setSupportActionBar(toolbar);
         }
 
         ExpansionsLoader myExpansions = new ExpansionsLoader(mActivity);
@@ -222,13 +229,14 @@ public class AddPlayFragment extends Fragment implements
         photoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                try{
+                try {
                     InputMethodManager inputManager = (InputMethodManager)
                             mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
 
                     inputManager.hideSoftInputFromWindow(mActivity.getCurrentFocus().getWindowToken(),
                             InputMethodManager.HIDE_NOT_ALWAYS);
-                }catch (Exception ignored){}
+                } catch (Exception ignored) {
+                }
 
                 Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 // Ensure that there's a camera activity to handle the intent
@@ -268,7 +276,7 @@ public class AddPlayFragment extends Fragment implements
                 DatePickerFragment newFragment = new DatePickerFragment();
                 if (mActivity instanceof MainActivity) {
                     newFragment.show(((MainActivity) mActivity).getSupportFragmentManager(), "datePicker");
-                }else{
+                } else {
                     newFragment.show(((ViewPlayActivity) mActivity).getSupportFragmentManager(), "datePicker");
                 }
             }
@@ -282,7 +290,8 @@ public class AddPlayFragment extends Fragment implements
             DateFormat outputFormatter = new SimpleDateFormat("MM/dd/yyyy");
             String output_date = outputFormatter.format(date1); // Output : 01/20/2012
             textViewDate.setText(output_date);
-        }catch (ParseException ignored) {}
+        } catch (ParseException ignored) {
+        }
 
         // Construct the data source
         arrayOfUsers = new ArrayList<>();
@@ -293,36 +302,41 @@ public class AddPlayFragment extends Fragment implements
         //listView2.setAdapter(expansionAdapter);
 
 
-
-        if (playID >= 0){
+        if (playID >= 0) {
             //we're editing a play
             //Log.d("V1", "editing a play");
             Play editPlay = Play.findById(Play.class, playID);
             //set up the values, based on DB
 
+            if (!copyPlay) {
+                //date
+                DateFormat outputFormatter = new SimpleDateFormat("MM/dd/yyyy");
+                String output_date = outputFormatter.format(editPlay.playDate); // Output : 01/20/2012
+                textViewDate.setText(output_date);
+                DateFormat inputUser = new SimpleDateFormat("yyyy-MM-dd");
+                gameDate = inputUser.format(editPlay.playDate);
 
-            //date
-            DateFormat outputFormatter = new SimpleDateFormat("MM/dd/yyyy");
-            String output_date = outputFormatter.format(editPlay.playDate); // Output : 01/20/2012
-            textViewDate.setText(output_date);
-            DateFormat inputUser = new SimpleDateFormat("yyyy-MM-dd");
-            gameDate = inputUser.format(editPlay.playDate);
-
-            //photo
-            final DisplayImageOptions options = new DisplayImageOptions.Builder()
-                    .cacheOnDisk(true)
-                    .cacheInMemory(false)
-                    .considerExifParams(true)
-                    .build();
-            ImageLoader.getInstance().displayImage(editPlay.playPhoto, playPhoto, options);
-            mCurrentPhotoPath = editPlay.playPhoto;
+                //photo
+                final DisplayImageOptions options = new DisplayImageOptions.Builder()
+                        .cacheOnDisk(true)
+                        .cacheInMemory(false)
+                        .considerExifParams(true)
+                        .build();
+                ImageLoader.getInstance().displayImage(editPlay.playPhoto, playPhoto, options);
+                mCurrentPhotoPath = editPlay.playPhoto;
+            }
 
             //players
             List<PlayersPerPlay> players = PlayersPerPlay.getPlayers(editPlay);
-            for(PlayersPerPlay player:players){
+            for (PlayersPerPlay player : players) {
                 Player thisPlayer = player.player;
                 //Log.d("V1", "score = " + player.score);
-                AddPlayer addedPlayer = new AddPlayer(thisPlayer.getId(),thisPlayer.playerName, player.color, player.score); //id, name, color, score
+                AddPlayer addedPlayer;
+                if (!copyPlay) {
+                     addedPlayer = new AddPlayer(thisPlayer.getId(), thisPlayer.playerName, player.color, player.score); //id, name, color, score]
+                }else{
+                    addedPlayer = new AddPlayer(thisPlayer.getId(), thisPlayer.playerName, player.color, 0); //id, name, color, score]
+                }
                 addPlayer(addedPlayer);
                 addedUsers.add(thisPlayer.getId());
                 adapter.add(addedPlayer);
@@ -331,6 +345,9 @@ public class AddPlayFragment extends Fragment implements
 
             //note
             notesText.setText(editPlay.playNotes);
+        }
+        if (copyPlay){
+            playID = -1;
         }
 
         return rootView;
@@ -517,7 +534,7 @@ public class AddPlayFragment extends Fragment implements
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         menu.clear();
-        if(playID >= 0 ){
+        if(playID >= 0){
             inflater.inflate(R.menu.edit_play, menu);
         }else {
             inflater.inflate(R.menu.add_play, menu);
@@ -674,20 +691,20 @@ public class AddPlayFragment extends Fragment implements
 
                         savedThis = true;
                         //if (playID <= 0){
-                            //if (((MainActivity)mActivity).mLogInHelper.canLogIn()) {
+                        //if (((MainActivity)mActivity).mLogInHelper.canLogIn()) {
 
-                                long currentDefaultPlayer = app_preferences.getLong("defaultPlayer", -1);
-                                if (currentDefaultPlayer >= 0) {
-                                    Player defaultPlayer = Player.findById(Player.class, currentDefaultPlayer);
-                                    //post this to BGG
-                                    PlayPoster postPlay = new PlayPoster(getActivity(), defaultPlayer.bggUsername);
-                                    try {
-                                        postPlay.execute(thePlay);
-                                    } catch (Exception e) {
+                        long currentDefaultPlayer = app_preferences.getLong("defaultPlayer", -1);
+                        if (currentDefaultPlayer >= 0) {
+                            Player defaultPlayer = Player.findById(Player.class, currentDefaultPlayer);
+                            //post this to BGG
+                            PlayPoster postPlay = new PlayPoster(getActivity(), defaultPlayer.bggUsername);
+                            try {
+                                postPlay.execute(thePlay);
+                            } catch (Exception e) {
 
-                                    }
-                                }
-                            //}
+                            }
+                        }
+                        //}
                         //}
                     } catch (ParseException e) {
                         e.printStackTrace();
@@ -1037,10 +1054,16 @@ public class AddPlayFragment extends Fragment implements
                             }
                         }
                     });
-                    if (playID >= 0) {
+                    if (playID >= 0 || copyPlayID >= 0) {
+                        long useMe;
+                        if (playID >= 0){
+                            useMe = playID;
+                        }else{
+                            useMe = copyPlayID;
+                        }
                         //we're editing a play
                         //Log.d("V1", "editing a play");
-                        Play editPlay = Play.findById(Play.class, playID);
+                        Play editPlay = Play.findById(Play.class, useMe);
                         //set up the values, based on DB
 
                         //expansions

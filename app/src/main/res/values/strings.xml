@@ -71,6 +71,7 @@
     <string name="game_exp">Game (and Expansions)</string>
     <string name="expansions">Expansions</string>
     <string name="view_plays">View Plays</string>
+    <string name="copy_play">Copy Play</string>
     <string name="view_wins">View Wins</string>
     <string name="winners">"Winner: "</string>
     <string name="plays">"Plays: "</string>

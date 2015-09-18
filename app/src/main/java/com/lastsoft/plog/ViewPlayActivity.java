@@ -442,7 +442,7 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction ft = fragmentManager.beginTransaction();
 
-        mAddPlayFragment = AddPlayFragment.newInstance(0, 0, true, game_name, playID);
+        mAddPlayFragment = AddPlayFragment.newInstance(0, 0, true, game_name, playID, false);
         //mAddPlayFragment.setEnterTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.slide_bottom));
         //mAddPlayFragment.setExitTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.slide_top));
         ft.setCustomAnimations(R.anim.slide_in_bottom, R.anim.slide_out_top, R.anim.slide_in_top, R.anim.slide_out_bottom);
