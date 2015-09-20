@@ -18,6 +18,7 @@ package com.lastsoft.plog.adapter;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -49,6 +50,7 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.ViewHolder
     private Activity mActivity;
     private Fragment mFragment;
     private List<Player> players;
+    private long mLastClickTime = 0;
 
 
     // BEGIN_INCLUDE(recyclerViewSampleViewHolder)
@@ -138,6 +140,10 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.ViewHolder
         viewHolder.getView().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (SystemClock.elapsedRealtime() - mLastClickTime < 1000){
+                    return;
+                }
+                mLastClickTime = SystemClock.elapsedRealtime();
                 ((MainActivity)mActivity).openAddPlayer(mFragment, players.get(position).getId());
             }
         });

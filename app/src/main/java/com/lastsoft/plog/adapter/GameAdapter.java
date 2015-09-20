@@ -22,6 +22,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Environment;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -73,6 +74,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
     int playListType;
     private String gameGroup = null;
     private String fragmentName = "";
+    private long mLastClickTime = 0;
 
     // BEGIN_INCLUDE(recyclerViewSampleViewHolder)
     /**
@@ -316,6 +318,10 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
                 viewHolder.getClickLayout().setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        if (SystemClock.elapsedRealtime() - mLastClickTime < 1000){
+                            return;
+                        }
+                        mLastClickTime = SystemClock.elapsedRealtime();
                         ((MainActivity) mActivity).openAddPlay(mFragment, games.get(position).gameName, -1, false);
                     }
                 });

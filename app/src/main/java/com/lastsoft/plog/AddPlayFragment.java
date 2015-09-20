@@ -88,7 +88,7 @@ public class AddPlayFragment extends Fragment implements
     AddPlayerAdapter adapter;
     String gameName;
     long playID;
-    long copyPlayID;
+    long copyPlayID = -1;
     TextView textViewDate;
     View expansionButton;
     static boolean[] checkedItems;
@@ -1062,7 +1062,7 @@ public class AddPlayFragment extends Fragment implements
                             useMe = copyPlayID;
                         }
                         //we're editing a play
-                        //Log.d("V1", "editing a play");
+
                         Play editPlay = Play.findById(Play.class, useMe);
                         //set up the values, based on DB
 
