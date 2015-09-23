@@ -145,6 +145,7 @@ public class SyncPlaysTask extends AsyncTask<String, String, String> {
                 Player defaultPlayer = Player.findById(Player.class, currentDefaultPlayer);
                 if (defaultPlayer != null) {
                     //Log.d("V1", "https://www.boardgamegeek.com/xmlapi2/collection?username=" + defaultPlayer.bggUsername);
+                    //first we parse the BGG Plays XML and add plays to the app that are missing
                     boolean stopLooping = false;
                     while(!stopLooping) {
                         parsePlaysXML(pageCounter, defaultPlayer.bggUsername);
@@ -155,6 +156,30 @@ public class SyncPlaysTask extends AsyncTask<String, String, String> {
                         }else{
                             stopLooping = true;
                         }
+                    }
+
+                    //then we go through the plays and add the plays that don't have BGGIDs to BGG
+                    BGGLogInHelper helper = new BGGLogInHelper(theContext, null);
+                    if (helper.canLogIn() && helper.checkCookies()) {
+
+                        List<Play>plays_out = Play.listPlaysNewOld(0);
+                        totalCount = plays_out.size();
+                        syncCounter = 1;
+                        for(Play thePlay:plays_out){
+                            publishProgress("" + syncCounter, "" + totalCount);
+                            if (thePlay.bggPlayID == null || thePlay.bggPlayID.equals("")){
+                                BGGUtils.postPlay(theContext, helper, defaultPlayer.bggUsername, thePlay, null);
+
+                                //then do expansions
+                                List<GamesPerPlay> expansions = GamesPerPlay.getExpansions(thePlay);
+                                for(GamesPerPlay expansion:expansions){
+                                    BGGUtils.postPlay(theContext, helper, defaultPlayer.bggUsername, thePlay, expansion);
+                                }
+                            }
+                            syncCounter++;
+                        }
+
+
                     }
                 }
             }
@@ -225,7 +250,6 @@ public class SyncPlaysTask extends AsyncTask<String, String, String> {
 
                         publishProgress("" + syncCounter, "" + totalCount_out);
 
-                        //make sure this play doesn't already exist in Db
                         if (playToAdd.theGame.expansionFlag == false) {
                             //Log.d("V1", "Adding Base Game");
                             existingPlay = Play.findPlayByBGGID(playToAdd.playID);
@@ -282,11 +306,6 @@ public class SyncPlaysTask extends AsyncTask<String, String, String> {
                                 //otherwise, delete the old expansions
                                 List<GamesPerPlay> gamez = GamesPerPlay.getExpansions(existingPlay);
                                 for(GamesPerPlay game:gamez){
-                                    /*if (game.expansionFlag == true){
-                                        if (game.bggPlayId != null && !game.bggPlayId.equals("")){
-                                            publishProgress("", "", "", "", game.bggPlayId);
-                                        }
-                                    }*/
                                     game.delete();
                                 }
                             }
@@ -335,15 +354,6 @@ public class SyncPlaysTask extends AsyncTask<String, String, String> {
                                         newGroupPlay = new PlaysPerGameGroup(existingPlay, thisGroup);
                                     }
                                     newGroupPlay.save();
-                                }
-                            }
-
-                            //remove from bucket list if it's there
-                            //only do this if there are more than one players...or the remove solo plays setting is enabled
-                            if (playToAdd.thePlayers.length > 1 || app_preferences.getBoolean("solo_remove_bucket_list", true) == true) {
-                                if (theGame != null && theGame.taggedToPlay > 0) {
-                                    theGame.taggedToPlay = 0;
-                                    theGame.save();
                                 }
                             }
                             //Log.d("V1", "Added " + playToAdd.theGame.gameName + " to play " + newPlay.getId());
