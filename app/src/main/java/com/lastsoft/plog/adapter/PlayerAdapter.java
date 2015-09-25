@@ -49,7 +49,7 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.ViewHolder
     private DisplayImageOptions options;
     private Activity mActivity;
     private Fragment mFragment;
-    private List<Player> players;
+    public List<Player> players;
     private long mLastClickTime = 0;
 
 
@@ -130,6 +130,16 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.ViewHolder
     // Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, final int position) {
+        String drawable = "R.drawable." + players.get(position).defaultColor;
+        int id;
+        if (players.get(position).playerPhoto == null) {
+            if (players.get(position).defaultColor == null) {
+                id = mActivity.getResources().getIdentifier("none", "drawable", mActivity.getPackageName());
+            } else {
+                id = mActivity.getResources().getIdentifier(players.get(position).defaultColor.toLowerCase(), "drawable", mActivity.getPackageName());
+            }
+            viewHolder.getImageView().setImageResource(id);
+        }
         viewHolder.getNameView().setText(players.get(position).playerName);
         viewHolder.getWinsView().setText(mActivity.getString(R.string.wins) + players.get(position).totalWins);
         viewHolder.getPlaysView().setText(mActivity.getString(R.string.plays) + players.get(position).totalPlays);

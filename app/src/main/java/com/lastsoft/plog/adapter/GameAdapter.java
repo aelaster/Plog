@@ -248,7 +248,9 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
 
         if (games.get(position).tbtCount >= 5){
             viewHolder.getNickDimeView().setVisibility(View.VISIBLE);
-            if (games.get(position).tbtCount >= 10){
+            if (games.get(position).tbtCount >= 25){
+                viewHolder.getNickDimeView().setText("25¢");
+            }else if (games.get(position).tbtCount >= 10){
                 viewHolder.getNickDimeView().setText("10¢");
             }else{
                 viewHolder.getNickDimeView().setText("5¢");
