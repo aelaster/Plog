@@ -8,8 +8,8 @@ android {
         applicationId "com.lastsoft.plog"
         minSdkVersion 21
         targetSdkVersion 22
-        versionCode 52
-        versionName "0.0.51"
+        versionCode 53
+        versionName "0.0.52"
     }
     buildTypes {
         release {

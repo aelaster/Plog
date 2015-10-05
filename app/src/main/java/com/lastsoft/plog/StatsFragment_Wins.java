@@ -7,9 +7,13 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.animation.Easing;
@@ -29,6 +33,7 @@ import com.lastsoft.plog.db.Player;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -39,6 +44,8 @@ public class StatsFragment_Wins extends Fragment {
     View statsView;
     private ViewGroup mContainerView_Players;
     GameGroup gameGroup;
+    int year;
+    boolean boot = true;
 
     public static StatsFragment_Wins newInstance(String gameGroup) {
         StatsFragment_Wins fragment = new StatsFragment_Wins();
@@ -74,12 +81,64 @@ public class StatsFragment_Wins extends Fragment {
                     //errybody
                     groupPlayers = Player.listPlayersAZ();
                 }
+
+
+                final ViewGroup newView = (ViewGroup) LayoutInflater.from(mActivity).inflate(
+                        R.layout.stats_viewstat_spinner, mContainerView_Players, false);
+
+                TextView statTypeView = (TextView) newView.findViewById(R.id.statType);
+                Spinner spinnerValueView = (Spinner) newView.findViewById(R.id.spinnerValue);
+                statTypeView.setText(getString(R.string.year_label));
+                statTypeView.setTextSize(24);
+                // Create an ArrayAdapter using the string array and a default spinner layout
+                ArrayList<String> theYears = new ArrayList<String>();
+
+                Calendar calendar = Calendar.getInstance();
+                year = calendar.get(Calendar.YEAR);
+                theYears.add("All Time");
+                for (int i = year; i >= 2014; i--){
+                    theYears.add(i+"");
+                }
+                year = 0;
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(mActivity,R.layout.stats_viewstat_spinner_item, theYears);
+                spinnerValueView.setAdapter(adapter);
+                spinnerValueView.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                        if (!boot) {
+                            mContainerView_Players.removeViewsInLayout(1, mContainerView_Players.getChildCount()-1);
+                            if (i == 0){
+                                year = 0;
+                            }else{
+                                year = Integer.parseInt((String) adapterView.getItemAtPosition(i));
+                            }
+                            LoadStatsTask initStats = new LoadStatsTask(mActivity, gameGroup);
+                            try {
+                                initStats.execute();
+                            } catch (Exception ignored) {
+
+                            }
+                        }else{
+                            boot = false;
+                        }
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> adapterView) {
+
+                    }
+                });
+
+                mContainerView_Players.addView(newView);
+
                 LoadStatsTask initStats = new LoadStatsTask(mActivity, gameGroup);
                 try {
                     initStats.execute();
                 } catch (Exception ignored) {
 
                 }
+
+
             }
         }
         return statsView;
@@ -151,13 +210,14 @@ public class StatsFragment_Wins extends Fragment {
         @Override
         protected ArrayList<WinStats> doInBackground(final Long... args) {
 
+            Log.d("V1", "year = " + year);
             ArrayList<WinStats> output = new ArrayList<>();
             //Long[] output = new Long[outputBounds];
             //times 2 because each player needs regular and asterisk totals
             //plus two because we put total and unique plays on the top
             long totalPlays, totalUnique, totalUnplayed;
             if (theGroup.getId() == 0){
-                totalPlays = ((long) Play.listPlaysNewOld(0).size());
+                totalPlays = ((long) Play.listPlaysNewOld(0, year).size());
                 totalUnique = Game.getUniqueGames(0).size();
                 totalUnplayed = Game.getUnplayedGames(0, false).size();
                 try {
@@ -182,6 +242,7 @@ public class StatsFragment_Wins extends Fragment {
                     e.printStackTrace();
                 }
             }else {
+                theGroup = GameGroup.refreshStats(theGroup, year);
                 totalPlays = theGroup.totalPlays;
                 totalUnique = theGroup.uniqueGames;
                 totalUnplayed = Game.getUnplayedGames_GameGroup(GameGroup.findById(GameGroup.class, theGroup.getId()), 0, false).size();
@@ -189,9 +250,9 @@ public class StatsFragment_Wins extends Fragment {
                     for (int i = 0; i < groupPlayers.size(); i++){
                         Player thisPlayer = Player.findById(Player.class, groupPlayers.get(i).getId());
                         //regular wins
-                        int regularWins = Play.totalWins_GameGroup_Player(theGroup, thisPlayer, 0).size();
+                        int regularWins = Play.totalWins_GameGroup_Player(theGroup, thisPlayer, 0, year).size();
                         //asterisk wins
-                        int asteriskWins = Play.totalAsteriskWins_GameGroup_Player(theGroup, thisPlayer, 0).size();
+                        int asteriskWins = Play.totalAsteriskWins_GameGroup_Player(theGroup, thisPlayer, 0, year).size();
                         //output[arrayBounds+1] = (long)(regularWins + asteriskWins);
                         output.add(new WinStats(thisPlayer, regularWins, asteriskWins, totalPlays, totalUnique, totalUnplayed, 0));
                     }
@@ -241,8 +302,8 @@ public class StatsFragment_Wins extends Fragment {
                     //sharedCounter = Play.totalSharedWins().size();
                     //loserCounter = Play.totalGroupLosses().size();
                 }else {
-                    sharedCounter = Play.totalSharedWins(theGroup, 0).size();
-                    loserCounter = Play.totalGroupLosses(theGroup, 0).size();
+                    sharedCounter = Play.totalSharedWins(theGroup, 0, year).size();
+                    loserCounter = Play.totalGroupLosses(theGroup, 0, year).size();
 
                     addStat(5, getString(R.string.stats_shared_wins), sharedCounter + "", "");
                     addStat(6, getString(R.string.stats_total_losses), loserCounter + "", "");
@@ -314,10 +375,10 @@ public class StatsFragment_Wins extends Fragment {
                 public void onValueSelected(Entry e, int dataSetIndex, Highlight h) {
                     switch (e.getXIndex()) {
                         case 0:
-                            ((MainActivity) mActivity).openPlays(gameGroup.getId() + "^" + playerValue, false, 2, getString(R.string.title_statistics));
+                            ((MainActivity) mActivity).openPlays(gameGroup.getId() + "^" + playerValue, false, 2, getString(R.string.title_statistics), year);
                             break;
                         case 1:
-                            ((MainActivity) mActivity).openPlays(gameGroup.getId() + "^" + playerValue, false, 3, getString(R.string.title_statistics));
+                            ((MainActivity) mActivity).openPlays(gameGroup.getId() + "^" + playerValue, false, 3, getString(R.string.title_statistics), year);
                             break;
                     }
                 }
@@ -409,40 +470,40 @@ public class StatsFragment_Wins extends Fragment {
                         switch (statType) {
                             case 0:
                                 //((MainActivity) mActivity).openPlays(games.get(position).gameName, false);
-                                ((MainActivity) mActivity).openPlays(gameGroup.getId()+"", false, 1, getString(R.string.title_statistics));
+                                ((MainActivity) mActivity).openPlays(gameGroup.getId()+"", false, 1, getString(R.string.title_statistics), year);
                                 break;
                             case 1:
                                 //((MainActivity) mActivity).openPlays(games.get(position).gameName, false);
-                                ((MainActivity) mActivity).openGames(gameGroup.getId()+"", false, 1, getString(R.string.title_statistics));
+                                ((MainActivity) mActivity).openGames(gameGroup.getId()+"", false, 1, getString(R.string.title_statistics), year);
                                 break;
                             case 2:
                                 //((MainActivity) mActivity).openPlays(games.get(position).gameName, false);
-                                ((MainActivity) mActivity).openPlays(gameGroup.getId()+"^"+playerValue, false, 2, getString(R.string.title_statistics));
+                                ((MainActivity) mActivity).openPlays(gameGroup.getId()+"^"+playerValue, false, 2, getString(R.string.title_statistics), year);
                                 break;
                             case 3:
                                 //((MainActivity) mActivity).openPlays(games.get(position).gameName, false);
-                                ((MainActivity) mActivity).openPlays(gameGroup.getId()+"^"+playerValue, false, 3, getString(R.string.title_statistics));
+                                ((MainActivity) mActivity).openPlays(gameGroup.getId()+"^"+playerValue, false, 3, getString(R.string.title_statistics), year);
                                 break;
                             case 4:
                                 //((MainActivity) mActivity).openPlays(games.get(position).gameName, false);
-                                ((MainActivity) mActivity).openPlays(gameGroup.getId()+"^"+playerValue, false, 4, getString(R.string.title_statistics));
+                                ((MainActivity) mActivity).openPlays(gameGroup.getId()+"^"+playerValue, false, 4, getString(R.string.title_statistics), year);
                                 break;
                             case 5:
                                 //((MainActivity) mActivity).openPlays(games.get(position).gameName, false);
-                                ((MainActivity) mActivity).openPlays(gameGroup.getId()+"", false, 5, getString(R.string.title_statistics));
+                                ((MainActivity) mActivity).openPlays(gameGroup.getId()+"", false, 5, getString(R.string.title_statistics), year);
                                 break;
                             case 6:
                                 //((MainActivity) mActivity).openPlays(games.get(position).gameName, false);
-                                ((MainActivity) mActivity).openPlays(gameGroup.getId()+"", false, 6, getString(R.string.title_statistics));
+                                ((MainActivity) mActivity).openPlays(gameGroup.getId()+"", false, 6, getString(R.string.title_statistics), year);
                                 break;
                             case 7:
                                 //regular wins percentage
                                 //just using this to get a list of total games played for a player
                                 //using it because it's part of the "Everyone" list too
-                                ((MainActivity) mActivity).openPlays(gameGroup.getId() + "^" + playerValue, false, 8, getString(R.string.title_statistics));
+                                ((MainActivity) mActivity).openPlays(gameGroup.getId() + "^" + playerValue, false, 8, getString(R.string.title_statistics), year);
                                 break;
                             case 8:
-                                ((MainActivity) mActivity).openGames(gameGroup.getId() + "", false, 4, getString(R.string.title_statistics));
+                                ((MainActivity) mActivity).openGames(gameGroup.getId() + "", false, 4, getString(R.string.title_statistics), year);
                                 break;
                         }
                     }

@@ -73,14 +73,16 @@ public class PlaysFragment extends Fragment{
     private String mSearchQuery = "";
     private String fragmentName = "";
     private int playListType = 0;
+    private int currentYear = 0;
     private boolean fromDrawer;
 
-    public static PlaysFragment newInstance(boolean fromDrawer, String searchQuery, int playListType, String fragmentName) {
+    public static PlaysFragment newInstance(boolean fromDrawer, String searchQuery, int playListType, String fragmentName, int currentYear) {
         PlaysFragment fragment = new PlaysFragment();
         Bundle args = new Bundle();
         args.putBoolean("fromDrawer", fromDrawer);
         args.putString("searchQuery", searchQuery);
         args.putInt("playListType", playListType);
+        args.putInt("currentYear", currentYear);
         args.putString("fragmentName", fragmentName);
         fragment.setArguments(args);
         return fragment;
@@ -94,6 +96,7 @@ public class PlaysFragment extends Fragment{
             mSearchQuery = getArguments().getString("searchQuery");
             fragmentName = getArguments().getString("fragmentName");
             playListType = getArguments().getInt("playListType");
+            currentYear = getArguments().getInt("currentYear");
         }
         ActionBar actionBar = ((MainActivity) mActivity).getSupportActionBar();
         if (fromDrawer) {
@@ -198,7 +201,7 @@ public class PlaysFragment extends Fragment{
                         mSearchQuery = cs.toString();
                         //initDataset();
                         //mAdapter = new GameAdapter(PlaysFragment.this, mActivity,mSearchQuery);
-                        mAdapter = ((MainActivity) mActivity).initPlayAdapter(mSearchQuery, fromDrawer, playListType);
+                        mAdapter = ((MainActivity) mActivity).initPlayAdapter(mSearchQuery, fromDrawer, playListType, currentYear);
                         // Set CustomAdapter as the adapter for RecyclerView.
                         mRecyclerView.setAdapter(mAdapter);
                     }
@@ -218,7 +221,7 @@ public class PlaysFragment extends Fragment{
                 public void onClick(View view) {
                     if (!mSearch.getText().toString().equals("")) {
                         mSearchQuery = "";
-                        ((MainActivity) mActivity).initPlayAdapter(mSearchQuery, fromDrawer, playListType);
+                        ((MainActivity) mActivity).initPlayAdapter(mSearchQuery, fromDrawer, playListType, currentYear);
                         mSearch.setText(mSearchQuery);
 
                         //mActivity.onBackPressed();
@@ -275,22 +278,22 @@ public class PlaysFragment extends Fragment{
                         switch (item.getItemId()) {
                             case R.id.sort_date_newold:
                                 sortType = 0;
-                                mAdapter.updateData(mAdapter.generatePlayData(mSearchQuery, playListType, sortType));
+                                mAdapter.updateData(mAdapter.generatePlayData(mSearchQuery, playListType, sortType, currentYear));
                                 mRecyclerView.scrollToPosition(0);
                                 return true;
                             case R.id.sort_date_oldnew:
                                 sortType = 1;
-                                mAdapter.updateData(mAdapter.generatePlayData(mSearchQuery, playListType, sortType));
+                                mAdapter.updateData(mAdapter.generatePlayData(mSearchQuery, playListType, sortType, currentYear));
                                 mRecyclerView.scrollToPosition(0);
                                 return true;
                             case R.id.sort_az:
                                 sortType = 2;
-                                mAdapter.updateData(mAdapter.generatePlayData(mSearchQuery, playListType, sortType));
+                                mAdapter.updateData(mAdapter.generatePlayData(mSearchQuery, playListType, sortType, currentYear));
                                 mRecyclerView.scrollToPosition(0);
                                 return true;
                             case R.id.sort_za:
                                 sortType = 3;
-                                mAdapter.updateData(mAdapter.generatePlayData(mSearchQuery, playListType, sortType));
+                                mAdapter.updateData(mAdapter.generatePlayData(mSearchQuery, playListType, sortType, currentYear));
                                 mRecyclerView.scrollToPosition(0);
                                 return true;
                         }
@@ -420,9 +423,13 @@ public class PlaysFragment extends Fragment{
         // Set CustomAdapter as the adapter for RecyclerView.
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.scrollToPosition(firstVisible);*/
-        mAdapter.updateData(mAdapter.generatePlayData(mSearchQuery, playListType, sortType));
-        if (mSearch != null) {
-            mSearch.setHint(getString(R.string.filter) + mAdapter.getItemCount() + getString(R.string.filter_plays));
+        if (mAdapter != null) {
+            mAdapter.updateData(mAdapter.generatePlayData(mSearchQuery, playListType, sortType, currentYear));
+            if (mSearch != null) {
+                mSearch.setHint(getString(R.string.filter) + mAdapter.getItemCount() + getString(R.string.filter_plays));
+            }
+        }else{
+            mAdapter = ((MainActivity) mActivity).initPlayAdapter(mSearchQuery, fromDrawer, playListType, currentYear);
         }
     }
 

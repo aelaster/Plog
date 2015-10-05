@@ -50,6 +50,7 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
     private Fragment mFragment;
     private List<GameGroup> groups;
     private long mLastClickTime = 0;
+    int currentYear = 0;
 
 
     // BEGIN_INCLUDE(recyclerViewSampleViewHolder)
@@ -102,11 +103,12 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
     }
     // END_INCLUDE(recyclerViewSampleViewHolder)
 
-    public GroupAdapter(Activity theActivity, Fragment theFragment) {
+    public GroupAdapter(Activity theActivity, Fragment theFragment, int mCurrentYear) {
         mActivity = theActivity;
         mFragment = theFragment;
+        currentYear = mCurrentYear;
 
-        groups = GameGroup.listAll_AZ(false);
+        groups = GameGroup.listAll_AZ(false, currentYear);
 
         options = new DisplayImageOptions.Builder()
                 .cacheOnDisk(true)
@@ -173,7 +175,7 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.view_plays:
-                        ((MainActivity) mActivity).openPlays(groups.get(position).getId()+"", false, 1, mActivity.getString(R.string.title_players));
+                        ((MainActivity) mActivity).openPlays(groups.get(position).getId()+"", false, 1, mActivity.getString(R.string.title_players), currentYear);
                         return true;
                     default:
                         return false;

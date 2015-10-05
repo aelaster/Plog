@@ -143,14 +143,14 @@ public class StatsFragment_TenByTen extends Fragment {
                 newView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        ((MainActivity) mActivity).openPlays(gameGroup.getId() + "^" + gameValue + "^" + theYear, false, 7, mActivity.getString(R.string.title_statistics));
+                        ((MainActivity) mActivity).openPlays(gameGroup.getId() + "^" + gameValue + "^" + theYear, false, 7, mActivity.getString(R.string.title_statistics), year);
                     }
                 });
             }else{
                 newView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        ((MainActivity) mActivity).openPlays(gameGroup.getId() + "^" + theYear, false, 10, mActivity.getString(R.string.title_statistics));
+                        ((MainActivity) mActivity).openPlays(gameGroup.getId() + "^" + theYear, false, 10, mActivity.getString(R.string.title_statistics), year);
 
                     }
                 });

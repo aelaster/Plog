@@ -72,6 +72,7 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
     private boolean fromDrawer;
     int mPosition;
     int playListType;
+    int currentYear;
     int sortType;
     private long mLastClickTime = 0;
 
@@ -128,7 +129,7 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
         this.notifyDataSetChanged();
     }
 
-    public List<Play> generatePlayData(String mSearchQuery, int playListType, int sortType){
+    public List<Play> generatePlayData(String mSearchQuery, int playListType, int sortType, int currentYear){
         /*
         playListType:
         0 - listPlaysNewOld
@@ -148,40 +149,40 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
         List<Play> plays_out;
         switch (playListType) {
             case 0:
-                plays_out = Play.listPlaysNewOld(mSearchQuery, fromDrawer, false, sortType);
+                plays_out = Play.listPlaysNewOld(mSearchQuery, fromDrawer, false, sortType, currentYear);
                 break;
             case 1:
                 if (mSearchQuery.equals("0")){
-                    plays_out = Play.listPlaysNewOld(sortType);
+                    plays_out = Play.listPlaysNewOld(sortType, currentYear);
                 }else {
-                    plays_out = Play.listPlaysNewOld_GameGroup(mSearchQuery, sortType);
+                    plays_out = Play.listPlaysNewOld_GameGroup(mSearchQuery, sortType, currentYear);
                 }
                 break;
             case 2:
                 String[] query = mSearchQuery.split("\\^");
                 if (query[0].equals("0")){
-                    plays_out = Play.totalWins_Player(Player.findById(Player.class, Long.parseLong(query[1])), sortType);
+                    plays_out = Play.totalWins_Player(Player.findById(Player.class, Long.parseLong(query[1])), sortType, currentYear);
                 }else {
-                    plays_out = Play.totalWins_GameGroup_Player(GameGroup.findById(GameGroup.class, Long.parseLong(query[0])), Player.findById(Player.class, Long.parseLong(query[1])), sortType);
+                    plays_out = Play.totalWins_GameGroup_Player(GameGroup.findById(GameGroup.class, Long.parseLong(query[0])), Player.findById(Player.class, Long.parseLong(query[1])), sortType, currentYear);
                 }
                 break;
             case 3:
                 String[] query2 = mSearchQuery.split("\\^");
                 if (query2[0].equals("0")){
-                    plays_out = Play.totalAsteriskWins_Player(Player.findById(Player.class, Long.parseLong(query2[1])), sortType);
+                    plays_out = Play.totalAsteriskWins_Player(Player.findById(Player.class, Long.parseLong(query2[1])), sortType, currentYear);
                 }else {
-                    plays_out = Play.totalAsteriskWins_GameGroup_Player(GameGroup.findById(GameGroup.class, Long.parseLong(query2[0])), Player.findById(Player.class, Long.parseLong(query2[1])), sortType);
+                    plays_out = Play.totalAsteriskWins_GameGroup_Player(GameGroup.findById(GameGroup.class, Long.parseLong(query2[0])), Player.findById(Player.class, Long.parseLong(query2[1])), sortType, currentYear);
                 }
                 break;
             case 4:
                 String[] query3 = mSearchQuery.split("\\^");
                 List<Play> wins;
                 if (query3[0].equals("0")){
-                    wins = Play.totalWins_Player(Player.findById(Player.class, Long.parseLong(query3[1])), sortType);
-                    plays_out = Play.totalAsteriskWins_Player(Player.findById(Player.class, Long.parseLong(query3[1])), sortType);
+                    wins = Play.totalWins_Player(Player.findById(Player.class, Long.parseLong(query3[1])), sortType, currentYear);
+                    plays_out = Play.totalAsteriskWins_Player(Player.findById(Player.class, Long.parseLong(query3[1])), sortType, currentYear);
                 }else {
-                    wins = Play.totalWins_GameGroup_Player(GameGroup.findById(GameGroup.class, Long.parseLong(query3[0])), Player.findById(Player.class, Long.parseLong(query3[1])), sortType);
-                    plays_out = Play.totalAsteriskWins_GameGroup_Player(GameGroup.findById(GameGroup.class, Long.parseLong(query3[0])), Player.findById(Player.class, Long.parseLong(query3[1])), sortType);
+                    wins = Play.totalWins_GameGroup_Player(GameGroup.findById(GameGroup.class, Long.parseLong(query3[0])), Player.findById(Player.class, Long.parseLong(query3[1])), sortType, currentYear);
+                    plays_out = Play.totalAsteriskWins_GameGroup_Player(GameGroup.findById(GameGroup.class, Long.parseLong(query3[0])), Player.findById(Player.class, Long.parseLong(query3[1])), sortType, currentYear);
                 }
                 plays_out.addAll(wins);
                 Collections.sort(plays_out, new Comparator<Play>() {
@@ -192,16 +193,16 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
                 break;
             case 5:
                 if (mSearchQuery.equals("0")){
-                    plays_out = Play.totalSharedWins(sortType);
+                    plays_out = Play.totalSharedWins(sortType, currentYear);
                 }else {
-                    plays_out = Play.totalSharedWins(GameGroup.findById(GameGroup.class, Long.parseLong(mSearchQuery)), sortType);
+                    plays_out = Play.totalSharedWins(GameGroup.findById(GameGroup.class, Long.parseLong(mSearchQuery)), sortType, currentYear);
                 }
                 break;
             case 6:
                 if (mSearchQuery.equals("0")){
-                    plays_out = Play.totalGroupLosses(sortType);
+                    plays_out = Play.totalGroupLosses(sortType, currentYear);
                 }else {
-                    plays_out = Play.totalGroupLosses(GameGroup.findById(GameGroup.class, Long.parseLong(mSearchQuery)), sortType);
+                    plays_out = Play.totalGroupLosses(GameGroup.findById(GameGroup.class, Long.parseLong(mSearchQuery)), sortType, currentYear);
                 }
                 break;
             case 7:
@@ -211,33 +212,34 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
             case 8:
                 String[] query8 = mSearchQuery.split("\\^");
                 if (query8[0].equals("0")){
-                    plays_out = Play.totalPlays_Player(Player.findById(Player.class, Long.parseLong(query8[1])), sortType);
+                    plays_out = Play.totalPlays_Player(Player.findById(Player.class, Long.parseLong(query8[1])), sortType, currentYear);
                 }else {
-                    plays_out = Play.totalPlays_Player_GameGroup(Player.findById(Player.class, Long.parseLong(query8[1])), GameGroup.findById(GameGroup.class, Long.parseLong(query8[0])), sortType);
+                    plays_out = Play.totalPlays_Player_GameGroup(Player.findById(Player.class, Long.parseLong(query8[1])), GameGroup.findById(GameGroup.class, Long.parseLong(query8[0])), sortType, currentYear);
 
                 }
                 break;
             case 9:
-                plays_out = Play.listPlaysNewOld(mSearchQuery, fromDrawer, true, sortType);
+                plays_out = Play.listPlaysNewOld(mSearchQuery, fromDrawer, true, sortType, currentYear);
                 break;
             case 10:
                 String[] query10 = mSearchQuery.split("\\^");
                 plays_out = Play.totalPlays_TenByTen_GameGroup(GameGroup.findById(GameGroup.class, Long.parseLong(query10[0])), Integer.parseInt(query10[1]), sortType);
                 break;
             default:
-                plays_out = Play.listPlaysNewOld(mSearchQuery, fromDrawer, false, sortType);
+                plays_out = Play.listPlaysNewOld(mSearchQuery, fromDrawer, false, sortType, currentYear);
         }
         return plays_out;
     }
 
-    public PlayAdapter(Activity theActivity, Fragment theFragment, String mSearchQuery, boolean mFromDrawer, int mPlayListType, int mSortType) {
+    public PlayAdapter(Activity theActivity, Fragment theFragment, String mSearchQuery, boolean mFromDrawer, int mPlayListType, int mSortType, int mCurrentYear) {
         mActivity = theActivity;
         mFragment = theFragment;
         playListType = mPlayListType;
         sortType = mSortType;
         fromDrawer = mFromDrawer;
+        currentYear = mCurrentYear;
 
-        plays = generatePlayData(mSearchQuery, mPlayListType, mSortType);
+        plays = generatePlayData(mSearchQuery, mPlayListType, mSortType, mCurrentYear);
 
         options = new DisplayImageOptions.Builder()
                 .cacheOnDisk(true)

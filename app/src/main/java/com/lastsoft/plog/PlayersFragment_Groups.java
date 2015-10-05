@@ -111,7 +111,7 @@ public class PlayersFragment_Groups extends Fragment{
         }
         setRecyclerViewLayoutManager(mCurrentLayoutManagerType);
 
-        mAdapter = new GroupAdapter(mActivity, this);
+        mAdapter = new GroupAdapter(mActivity, this, MainActivity.CurrentYear);
         // Set CustomAdapter as the adapter for RecyclerView.
         mRecyclerView.setAdapter(mAdapter);
         return rootView;

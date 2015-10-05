@@ -51,6 +51,7 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.ViewHolder
     private Fragment mFragment;
     public List<Player> players;
     private long mLastClickTime = 0;
+    int currentYear = 0;
 
 
     // BEGIN_INCLUDE(recyclerViewSampleViewHolder)
@@ -103,9 +104,10 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.ViewHolder
     }
     // END_INCLUDE(recyclerViewSampleViewHolder)
 
-    public PlayerAdapter(Activity theActivity, Fragment theFragment) {
+    public PlayerAdapter(Activity theActivity, Fragment theFragment, int mCurrentYear) {
         mActivity = theActivity;
         mFragment = theFragment;
+        currentYear = mCurrentYear;
         players = Player.listPlayersAZ();
         options = new DisplayImageOptions.Builder()
                 .cacheOnDisk(true)
@@ -184,10 +186,10 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.ViewHolder
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.view_plays:
-                        ((MainActivity) mActivity).openPlays("0^" + players.get(position).getId(), false, 8, mActivity.getString(R.string.title_players));
+                        ((MainActivity) mActivity).openPlays("0^" + players.get(position).getId(), false, 8, mActivity.getString(R.string.title_players), currentYear);
                         return true;
                     case R.id.view_wins:
-                        ((MainActivity) mActivity).openPlays("0^" + players.get(position).getId(), false, 2, mActivity.getString(R.string.title_players));
+                        ((MainActivity) mActivity).openPlays("0^" + players.get(position).getId(), false, 2, mActivity.getString(R.string.title_players), currentYear);
                         return true;
                     default:
                         return false;

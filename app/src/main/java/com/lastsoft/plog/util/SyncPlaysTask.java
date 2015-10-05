@@ -162,7 +162,7 @@ public class SyncPlaysTask extends AsyncTask<String, String, String> {
                     BGGLogInHelper helper = new BGGLogInHelper(theContext, null);
                     if (helper.canLogIn() && helper.checkCookies()) {
 
-                        List<Play>plays_out = Play.listPlaysNewOld(0);
+                        List<Play>plays_out = Play.listPlaysNewOld(0, 0);
                         totalCount = plays_out.size();
                         syncCounter = 1;
                         for(Play thePlay:plays_out){

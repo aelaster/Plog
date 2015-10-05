@@ -104,6 +104,7 @@ public class GamesFragment extends Fragment{
     public CoordinatorLayout mCoordinatorLayout;
     private boolean releaseFocus = false;
     private int playListType = 0;
+    private int currentYear = 0;
     private int playListType_Holder = 0;
     private int sortType = 0;
     FloatingActionButton addPlayer;
@@ -112,12 +113,13 @@ public class GamesFragment extends Fragment{
     VerticalRecyclerViewFastScroller fastScroller;
 
 
-    public static GamesFragment newInstance(boolean fromDrawer, String searchQuery, int playListType, String fragmentName) {
+    public static GamesFragment newInstance(boolean fromDrawer, String searchQuery, int playListType, String fragmentName, int currentYear) {
         GamesFragment fragment = new GamesFragment();
         Bundle args = new Bundle();
         args.putBoolean("fromDrawer", fromDrawer);
         args.putString("searchQuery", searchQuery);
         args.putInt("playListType", playListType);
+        args.putInt("currentYear", currentYear);
         args.putString("fragmentName", fragmentName);
         fragment.setArguments(args);
         return fragment;
@@ -132,6 +134,7 @@ public class GamesFragment extends Fragment{
             mSearchQuery = getArguments().getString("searchQuery");
             fragmentName = getArguments().getString("fragmentName");
             playListType = getArguments().getInt("playListType");
+            currentYear = getArguments().getInt("currentYear");
         }
         if (fromDrawer && playListType != 2) {
             try {
@@ -243,7 +246,7 @@ public class GamesFragment extends Fragment{
         setRecyclerViewLayoutManager(mCurrentLayoutManagerType);
 
         //mAdapter = new CustomAdapter(mDataset, mDataset_Thumb);
-        mAdapter = new GameAdapter(this, mActivity,mSearchQuery, fromDrawer, playListType, sortType, fragmentName);
+        mAdapter = new GameAdapter(this, mActivity,mSearchQuery, fromDrawer, playListType, sortType, fragmentName, currentYear);
         // Set CustomAdapter as the adapter for RecyclerView.
         mRecyclerView.setAdapter(mAdapter);
 
@@ -277,7 +280,7 @@ public class GamesFragment extends Fragment{
                     // When user changed the Text
                     mSearchQuery = cs.toString();
                     //initDataset();
-                    mAdapter = new GameAdapter(GamesFragment.this, mActivity, mSearchQuery, fromDrawer, playListType, sortType, fragmentName);
+                    mAdapter = new GameAdapter(GamesFragment.this, mActivity, mSearchQuery, fromDrawer, playListType, sortType, fragmentName, currentYear);
                     // Set CustomAdapter as the adapter for RecyclerView.
                     mRecyclerView.setAdapter(mAdapter);
                 }
@@ -610,9 +613,13 @@ public class GamesFragment extends Fragment{
     }
 
     protected void updateDataset(){
-        mAdapter.updateData(mAdapter.generateGameList(mSearchQuery, playListType, sortType));
-        if (mSearch != null) {
-            mSearch.setHint(getString(R.string.filter) + mAdapter.getItemCount() + getString(R.string.filter_games));
+        if (mAdapter != null) {
+            mAdapter.updateData(mAdapter.generateGameList(mSearchQuery, playListType, sortType));
+            if (mSearch != null) {
+                mSearch.setHint(getString(R.string.filter) + mAdapter.getItemCount() + getString(R.string.filter_games));
+            }
+        }else{
+            initDataset();
         }
     }
 
@@ -637,7 +644,7 @@ public class GamesFragment extends Fragment{
                 myTask = null;
 
                 //mAdapter = new CustomAdapter(mDataset, mDataset_Thumb);
-                mAdapter = new GameAdapter(GamesFragment.this, mActivity, mSearchQuery, fromDrawer, playListType, sortType, fragmentName);
+                mAdapter = new GameAdapter(GamesFragment.this, mActivity, mSearchQuery, fromDrawer, playListType, sortType, fragmentName, currentYear);
                 // Set CustomAdapter as the adapter for RecyclerView.
                 mRecyclerView.setAdapter(mAdapter);
 

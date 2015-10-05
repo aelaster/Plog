@@ -58,6 +58,7 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
     PlayAdapter mPlayAdapter;
     String searchQuery = "";
     private int playListType = 0;
+    private int currentYear = 0;
     private int sortType = 0;
     private boolean fromDrawer;
 
@@ -235,6 +236,7 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
             mCurrentPosition =  getIntent().getExtras().getInt("adapterPosition");
             fromDrawer =  getIntent().getExtras().getBoolean("fromDrawer");
             playListType =  getIntent().getExtras().getInt("playListType");
+            currentYear =  getIntent().getExtras().getInt("currentYear");
             sortType =  getIntent().getExtras().getInt("sortType");
             mOriginalPosition = mCurrentPosition;
         } else {
@@ -242,6 +244,7 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
             mOriginalPosition = savedInstanceState.getInt(STATE_OLD_POSITION);
             searchQuery = savedInstanceState.getString("searchQuery");
             playListType = savedInstanceState.getInt("playListType");
+            currentYear = savedInstanceState.getInt("currentYear");
             sortType =  savedInstanceState.getInt("sortType");
         }
 
@@ -311,7 +314,7 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
 
 
         //setBackgroundColor(getResources().getColor(R.color.cardview_initial_background));
-        mPlayAdapter = new PlayAdapter(this, null, searchQuery, fromDrawer, playListType, sortType);
+        mPlayAdapter = new PlayAdapter(this, null, searchQuery, fromDrawer, playListType, sortType, currentYear);
         // Instantiate a ViewPager and a PagerAdapter.
         mPager = (CustomViewPager) findViewById(R.id.pager);
         //mPager.setBackgroundColor(getResources().getColor(R.color.cardview_initial_background));
@@ -376,6 +379,7 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
         outState.putString("searchQuery", searchQuery);
         outState.putInt("playListType", playListType);
         outState.putInt("sortType", sortType);
+        outState.putInt("currentYear", currentYear);
     }
 
     @Override
@@ -387,6 +391,7 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
         data.putExtra(EXTRA_CURRENT_ITEM_POSITION, mCurrentPosition);
         data.putExtra("mSearchQuery", searchQuery);
         data.putExtra("playListType", playListType);
+        data.putExtra("currentYear", currentYear);
         data.putExtra("sortType", sortType);
         setResult(RESULT_OK, data);
         super.finishAfterTransition();
@@ -533,7 +538,7 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
                             //delete play
                             deleteMe.delete();
 
-                            mPlayAdapter = new PlayAdapter(getActivity(), null, searchQuery, fromDrawer, playListType, sortType);
+                            mPlayAdapter = new PlayAdapter(getActivity(), null, searchQuery, fromDrawer, playListType, sortType, currentYear);
                             mPagerAdapter.notifyDataSetChanged();
                             if (mPlayAdapter.getItemCount() == 0){
                                 onBackPressed();

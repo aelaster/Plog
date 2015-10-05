@@ -72,6 +72,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
     private boolean fromDrawer;
     int mPosition;
     int playListType;
+    int currentYear;
     private String gameGroup = null;
     private String fragmentName = "";
     private long mLastClickTime = 0;
@@ -201,7 +202,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
         return games_out;
     }
 
-    public GameAdapter(Fragment theFragment, Activity theActivity, String mSearchQuery, boolean theFromDrawer, int mPlayListType, int mSortType, String mFragmentName) {
+    public GameAdapter(Fragment theFragment, Activity theActivity, String mSearchQuery, boolean theFromDrawer, int mPlayListType, int mSortType, String mFragmentName, int mCurrentYear) {
         //games = Game.listAll(Game.class);
         //find(Class<T> type, String whereClause, String[] whereArgs, String groupBy, String orderBy, String limit)
         mFragment = theFragment;
@@ -209,6 +210,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
         playListType = mPlayListType;
         fromDrawer = theFromDrawer;
         fragmentName = mFragmentName;
+        currentYear = mCurrentYear;
 
         games = generateGameList(mSearchQuery, mPlayListType, mSortType);
 
@@ -403,9 +405,9 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
                          return true;
                      case R.id.view_plays:
                          if (games.get(position).expansionFlag == true) {
-                             ((MainActivity) mActivity).openPlays(games.get(position).gameName, false, 9, fragmentName);
+                             ((MainActivity) mActivity).openPlays(games.get(position).gameName, false, 9, fragmentName, currentYear);
                          }else{
-                             ((MainActivity) mActivity).openPlays(games.get(position).gameName, false, 0, fragmentName);
+                             ((MainActivity) mActivity).openPlays(games.get(position).gameName, false, 0, fragmentName, currentYear);
                          }
                          return true;
                      case R.id.open_bgg:

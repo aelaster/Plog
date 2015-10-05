@@ -228,7 +228,7 @@ public class ViewPlayerActivity extends AppCompatActivity implements AddPlayFrag
 
 
         //setBackgroundColor(getResources().getColor(R.color.cardview_initial_background));
-        mPlayerAdapter = new PlayerAdapter(this, null);
+        mPlayerAdapter = new PlayerAdapter(this, null, 0);
         // Instantiate a ViewPager and a PagerAdapter.
         mPager = (CustomViewPager) findViewById(R.id.pager);
         //mPager.setBackgroundColor(getResources().getColor(R.color.cardview_initial_background));

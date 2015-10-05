@@ -54,7 +54,7 @@ public class Play extends SugarRecord<Play> {
     }
 
 
-    public static List listPlaysNewOld(int sortType){
+    public static List listPlaysNewOld(int sortType, int year){
         String query;
         query = " SELECT P.*, " +
                 "("+
@@ -77,6 +77,9 @@ public class Play extends SugarRecord<Play> {
                 " INNER JOIN " + StringUtil.toSQLName("Game") +
                 " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("game") + " = " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("id") +
                 " and " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("expansionFlag") + " = 0 ";
+        if (year > 0){
+            query = query + " AND STRFTIME('%Y', DATETIME(SUBSTR(P." + StringUtil.toSQLName("playDate") + ",0, 11), 'unixepoch')) = ? ";
+        }
         switch (sortType) {
             case 0:
                 query = query + " ORDER BY P." + StringUtil.toSQLName("playDate") + " DESC";
@@ -95,18 +98,22 @@ public class Play extends SugarRecord<Play> {
         /*Select dateSort_NewOld = Select.from(Play.class);
         dateSort_NewOld.orderBy(StringUtil.toSQLName("playDate") + " DESC, " + StringUtil.toSQLName("ID") + " DESC");
         return dateSort_NewOld.list();*/
-        return Play.findWithQuery(Play.class,query);
+        if (year > 0) {
+            return Play.findWithQuery(Play.class, query, year + "");
+        }else{
+            return Play.findWithQuery(Play.class, query);
+        }
     }
 
 
 
-    public static List<Play> listPlaysNewOld(String mSearchQuery, boolean allowLike, boolean allowExpansions, int sortType){
+    public static List<Play> listPlaysNewOld(String mSearchQuery, boolean allowLike, boolean allowExpansions, int sortType, int year){
         String query;
         if (mSearchQuery.contains("'")) {
             mSearchQuery = mSearchQuery.replaceAll("'", "''");
         }
         if (mSearchQuery.equals("")) {
-           return listPlaysNewOld(sortType);
+           return listPlaysNewOld(sortType, year);
         }else {
            query =  " SELECT P.*, " +
                    "("+
@@ -136,6 +143,9 @@ public class Play extends SugarRecord<Play> {
            }else {
                query = query + " and " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " = '" + mSearchQuery + "'";
            }
+            if (year > 0){
+                query = query + " AND STRFTIME('%Y', DATETIME(SUBSTR(P." + StringUtil.toSQLName("playDate") + ",0, 11), 'unixepoch')) = ? ";
+            }
             switch (sortType) {
                 case 0:
                     query = query + " ORDER BY P." + StringUtil.toSQLName("playDate") + " DESC";
@@ -152,11 +162,15 @@ public class Play extends SugarRecord<Play> {
             }
             query = query + ", P." + StringUtil.toSQLName("ID") + " DESC";
            //query = query + " order by " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("playDate") + " DESC, "  + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " DESC";
-           return Play.findWithQuery(Play.class,query);
+            if (year > 0) {
+                return Play.findWithQuery(Play.class, query, year + "");
+            }else{
+                return Play.findWithQuery(Play.class, query);
+            }
         }
     }
 
-    public static List<Play> listPlaysNewOld_GameGroup(String gameGroup, int sortType){
+    public static List<Play> listPlaysNewOld_GameGroup(String gameGroup, int sortType, int year){
         String query;
         query =  " SELECT P.*, " +
                 "("+
@@ -183,6 +197,9 @@ public class Play extends SugarRecord<Play> {
                 " ON " + StringUtil.toSQLName("PlaysPerGameGroup") + "." + StringUtil.toSQLName("play") + " = P." + StringUtil.toSQLName("id") +
                 " and " + StringUtil.toSQLName("PlaysPerGameGroup") + "." + StringUtil.toSQLName("gameGroup") + " = ?";
         //query = query + " order by " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("playDate") + " DESC, "  + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " DESC";
+        if (year > 0){
+            query = query + " AND STRFTIME('%Y', DATETIME(SUBSTR(P." + StringUtil.toSQLName("playDate") + ",0, 11), 'unixepoch')) = ? ";
+        }
         switch (sortType) {
             case 0:
                 query = query + " ORDER BY P." + StringUtil.toSQLName("playDate") + " DESC";
@@ -198,7 +215,11 @@ public class Play extends SugarRecord<Play> {
                 break;
         }
         query = query + ", P." + StringUtil.toSQLName("ID") + " DESC";
-        return Play.findWithQuery(Play.class, query, gameGroup);
+        if (year > 0) {
+            return Play.findWithQuery(Play.class, query, gameGroup, year + "");
+        }else{
+            return Play.findWithQuery(Play.class, query, gameGroup);
+        }
 
     }
 
@@ -249,7 +270,11 @@ public class Play extends SugarRecord<Play> {
                 break;
         }
         query = query + ", P." + StringUtil.toSQLName("ID") + " DESC";
-        return Play.findWithQuery(Play.class,query, group.getId().toString(), game.getId().toString(), year + "");
+        if (year > 0) {
+            return Play.findWithQuery(Play.class, query, group.getId().toString(), game.getId().toString(), year + "");
+        }else{
+            return Play.findWithQuery(Play.class, query, group.getId().toString(), game.getId().toString());
+        }
     }
 
     public static List<Play> totalPlays_TenByTen_GameGroup(GameGroup group, int year, int sortType){
@@ -298,10 +323,14 @@ public class Play extends SugarRecord<Play> {
                 break;
         }
         query = query + ", P." + StringUtil.toSQLName("ID") + " DESC";
-        return Play.findWithQuery(Play.class, query, group.getId().toString(), year + "");
+        if (year > 0) {
+            return Play.findWithQuery(Play.class, query, group.getId().toString(), year + "");
+        }else{
+            return Play.findWithQuery(Play.class, query, group.getId().toString());
+        }
     }
 
-    public static List<Play> totalWins_GameGroup_Player(GameGroup group, Player player, int sortType) {
+    public static List<Play> totalWins_GameGroup_Player(GameGroup group, Player player, int sortType, int year) {
         String query;
         query =  " SELECT P.*, " +
                 "("+
@@ -331,6 +360,9 @@ public class Play extends SugarRecord<Play> {
                 " AND " + StringUtil.toSQLName("GameGroup") + " = ?" +
                 " AND "+ StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("player") + " = ? " +
                 " AND "+ StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("score") + " >= " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("playHighScore");
+        if (year > 0){
+            query = query + " AND STRFTIME('%Y', DATETIME(SUBSTR(P." + StringUtil.toSQLName("playDate") + ",0, 11), 'unixepoch')) = ? ";
+        }
         switch (sortType) {
             case 0:
                 query = query + " ORDER BY P." + StringUtil.toSQLName("playDate") + " DESC";
@@ -345,10 +377,14 @@ public class Play extends SugarRecord<Play> {
                 query = query + " ORDER BY " +StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " DESC";
                 break;
         }
-        return Play.findWithQuery(Play.class, query, group.getId().toString(), player.getId().toString());
+        if (year > 0) {
+            return Play.findWithQuery(Play.class, query, group.getId().toString(), player.getId().toString(), year + "");
+        }else{
+            return Play.findWithQuery(Play.class, query, group.getId().toString(), player.getId().toString());
+        }
     }
 
-    public static List<Play> totalPlays_Player(Player player, int sortType) {
+    public static List<Play> totalPlays_Player(Player player, int sortType, int year) {
         String query;
         query =  " SELECT P.*, " +
                 "("+
@@ -374,6 +410,9 @@ public class Play extends SugarRecord<Play> {
                 " ON P." + StringUtil.toSQLName("id") + " = " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("play") +
                 " AND " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("expansionFlag") + " = 0 " +
                 " AND "+ StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("player") + " = ? ";
+        if (year > 0){
+            query = query + " AND STRFTIME('%Y', DATETIME(SUBSTR(P." + StringUtil.toSQLName("playDate") + ",0, 11), 'unixepoch')) = ? ";
+        }
         switch (sortType) {
             case 0:
                 query = query + " ORDER BY P." + StringUtil.toSQLName("playDate") + " DESC";
@@ -388,10 +427,14 @@ public class Play extends SugarRecord<Play> {
                 query = query + " ORDER BY " +StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " DESC";
                 break;
         }
-        return Play.findWithQuery(Play.class, query, player.getId().toString());
+        if (year > 0) {
+            return Play.findWithQuery(Play.class, query, player.getId().toString(), year + "");
+        }else{
+            return Play.findWithQuery(Play.class, query, player.getId().toString());
+        }
     }
 
-    public static List<Play> totalPlays_Player_GameGroup(Player player, GameGroup group, int sortType) {
+    public static List<Play> totalPlays_Player_GameGroup(Player player, GameGroup group, int sortType, int year) {
         String query;
         query =  " SELECT P.*, " +
                 "("+
@@ -419,6 +462,9 @@ public class Play extends SugarRecord<Play> {
                 " INNER JOIN " + StringUtil.toSQLName("PlaysPerGameGroup") +
                 " ON " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("play") + " = " + StringUtil.toSQLName("PlaysPerGameGroup") + "." + StringUtil.toSQLName("play") +
                 " AND " + StringUtil.toSQLName("GameGroup") + " = ?";
+        if (year > 0){
+            query = query + " AND STRFTIME('%Y', DATETIME(SUBSTR(P." + StringUtil.toSQLName("playDate") + ",0, 11), 'unixepoch')) = ? ";
+        }
         switch (sortType) {
             case 0:
                 query = query + " ORDER BY P." + StringUtil.toSQLName("playDate") + " DESC";
@@ -433,10 +479,14 @@ public class Play extends SugarRecord<Play> {
                 query = query + " ORDER BY " +StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " DESC";
                 break;
         }
-        return Play.findWithQuery(Play.class, query, player.getId().toString(), group.getId().toString());
+        if (year > 0) {
+            return Play.findWithQuery(Play.class, query, player.getId().toString(), group.getId().toString(), year + "");
+        }else{
+            return Play.findWithQuery(Play.class, query, player.getId().toString(), group.getId().toString());
+        }
     }
 
-    public static List<Play> totalWins_Player(Player player, int sortType) {
+    public static List<Play> totalWins_Player(Player player, int sortType, int year) {
         String query;
         query =  " SELECT P.*, " +
                 "("+
@@ -463,6 +513,9 @@ public class Play extends SugarRecord<Play> {
                 " AND "+ StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("expansionFlag") + " = 0 " +
                 " AND "+ StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("player") + " = ? " +
                 " AND "+ StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("score") + " >= " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("playHighScore");
+        if (year > 0){
+            query = query + " AND STRFTIME('%Y', DATETIME(SUBSTR(P." + StringUtil.toSQLName("playDate") + ",0, 11), 'unixepoch')) = ? ";
+        }
         switch (sortType) {
             case 0:
                 query = query + " ORDER BY P." + StringUtil.toSQLName("playDate") + " DESC";
@@ -477,10 +530,14 @@ public class Play extends SugarRecord<Play> {
                 query = query + " ORDER BY " +StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " DESC";
                 break;
         }
-        return Play.findWithQuery(Play.class, query, player.getId().toString());
+        if (year > 0) {
+            return Play.findWithQuery(Play.class, query, player.getId().toString(), year + "");
+        }else{
+            return Play.findWithQuery(Play.class, query, player.getId().toString());
+        }
     }
 
-    public static List<Play> totalAsteriskWins_GameGroup_Player(GameGroup group, Player player, int sortType) {
+    public static List<Play> totalAsteriskWins_GameGroup_Player(GameGroup group, Player player, int sortType, int year) {
         String query;
         query =  " SELECT PP.*, " +
                 "("+
@@ -530,6 +587,9 @@ public class Play extends SugarRecord<Play> {
                 " AND Q." + StringUtil.toSQLName("play") + " = P." + StringUtil.toSQLName("play") +
                 " AND Q." + StringUtil.toSQLName("score") + " = P." + StringUtil.toSQLName("score") +
                 ") = 1";
+        if (year > 0){
+            query = query + " AND STRFTIME('%Y', DATETIME(SUBSTR(PP." + StringUtil.toSQLName("playDate") + ",0, 11), 'unixepoch')) = ? ";
+        }
         switch (sortType) {
             case 0:
                 query = query + " ORDER BY PP." + StringUtil.toSQLName("playDate") + " DESC";
@@ -544,10 +604,14 @@ public class Play extends SugarRecord<Play> {
                 query = query + " ORDER BY " +StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " DESC";
                 break;
         }
-        return Play.findWithQuery(Play.class, query, player.getId().toString(), group.getId().toString(), group.getId().toString(), group.getId().toString());
+        if (year > 0) {
+            return Play.findWithQuery(Play.class, query, player.getId().toString(), group.getId().toString(), group.getId().toString(), group.getId().toString(), year + "");
+        }else{
+            return Play.findWithQuery(Play.class, query, player.getId().toString(), group.getId().toString(), group.getId().toString(), group.getId().toString());
+        }
     }
 
-    public static List<Play> totalAsteriskWins_Player(Player player, int sortType) {
+    public static List<Play> totalAsteriskWins_Player(Player player, int sortType, int year) {
         String query;
         query =  " SELECT PP.*, " +
                 "("+
@@ -586,6 +650,9 @@ public class Play extends SugarRecord<Play> {
                 " WHERE Q." + StringUtil.toSQLName("play") + " = P." + StringUtil.toSQLName("play") +
                 " AND Q." + StringUtil.toSQLName("score") + " = P." + StringUtil.toSQLName("score") +
                 ") = 1";
+        if (year > 0){
+            query = query + " AND STRFTIME('%Y', DATETIME(SUBSTR(PP." + StringUtil.toSQLName("playDate") + ",0, 11), 'unixepoch')) = ? ";
+        }
         switch (sortType) {
             case 0:
                 query = query + " ORDER BY PP." + StringUtil.toSQLName("playDate") + " DESC";
@@ -600,10 +667,14 @@ public class Play extends SugarRecord<Play> {
                 query = query + " ORDER BY " +StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " DESC";
                 break;
         }
-        return Play.findWithQuery(Play.class,query, player.getId().toString());
+        if (year > 0) {
+            return Play.findWithQuery(Play.class, query, player.getId().toString(), year + "");
+        }else{
+            return Play.findWithQuery(Play.class, query, player.getId().toString());
+        }
     }
 
-    public static List<Play> totalGroupLosses(GameGroup group, int sortType) {
+    public static List<Play> totalGroupLosses(GameGroup group, int sortType, int year) {
         String query;
         query =  " SELECT PP.*, " +
                 "("+
@@ -651,6 +722,9 @@ public class Play extends SugarRecord<Play> {
                 " (SELECT COUNT(" + StringUtil.toSQLName("player") + ")" +
                 "  FROM " + StringUtil.toSQLName("PlayersPerGameGroup") +
                 "  WHERE " + StringUtil.toSQLName("GameGroup") + " = ?)";
+        if (year > 0){
+            query = query + " AND STRFTIME('%Y', DATETIME(SUBSTR(PP." + StringUtil.toSQLName("playDate") + ",0, 11), 'unixepoch')) = ? ";
+        }
         switch (sortType) {
             case 0:
                 query = query + " ORDER BY PP." + StringUtil.toSQLName("playDate") + " DESC";
@@ -665,10 +739,14 @@ public class Play extends SugarRecord<Play> {
                 query = query + " ORDER BY " +StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " DESC";
                 break;
         }
-        return Play.findWithQuery(Play.class, query, group.getId().toString(), group.getId().toString(), group.getId().toString());
+        if (year > 0) {
+            return Play.findWithQuery(Play.class, query, group.getId().toString(), group.getId().toString(), group.getId().toString(), year + "");
+        }else{
+            return Play.findWithQuery(Play.class, query, group.getId().toString(), group.getId().toString(), group.getId().toString());
+        }
     }
 
-    public static List<Play> totalGroupLosses(int sortType) {
+    public static List<Play> totalGroupLosses(int sortType, int year) {
         String query;
         query =  " SELECT PP.*, " +
                 "("+
@@ -707,6 +785,9 @@ public class Play extends SugarRecord<Play> {
                 " (SELECT COUNT(" + StringUtil.toSQLName("player") + ")" +
                 "  FROM " + StringUtil.toSQLName("Player") +
                 " )";
+        if (year > 0){
+            query = query + " AND STRFTIME('%Y', DATETIME(SUBSTR(PP." + StringUtil.toSQLName("playDate") + ",0, 11), 'unixepoch')) = ? ";
+        }
         switch (sortType) {
             case 0:
                 query = query + " ORDER BY PP." + StringUtil.toSQLName("playDate") + " DESC";
@@ -721,10 +802,14 @@ public class Play extends SugarRecord<Play> {
                 query = query + " ORDER BY " +StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " DESC";
                 break;
         }
-        return Play.findWithQuery(Play.class, query);
+        if (year > 0) {
+            return Play.findWithQuery(Play.class, query, year + "");
+        }else{
+            return Play.findWithQuery(Play.class, query);
+        }
     }
 
-    public static List<Play> totalSharedWins(GameGroup group, int sortType) {
+    public static List<Play> totalSharedWins(GameGroup group, int sortType, int year) {
         String query;
         query =  " SELECT PP.*, " +
                 "("+
@@ -776,6 +861,9 @@ public class Play extends SugarRecord<Play> {
                 " (SELECT COUNT(" + StringUtil.toSQLName("player") + ")" +
                 "  FROM " + StringUtil.toSQLName("PlayersPerGameGroup") +
                 "  WHERE " + StringUtil.toSQLName("GameGroup") + " = ?)";
+        if (year > 0){
+            query = query + " AND STRFTIME('%Y', DATETIME(SUBSTR(PP." + StringUtil.toSQLName("playDate") + ",0, 11), 'unixepoch')) = ? ";
+        }
         switch (sortType) {
             case 0:
                 query = query + " ORDER BY PP." + StringUtil.toSQLName("playDate") + " DESC";
@@ -790,10 +878,14 @@ public class Play extends SugarRecord<Play> {
                 query = query + " ORDER BY " +StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " DESC";
                 break;
         }
-        return Play.findWithQuery(Play.class, query, group.getId().toString(), group.getId().toString(), group.getId().toString());
+        if (year > 0) {
+            return Play.findWithQuery(Play.class, query, group.getId().toString(), group.getId().toString(), group.getId().toString(), year + "");
+        }else{
+            return Play.findWithQuery(Play.class, query, group.getId().toString(), group.getId().toString(), group.getId().toString());
+        }
     }
 
-    public static List<Play> totalSharedWins(int sortType) {
+    public static List<Play> totalSharedWins(int sortType, int year) {
         String query;
         query =  " SELECT PP.*, " +
                 "("+
@@ -836,6 +928,9 @@ public class Play extends SugarRecord<Play> {
                 " (SELECT COUNT(" + StringUtil.toSQLName("player") + ")" +
                 "  FROM " + StringUtil.toSQLName("Player") +
                 "  )";
+        if (year > 0){
+            query = query + " AND STRFTIME('%Y', DATETIME(SUBSTR(PP." + StringUtil.toSQLName("playDate") + ",0, 11), 'unixepoch')) = ? ";
+        }
         switch (sortType) {
             case 0:
                 query = query + " ORDER BY PP." + StringUtil.toSQLName("playDate") + " DESC";
@@ -850,7 +945,11 @@ public class Play extends SugarRecord<Play> {
                 query = query + " ORDER BY " +StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " DESC";
                 break;
         }
-        return Play.findWithQuery(Play.class, query);
+        if (year > 0) {
+            return Play.findWithQuery(Play.class, query, year + "");
+        }else{
+            return Play.findWithQuery(Play.class, query);
+        }
     }
 
 }

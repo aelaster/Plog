@@ -76,7 +76,7 @@ public class StatsFragment extends Fragment {
         ActionBar mActionBar = ((MainActivity)mActivity).getSupportActionBar();
 
         List<String> gameGroupNames = new ArrayList<>();
-        final List<GameGroup> gameGroups = GameGroup.listAll_AZ(true);
+        final List<GameGroup> gameGroups = GameGroup.listAll_AZ(true, 0);
         gameGroupNames.add(getString(R.string.select_group));
         gameGroupNames.add(getString(R.string.everyone));
         for(GameGroup group:gameGroups){
@@ -91,7 +91,7 @@ public class StatsFragment extends Fragment {
             mActionBar.setListNavigationCallbacks(mSpinnerAdapter, new ActionBar.OnNavigationListener() {
                 @Override
                 public boolean onNavigationItemSelected(int position, long itemId) {
-                    List<GameGroup> gameGroups2 = GameGroup.listAll_AZ(true);
+                    List<GameGroup> gameGroups2 = GameGroup.listAll_AZ(true, 0);
                     if (position > 0) {
 
                         if (position - 2 == -2) {

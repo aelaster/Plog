@@ -85,6 +85,7 @@ public class MainActivity extends AppCompatActivity
     private AddGameFragment mAddGameFragment;
     private AddPlayFragment mAddPlayFragment;
     private AddGroupFragment mAddGroupFragment;
+    public static final int CurrentYear = 0;
     PlaysFragment mPlaysFragment;
     GamesFragment mGamesFragment;
     StatsFragment mStatsFragment;
@@ -236,9 +237,9 @@ public class MainActivity extends AppCompatActivity
     }
 
     private String mSearchQuery;
-    public PlayAdapter initPlayAdapter(String searchQuery, boolean fromDrawer, int playListType){
+    public PlayAdapter initPlayAdapter(String searchQuery, boolean fromDrawer, int playListType, int currentYear){
         mSearchQuery = searchQuery;
-        mPlayAdapter = new PlayAdapter(this, mPlaysFragment, searchQuery, fromDrawer, playListType, 0);
+        mPlayAdapter = new PlayAdapter(this, mPlaysFragment, searchQuery, fromDrawer, playListType, 0, currentYear);
         return mPlayAdapter;
     }
 
@@ -259,15 +260,15 @@ public class MainActivity extends AppCompatActivity
             String positionName = mNavigationDrawerFragment.getPositionHeading(position);
 
             if (positionName.equals(getString(R.string.title_plays))) {
-                openPlays("", true, 0, getString(R.string.title_plays));
+                openPlays("", true, 0, getString(R.string.title_plays), CurrentYear);
             } else if (positionName.equals(getString(R.string.title_players))) {
                 fragmentManager.beginTransaction()
                         .replace(R.id.container, new PlayersFragment(), "players")
                         .commitAllowingStateLoss();
             } else if (positionName.equals(getString(R.string.title_games))) {
-                openGames("", true, 0, getString(R.string.title_games));
+                openGames("", true, 0, getString(R.string.title_games), CurrentYear);
             } else if (positionName.equals(getString(R.string.title_bucket_list))) {
-                openGames("BucketList", true, 2, getString(R.string.title_bucket_list));
+                openGames("BucketList", true, 2, getString(R.string.title_bucket_list), CurrentYear);
             } else if (positionName.equals(getString(R.string.title_statistics))) {
                 openStats();
             } else if (positionName.equals(getString(R.string.title_export_db))) {
@@ -350,7 +351,7 @@ public class MainActivity extends AppCompatActivity
                 .commitAllowingStateLoss();
     }
 
-    public void openGames(String searchQuery, boolean fromDrawer, int playListType, String fragmentName){
+    public void openGames(String searchQuery, boolean fromDrawer, int playListType, String fragmentName, int currentYear){
         invalidateOptionsMenu();
         if(!fromDrawer){
             mNavigationDrawerFragment.mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
@@ -363,7 +364,7 @@ public class MainActivity extends AppCompatActivity
             mGamesFragment = null;
         }
 
-        mGamesFragment = GamesFragment.newInstance(fromDrawer, searchQuery, playListType, fragmentName);
+        mGamesFragment = GamesFragment.newInstance(fromDrawer, searchQuery, playListType, fragmentName, currentYear);
         FragmentTransaction ft = fragmentManager.beginTransaction();
         if (!fromDrawer){
             ft.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right);
@@ -378,7 +379,7 @@ public class MainActivity extends AppCompatActivity
         fragmentManager.executePendingTransactions();
     }
 
-    public void openPlays(String searchQuery, boolean fromDrawer, int playListType, String fragmentName){
+    public void openPlays(String searchQuery, boolean fromDrawer, int playListType, String fragmentName, int currentYear){
         invalidateOptionsMenu();
         if(!fromDrawer){
             mNavigationDrawerFragment.mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
@@ -391,8 +392,8 @@ public class MainActivity extends AppCompatActivity
             mPlaysFragment = null;
         }
 
-        mPlaysFragment = PlaysFragment.newInstance(fromDrawer, searchQuery, playListType, fragmentName);
-        mPlayAdapter = initPlayAdapter(searchQuery, fromDrawer, playListType);
+        mPlaysFragment = PlaysFragment.newInstance(fromDrawer, searchQuery, playListType, fragmentName, currentYear);
+        mPlayAdapter = initPlayAdapter(searchQuery, fromDrawer, playListType, currentYear);
         //initPlayAdapter();
         FragmentTransaction ft = fragmentManager.beginTransaction();
         if (!fromDrawer){
