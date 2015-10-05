@@ -201,7 +201,7 @@ public class PlayersFragment_Players extends Fragment{
      * from a local content provider or remote server.
      */
     private void initDataset() {
-        List<Player> players = Player.listPlayersAZ();
+        List<Player> players = Player.listPlayersAZ(0);
         if (players != null) {
             mDataset = new String[players.size()];
             int i = 0;

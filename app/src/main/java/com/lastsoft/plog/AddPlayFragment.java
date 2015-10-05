@@ -151,7 +151,7 @@ public class AddPlayFragment extends Fragment implements
         //checkedItems = new boolean[expansions.size()];
         addedUsers = new ArrayList<>();
         addedExpansions = new ArrayList<>();
-        List<Player> players = Player.listPlayersAZ();
+        List<Player> players = Player.listPlayersAZ(0);
         playersName = new ArrayList<>();
         playersID = new ArrayList<>();
         for(Player player:players){

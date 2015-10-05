@@ -108,7 +108,7 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.ViewHolder
         mActivity = theActivity;
         mFragment = theFragment;
         currentYear = mCurrentYear;
-        players = Player.listPlayersAZ();
+        players = Player.listPlayersAZ(currentYear);
         options = new DisplayImageOptions.Builder()
                 .cacheOnDisk(true)
                 .cacheInMemory(true)

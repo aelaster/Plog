@@ -48,7 +48,7 @@ public class Player extends SugarRecord<Player> {
         this.playerName = playerName;
     }
 
-    public static List listPlayersAZ(){
+    public static List listPlayersAZ(int year){
         String query;
         query = " SELECT " + StringUtil.toSQLName("Player") + ".*, " +
                 "("+
@@ -58,19 +58,30 @@ public class Player extends SugarRecord<Player> {
                 " ON " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("Play") + " = "+ StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") +
                 " INNER JOIN " + StringUtil.toSQLName("Player") + " P " +
                 " ON " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("Player") + " = P." + StringUtil.toSQLName("id") +
-                " where " + StringUtil.toSQLName("Player") + "." + StringUtil.toSQLName("id") + " = P." + StringUtil.toSQLName("id") +
-                ") as " + StringUtil.toSQLName("totalPlays") +
-                ", COUNT("+ StringUtil.toSQLName("Play") +"." + StringUtil.toSQLName("id") + ") as " + StringUtil.toSQLName("totalWins") +
+                " where " + StringUtil.toSQLName("Player") + "." + StringUtil.toSQLName("id") + " = P." + StringUtil.toSQLName("id");
+        if (year > 0){
+            query = query + " AND STRFTIME('%Y', DATETIME(SUBSTR(" + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("playDate") + ",0, 11), 'unixepoch')) = ? ";
+        }
+         query = query + ") as " + StringUtil.toSQLName("totalPlays") +
+                ", COUNT("+ StringUtil.toSQLName("Play") +"." + StringUtil.toSQLName("id");
+        query = query + ") as " + StringUtil.toSQLName("totalWins") +
                 " FROM " + StringUtil.toSQLName("Player") +
                 " LEFT JOIN "+ StringUtil.toSQLName("PlayersPerPlay") +
                 " ON " + StringUtil.toSQLName("Player") + "." + StringUtil.toSQLName("id") + " = " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("player") +
                 " LEFT JOIN "+ StringUtil.toSQLName("Play") +
                 " ON " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " = " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("play") +
                 " AND "+ StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("player") + " = " + StringUtil.toSQLName("Player") + "." + StringUtil.toSQLName("id") +
-                " AND "+ StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("score") + " >= " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("playHighScore") +
-                " GROUP BY " + StringUtil.toSQLName("Player") + "." + StringUtil.toSQLName("id") +
+                " AND "+ StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("score") + " >= " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("playHighScore");
+        if (year > 0){
+            query = query + " AND STRFTIME('%Y', DATETIME(SUBSTR(" + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("playDate") + ",0, 11), 'unixepoch')) = ? ";
+        }
+        query = query + " GROUP BY " + StringUtil.toSQLName("Player") + "." + StringUtil.toSQLName("id") +
                 " ORDER BY " + StringUtil.toSQLName("Player") + "." + StringUtil.toSQLName("playerName") + " ASC";
-        return Player.findWithQuery(Player.class, query);
+        if (year > 0){
+            return Player.findWithQuery(Player.class, query, year+"", year+"");
+        }else {
+            return Player.findWithQuery(Player.class, query);
+        }
     }
 
     public static boolean playerExists(String playerName){

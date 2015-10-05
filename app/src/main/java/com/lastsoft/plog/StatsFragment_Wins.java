@@ -75,21 +75,7 @@ public class StatsFragment_Wins extends Fragment {
             statsView = inflater.inflate(R.layout.fragment_statistics, container, false);
             mContainerView_Players = (ViewGroup) statsView.findViewById(R.id.container_players);
             if (gameGroup.getId() >= 0) {
-                if (gameGroup.getId() > 0) {
-                    groupPlayers = GameGroup.getGroupPlayers(GameGroup.findById(GameGroup.class, gameGroup.getId()));
-                } else {
-                    //errybody
-                    groupPlayers = Player.listPlayersAZ();
-                }
 
-
-                final ViewGroup newView = (ViewGroup) LayoutInflater.from(mActivity).inflate(
-                        R.layout.stats_viewstat_spinner, mContainerView_Players, false);
-
-                TextView statTypeView = (TextView) newView.findViewById(R.id.statType);
-                Spinner spinnerValueView = (Spinner) newView.findViewById(R.id.spinnerValue);
-                statTypeView.setText(getString(R.string.year_label));
-                statTypeView.setTextSize(24);
                 // Create an ArrayAdapter using the string array and a default spinner layout
                 ArrayList<String> theYears = new ArrayList<String>();
 
@@ -100,6 +86,23 @@ public class StatsFragment_Wins extends Fragment {
                     theYears.add(i+"");
                 }
                 year = 0;
+
+                if (gameGroup.getId() > 0) {
+                    groupPlayers = GameGroup.getGroupPlayers(GameGroup.findById(GameGroup.class, gameGroup.getId()));
+                } else {
+                    //errybody
+                    groupPlayers = Player.listPlayersAZ(year);
+                }
+
+
+                final ViewGroup newView = (ViewGroup) LayoutInflater.from(mActivity).inflate(
+                        R.layout.stats_viewstat_spinner, mContainerView_Players, false);
+
+                TextView statTypeView = (TextView) newView.findViewById(R.id.statType);
+                Spinner spinnerValueView = (Spinner) newView.findViewById(R.id.spinnerValue);
+                statTypeView.setText(getString(R.string.year_label));
+                statTypeView.setTextSize(24);
+
                 ArrayAdapter<String> adapter = new ArrayAdapter<>(mActivity,R.layout.stats_viewstat_spinner_item, theYears);
                 spinnerValueView.setAdapter(adapter);
                 spinnerValueView.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -217,9 +220,10 @@ public class StatsFragment_Wins extends Fragment {
             //plus two because we put total and unique plays on the top
             long totalPlays, totalUnique, totalUnplayed;
             if (theGroup.getId() == 0){
+                groupPlayers = Player.listPlayersAZ(year);
                 totalPlays = ((long) Play.listPlaysNewOld(0, year).size());
-                totalUnique = Game.getUniqueGames(0).size();
-                totalUnplayed = Game.getUnplayedGames(0, false).size();
+                totalUnique = Game.getUniqueGames(0, year).size();
+                totalUnplayed = Game.getUnplayedGames(0, false, year).size();
                 try {
                     for (int i = 0; i < groupPlayers.size(); i++){
                         Player thisPlayer = Player.findById(Player.class, groupPlayers.get(i).getId());
@@ -245,7 +249,7 @@ public class StatsFragment_Wins extends Fragment {
                 theGroup = GameGroup.refreshStats(theGroup, year);
                 totalPlays = theGroup.totalPlays;
                 totalUnique = theGroup.uniqueGames;
-                totalUnplayed = Game.getUnplayedGames_GameGroup(GameGroup.findById(GameGroup.class, theGroup.getId()), 0, false).size();
+                totalUnplayed = Game.getUnplayedGames_GameGroup(GameGroup.findById(GameGroup.class, theGroup.getId()), 0, false, year).size();
                 try {
                     for (int i = 0; i < groupPlayers.size(); i++){
                         Player thisPlayer = Player.findById(Player.class, groupPlayers.get(i).getId());

@@ -156,10 +156,10 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
                 break;
             case 1:
                 if (mSearchQuery.equals("0")){
-                    games_out = Game.getUniqueGames(sortType);
+                    games_out = Game.getUniqueGames(sortType, year);
                 }else {
                     gameGroup = mSearchQuery;
-                    games_out = Game.getUniqueGames_GameGroup(GameGroup.findById(GameGroup.class, Long.parseLong(mSearchQuery)), sortType);
+                    games_out = Game.getUniqueGames_GameGroup(GameGroup.findById(GameGroup.class, Long.parseLong(mSearchQuery)), sortType, year);
                 }
                 break;
             case 2:
@@ -180,18 +180,18 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
                 break;
             case 4:
                 if (mSearchQuery.equals("0")){
-                    games_out = Game.getUnplayedGames(sortType, false);
+                    games_out = Game.getUnplayedGames(sortType, false, year);
                 }else {
                     gameGroup = mSearchQuery;
-                    games_out = Game.getUnplayedGames_GameGroup(GameGroup.findById(GameGroup.class, Long.parseLong(mSearchQuery)), sortType, false);
+                    games_out = Game.getUnplayedGames_GameGroup(GameGroup.findById(GameGroup.class, Long.parseLong(mSearchQuery)), sortType, false, year);
                 }
                 break;
             case 5:
                 if (mSearchQuery.equals("0")){
-                    games_out = Game.getUnplayedGames(sortType, true);
+                    games_out = Game.getUnplayedGames(sortType, true, year);
                 }else {
                     gameGroup = mSearchQuery;
-                    games_out = Game.getUnplayedGames_GameGroup(GameGroup.findById(GameGroup.class, Long.parseLong(mSearchQuery)), sortType, true);
+                    games_out = Game.getUnplayedGames_GameGroup(GameGroup.findById(GameGroup.class, Long.parseLong(mSearchQuery)), sortType, true, year);
                 }
                 break;
             default:

@@ -76,7 +76,7 @@ public class AddGroupFragment extends Fragment {
         if (getArguments() != null) {
             groupID = getArguments().getLong("groupID");
         }
-        List<Player> players = Player.listPlayersAZ();
+        List<Player> players = Player.listPlayersAZ(0);
         addedUsers = new ArrayList<>();
         playersName = new ArrayList<String>();
         playersID = new ArrayList<Integer>();
