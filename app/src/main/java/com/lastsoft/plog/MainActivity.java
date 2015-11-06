@@ -594,7 +594,7 @@ public class MainActivity extends AppCompatActivity
             GamesFragment collectionFrag = (GamesFragment)
                     getSupportFragmentManager().findFragmentByTag("games");
             if (collectionFrag != null) {
-                collectionFrag.refreshDataset(false);
+                collectionFrag.refreshDataset(true);
             }
         }else if (id.contains("update_games")){
             GamesFragment collectionFrag = (GamesFragment)
@@ -746,7 +746,7 @@ public class MainActivity extends AppCompatActivity
 
     public void notifyUser(int notificationId){
         NotificationFragment newFragment = new NotificationFragment().newInstance(notificationId);
-        newFragment.show(getFragmentManager(), "notifyUser");
+        newFragment.show(getSupportFragmentManager(), "notifyUser");
     }
 
     public void deleteGame(long gameId){
@@ -1154,10 +1154,12 @@ public class MainActivity extends AppCompatActivity
                             if (playersFrag.fabMenu.isExpanded()) {
                                 playersFrag.fabMenu.collapse();
                             } else {
-                                mNavigationDrawerFragment.openDrawer();
+                                //mNavigationDrawerFragment.openDrawer();
+                                super.onBackPressed();
                             }
                         } else {
-                            mNavigationDrawerFragment.openDrawer();
+                            //mNavigationDrawerFragment.openDrawer();
+                            super.onBackPressed();
                         }
                     }
 

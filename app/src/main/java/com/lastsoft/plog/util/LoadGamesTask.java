@@ -43,7 +43,7 @@ public class LoadGamesTask extends AsyncTask<String, Void, String> {
             url = new URL("https://www.boardgamegeek.com/xmlapi2/collection?username=" + bggUsername);
             ucon = url.openConnection();
             ucon.setConnectTimeout(3000);
-            ucon.setReadTimeout(30000);
+            ucon.setReadTimeout(3000);
                      /* Define InputStreams to read
                         * from the URLConnection. */
             InputStream is = ucon.getInputStream();

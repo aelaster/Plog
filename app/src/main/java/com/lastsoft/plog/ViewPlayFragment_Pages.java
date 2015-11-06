@@ -153,7 +153,7 @@ public class ViewPlayFragment_Pages extends Fragment {
         //Log.d("V1", "imageTransID = " + imageTransID);
 
         options = new DisplayImageOptions.Builder()
-                .cacheOnDisk(true)
+                .cacheOnDisk(false)
                 .cacheInMemory(false)
                 .considerExifParams(true)
                 .build();

@@ -318,7 +318,7 @@ public class AddPlayFragment extends Fragment implements
 
                 //photo
                 final DisplayImageOptions options = new DisplayImageOptions.Builder()
-                        .cacheOnDisk(true)
+                        .cacheOnDisk(false)
                         .cacheInMemory(false)
                         .considerExifParams(true)
                         .build();
@@ -476,7 +476,7 @@ public class AddPlayFragment extends Fragment implements
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         DisplayImageOptions options = new DisplayImageOptions.Builder()
-                .cacheOnDisk(true)
+                .cacheOnDisk(false)
                 .cacheInMemory(false)
                 .considerExifParams(true)
                 .build();
@@ -845,7 +845,7 @@ public class AddPlayFragment extends Fragment implements
             public void run() {
                 if (chosenImage != null) {
                     DisplayImageOptions options = new DisplayImageOptions.Builder()
-                            .cacheOnDisk(true)
+                            .cacheOnDisk(false)
                             .cacheInMemory(false)
                             .considerExifParams(true)
                             .build();

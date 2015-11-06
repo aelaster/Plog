@@ -30,6 +30,8 @@
         <item name="colorPrimaryDark">@color/darker_logo_blue</item>
         <item name="actionBarStyle">@style/MyActionBar</item>
         <item name="actionModeShareDrawable">@drawable/ic_action_share</item>
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
+        <item name="android:activatedBackgroundIndicator">?android:attr/selectableItemBackground</item>
     </style>
 
 

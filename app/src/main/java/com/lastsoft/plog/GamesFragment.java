@@ -38,6 +38,7 @@ import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -283,6 +284,10 @@ public class GamesFragment extends Fragment{
                     mAdapter = new GameAdapter(GamesFragment.this, mActivity, mSearchQuery, fromDrawer, playListType, sortType, fragmentName, currentYear);
                     // Set CustomAdapter as the adapter for RecyclerView.
                     mRecyclerView.setAdapter(mAdapter);
+
+                    if (mSearch != null) {
+                        mSearch.setHint(getString(R.string.filter) + mAdapter.getItemCount() + getString(R.string.filter_games));
+                    }
                 }
 
                 @Override
@@ -313,6 +318,10 @@ public class GamesFragment extends Fragment{
                     mRecyclerView.requestFocus();
 
                     initDataset();
+
+                    if (mSearch != null) {
+                        mSearch.setHint(getString(R.string.filter) + mAdapter.getItemCount() + getString(R.string.filter_games));
+                    }
                 }
             });
         }
@@ -606,6 +615,7 @@ public class GamesFragment extends Fragment{
     }
 
     protected void refreshDataset(boolean reInit){
+        Log.d("V1", "refreshing dataset");
         if (reInit) {
             initDataset();
         }

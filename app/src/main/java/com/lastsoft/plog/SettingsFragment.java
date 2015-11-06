@@ -21,11 +21,12 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.preference.Preference;
-import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
-import android.util.Log;
+import android.support.v7.preference.Preference;
+import android.support.v7.preference.PreferenceFragmentCompat;
 
+import com.lastsoft.plog.util.FileUtils;
+import com.lastsoft.plog.util.MySQLiteOpenHelper;
 import com.lastsoft.plog.util.NotificationFragment;
 import com.lastsoft.plog.util.PostMortemReportExceptionHandler;
 import com.lastsoft.plog.util.SyncPlaysTask;
@@ -36,9 +37,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.channels.FileChannel;
 
-public class SettingsFragment extends PreferenceFragment {
+public class SettingsFragment extends PreferenceFragmentCompat {
 
     private Preference mImportPreference, mExportPreference, mSendDebugPreference, mSyncPlays;
 
@@ -92,6 +92,11 @@ public class SettingsFragment extends PreferenceFragment {
         }else{
             mSyncPlays.setEnabled(false);
         }
+    }
+
+    @Override
+    public void onCreatePreferences(Bundle bundle, String s) {
+
     }
 
     public void syncPlays(){
@@ -163,28 +168,8 @@ public class SettingsFragment extends PreferenceFragment {
 
     public void importDB(){
         try{
-            File oldDb = getActivity().getDatabasePath("SRX.db");
-            File newDb = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/SRX_export.db");
-            if (newDb.exists()) {
-                if(oldDb.exists()){
-
-                }
-                else{
-                    //This'll create the directories you wanna write to, so you
-                    //can put the DB in the right spot.
-                    oldDb.getParentFile().mkdirs();
-                }
-                Log.d("V1", "importing database");
-                FileInputStream src_input = new FileInputStream(newDb);
-                FileOutputStream dst_input = new FileOutputStream(oldDb);
-                FileChannel src = src_input.getChannel();
-                FileChannel dst = dst_input.getChannel();
-                dst.transferFrom(src, 0, src.size());
-                src.close();
-                dst.close();
-                src_input.close();
-                dst_input.close();
-            }
+            MySQLiteOpenHelper helpa = new MySQLiteOpenHelper(getActivity());
+            helpa.importDatabase(Environment.getExternalStorageDirectory().getAbsolutePath() + "/SRX_export.db");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -192,21 +177,18 @@ public class SettingsFragment extends PreferenceFragment {
 
     public void exportDB(){
         try{
-            File currentDB = getActivity().getDatabasePath("SRX.db");
             String backupDBPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/SRX_export.db";
-            File backupDB = new File(backupDBPath);
+            String DB_FILEPATH = "/data/data/com.lastsoft.plog/databases/SRX.db";
 
-            if (currentDB.exists()) {
-                FileInputStream src_input = new FileInputStream(currentDB);
-                FileOutputStream dst_input = new FileOutputStream(backupDB);
-                FileChannel src = src_input.getChannel();
-                FileChannel dst = dst_input.getChannel();
-                dst.transferFrom(src, 0, src.size());
-                src.close();
-                dst.close();
-                src_input.close();
-                dst_input.close();
-                mImportPreference.setEnabled(true);
+            File fromDB = new File(DB_FILEPATH);
+            File toDB = new File(backupDBPath);
+            if (fromDB.exists()) {
+                if (toDB.exists()) {
+
+                } else {
+                    toDB.getParentFile().mkdirs();
+                }
+                FileUtils.copyFile(new FileInputStream(fromDB), new FileOutputStream(toDB));
             }
             notifyUser(1);
         } catch (Exception e) {
