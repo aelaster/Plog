@@ -31,7 +31,6 @@
         <item name="actionBarStyle">@style/MyActionBar</item>
         <item name="actionModeShareDrawable">@drawable/ic_action_share</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
-        <item name="android:activatedBackgroundIndicator">?android:attr/selectableItemBackground</item>
     </style>
 
 
@@ -142,6 +141,13 @@
 
     <style name="CardMain">
         <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="viepagertitlestrip">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textSize">14sp</item>
     </style>
 
 </resources>
