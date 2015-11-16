@@ -170,6 +170,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         try{
             MySQLiteOpenHelper helpa = new MySQLiteOpenHelper(getActivity());
             helpa.importDatabase(Environment.getExternalStorageDirectory().getAbsolutePath() + "/SRX_export.db");
+            ((SettingsActivity) getActivity()).setImportedFlag(true);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -191,6 +192,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                 FileUtils.copyFile(new FileInputStream(fromDB), new FileOutputStream(toDB));
             }
             notifyUser(1);
+
         } catch (Exception e) {
             e.printStackTrace();
         }

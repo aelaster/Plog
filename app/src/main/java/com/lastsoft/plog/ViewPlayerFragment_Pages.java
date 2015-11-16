@@ -139,7 +139,7 @@ public class ViewPlayerFragment_Pages extends Fragment {
                     if (progressContainer.getVisibility() != View.VISIBLE) {
                         progressContainer.setVisibility(View.VISIBLE);
                         String[] photoParts = thisPlayer.playerPhoto.split("/");
-                        File newFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),photoParts[photoParts.length-1]);
+                        File newFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)+"/Plog/",photoParts[photoParts.length-1]);
                         Uri contentUri = FileProvider.getUriForFile(getActivity().getApplicationContext(), "com.lastsoft.plog.fileprovider", newFile);
                         //Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI.buildUpon().appendPath("Pictures/" + photoParts[photoParts.length - 1]).build();
                         //Log.d("V1", uri.toString());

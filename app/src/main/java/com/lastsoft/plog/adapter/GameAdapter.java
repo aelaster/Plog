@@ -431,7 +431,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
                          return true;
                      case R.id.view_box_photo:
                          String[] photoParts = games.get(position).gameBoxImage.split("/");
-                         File newFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),photoParts[photoParts.length-1]);
+                         File newFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)+"/Plog/",photoParts[photoParts.length-1]);
                          Uri contentUri = FileProvider.getUriForFile(mActivity.getApplicationContext(), "com.lastsoft.plog.fileprovider", newFile);
                          Intent intent = new Intent();
                          intent.setAction(Intent.ACTION_VIEW);

@@ -21,6 +21,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
+import android.os.Environment;
 import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.PopupMenu;
@@ -312,7 +313,12 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
                     playPopup(view, position);
                 }
             });
-            if(plays.get(position).playPhoto != null && (plays.get(position).playPhoto.equals("") || new File(plays.get(position).playPhoto.substring(7, plays.get(position).playPhoto.length())).exists() == false)) {
+
+            String playPhoto;
+            playPhoto = Environment.getExternalStoragePublicDirectory(
+                    Environment.DIRECTORY_PICTURES) + "/Plog/" + plays.get(position).playPhoto;
+
+            if(plays.get(position).playPhoto != null && (plays.get(position).playPhoto.equals("") || new File(playPhoto).exists() == false)) {
                 String gameThumb = GamesPerPlay.getBaseGame(plays.get(position)).gameThumb;
                 if (gameThumb != null && !gameThumb.equals("")) {
                     //ImageLoader.getInstance().displayImage("http:" + GamesPerPlay.getBaseGame(plays.get(position)).gameThumb, viewHolder.getImageView(), options);
@@ -322,25 +328,23 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
                     viewHolder.getImageView().setImageDrawable(null);
                 }
             }else{
-                String thumbPathCheck = plays.get(position).playPhoto.substring(7, plays.get(position).playPhoto.length() - 4) + "_thumb3.jpg";
-                String thumbPath = plays.get(position).playPhoto.substring(0, plays.get(position).playPhoto.length() - 4) + "_thumb3.jpg";
-                if (new File(thumbPathCheck).exists()) {
+                String thumbPath =  playPhoto.substring(0, playPhoto.length() - 4) + "_thumb3.jpg";
+                if (new File(thumbPath).exists()) {
                     //ImageLoader.getInstance().displayImage(thumbPath, viewHolder.getImageView(), options);
-                    Picasso.with(mActivity).load(thumbPath).into(viewHolder.getImageView());
+                    Picasso.with(mActivity).load("file://" + thumbPath).into(viewHolder.getImageView());
                 }else{
-                    //ImageLoader.getInstance().displayImage(plays.get(position).playPhoto, viewHolder.getImageView(), options);
-                    //Picasso.with(mActivity).load(plays.get(position).playPhoto).fit().into(viewHolder.getImageView());
+                    //ImageLoader.getInstance().displayImage(playPhoto, viewHolder.getImageView(), options);
+                    //Picasso.with(mActivity).load(playPhoto).fit().into(viewHolder.getImageView());
                     Picasso.with(mActivity)
-                            .load(plays.get(position).playPhoto)
+                            .load(playPhoto)
                             .resize(100, 100)
                             .centerCrop()
                             .into(viewHolder.getImageView());
                     // make a thumb
-                    String fixedPath = plays.get(position).playPhoto.substring(6, plays.get(position).playPhoto.length());
-                    String thumbPath2 = fixedPath.substring(0, fixedPath.length() - 4) + "_thumb3.jpg";
+                    String thumbPath2 = playPhoto.substring(0, playPhoto.length() - 4) + "_thumb3.jpg";
                     try {
                         FileInputStream fis;
-                        fis = new FileInputStream(fixedPath);
+                        fis = new FileInputStream(thumbPath2);
                         Bitmap imageBitmap = BitmapFactory.decodeStream(fis);
                         Bitmap b = resizeImageForImageView(imageBitmap, 100);
 
@@ -359,8 +363,8 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
                     }
                     //still use the og picture.  next time there will be a thumb
                 }
-                //Picasso.with(mActivity).load(plays.get(position).playPhoto).fetch();
-                //ImageLoader.getInstance().loadImage(plays.get(position).playPhoto, options, null);
+                //Picasso.with(mActivity).load(playPhoto).fetch();
+                //ImageLoader.getInstance().loadImage(playPhoto, options, null);
             }
 
 

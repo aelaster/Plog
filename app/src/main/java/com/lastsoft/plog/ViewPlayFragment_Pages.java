@@ -163,8 +163,13 @@ public class ViewPlayFragment_Pages extends Fragment {
 
         playImage = (ImageView) viewPlayLayout.findViewById(R.id.imageView1);
         playImage.setTransitionName(imageTransID);
-        if (thisPlay.playPhoto != null && !thisPlay.playPhoto.equals("") && new File(thisPlay.playPhoto.substring(7, thisPlay.playPhoto.length())).exists()){
-            ImageLoader.getInstance().displayImage(thisPlay.playPhoto, playImage, options);
+
+        String playPhoto;
+        playPhoto = Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES) + "/Plog/" + thisPlay.playPhoto;
+
+        if (thisPlay.playPhoto != null && !thisPlay.playPhoto.equals("") && new File(playPhoto).exists()){
+            ImageLoader.getInstance().displayImage("file://" + playPhoto, playImage, options);
             //Picasso.with(mActivity).load(thisPlay.playPhoto).fit().into(playImage);
 
             playImage.setOnClickListener(new View.OnClickListener() {
@@ -173,7 +178,7 @@ public class ViewPlayFragment_Pages extends Fragment {
                     if (progressContainer.getVisibility() != View.VISIBLE) {
                         progressContainer.setVisibility(View.VISIBLE);
                         String[] photoParts = thisPlay.playPhoto.split("/");
-                        File newFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),photoParts[photoParts.length-1]);
+                        File newFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)+"/Plog/",photoParts[photoParts.length-1]);
                         Uri contentUri = FileProvider.getUriForFile(getActivity().getApplicationContext(), "com.lastsoft.plog.fileprovider", newFile);
                         //Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI.buildUpon().appendPath("Pictures/" + photoParts[photoParts.length - 1]).build();
                         //Log.d("V1", uri.toString());

@@ -38,7 +38,6 @@ import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -615,7 +614,7 @@ public class GamesFragment extends Fragment{
     }
 
     protected void refreshDataset(boolean reInit){
-        Log.d("V1", "refreshing dataset");
+        //Log.d("V1", "refreshing dataset");
         if (reInit) {
             initDataset();
         }
@@ -700,7 +699,7 @@ public class GamesFragment extends Fragment{
     private File createImageFile() throws IOException {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "PLAY_" + timeStamp + "_";
+        String imageFileName = "Plog/PLAY_" + timeStamp + "_";
         File storageDir = Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(

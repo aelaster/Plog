@@ -25,6 +25,7 @@ import android.view.MenuItem;
 public class SettingsActivity extends AppCompatActivity {
 
     private Preference mImportPreference, mExportPreference;
+    private boolean importedFlag = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -36,6 +37,20 @@ public class SettingsActivity extends AppCompatActivity {
             actionBar.setTitle(getString(R.string.title_settings));
         }
         getSupportFragmentManager().beginTransaction().replace(android.R.id.content, new SettingsFragment()).commit();
+    }
+
+    public void setImportedFlag(boolean imported){
+        importedFlag = imported;
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (importedFlag){
+            setResult(1);
+        }else{
+            setResult(0);
+        }
+        super.onBackPressed();
     }
 
     @Override

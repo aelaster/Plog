@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -277,28 +278,17 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
                 } else if (id == R.id.share_play) {
                     ShareActionProvider mShareActionProvider = new ShareActionProvider(ViewPlayActivity.this);
                     MenuItemCompat.setActionProvider(item, mShareActionProvider);
-                    Uri imageUri = Uri.parse(mPagerAdapter.getCurrentDetailsFragment().thisPlay.playPhoto);
+
+                    String playPhoto;
+                    playPhoto = Environment.getExternalStoragePublicDirectory(
+                            Environment.DIRECTORY_PICTURES) + "/Plog/" + mPagerAdapter.getCurrentDetailsFragment().thisPlay.playPhoto;
+
+                    Uri imageUri = Uri.parse("file://" + playPhoto);
                     Intent shareIntent = new Intent();
                     shareIntent.setAction(Intent.ACTION_SEND);
                     shareIntent.putExtra(Intent.EXTRA_STREAM, imageUri);
                     shareIntent.setType("image/*");
                     mShareActionProvider.setShareIntent(shareIntent);
-                    /*if (ShareDialog.canShow(ShareLinkContent.class)) {
-                        if (mPagerAdapter.getCurrentDetailsFragment().playImage != null) {
-                            try {
-                                Bitmap bitmap = ((BitmapDrawable) mPagerAdapter.getCurrentDetailsFragment().playImage.getDrawable()).getBitmap();
-                                SharePhoto photo = new SharePhoto.Builder()
-                                        .setBitmap(bitmap)
-                                        .setCaption(Play.findById(Play.class, menuPlayId).playNotes)
-                                        .build();
-                                SharePhotoContent content = new SharePhotoContent.Builder()
-                                        .addPhoto(photo)
-                                        .build();
-                                shareDialog.show(content);
-                            } catch (Exception ignored) {
-                            }
-                        }
-                    }*/
                 }
                 return false;
             }
@@ -513,13 +503,15 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
 
                             //delete play image
                             if(deleteMe.playPhoto != null && !deleteMe.playPhoto.equals("")) {
-                                File deleteImage = new File(deleteMe.playPhoto.substring(7, deleteMe.playPhoto.length()));
+                                String deletePhoto =  Environment.getExternalStoragePublicDirectory(
+                                        Environment.DIRECTORY_PICTURES) + "/Plog/" + deleteMe.playPhoto;
+                                File deleteImage = new File(deletePhoto);
                                 if (deleteImage.exists()) {
                                     deleteImage.delete();
                                 }
 
                                 //delete play image thumb
-                                File deleteImage_thumb = new File(deleteMe.playPhoto.substring(7, deleteMe.playPhoto.length() - 4) + "_thumb3.jpg");
+                                File deleteImage_thumb = new File(deletePhoto.substring(0, deletePhoto.length() - 4) + "_thumb3.jpg");
                                 if (deleteImage_thumb.exists()) {
                                     deleteImage_thumb.delete();
                                 }

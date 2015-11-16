@@ -277,12 +277,25 @@ public class MainActivity extends AppCompatActivity
                 importDB();
             } else if (positionName.equals(getString(R.string.title_settings))) {
                 Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
-                startActivity(intent);
+                startActivityForResult(intent, 1);
             } else {
                 super.onBackPressed();
             }
         }catch (Exception e){
             e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1 && resultCode == 1) {
+            //refresh games
+            GamesFragment collectionFrag = (GamesFragment)
+                    getSupportFragmentManager().findFragmentByTag("games");
+            if (collectionFrag != null) {
+                collectionFrag.refreshDataset(true);
+            }
         }
     }
 
@@ -594,7 +607,7 @@ public class MainActivity extends AppCompatActivity
             GamesFragment collectionFrag = (GamesFragment)
                     getSupportFragmentManager().findFragmentByTag("games");
             if (collectionFrag != null) {
-                collectionFrag.refreshDataset(true);
+                collectionFrag.refreshDataset(false);
             }
         }else if (id.contains("update_games")){
             GamesFragment collectionFrag = (GamesFragment)
@@ -1053,13 +1066,15 @@ public class MainActivity extends AppCompatActivity
 
                             //delete play image
                             if(deleteMe.playPhoto != null && !deleteMe.playPhoto.equals("")) {
-                                File deleteImage = new File(deleteMe.playPhoto.substring(7, deleteMe.playPhoto.length()));
+                                String deletePhoto =  Environment.getExternalStoragePublicDirectory(
+                                        Environment.DIRECTORY_PICTURES) + "/Plog/" + deleteMe.playPhoto;
+                                File deleteImage = new File(deletePhoto);
                                 if (deleteImage.exists()) {
                                     deleteImage.delete();
                                 }
 
                                 //delete play image thumb
-                                File deleteImage_thumb = new File(deleteMe.playPhoto.substring(7, deleteMe.playPhoto.length() - 4) + "_thumb3.jpg");
+                                File deleteImage_thumb = new File(deletePhoto.substring(0, deletePhoto.length() - 4) + "_thumb3.jpg");
                                 if (deleteImage_thumb.exists()) {
                                     deleteImage_thumb.delete();
                                 }

@@ -36,6 +36,7 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.kbeanie.imagechooser.api.BChooserPreferences;
 import com.kbeanie.imagechooser.api.ChooserType;
 import com.kbeanie.imagechooser.api.ChosenImage;
 import com.kbeanie.imagechooser.api.ImageChooserListener;
@@ -48,7 +49,6 @@ import com.lastsoft.plog.db.Player;
 import com.lastsoft.plog.db.PlayersPerPlay;
 import com.lastsoft.plog.db.PlaysPerGameGroup;
 import com.lastsoft.plog.util.DeletePlayTask;
-import com.lastsoft.plog.util.FileUtils;
 import com.lastsoft.plog.util.LoadExpansionsTask;
 import com.lastsoft.plog.util.PostPlayTask;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -80,6 +80,7 @@ import java.util.List;
 public class AddPlayFragment extends Fragment implements
         ImageChooserListener {
     String mCurrentPhotoPath = "";
+    String mCurrentPhotoName = "";
     private OnFragmentInteractionListener mListener;
     int cx, cy;
     File f;
@@ -221,7 +222,19 @@ public class AddPlayFragment extends Fragment implements
         playPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                File deleteImage = new File(mCurrentPhotoPath);
+                if (deleteImage.exists()) {
+                    deleteImage.delete();
+                }
+
+                //delete play image thumb
+                File deleteImage_thumb = new File(mCurrentPhotoPath.substring(0, mCurrentPhotoPath.length() - 4) + "_thumb3.jpg");
+                if (deleteImage_thumb.exists()) {
+                    deleteImage_thumb.delete();
+                }
+
                 mCurrentPhotoPath = "";
+                mCurrentPhotoName = "";
                 playPhoto.setImageDrawable(null);
             }
         });
@@ -322,8 +335,13 @@ public class AddPlayFragment extends Fragment implements
                         .cacheInMemory(false)
                         .considerExifParams(true)
                         .build();
-                ImageLoader.getInstance().displayImage(editPlay.playPhoto, playPhoto, options);
-                mCurrentPhotoPath = editPlay.playPhoto;
+
+                mCurrentPhotoName = editPlay.playPhoto;
+                mCurrentPhotoPath = Environment.getExternalStoragePublicDirectory(
+                        Environment.DIRECTORY_PICTURES) + "/Plog/" + mCurrentPhotoName;
+
+                ImageLoader.getInstance().displayImage("file://" + mCurrentPhotoPath, playPhoto, options);
+
             }
 
             //players
@@ -362,12 +380,16 @@ public class AddPlayFragment extends Fragment implements
                     InputMethodManager.HIDE_NOT_ALWAYS);
         }catch (Exception ignored){}
 
-        int chooserType = ChooserType.REQUEST_PICK_PICTURE;
+        BChooserPreferences prefs = new BChooserPreferences(mActivity);
+        prefs.setFolderName("Pictures/Plog");
+
         imageChooserManager = new ImageChooserManager(this,
-                ChooserType.REQUEST_PICK_PICTURE, "myfolder", true);
+                ChooserType.REQUEST_PICK_PICTURE, false);
         imageChooserManager.setImageChooserListener(this);
+
+
         try {
-            String filePath = imageChooserManager.choose();
+            imageChooserManager.choose();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -459,7 +481,8 @@ public class AddPlayFragment extends Fragment implements
     private File createImageFile() throws IOException {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "PLAY_" + timeStamp + "_";
+        String fileName = "PLAY_" + timeStamp + "_";
+        String imageFileName = "Plog/" + fileName;
         File storageDir = Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(
@@ -469,7 +492,9 @@ public class AddPlayFragment extends Fragment implements
         );
 
         // Save a file: path for use with ACTION_VIEW intents
-        mCurrentPhotoPath = "file://" + image.getAbsolutePath();
+        mCurrentPhotoName = image.getName();
+        mCurrentPhotoPath = Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES) + "/Plog/" + mCurrentPhotoName;
         return image;
     }
 
@@ -481,30 +506,33 @@ public class AddPlayFragment extends Fragment implements
                 .considerExifParams(true)
                 .build();
         if (requestCode == 0 && resultCode == -1) {
-            ImageLoader.getInstance().displayImage(mCurrentPhotoPath, playPhoto, options);
-
-            try {
-                String fixedPath = mCurrentPhotoPath.substring(6, mCurrentPhotoPath.length());
-                String thumbPath = fixedPath.substring(0, fixedPath.length() - 4) + "_thumb3.jpg";
-                FileInputStream fis;
-                fis = new FileInputStream(fixedPath);
-                Bitmap imageBitmap = BitmapFactory.decodeStream(fis);
-                Bitmap b = resizeImageForImageView(imageBitmap, 100);
-                if (b != null) {
-                    try {
-                        b.compress(Bitmap.CompressFormat.JPEG, 50, new FileOutputStream(new File(thumbPath)));
-                    } catch (Exception ignored) {
-                    }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            //Log.d("V1", "mCurrentPhotoPath=" + mCurrentPhotoPath);
+            makeAThumb();
+            ImageLoader.getInstance().displayImage("file://" + mCurrentPhotoPath, playPhoto, options);
 
         }else if (resultCode == -1 && (requestCode == ChooserType.REQUEST_PICK_PICTURE || requestCode == ChooserType.REQUEST_CAPTURE_PICTURE)) {
             imageChooserManager.submit(requestCode, data);
         }
     }
 
+
+    private void makeAThumb(){
+        try {
+            String thumbPath = mCurrentPhotoPath.substring(0, mCurrentPhotoPath.length() - 4) + "_thumb3.jpg";
+            FileInputStream fis;
+            fis = new FileInputStream(mCurrentPhotoPath);
+            Bitmap imageBitmap = BitmapFactory.decodeStream(fis);
+            Bitmap b = resizeImageForImageView(imageBitmap, 100);
+            if (b != null) {
+                try {
+                    b.compress(Bitmap.CompressFormat.JPEG, 50, new FileOutputStream(new File(thumbPath)));
+                } catch (Exception ignored) {
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     public Bitmap resizeImageForImageView(Bitmap bitmap, int size) {
         Bitmap resizedBitmap;
@@ -576,11 +604,11 @@ public class AddPlayFragment extends Fragment implements
                             Play savePlay = Play.findById(Play.class, playID);
                             savePlay.playDate = date1;
                             savePlay.playNotes = notesText.getText().toString();
-                            savePlay.playPhoto = mCurrentPhotoPath;
+                            savePlay.playPhoto = mCurrentPhotoName;
                             savePlay.save();
                             thePlay = savePlay;
                         }else{
-                            Play newPlay = new Play(date1, notesText.getText().toString(), mCurrentPhotoPath);
+                            Play newPlay = new Play(date1, notesText.getText().toString(), mCurrentPhotoName);
                             newPlay.save();
                             thePlay = newPlay;
                         }
@@ -768,10 +796,10 @@ public class AddPlayFragment extends Fragment implements
         if (!savedThis && playID < 0){
             //Log.d("V1", "we're gonna try and delete these pictures");
             if (mCurrentPhotoPath.length() > 0) {
-                String fixedPath = mCurrentPhotoPath.substring(6, mCurrentPhotoPath.length());
-                String thumbPath = fixedPath.substring(0, fixedPath.length() - 4) + "_thumb3.jpg";
+                //String fixedPath = mCurrentPhotoPath.substring(6, mCurrentPhotoPath.length());
+                String thumbPath = mCurrentPhotoPath.substring(0, mCurrentPhotoPath.length() - 4) + "_thumb3.jpg";
 
-                File deleteImage = new File(fixedPath);
+                File deleteImage = new File(mCurrentPhotoPath);
                 if (deleteImage.exists()) {
                     deleteImage.delete();
                 }
@@ -852,13 +880,12 @@ public class AddPlayFragment extends Fragment implements
 
                     try {
                         String[] splitMe = chosenImage.getFilePathOriginal().split("/");
-                        File src = new File(chosenImage.getFilePathOriginal());
-                        File dest = new File(Environment.getExternalStoragePublicDirectory(
-                                Environment.DIRECTORY_PICTURES) + "/" + splitMe[splitMe.length-1]);
-                        FileUtils.copy(src, dest);
-                        mCurrentPhotoPath = "file://" + dest.getAbsolutePath();
-                        ImageLoader.getInstance().displayImage(mCurrentPhotoPath, playPhoto, options);
-                    } catch (IOException e) {
+                        mCurrentPhotoName = splitMe[splitMe.length-1];
+                        mCurrentPhotoPath = Environment.getExternalStoragePublicDirectory(
+                                Environment.DIRECTORY_PICTURES) + "/Plog/" + mCurrentPhotoName;
+                        makeAThumb();
+                        ImageLoader.getInstance().displayImage("file://" + mCurrentPhotoPath, playPhoto, options);
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
 
@@ -1036,57 +1063,59 @@ public class AddPlayFragment extends Fragment implements
 
         @Override
         protected void onPostExecute(final List<Game> result) {
-            expansions = result;
-            if (expansions != null) {
-                checkedItems = new boolean[expansions.size()];
-                if (expansions.size() > 0) {
-                    mContainerView_Expansions.setVisibility(View.VISIBLE);
-                    ViewGroup expLayout = (ViewGroup) rootView.findViewById(R.id.expansionsLayout);
-                    expLayout.setVisibility(View.VISIBLE);
-                    expansionButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            CheckBoxAlertDialogFragment newFragment = new CheckBoxAlertDialogFragment().newInstance(checkedItems, gameName);
-                            if (mActivity instanceof MainActivity) {
-                                newFragment.show(((MainActivity) mActivity).getSupportFragmentManager(), "datePicker");
-                            } else {
-                                newFragment.show(((ViewPlayActivity) mActivity).getSupportFragmentManager(), "datePicker");
+            try {
+                expansions = result;
+                if (expansions != null) {
+                    checkedItems = new boolean[expansions.size()];
+                    if (expansions.size() > 0) {
+                        mContainerView_Expansions.setVisibility(View.VISIBLE);
+                        ViewGroup expLayout = (ViewGroup) rootView.findViewById(R.id.expansionsLayout);
+                        expLayout.setVisibility(View.VISIBLE);
+                        expansionButton.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                CheckBoxAlertDialogFragment newFragment = new CheckBoxAlertDialogFragment().newInstance(checkedItems, gameName);
+                                if (mActivity instanceof MainActivity) {
+                                    newFragment.show(((MainActivity) mActivity).getSupportFragmentManager(), "datePicker");
+                                } else {
+                                    newFragment.show(((ViewPlayActivity) mActivity).getSupportFragmentManager(), "datePicker");
+                                }
                             }
-                        }
-                    });
-                    if (playID >= 0 || copyPlayID >= 0) {
-                        long useMe;
-                        if (playID >= 0){
-                            useMe = playID;
-                        }else{
-                            useMe = copyPlayID;
-                        }
-                        //we're editing a play
-
-                        Play editPlay = Play.findById(Play.class, useMe);
-                        //set up the values, based on DB
-
-                        //expansions
-                        //for each expansion the game has
-                        int x = 0;
-                        for (Game expansion0 : expansions) {
-                            //if the added expansions contains it
-                            if (GamesPerPlay.doesExpansionExist(editPlay, expansion0)) {
-                                //add to added expansions
-                                addedExpansions.add(expansion0);
-                                //add the game to the list
-                                addGame(expansion0);
-                                //check it
-                                checkedItems[x] = true;
+                        });
+                        if (playID >= 0 || copyPlayID >= 0) {
+                            long useMe;
+                            if (playID >= 0) {
+                                useMe = playID;
                             } else {
-                                //don't check it
-                                checkedItems[x] = false;
+                                useMe = copyPlayID;
                             }
-                            x++;
+                            //we're editing a play
+
+                            Play editPlay = Play.findById(Play.class, useMe);
+                            //set up the values, based on DB
+
+                            //expansions
+                            //for each expansion the game has
+                            int x = 0;
+                            for (Game expansion0 : expansions) {
+                                //if the added expansions contains it
+                                if (GamesPerPlay.doesExpansionExist(editPlay, expansion0)) {
+                                    //add to added expansions
+                                    addedExpansions.add(expansion0);
+                                    //add the game to the list
+                                    addGame(expansion0);
+                                    //check it
+                                    checkedItems[x] = true;
+                                } else {
+                                    //don't check it
+                                    checkedItems[x] = false;
+                                }
+                                x++;
+                            }
                         }
                     }
                 }
-            }
+            }catch (Exception ignored){}
         }
     }
 
