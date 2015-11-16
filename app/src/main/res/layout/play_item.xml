@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+android:id="@+id/cv"
+android:layout_width="match_parent"
+android:layout_height="350dp"
+android:layout_margin="8dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:layout_alignParentTop="true"
+            android:id="@+id/gameName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="3"
+            android:padding="8dp"
+            android:textColor="#222"
+            android:textStyle="bold"
+            android:textSize="22dp" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:orientation="horizontal"
+            android:id="@+id/clickLayout"
+            android:layout_below="@+id/gameName"
+            android:background="@drawable/ripple"
+            >
+        <ImageView
+            android:id="@+id/imageView1"
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:scaleType="centerCrop"
+            />
+        </LinearLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/clickLayout"
+            android:id="@+id/playDate"
+            android:paddingTop="4dp"
+            android:paddingLeft="8dp"
+            android:paddingBottom="4dp"
+            android:textColor="#666"
+            android:textSize="14dp" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/playDate"
+            android:id="@+id/playWinner"
+            android:textColor="#666"
+            android:paddingLeft="8dp"
+            android:textSize="14dp" />
+        <LinearLayout
+            android:id="@+id/overflowLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:padding="8dp"
+            android:orientation="horizontal"
+            android:layout_gravity="center"
+            android:layout_below="@+id/clickLayout"
+            android:layout_alignRight="@+id/clickLayout"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="10dp">
+            <ImageView
+                android:id="@+id/overflowMenu"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_action_overflow"
+                android:layout_gravity="center_vertical"
+                />
+        </LinearLayout>
+    </RelativeLayout>
+
+</android.support.v7.widget.CardView>

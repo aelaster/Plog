@@ -228,7 +228,7 @@ public class AddPlayFragment extends Fragment implements
                 }
 
                 //delete play image thumb
-                File deleteImage_thumb = new File(mCurrentPhotoPath.substring(0, mCurrentPhotoPath.length() - 4) + "_thumb3.jpg");
+                File deleteImage_thumb = new File(mCurrentPhotoPath.substring(0, mCurrentPhotoPath.length() - 4) + "_thumb6.jpg");
                 if (deleteImage_thumb.exists()) {
                     deleteImage_thumb.delete();
                 }
@@ -518,14 +518,14 @@ public class AddPlayFragment extends Fragment implements
 
     private void makeAThumb(){
         try {
-            String thumbPath = mCurrentPhotoPath.substring(0, mCurrentPhotoPath.length() - 4) + "_thumb3.jpg";
+            String thumbPath = mCurrentPhotoPath.substring(0, mCurrentPhotoPath.length() - 4) + "_thumb6.jpg";
             FileInputStream fis;
             fis = new FileInputStream(mCurrentPhotoPath);
             Bitmap imageBitmap = BitmapFactory.decodeStream(fis);
-            Bitmap b = resizeImageForImageView(imageBitmap, 100);
+            Bitmap b = resizeImageForImageView(imageBitmap, 500);
             if (b != null) {
                 try {
-                    b.compress(Bitmap.CompressFormat.JPEG, 50, new FileOutputStream(new File(thumbPath)));
+                    b.compress(Bitmap.CompressFormat.JPEG, 100, new FileOutputStream(new File(thumbPath)));
                 } catch (Exception ignored) {
                 }
             }
@@ -797,7 +797,7 @@ public class AddPlayFragment extends Fragment implements
             //Log.d("V1", "we're gonna try and delete these pictures");
             if (mCurrentPhotoPath.length() > 0) {
                 //String fixedPath = mCurrentPhotoPath.substring(6, mCurrentPhotoPath.length());
-                String thumbPath = mCurrentPhotoPath.substring(0, mCurrentPhotoPath.length() - 4) + "_thumb3.jpg";
+                String thumbPath = mCurrentPhotoPath.substring(0, mCurrentPhotoPath.length() - 4) + "_thumb6.jpg";
 
                 File deleteImage = new File(mCurrentPhotoPath);
                 if (deleteImage.exists()) {

@@ -257,7 +257,7 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         // Create a new view.
         View v = LayoutInflater.from(viewGroup.getContext())
-                .inflate(R.layout.play_row_item, viewGroup, false);
+                .inflate(R.layout.play_item, viewGroup, false);
 
         return new ViewHolder(v);
     }
@@ -328,29 +328,25 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
                     viewHolder.getImageView().setImageDrawable(null);
                 }
             }else{
-                String thumbPath =  playPhoto.substring(0, playPhoto.length() - 4) + "_thumb3.jpg";
+                String thumbPath =  playPhoto.substring(0, playPhoto.length() - 4) + "_thumb6.jpg";
                 if (new File(thumbPath).exists()) {
                     //ImageLoader.getInstance().displayImage(thumbPath, viewHolder.getImageView(), options);
                     Picasso.with(mActivity).load("file://" + thumbPath).into(viewHolder.getImageView());
                 }else{
                     //ImageLoader.getInstance().displayImage(playPhoto, viewHolder.getImageView(), options);
                     //Picasso.with(mActivity).load(playPhoto).fit().into(viewHolder.getImageView());
-                    Picasso.with(mActivity)
-                            .load(playPhoto)
-                            .resize(100, 100)
-                            .centerCrop()
-                            .into(viewHolder.getImageView());
+
                     // make a thumb
-                    String thumbPath2 = playPhoto.substring(0, playPhoto.length() - 4) + "_thumb3.jpg";
+                    String thumbPath2 = playPhoto.substring(0, playPhoto.length() - 4) + "_thumb6.jpg";
                     try {
                         FileInputStream fis;
-                        fis = new FileInputStream(thumbPath2);
+                        fis = new FileInputStream(playPhoto);
                         Bitmap imageBitmap = BitmapFactory.decodeStream(fis);
-                        Bitmap b = resizeImageForImageView(imageBitmap, 100);
+                        Bitmap b = resizeImageForImageView(imageBitmap, 500);
 
                         if (b != null) {
                             try {
-                                b.compress(Bitmap.CompressFormat.JPEG,50, new FileOutputStream(new File(thumbPath2)));
+                                b.compress(Bitmap.CompressFormat.JPEG,100, new FileOutputStream(new File(thumbPath2)));
                             } catch (Exception ignored) {
                             }
                             b = null;
@@ -358,6 +354,11 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
                         if (imageBitmap != null){
                             imageBitmap = null;
                         }
+                        Picasso.with(mActivity)
+                                .load("file://" + thumbPath2)
+                                .resize(500, 500)
+                                .centerCrop()
+                                .into(viewHolder.getImageView());
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -369,11 +370,17 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
 
 
             viewHolder.getPlayWinnerView().setTypeface(null, Typeface.ITALIC);
-            if (plays.get(position).winners != null) {
+            /*if (plays.get(position).winners != null) {
                 viewHolder.getPlayWinnerView().setText(mActivity.getString(R.string.winners) + plays.get(position).winners);
-            }else{
-                viewHolder.getPlayWinnerView().setText(mActivity.getString(R.string.winners) + mActivity.getString(R.string.none));
-            }
+            }else{*/
+                //Log.d("V1", "winners = " + Play.getWinners(plays.get(position)));
+                String winners = Play.getWinners(plays.get(position));
+                if (winners == null) {
+                    viewHolder.getPlayWinnerView().setText(mActivity.getString(R.string.winners) + mActivity.getString(R.string.none));
+                }else{
+                    viewHolder.getPlayWinnerView().setText(mActivity.getString(R.string.winners) + winners);
+                }
+            //}
 
     }
     // END_INCLUDE(recyclerViewOnBindViewHolder)

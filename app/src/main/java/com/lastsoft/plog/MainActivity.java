@@ -1074,7 +1074,7 @@ public class MainActivity extends AppCompatActivity
                                 }
 
                                 //delete play image thumb
-                                File deleteImage_thumb = new File(deletePhoto.substring(0, deletePhoto.length() - 4) + "_thumb3.jpg");
+                                File deleteImage_thumb = new File(deletePhoto.substring(0, deletePhoto.length() - 4) + "_thumb6.jpg");
                                 if (deleteImage_thumb.exists()) {
                                     deleteImage_thumb.delete();
                                 }
