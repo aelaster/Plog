@@ -16,6 +16,7 @@
 -->
 
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/coordinatorLayout"
     android:layout_height="match_parent"
     android:layout_width="match_parent">
@@ -44,4 +45,18 @@
         />
     <!--</android.support.v4.widget.SwipeRefreshLayout>-->
     </RelativeLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/add_play"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_add"
+        android:layout_gravity="bottom|end"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="@dimen/fab_margin"
+        android:layout_marginEnd="@dimen/fab_margin"
+        app:elevation="4dp"
+        app:borderWidth="0dp"/>
+
 </android.support.design.widget.CoordinatorLayout>

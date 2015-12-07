@@ -20,8 +20,6 @@
 
     <style name="Theme.Base" parent="android:Theme.Light" />
 
-    <style name="Theme.Sample" parent="Theme.Base" />
-
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
         <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
@@ -31,10 +29,12 @@
         <item name="actionBarStyle">@style/MyActionBar</item>
         <item name="actionModeShareDrawable">@drawable/ic_action_share</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
+        <item name="android:windowSharedElementsUseOverlay">false</item>
     </style>
 
 
     <style name="AppTheme.NoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowBackground">@android:color/black</item>
         <item name="android:windowContentTransitions">true</item>
         <item name="android:windowSharedElementEnterTransition">@android:transition/move</item>
         <item name="android:windowSharedElementExitTransition">@android:transition/move</item>
@@ -49,6 +49,7 @@
         <item name="android:itemBackground">@color/white</item>
         <item name="actionModeShareDrawable">@drawable/ic_action_share</item>
         <item name="android:actionModeShareDrawable">@drawable/ic_action_share</item>
+
     </style>
 
     <style name="TextAppearance">
@@ -150,10 +151,19 @@
         <item name="android:textSize">14sp</item>
     </style>
 
-    <style name="Theme.Transparent" parent="Theme.AppCompat.NoActionBar">
+    <style name="Theme.Transparent" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowBackground">@android:color/black</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:windowSharedElementEnterTransition">@android:transition/move</item>
+        <item name="android:windowSharedElementExitTransition">@android:transition/move</item>
+        <item name="android:colorPrimaryDark">@color/darker_logo_blue</item>
+        <item name="colorPrimaryDark">@color/darker_logo_blue</item>
+        <item name="actionModeShareDrawable">@drawable/ic_action_share</item>
+        <item name="android:actionModeShareDrawable">@drawable/ic_action_share</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:itemTextAppearance">@style/TextAppearance</item>
+        <item name="android:itemBackground">@color/white</item>
     </style>
 </resources>

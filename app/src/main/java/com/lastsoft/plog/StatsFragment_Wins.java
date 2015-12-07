@@ -202,11 +202,11 @@ public class StatsFragment_Wins extends Fragment {
         @Override
         protected void onPreExecute() {
 
-            mydialog.setMessage(getString(R.string.calculating));
+            /*mydialog.setMessage(getString(R.string.calculating));
             mydialog.setCancelable(false);
             try{
                 mydialog.show();
-            }catch (Exception ignored){}
+            }catch (Exception ignored){}*/
         }
 
         // automatically done on worker thread (separate from UI thread)
@@ -343,7 +343,7 @@ public class StatsFragment_Wins extends Fragment {
                     }
                 }
             }
-            mydialog.dismiss();
+            //mydialog.dismiss();
         }
     }
 

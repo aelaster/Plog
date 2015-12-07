@@ -81,6 +81,7 @@ public class MainActivity extends AppCompatActivity
     static final String CURRENT_FRAGMENT_CODE = "current_fragment_code";
 
     private Boolean fragUp = false;
+    public Boolean usedFAB = false;
     private AddPlayerFragment mAddPlayerFragment;
     private AddGameFragment mAddGameFragment;
     private AddPlayFragment mAddPlayFragment;
@@ -248,6 +249,7 @@ public class MainActivity extends AppCompatActivity
         // update the main content by replacing fragments
         //Log.d("V1", ""+position);
         forceBack = false;
+        usedFAB = false;
         try {
             FragmentManager fragmentManager = getSupportFragmentManager();
             if (fragmentManager.getBackStackEntryCount() > 0) {
@@ -692,8 +694,18 @@ public class MainActivity extends AppCompatActivity
         intent.putExtra("playListType", playListType);
         intent.putExtra("sortType", sortType);
 
+        View decor = getWindow().getDecorView();
+        View statusBar = decor.findViewById(android.R.id.statusBarBackground);
+        View navBar = decor.findViewById(android.R.id.navigationBarBackground);
+        View actionBar = decor.findViewById(R.id.action_bar_container);
+        actionBar.setTransitionName("actionBar");
+
         ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(this,
-                Pair.create(view, view.getTransitionName()));
+                Pair.create(view, view.getTransitionName())
+                ,Pair.create(statusBar, statusBar.getTransitionName())
+                ,Pair.create(navBar, navBar.getTransitionName())
+                //,Pair.create(actionBar, actionBar.getTransitionName())
+        );
         startActivity(intent, options.toBundle());
     }
 
@@ -1170,11 +1182,21 @@ public class MainActivity extends AppCompatActivity
                                 playersFrag.fabMenu.collapse();
                             } else {
                                 //mNavigationDrawerFragment.openDrawer();
-                                super.onBackPressed();
+                                if (usedFAB){
+                                    usedFAB = false;
+                                    openPlays("", true, 0, getString(R.string.title_plays), CurrentYear);
+                                }else {
+                                    super.onBackPressed();
+                                }
                             }
                         } else {
                             //mNavigationDrawerFragment.openDrawer();
-                            super.onBackPressed();
+                            if (usedFAB){
+                                usedFAB = false;
+                                openPlays("", true, 0, getString(R.string.title_plays), CurrentYear);
+                            }else {
+                                super.onBackPressed();
+                            }
                         }
                     }
 

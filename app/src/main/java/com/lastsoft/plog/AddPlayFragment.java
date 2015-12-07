@@ -222,20 +222,22 @@ public class AddPlayFragment extends Fragment implements
         playPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                File deleteImage = new File(mCurrentPhotoPath);
-                if (deleteImage.exists()) {
-                    deleteImage.delete();
-                }
+                if (!mCurrentPhotoPath.equals("")) {
+                    File deleteImage = new File(mCurrentPhotoPath);
+                    if (deleteImage.exists()) {
+                        deleteImage.delete();
+                    }
 
-                //delete play image thumb
-                File deleteImage_thumb = new File(mCurrentPhotoPath.substring(0, mCurrentPhotoPath.length() - 4) + "_thumb6.jpg");
-                if (deleteImage_thumb.exists()) {
-                    deleteImage_thumb.delete();
-                }
+                    //delete play image thumb
+                    File deleteImage_thumb = new File(mCurrentPhotoPath.substring(0, mCurrentPhotoPath.length() - 4) + "_thumb6.jpg");
+                    if (deleteImage_thumb.exists()) {
+                        deleteImage_thumb.delete();
+                    }
 
-                mCurrentPhotoPath = "";
-                mCurrentPhotoName = "";
-                playPhoto.setImageDrawable(null);
+                    mCurrentPhotoPath = "";
+                    mCurrentPhotoName = "";
+                    playPhoto.setImageDrawable(null);
+                }
             }
         });
         View photoButton = rootView.findViewById(R.id.takePhoto);

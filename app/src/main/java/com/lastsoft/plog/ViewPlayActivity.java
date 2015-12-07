@@ -256,7 +256,10 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
                 .diskCacheSize(104857600)
                 .threadPoolSize(10)
                 .build();
-        ImageLoader.getInstance().init(config);
+        if (!ImageLoader.getInstance().isInited()) {
+            ImageLoader.getInstance().init(config);
+        }
+
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setVisibility(View.VISIBLE);

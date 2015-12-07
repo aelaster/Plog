@@ -71,11 +71,6 @@ public class ViewPlayFragment_Pages extends Fragment {
             nameTransID = getArguments().getString("nameTransID");
             dateTransID = getArguments().getString("dateTransID");
         }
-        options = new DisplayImageOptions.Builder()
-                .cacheOnDisk(true)
-                .cacheInMemory(false)
-                .considerExifParams(true)
-                .build();
         setHasOptionsMenu(true);
     }
 
@@ -97,12 +92,6 @@ public class ViewPlayFragment_Pages extends Fragment {
         progressContainer = (LinearLayout) viewPlayLayout.findViewById(R.id.progressContainer);
         LinearLayout linLayout = (LinearLayout) viewPlayLayout.findViewById(R.id.linearLayout);
         //Log.d("V1", "playID = " + playID);
-
-        options = new DisplayImageOptions.Builder()
-                .cacheOnDisk(true)
-                .cacheInMemory(false)
-                .considerExifParams(true)
-                .build();
 
         drawLayout();
 
@@ -151,7 +140,6 @@ public class ViewPlayFragment_Pages extends Fragment {
     public void drawLayout(){
         thisPlay = Play.findById(Play.class, playID);
         //Log.d("V1", "imageTransID = " + imageTransID);
-
         options = new DisplayImageOptions.Builder()
                 .cacheOnDisk(false)
                 .cacheInMemory(false)
@@ -264,11 +252,6 @@ public class ViewPlayFragment_Pages extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        options = new DisplayImageOptions.Builder()
-                .cacheOnDisk(true)
-                .cacheInMemory(false)
-                .considerExifParams(true)
-                .build();
         progressContainer.setVisibility(View.GONE);
     }
 

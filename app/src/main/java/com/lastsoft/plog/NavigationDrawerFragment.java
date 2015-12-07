@@ -91,33 +91,9 @@ public class NavigationDrawerFragment extends Fragment {
                              Bundle savedInstanceState) {
         //detect presence of db
         String[] headings;
-        /*String backupDBPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/SRX_export.db";
-        File backupDB = new File(backupDBPath);
-        //Todo:  put export and import into a settings page
-        if (backupDB.exists()){
-            headings = new String[]{
-                    getString(R.string.title_games),
-                    getString(R.string.title_plays),
-                    getString(R.string.title_players),
-                    getString(R.string.title_bucket_list),
-                    getString(R.string.title_statistics),
-                    getString(R.string.title_import_db),
-                    getString(R.string.title_export_db),
-                    getString(R.string.title_exit)};
-        }else{
-            headings = new String[]{
-                    getString(R.string.title_games),
-                    getString(R.string.title_plays),
-                    getString(R.string.title_players),
-                    getString(R.string.title_bucket_list),
-                    getString(R.string.title_statistics),
-                    getString(R.string.title_export_db),
-                    getString(R.string.title_exit)};
-        }*/
-
         headings = new String[]{
-                getString(R.string.title_games),
                 getString(R.string.title_plays),
+                getString(R.string.title_games),
                 getString(R.string.title_players),
                 getString(R.string.title_bucket_list),
                 getString(R.string.title_statistics),

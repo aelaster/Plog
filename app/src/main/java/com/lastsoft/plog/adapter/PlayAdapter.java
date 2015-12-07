@@ -37,7 +37,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.lastsoft.plog.MainActivity;
-import com.lastsoft.plog.PlaysFragment;
 import com.lastsoft.plog.R;
 import com.lastsoft.plog.db.Game;
 import com.lastsoft.plog.db.GameGroup;
@@ -45,6 +44,7 @@ import com.lastsoft.plog.db.GamesPerPlay;
 import com.lastsoft.plog.db.Play;
 import com.lastsoft.plog.db.Player;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.squareup.picasso.Picasso;
 
@@ -330,10 +330,11 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
             }else{
                 String thumbPath =  playPhoto.substring(0, playPhoto.length() - 4) + "_thumb6.jpg";
                 if (new File(thumbPath).exists()) {
-                    //ImageLoader.getInstance().displayImage(thumbPath, viewHolder.getImageView(), options);
-                    Picasso.with(mActivity).load("file://" + thumbPath).into(viewHolder.getImageView());
+                    ImageLoader.getInstance().displayImage("file://" + thumbPath, viewHolder.getImageView(), options);
+                    ImageLoader.getInstance().loadImage("file://" + playPhoto, options, null);
+                    //Picasso.with(mActivity).load("file://" + thumbPath).into(viewHolder.getImageView());
                 }else{
-                    //ImageLoader.getInstance().displayImage(playPhoto, viewHolder.getImageView(), options);
+                    ImageLoader.getInstance().displayImage("file://" + playPhoto, viewHolder.getImageView(), options);
                     //Picasso.with(mActivity).load(playPhoto).fit().into(viewHolder.getImageView());
 
                     // make a thumb
@@ -373,7 +374,6 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
             /*if (plays.get(position).winners != null) {
                 viewHolder.getPlayWinnerView().setText(mActivity.getString(R.string.winners) + plays.get(position).winners);
             }else{*/
-                //Log.d("V1", "winners = " + Play.getWinners(plays.get(position)));
                 String winners = Play.getWinners(plays.get(position));
                 if (winners == null) {
                     viewHolder.getPlayWinnerView().setText(mActivity.getString(R.string.winners) + mActivity.getString(R.string.none));
@@ -441,7 +441,8 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
                 mPosition = position;
                 switch (item.getItemId()) {
                     case R.id.view_plays:
-                        ((PlaysFragment)mFragment).setSearchText(GamesPerPlay.getBaseGame(plays.get(position)).gameName);
+                        //((PlaysFragment)mFragment).setSearchText(GamesPerPlay.getBaseGame(plays.get(position)).gameName);
+                        ((MainActivity) mActivity).openPlays(GamesPerPlay.getBaseGame(plays.get(position)).gameName, false, 0, mActivity.getString(R.string.title_plays), currentYear);
                         return true;
                     case R.id.edit_play:
                         ((MainActivity) mActivity).openAddPlay(mFragment, GamesPerPlay.getBaseGame(plays.get(position)).gameName, plays.get(position).getId(), false);

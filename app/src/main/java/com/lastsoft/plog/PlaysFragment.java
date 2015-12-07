@@ -20,10 +20,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.SwipeDismissBehavior;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
@@ -36,6 +36,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -43,6 +45,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.lastsoft.plog.adapter.PlayAdapter;
+import com.lastsoft.plog.util.MyRecyclerScroll;
 
 import xyz.danoz.recyclerviewfastscroller.vertical.VerticalRecyclerViewFastScroller;
 
@@ -54,7 +57,8 @@ public class PlaysFragment extends Fragment{
     private static final int DATASET_COUNT = 60;
     private float x,y;
     private int sortType = 0;
-
+    FloatingActionButton addPlay;
+    int fabMargin;
 
 
     private enum LayoutManagerType {
@@ -62,12 +66,11 @@ public class PlaysFragment extends Fragment{
     }
 
     protected LayoutManagerType mCurrentLayoutManagerType;
+    //private OnFragmentInteractionListener mListener;
 
     protected RecyclerView mRecyclerView;
     protected PlayAdapter mAdapter;
     protected RecyclerView.LayoutManager mLayoutManager;
-    protected String[] mDataset;
-    private SwipeRefreshLayout pullToRefreshView;
     private ImageView mCancel;
     private EditText mSearch;
     private String mSearchQuery = "";
@@ -131,6 +134,37 @@ public class PlaysFragment extends Fragment{
         // Connect the recycler to the scroller (to let the scroller scroll the list)
         fastScroller.setRecyclerView(mRecyclerView, null);
 
+        addPlay = (FloatingActionButton) rootView.findViewById(R.id.add_play);
+        if (fromDrawer && playListType != 2) {
+            addPlay.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int viewXY[] = new int[2];
+                    v.getLocationOnScreen(viewXY);
+                    /*if (mListener != null) {
+                        mListener.onFragmentInteraction("add_play", viewXY[0], viewXY[1]);
+                    }*/
+                    ((MainActivity)mActivity).usedFAB = true;
+                    ((MainActivity)mActivity).openGames("", true, 0, getString(R.string.title_games), MainActivity.CurrentYear);
+                }
+            });
+        }else{
+            addPlay.setVisibility(View.GONE);
+        }
+
+        fabMargin = getResources().getDimensionPixelSize(R.dimen.fab_margin);
+        mRecyclerView.addOnScrollListener(new MyRecyclerScroll() {
+            @Override
+            public void show() {
+                addPlay.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();
+            }
+
+            @Override
+            public void hide() {
+                addPlay.animate().translationY(addPlay.getHeight() + fabMargin).setInterpolator(new AccelerateInterpolator(2)).start();
+            }
+        });
+
         // Connect the scroller to the recycler (to let the recycler scroll the scroller's handle)
         mRecyclerView.addOnScrollListener(fastScroller.getOnScrollListener());
 
@@ -149,7 +183,12 @@ public class PlaysFragment extends Fragment{
         setRecyclerViewLayoutManager(mCurrentLayoutManagerType);
 
         //mAdapter = new PlayAdapter(mActivity, this);
-        mAdapter = ((MainActivity)mActivity).mPlayAdapter;
+
+        if (((MainActivity)mActivity).mPlayAdapter != null) {
+            mAdapter = ((MainActivity) mActivity).mPlayAdapter;
+        }else{
+            mAdapter = ((MainActivity) mActivity).initPlayAdapter(mSearchQuery, fromDrawer, playListType, currentYear);
+        }
         // Set CustomAdapter as the adapter for RecyclerView.
         mRecyclerView.setAdapter(mAdapter);
         // END_INCLUDE(initializeRecyclerView)
