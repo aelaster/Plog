@@ -12,11 +12,14 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
-import com.lastsoft.plog.db.Game;
 import com.lastsoft.plog.db.GameGroup;
+import com.lastsoft.plog.db.Play;
+import com.lastsoft.plog.db.TenByTen;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class StatsFragment_TenByTen extends Fragment {
@@ -63,7 +66,7 @@ public class StatsFragment_TenByTen extends Fragment {
                     R.layout.stats_viewstat_spinner, mContainerView_Players, false);
 
             TextView statTypeView = (TextView) newView.findViewById(R.id.statType);
-            Spinner spinnerValueView = (Spinner) newView.findViewById(R.id.spinnerValue);
+            final Spinner spinnerValueView = (Spinner) newView.findViewById(R.id.spinnerValue);
             statTypeView.setText(getString(R.string.year_label));
             statTypeView.setTextSize(24);
             // Create an ArrayAdapter using the string array and a default spinner layout
@@ -71,10 +74,10 @@ public class StatsFragment_TenByTen extends Fragment {
 
             Calendar calendar = Calendar.getInstance();
             year = calendar.get(Calendar.YEAR);
-            for (int i = year; i >= 2015; i--){
+            for (int i = year+1; i >= 2015; i--){
                 theYears.add(i);
             }
-            ArrayAdapter<Integer> adapter = new ArrayAdapter<Integer>(mActivity,R.layout.stats_viewstat_spinner_item, theYears);
+            final ArrayAdapter<Integer> adapter = new ArrayAdapter<Integer>(mActivity,R.layout.stats_viewstat_spinner_item, theYears);
             spinnerValueView.setAdapter(adapter);
             spinnerValueView.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
@@ -84,6 +87,8 @@ public class StatsFragment_TenByTen extends Fragment {
                         getTenByTen((Integer) adapterView.getItemAtPosition(i));
                     }else{
                         boot = false;
+                        int spinnerPosition = adapter.getPosition(year);
+                        spinnerValueView.setSelection(spinnerPosition);
                     }
                 }
 
@@ -101,6 +106,31 @@ public class StatsFragment_TenByTen extends Fragment {
     }
 
     private void getTenByTen(int year){
+        List<TenByTen> tens = TenByTen.tenByTens_Group(gameGroup, year);
+        List<TBTInfo> info = new ArrayList<TBTInfo>();
+        int tbtCounts = 0;
+        for (TenByTen ten : tens){
+            //gameTenByTen_GameGroup(GameGroup group, Game game, int year, int sortType){
+            List<Play> plays = Play.gameTenByTen_GameGroup(gameGroup, ten.game, year, 0);
+            if (plays.size() <= 10) { //count only uses the value if it's less than or equal to 10
+                tbtCounts = tbtCounts + plays.size();
+            }else{//otherwise, it adds 10
+                tbtCounts = tbtCounts + 10;
+            }
+            info.add(new TBTInfo(year, ten.game.getId(), plays.size(), ten.game.gameName));
+            //addStat(ten.game.gameName, plays.size()+"", ten.game.getId()+"", year);
+        }
+        Collections.sort(info, new Comparator<TBTInfo>() {
+            public int compare(TBTInfo left, TBTInfo right) {
+                return Integer.compare(right.playsCount, left.playsCount); // The order depends on the direction of sorting.
+            }
+        });
+        for (TBTInfo ten2 : info){
+            //addStat(ten.game.gameName, plays.size()+"", ten.game.getId()+"", year);
+            addStat(ten2.gameName, ""+ten2.playsCount, ten2.gameID+"", ten2.year);
+        }
+        addStat(getString(R.string.percent_completed), ((int) (tbtCounts * 100.0 / 100 + 0.5)) + "%", "", year);
+        /*
         List<Game> tbts = Game.totalTenByTen_GameGroup(gameGroup, year);
         int tbtCounts = 0;
         for (Game tbt : tbts){
@@ -112,6 +142,7 @@ public class StatsFragment_TenByTen extends Fragment {
             addStat(tbt.gameName, tbt.tbtCount+"", tbt.getId()+"", year);
         }
         addStat(getString(R.string.percent_completed), ((int) (tbtCounts * 100.0 / 100 + 0.5)) + "%", "", year);
+        */
     }
 
     Activity mActivity;
@@ -158,5 +189,20 @@ public class StatsFragment_TenByTen extends Fragment {
 
             mContainerView_Players.addView(newView);
         }catch (Exception ignored){}
+    }
+
+    //addStat(ten.game.gameName, plays.size()+"", ten.game.getId()+"", year);
+    public class TBTInfo {
+        public int year;
+        public long gameID;
+        public int playsCount;
+        public String gameName;
+
+        public TBTInfo(int year, long gameID, int playsCount, String gameName) {
+            this.year = year;
+            this.gameID = gameID;
+            this.playsCount = playsCount;
+            this.gameName = gameName;
+        }
     }
 }

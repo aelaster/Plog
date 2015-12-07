@@ -1,7 +1,5 @@
 package com.lastsoft.plog.db;
 
-import android.util.Log;
-
 import com.orm.StringUtil;
 import com.orm.SugarRecord;
 
@@ -82,8 +80,6 @@ public class GameGroup extends SugarRecord<GameGroup> {
             query = query + " AND STRFTIME('%Y', DATETIME(SUBSTR(P." + StringUtil.toSQLName("playDate") + ",0, 11), 'unixepoch')) = ? ";
         }
         query = query + " GROUP BY " + StringUtil.toSQLName("GameGroup") + "." + StringUtil.toSQLName("id");
-
-        Log.d("V1", query);
 
         List<GameGroup> output;
         if (year > 0){

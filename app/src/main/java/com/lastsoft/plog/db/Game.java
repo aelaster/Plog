@@ -1,5 +1,7 @@
 package com.lastsoft.plog.db;
 
+import android.util.Log;
+
 import com.orm.StringUtil;
 import com.orm.SugarRecord;
 
@@ -253,23 +255,26 @@ public class Game extends SugarRecord<Game> {
     }
 
     public static List<Game> totalTenByTen_GameGroup(GameGroup group, int year){
+
+        String qwoorty = " SELECT G.*, COUNT(G." + StringUtil.toSQLName("gameName") + ") AS " + StringUtil.toSQLName("tbtCount") +
+                " FROM " + StringUtil.toSQLName("Play") + " P " +
+                " INNER JOIN " + StringUtil.toSQLName("PlaysPerGameGroup") + " PPGG " +
+                " ON P." + StringUtil.toSQLName("id") + " = PPGG." + StringUtil.toSQLName("play") +
+                " INNER JOIN " + StringUtil.toSQLName("GamesPerPlay") + " GPP " +
+                " ON P." + StringUtil.toSQLName("id") + " = GPP." + StringUtil.toSQLName("play") +
+                " INNER JOIN " + StringUtil.toSQLName("Game") + " G " +
+                " ON GPP." + StringUtil.toSQLName("game") + " = G." + StringUtil.toSQLName("id") +
+                " INNER JOIN " + StringUtil.toSQLName("TenByTen") + " TBT " +
+                " ON PPGG." + StringUtil.toSQLName("gameGroup") + " = TBT." + StringUtil.toSQLName("gameGroup") +
+                " WHERE PPGG. " + StringUtil.toSQLName("GameGroup") + " = ?" +
+                " AND TBT." + StringUtil.toSQLName("year") + " = " + year +
+                " AND TBT." + StringUtil.toSQLName("game") + " = GPP." + StringUtil.toSQLName("game") +
+                " AND STRFTIME('%Y', DATETIME(SUBSTR(P." + StringUtil.toSQLName("playDate") + ",0, 11), 'unixepoch')) = ? " +
+                " GROUP BY G." + StringUtil.toSQLName("gameName") +
+                " ORDER BY COUNT(G." + StringUtil.toSQLName("gameName") + ") DESC, G." + StringUtil.toSQLName("gameName");
+        Log.d("V1", qwoorty);
         return Game.findWithQuery(Game.class,
-                " SELECT G.*, COUNT(G." + StringUtil.toSQLName("gameName") + ") AS " + StringUtil.toSQLName("tbtCount") +
-                        " FROM " + StringUtil.toSQLName("Play") + " P " +
-                        " INNER JOIN " + StringUtil.toSQLName("PlaysPerGameGroup") + " PPGG " +
-                        " ON P." + StringUtil.toSQLName("id") + " = PPGG." + StringUtil.toSQLName("play") +
-                        " INNER JOIN " + StringUtil.toSQLName("GamesPerPlay") + " GPP " +
-                        " ON P." + StringUtil.toSQLName("id") + " = GPP." + StringUtil.toSQLName("play") +
-                        " INNER JOIN " + StringUtil.toSQLName("Game") + " G " +
-                        " ON GPP." + StringUtil.toSQLName("game") + " = G." + StringUtil.toSQLName("id") +
-                        " INNER JOIN " + StringUtil.toSQLName("TenByTen") + " TBT " +
-                        " ON PPGG." + StringUtil.toSQLName("gameGroup") + " = TBT." + StringUtil.toSQLName("gameGroup") +
-                        " WHERE PPGG. " + StringUtil.toSQLName("GameGroup") + " = ?" +
-                        " AND TBT." + StringUtil.toSQLName("year") + " = " + year +
-                        " AND TBT." + StringUtil.toSQLName("game") + " = GPP." + StringUtil.toSQLName("game") +
-                        " AND STRFTIME('%Y', DATETIME(SUBSTR(P." + StringUtil.toSQLName("playDate") + ",0, 11), 'unixepoch')) = ? " +
-                        " GROUP BY G." + StringUtil.toSQLName("gameName") +
-                        " ORDER BY COUNT(G." + StringUtil.toSQLName("gameName") + ") DESC, G." + StringUtil.toSQLName("gameName"), group.getId().toString(), year + "");
+                qwoorty, group.getId().toString(), year + "");
     }
 
     public static List<Game> getUnplayedGames(int sortType, boolean showExpansions, int year){
