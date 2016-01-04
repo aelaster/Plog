@@ -18,10 +18,10 @@ import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
 import java.io.BufferedInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
@@ -62,12 +62,12 @@ public class LoadGamesTask extends AsyncTask<String, Void, String> {
             is.close();
 
             return myString;
-        } catch (MalformedURLException e) {
+        } catch (FileNotFoundException e) {
             e.printStackTrace();
-            return null;
-        } catch (IOException e) {
+            return "will be processed";
+        }catch (Exception e) {
             e.printStackTrace();
-            return null;
+            return "will be processed";
         }
     }
 
@@ -91,13 +91,13 @@ public class LoadGamesTask extends AsyncTask<String, Void, String> {
                 if (defaultPlayer != null) {
                     //Log.d("V1", "https://www.boardgamegeek.com/xmlapi2/collection?username=" + defaultPlayer.bggUsername);
                     myString = getGamesCollection(defaultPlayer.bggUsername);
-                    //Log.d("V1", myString);
+                    Log.d("V1", myString);
                     if (myString != null && myString.contains("will be processed")){
                         //do it again
                         bggProcess = "true";
                     }
 
-                    if (myString != null) {
+                    if (myString != null && !bggProcess.equals("true")) {
                         XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
                         factory.setNamespaceAware(true);
                         XmlPullParser parser = factory.newPullParser();

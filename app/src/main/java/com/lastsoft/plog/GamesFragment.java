@@ -643,13 +643,18 @@ public class GamesFragment extends Fragment{
 
         @Override
         protected void onPostExecute(final String result) {
+            pullToRefreshView.setRefreshing(false);
             if (result.equals("true")) {
                 //Toast.makeText(theContext, theContext.getString(R.string.bgg_process_notice), Toast.LENGTH_LONG).show();
                 //go again
                 //wait a few seconds before tryi
-                initDataset();
+                //initDataset();
+                Snackbar
+                        .make(mCoordinatorLayout,
+                                theContext.getString(R.string.bgg_process_notice),
+                                Snackbar.LENGTH_LONG)
+                        .show(); // Do not forget to show!
             }else {
-                pullToRefreshView.setRefreshing(false);
                 myTask = null;
 
                 //mAdapter = new CustomAdapter(mDataset, mDataset_Thumb);

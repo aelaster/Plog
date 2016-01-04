@@ -277,9 +277,13 @@ public class SyncPlaysTask extends AsyncTask<String, String, String> {
 
                             //determine high score
                             float highScore = -99999;
+                            float lowScore = 99999;
                             for (AddPlayer thePlayer : playToAdd.thePlayers) {
                                 if (thePlayer.score > highScore) {
                                     highScore = thePlayer.score;
+                                }
+                                if (thePlayer.score < lowScore){
+                                    lowScore = thePlayer.score;
                                 }
                             }
 
@@ -294,9 +298,9 @@ public class SyncPlaysTask extends AsyncTask<String, String, String> {
                                 addedUsers.add(thisPlayer.getId());
                                 PlayersPerPlay newPlayer;
                                 if (existingPlay == null) {
-                                    newPlayer = new PlayersPerPlay(thisPlayer, newPlay, thePlayer.score, thePlayer.color, highScore);
+                                    newPlayer = new PlayersPerPlay(thisPlayer, newPlay, thePlayer.score, thePlayer.color, highScore, lowScore);
                                 }else{
-                                    newPlayer = new PlayersPerPlay(thisPlayer, existingPlay, thePlayer.score, thePlayer.color, highScore);
+                                    newPlayer = new PlayersPerPlay(thisPlayer, existingPlay, thePlayer.score, thePlayer.color, highScore, lowScore);
                                 }
                                 newPlayer.save();
                             }

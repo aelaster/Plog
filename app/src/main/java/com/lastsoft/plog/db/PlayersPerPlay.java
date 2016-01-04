@@ -17,6 +17,7 @@ public class PlayersPerPlay extends SugarRecord<PlayersPerPlay> {
     public float score;
     public String color;
     public float playHighScore;
+    public float playLowScore;
     public float personalBest;
 
     public PlayersPerPlay() {
@@ -31,12 +32,30 @@ public class PlayersPerPlay extends SugarRecord<PlayersPerPlay> {
         this.playHighScore = playHighScore;
     }
 
+    public PlayersPerPlay(Player player, Play play, float score, String color, float playHighScore, float playLowScore) {
+        this.player = player;
+        this.play = play;
+        this.score = score;
+        this.color = color;
+        this.playHighScore = playHighScore;
+        this.playLowScore = playLowScore;
+    }
+
     public PlayersPerPlay(Player player, Play play, float score, float playHighScore) {
         this.player = player;
         this.play = play;
         this.score = score;
         this.color = "";
         this.playHighScore = playHighScore;
+    }
+
+    public PlayersPerPlay(Player player, Play play, float score, float playHighScore, float playLowScore) {
+        this.player = player;
+        this.play = play;
+        this.score = score;
+        this.color = "";
+        this.playHighScore = playHighScore;
+        this.playLowScore = playLowScore;
     }
 
     public static List<PlayersPerPlay> totalPlays_GameGroup(GameGroup group) {

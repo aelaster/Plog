@@ -386,7 +386,9 @@ public class Play extends SugarRecord<Play> {
                 " AND " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("expansionFlag") + " = 0 " +
                 " AND " + StringUtil.toSQLName("GameGroup") + " = ?" +
                 " AND "+ StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("player") + " = ? " +
-                " AND "+ StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("score") + " >= " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("playHighScore");
+                " AND "+ StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("score") + " >= " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("playHighScore") +
+                " AND ("+ StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("score") + " != " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("playLowScore") + ")";
+                //" OR "+ StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("playLowScore") + " == " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("playHighScore") + ")";
         if (year > 0){
             query = query + " AND STRFTIME('%Y', DATETIME(SUBSTR(P." + StringUtil.toSQLName("playDate") + ",0, 11), 'unixepoch')) = ? ";
         }
@@ -539,7 +541,9 @@ public class Play extends SugarRecord<Play> {
                 " ON P." + StringUtil.toSQLName("id") + " = " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("play") +
                 " AND "+ StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("expansionFlag") + " = 0 " +
                 " AND "+ StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("player") + " = ? " +
-                " AND "+ StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("score") + " >= " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("playHighScore");
+                " AND "+ StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("score") + " >= " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("playHighScore") +
+                " AND ("+ StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("score") + " != " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("playLowScore") + ")";
+                //" OR "+ StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("playLowScore") + " == " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("playHighScore") + ")";
         if (year > 0){
             query = query + " AND STRFTIME('%Y', DATETIME(SUBSTR(P." + StringUtil.toSQLName("playDate") + ",0, 11), 'unixepoch')) = ? ";
         }
@@ -591,7 +595,7 @@ public class Play extends SugarRecord<Play> {
                 " WHERE P." + StringUtil.toSQLName("player") + " = ? " +
                 " AND " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("expansionFlag") + " = 0 " +
                 " AND P." + StringUtil.toSQLName("score") + " < P." + StringUtil.toSQLName("playHighScore") +
-                " AND P." + StringUtil.toSQLName("score") + " > 0 " +
+                " AND P." + StringUtil.toSQLName("score") + " > P." + StringUtil.toSQLName("playLowScore") +
                 " AND P." + StringUtil.toSQLName("score") + " = " +
                 " (SELECT MAX(A." + StringUtil.toSQLName("score") + ") " +
                 " FROM " + StringUtil.toSQLName("PlayersPerPlay") + " A " +
@@ -665,7 +669,7 @@ public class Play extends SugarRecord<Play> {
                 " WHERE P." + StringUtil.toSQLName("player") + " = ? " +
                 " AND " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("expansionFlag") + " = 0 " +
                 " AND P." + StringUtil.toSQLName("score") + " < P." + StringUtil.toSQLName("playHighScore") +
-                " AND P." + StringUtil.toSQLName("score") + " > 0 " +
+                " AND P." + StringUtil.toSQLName("score") + " > P." + StringUtil.toSQLName("playLowScore") +
                 " AND P." + StringUtil.toSQLName("score") + " = " +
                 " (SELECT MAX(A." + StringUtil.toSQLName("score") + ") " +
                 " FROM " + StringUtil.toSQLName("PlayersPerPlay") + " A " +

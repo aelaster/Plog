@@ -627,10 +627,14 @@ public class AddPlayFragment extends Fragment implements
                         }
 
                         float highScore = -99999;
+                        float lowScore = 99999;
                         for (int i = 0; i < adapter.getCount(); i++) {
                             AddPlayer thisGuy = adapter.getItem(i);
                             if (thisGuy.score > highScore){
                                 highScore = thisGuy.score;
+                            }
+                            if (thisGuy.score < lowScore){
+                                lowScore = thisGuy.score;
                             }
 
                         }
@@ -638,7 +642,7 @@ public class AddPlayFragment extends Fragment implements
                         for (int i = 0; i < adapter.getCount(); i++) {
                             AddPlayer thisGuy = adapter.getItem(i);
                             //if (thisGuy.score != -9999999) {
-                            PlayersPerPlay newPlayer = new PlayersPerPlay(Player.findById(Player.class, thisGuy.playerID), thePlay, thisGuy.score, thisGuy.color, highScore);
+                            PlayersPerPlay newPlayer = new PlayersPerPlay(Player.findById(Player.class, thisGuy.playerID), thePlay, thisGuy.score, thisGuy.color, highScore, lowScore);
                             newPlayer.save();
                             //}
                         }

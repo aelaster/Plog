@@ -55,6 +55,8 @@ public class LoadExpansionsTask extends AsyncTask<String, Void, List<Game>> {
             bis.close();
             is.close();
 
+            //Log.d("V1", myString);
+
             return myString;
         } catch (MalformedURLException e) {
             e.printStackTrace();

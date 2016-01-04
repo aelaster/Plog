@@ -1,0 +1,1 @@
+alter table PLAYERS_PER_PLAY add PLAY_LOW_SCORE FLOAT;
