@@ -424,7 +424,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
                          return true;
                      case R.id.add_bgg:
                          mPosition = position;
-                         ((MainActivity) mActivity).updateGameViaBGG(games.get(position).gameName, games.get(position).gameBGGID, true);
+                         ((MainActivity) mActivity).updateGameViaBGG(games.get(position).gameName, games.get(position).gameBGGID, "", true, false);
                          return true;
                      case R.id.add_box_photo:
                          ((GamesFragment) mFragment).captureBox(games.get(position));

@@ -106,6 +106,7 @@ public class MainActivity extends AppCompatActivity
     private boolean mIsReentering;
     public BGGLogInHelper mLogInHelper;
     public int currentFragmentCode = 4;
+    //private GoogleApiClient mGoogleApiClient;
 
     private final SharedElementCallback mCallback = new SharedElementCallback() {
         @Override
@@ -145,7 +146,6 @@ public class MainActivity extends AppCompatActivity
         mDamageReport.initialize();
 
         mLogInHelper = new BGGLogInHelper(this, this);
-
 
         BackupManager bm = new BackupManager(this);
         bm.dataChanged();
@@ -923,6 +923,9 @@ public class MainActivity extends AppCompatActivity
                             //if so, can't delete
                             if (!GamesPerPlay.hasGameBeenPlayed(deleteMe)){
                                 deleteMe.delete();
+
+                                //delete from BGG
+                                updateGameViaBGG(deleteMe.gameName, deleteMe.gameBGGID, deleteMe.gameBGGCollectionID, false, true);
                             }else{
                                 Snackbar
                                         .make(mGamesFragment.mCoordinatorLayout,
@@ -947,10 +950,10 @@ public class MainActivity extends AppCompatActivity
     }
 
     GameUpdater gameUpdate;
-    public void updateGameViaBGG(String gameName, String bggID, boolean addToCollection){
-        gameUpdate = new GameUpdater(this, addToCollection);
+    public void updateGameViaBGG(String gameName, String bggID, String bggCollectionID, boolean addToCollection, boolean deleteFromBGG){
+        gameUpdate = new GameUpdater(this, addToCollection, deleteFromBGG);
         try {
-            gameUpdate.execute(bggID, gameName);
+            gameUpdate.execute(bggID, gameName, bggCollectionID);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -1258,8 +1261,8 @@ public class MainActivity extends AppCompatActivity
 
 
     public class GameUpdater extends UpdateBGGTask {
-        public GameUpdater(Context context, boolean addToCollection) {
-            super(context, addToCollection, false);
+        public GameUpdater(Context context, boolean addToCollection, boolean deleteFromCollection) {
+            super(context, addToCollection, false, deleteFromCollection);
         }
 
         @Override
@@ -1286,7 +1289,7 @@ public class MainActivity extends AppCompatActivity
             if (result.size() > 0) {
                 if (result.size() == 1){
                     //this is the only game returned, so just go ahead and run update
-                    updateGameViaBGG(result.get(0).gameName, result.get(0).gameBGGID, addToCollection);
+                    updateGameViaBGG(result.get(0).gameName, result.get(0).gameBGGID, "", addToCollection, false);
                 }else {
                     //more than one choice, so give the user a dialog and let them pick
                     ArrayList<String> theGames = new ArrayList<>();
@@ -1455,7 +1458,7 @@ public class MainActivity extends AppCompatActivity
                                         updateMe.gameName = gameName;
                                         updateMe.save();
                                     }
-                                    updateGameViaBGG(gameName, BGGID, addToCollection);
+                                    updateGameViaBGG(gameName, BGGID, "", addToCollection, false);
                                 }
                             })
                     .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {

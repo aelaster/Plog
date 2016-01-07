@@ -35,7 +35,10 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlacePicker;
 import com.kbeanie.imagechooser.api.BChooserPreferences;
 import com.kbeanie.imagechooser.api.ChooserType;
 import com.kbeanie.imagechooser.api.ChosenImage;
@@ -297,6 +300,20 @@ public class AddPlayFragment extends Fragment implements
             }
         });
 
+        View locationButton = rootView.findViewById(R.id.locationButton);
+        locationButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int PLACE_PICKER_REQUEST = 2;
+                try {
+                    PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+                    startActivityForResult(builder.build(mActivity), PLACE_PICKER_REQUEST);
+                }catch (Exception ignored){
+
+                }
+            }
+        });
+
         textViewDate = (TextView) rootView.findViewById(R.id.textViewDate);
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -514,6 +531,14 @@ public class AddPlayFragment extends Fragment implements
 
         }else if (resultCode == -1 && (requestCode == ChooserType.REQUEST_PICK_PICTURE || requestCode == ChooserType.REQUEST_CAPTURE_PICTURE)) {
             imageChooserManager.submit(requestCode, data);
+        }else if (requestCode == 2) {
+            if (resultCode == -1) {
+                Place place = PlacePicker.getPlace(data, mActivity);
+                String toastMsg = String.format("Place: %s", place.getName());
+                String toastMsg2 = String.format("Place: %s", place.getAddress());
+                Toast.makeText(mActivity, toastMsg, Toast.LENGTH_LONG).show();
+                Toast.makeText(mActivity, toastMsg2, Toast.LENGTH_LONG).show();
+            }
         }
     }
 

@@ -14,6 +14,7 @@ public class Game extends SugarRecord<Game> {
 
     public String gameName;
     public String gameBGGID;
+    public String gameBGGCollectionID;
     public String gameImage;
     public String gameThumb;
     public String gameBoxImage;
@@ -26,35 +27,39 @@ public class Game extends SugarRecord<Game> {
 
     public Game(){ }
 
-    public Game(String gameName, String gameBGGID, String gameImage, String gameThumb, boolean expansionFlag, boolean collectionFlag) {
+    public Game(String gameName, String gameBGGID, String gameBGGCollectionID, String gameImage, String gameThumb, boolean expansionFlag, boolean collectionFlag) {
         this.gameName = gameName;
         this.gameBGGID = gameBGGID;
+        this.gameBGGCollectionID = gameBGGCollectionID;
         this.gameImage = gameImage;
         this.gameThumb = gameThumb;
         this.expansionFlag = expansionFlag;
         this.collectionFlag = collectionFlag;
     }
 
-    public Game(String gameName, String gameBGGID, String gameImage, String gameThumb, boolean expansionFlag) {
+    public Game(String gameName, String gameBGGID, String gameBGGCollectionID, String gameImage, String gameThumb, boolean expansionFlag) {
         this.gameName = gameName;
         this.gameBGGID = gameBGGID;
+        this.gameBGGCollectionID = gameBGGCollectionID;
         this.gameImage = gameImage;
         this.gameThumb = gameThumb;
         this.expansionFlag = expansionFlag;
     }
 
 
-    public Game(String gameName, String gameBGGID, String gameThumb, boolean expansionFlag) {
+    public Game(String gameName, String gameBGGID, String gameBGGCollectionID, String gameThumb, boolean expansionFlag) {
         this.gameName = gameName;
         this.gameBGGID = gameBGGID;
+        this.gameBGGCollectionID = gameBGGCollectionID;
         this.gameImage = null;
         this.gameThumb = gameThumb;
         this.expansionFlag = expansionFlag;
     }
 
-    public Game(String gameName, String gameBGGID, String gameThumb) {
+    public Game(String gameName, String gameBGGID, String gameBGGCollectionID, String gameThumb) {
         this.gameName = gameName;
         this.gameBGGID = gameBGGID;
+        this.gameBGGCollectionID = gameBGGCollectionID;
         this.gameImage = null;
         this.gameThumb = gameThumb;
         this.expansionFlag = false;
@@ -63,6 +68,7 @@ public class Game extends SugarRecord<Game> {
     public Game(String gameName, boolean expansionFlag) {
         this.gameName = gameName;
         this.gameBGGID = "";
+        this.gameBGGCollectionID = "";
         this.gameImage = null;
         this.gameThumb = null;
         this.expansionFlag = expansionFlag;
@@ -71,6 +77,7 @@ public class Game extends SugarRecord<Game> {
     public Game(String gameName, String gameThumb, boolean expansionFlag) {
         this.gameName = gameName;
         this.gameBGGID = "";
+        this.gameBGGCollectionID = "";
         this.gameImage = null;
         this.gameThumb = gameThumb;
         this.expansionFlag = expansionFlag;
@@ -79,6 +86,7 @@ public class Game extends SugarRecord<Game> {
     public Game(String gameName) {
         this.gameName = gameName;
         this.gameBGGID = "";
+        this.gameBGGCollectionID = "";
         this.gameImage = null;
         this.gameThumb = null;
         this.expansionFlag = false;

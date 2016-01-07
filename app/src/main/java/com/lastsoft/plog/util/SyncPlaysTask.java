@@ -82,11 +82,13 @@ public class SyncPlaysTask extends AsyncTask<String, String, String> {
     private class AddGame {
         public String gameName;
         public String gameId;
+        public String gameCollectionId;
         public boolean expansionFlag;
 
-        public AddGame(String gameName, String gameId, boolean expansionFlag) {
+        public AddGame(String gameName, String gameId, String collectionId, boolean expansionFlag) {
             this.gameName = gameName;
             this.gameId = gameId;
+            this.gameCollectionId = collectionId;
             this.expansionFlag = expansionFlag;
         }
     }
@@ -317,7 +319,7 @@ public class SyncPlaysTask extends AsyncTask<String, String, String> {
                             Game theGame = Game.findGameByName(playToAdd.theGame.gameName);
                             if (theGame == null) {
                                 //game does not exist
-                                Game game = new Game(playToAdd.theGame.gameName, playToAdd.theGame.gameId, "", false);
+                                Game game = new Game(playToAdd.theGame.gameName, playToAdd.theGame.gameId, playToAdd.theGame.gameCollectionId, "", false);
                                 game.save();
                                 theGame = game;
                                 //updateGameViaBGG(playToAdd.theGame.gameId, playToAdd.theGame.gameName);
@@ -403,7 +405,7 @@ public class SyncPlaysTask extends AsyncTask<String, String, String> {
         Game theGame = Game.findGameByName(playToAdd.theGame.gameName);
         if (theGame == null) {
             //game does not exist
-            Game game = new Game(playToAdd.theGame.gameName, playToAdd.theGame.gameId, "", true);
+            Game game = new Game(playToAdd.theGame.gameName, playToAdd.theGame.gameId, playToAdd.theGame.gameCollectionId, "", true);
             game.save();
             theGame = game;
             //updateGameViaBGG(playToAdd.theGame.gameId, playToAdd.theGame.gameName);
@@ -414,7 +416,7 @@ public class SyncPlaysTask extends AsyncTask<String, String, String> {
     }
 
     private void updateGameViaBGG(String bggID, String gameName){
-        UpdateBGGTask gameUpdate = new UpdateBGGTask(theContext, false, true);
+        UpdateBGGTask gameUpdate = new UpdateBGGTask(theContext, false, true, false);
         try {
             gameUpdate.execute(bggID, gameName);
         } catch (Exception e) {
@@ -425,7 +427,7 @@ public class SyncPlaysTask extends AsyncTask<String, String, String> {
     private AddPlay readEntry(XmlPullParser parser, String playID, String playDate) throws XmlPullParserException, IOException {
         AddGame gameToAdd = null;
         AddPlayer[] playersToAdd = null;
-        String gameName = "", gameBGGID = "", playComments = "";
+        String gameName = "", gameBGGID = "", gameBGGCollectionID = "", playComments = "";
 
         parser.require(XmlPullParser.START_TAG, null, "play");
         while (parser.next() != XmlPullParser.END_TAG) {
@@ -437,7 +439,8 @@ public class SyncPlaysTask extends AsyncTask<String, String, String> {
             if (name.equals("item")) {
                 gameName = readName(parser);
                 gameBGGID = readBGGID(parser);
-                gameToAdd = readGame(parser, gameName, gameBGGID);
+                gameBGGCollectionID = readBGGCollectionID(parser);
+                gameToAdd = readGame(parser, gameName, gameBGGID, gameBGGCollectionID);
             }else if (name.equals("players")) {
                 playersToAdd = readPlayers(parser);
             }else if (name.equals("comments")) {
@@ -468,7 +471,7 @@ public class SyncPlaysTask extends AsyncTask<String, String, String> {
     }
 
 
-    private AddGame readGame(XmlPullParser parser, String gameName, String gameBGGID) throws XmlPullParserException, IOException {
+    private AddGame readGame(XmlPullParser parser, String gameName, String gameBGGID, String gameBGGCollectionID) throws XmlPullParserException, IOException {
         boolean expansionFlag = false;
         parser.require(XmlPullParser.START_TAG, null, "item");
         while (parser.next() != XmlPullParser.END_TAG) {
@@ -484,7 +487,7 @@ public class SyncPlaysTask extends AsyncTask<String, String, String> {
             }
         }
         parser.require(XmlPullParser.END_TAG, null, "item");
-        return new AddGame(gameName, gameBGGID, expansionFlag);
+        return new AddGame(gameName, gameBGGID, gameBGGCollectionID, expansionFlag);
     }
 
     private boolean readSubtypes(XmlPullParser parser) throws XmlPullParserException, IOException {
@@ -572,6 +575,15 @@ public class SyncPlaysTask extends AsyncTask<String, String, String> {
             bggid = parser.getAttributeValue(null, "objectid");
         }
         return bggid;
+    }
+
+    private String readBGGCollectionID(XmlPullParser parser) throws IOException, XmlPullParserException {
+        String collectionid = "";
+        String tag = parser.getName();
+        if (tag.equals("item")) {
+            collectionid = parser.getAttributeValue(null, "collid");
+        }
+        return collectionid;
     }
 
     private String readTotal(XmlPullParser parser) throws IOException, XmlPullParserException {

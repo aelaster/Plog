@@ -91,7 +91,7 @@ public class LoadGamesTask extends AsyncTask<String, Void, String> {
                 if (defaultPlayer != null) {
                     //Log.d("V1", "https://www.boardgamegeek.com/xmlapi2/collection?username=" + defaultPlayer.bggUsername);
                     myString = getGamesCollection(defaultPlayer.bggUsername);
-                    Log.d("V1", myString);
+                    //Log.d("V1", myString);
                     if (myString != null && myString.contains("will be processed")){
                         //do it again
                         bggProcess = "true";
@@ -122,7 +122,7 @@ public class LoadGamesTask extends AsyncTask<String, Void, String> {
                                 //mDataset_Thumb = new String[total];
                             } else if (name.equals("item")) {
                                 //Log.d("V1", "name = " + mDataset[i]);
-                                readEntry(parser, readBGGID(parser));
+                                readEntry(parser, readBGGID(parser), readBGGCollectionID(parser));
                             } else {
                                 skip(parser);
                             }
@@ -201,16 +201,14 @@ public class LoadGamesTask extends AsyncTask<String, Void, String> {
         }
     }
 
-    private Game readEntry(XmlPullParser parser, String gameBGGID) throws XmlPullParserException, IOException {
+    private Game readEntry(XmlPullParser parser, String gameBGGID, String gameBGGCollectionID) throws XmlPullParserException, IOException {
         String gameName = "", gameThumb = "", gameOwn = "", gameImage = "";
-
         parser.require(XmlPullParser.START_TAG, null, "item");
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
                 continue;
             }
             String name = parser.getName();
-
             if (name.equals("name")) {
                 gameName = readName(parser);
                 List<Game> finders = null;
@@ -219,6 +217,10 @@ public class LoadGamesTask extends AsyncTask<String, Void, String> {
                     for(Game game:finders){
                         if (!game.collectionFlag) {
                             game.collectionFlag = true;
+                            game.save();
+                        }
+                        if (game.gameBGGCollectionID == null || game.gameBGGCollectionID.equals("")) {
+                            game.gameBGGCollectionID = gameBGGCollectionID;
                             game.save();
                         }
                     }
@@ -239,10 +241,18 @@ public class LoadGamesTask extends AsyncTask<String, Void, String> {
 
         parser.require(XmlPullParser.END_TAG, null, "item");
         if (gameOwn.equals("1")) {
-            Game game = new Game(gameName, gameBGGID, gameImage, gameThumb, false, true);
+            Game game = new Game(gameName, gameBGGID, gameBGGCollectionID, gameImage, gameThumb, false, true);
             game.save();
             return game;
         }else{
+            //check to see if it's in the collection.  if so, remove it
+            List<Game> finders = null;
+            finders = Game.find(Game.class, StringUtil.toSQLName("gameName") + " = ?", gameName);
+            if (finders.size() != 0){
+                for(Game game:finders){
+                    game.delete();
+                }
+            }
             return null;
         }
 
@@ -291,6 +301,15 @@ public class LoadGamesTask extends AsyncTask<String, Void, String> {
             bggid = parser.getAttributeValue(null, "objectid");
         }
         return bggid;
+    }
+
+    private String readBGGCollectionID(XmlPullParser parser) throws IOException, XmlPullParserException {
+        String collectionid = "";
+        String tag = parser.getName();
+        if (tag.equals("item")) {
+            collectionid = parser.getAttributeValue(null, "collid");
+        }
+        return collectionid;
     }
 
     private String readTotal(XmlPullParser parser) throws IOException, XmlPullParserException {

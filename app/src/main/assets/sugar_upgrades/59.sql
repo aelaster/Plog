@@ -1,0 +1,1 @@
+alter table GAME add GAME_BGG_COLLECTION_ID TEXT;
