@@ -101,7 +101,14 @@
     <string name="choose_photo">Choose Photo</string>
     <string name="game_photo">Game Photo:</string>
     <string name="name_taken">Name taken</string>
+    <string name="choose_location">Choose Location</string>
+    <string name="are_you_at">"Are you at "</string>
+    <string name="add_new">Add New</string>
+    <string name="enter_location_name">Enter Location Name</string>
+    <string name="location_name_exists">Location Name already exits.  Please try again.</string>
 
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
 

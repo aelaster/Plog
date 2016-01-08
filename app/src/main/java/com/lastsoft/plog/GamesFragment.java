@@ -38,7 +38,6 @@ import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -615,7 +614,6 @@ public class GamesFragment extends Fragment{
     }
 
     protected void refreshDataset(boolean reInit){
-        Log.d("V1", "refreshing dataset");
         if (reInit) {
             initDataset();
         }

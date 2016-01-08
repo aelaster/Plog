@@ -14,33 +14,38 @@ public class Play extends SugarRecord<Play> {
     public String playPhoto;
     public String bggPlayID;
     public String winners;
+    public Location playLocation;
 
     public Play() {
     }
 
-    public Play(Date playDate, String playNotes, String playPhoto, String bggPlayID) {
+    public Play(Date playDate, String playNotes, String playPhoto, String bggPlayID, Location playLocation) {
         this.playDate = playDate;
         this.playNotes = playNotes;
         this.playPhoto = playPhoto;
         this.bggPlayID = bggPlayID;
+        this.playLocation = playLocation;
     }
 
-    public Play(Date playDate, String playNotes, String playPhoto) {
+    public Play(Date playDate, String playNotes, String playPhoto, Location playLocation) {
         this.playDate = playDate;
         this.playNotes = playNotes;
         this.playPhoto = playPhoto;
+        this.playLocation = playLocation;
     }
 
-    public Play(Date playDate, String playNotes) {
+    public Play(Date playDate, String playNotes, Location playLocation) {
         this.playDate = playDate;
         this.playNotes = playNotes;
         this.playPhoto = "";
+        this.playLocation = playLocation;
     }
 
-    public Play(Date playDate) {
+    public Play(Date playDate, Location playLocation) {
         this.playDate = playDate;
         this.playNotes = "";
         this.playPhoto = "";
+        this.playLocation = playLocation;
     }
 
 

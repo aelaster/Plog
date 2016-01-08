@@ -36,7 +36,7 @@ public class CSVImport {
                     SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
                     Date date1 = dateFormat.parse(next[0]);
 
-                    Play newPlay = new Play(date1, next[3].trim());
+                    Play newPlay = new Play(date1, next[3].trim(), null);
                     newPlay.save();
 
                     int totalPlayers = 2;

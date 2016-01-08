@@ -4,40 +4,49 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/card_view"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="50dp"
     card_view:cardCornerRadius="4dp"
     android:layout_margin="5dp">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:background="@drawable/ripple">
         <Spinner
             android:id="@+id/player"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"/>
+            android:layout_gravity="center_vertical"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+
+            />
 
         <Spinner
             android:id="@+id/color"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1.25"/>
+            android:layout_toRightOf="@id/player"
+            android:layout_gravity="center_vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+           />
 
         <EditText
             android:id="@+id/score"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1.5"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:maxLength="3"
+            android:layout_gravity="center_vertical"
             android:inputType="numberDecimal|numberSigned"
+            android:layout_toRightOf="@id/color"
             android:hint="@string/score"/>
 
         <ImageView
             android:id="@+id/closeButton"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_gravity="center_vertical"
             android:scaleType="fitCenter"
+            android:layout_toRightOf="@id/score"
+            android:layout_alignParentRight="true"
             android:paddingLeft="5dp"
             android:src="@android:drawable/ic_menu_close_clear_cancel"
             />

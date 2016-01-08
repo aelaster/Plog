@@ -5,6 +5,7 @@ import android.text.TextUtils;
 
 import com.lastsoft.plog.db.Game;
 import com.lastsoft.plog.db.GamesPerPlay;
+import com.lastsoft.plog.db.Location;
 import com.lastsoft.plog.db.Play;
 import com.lastsoft.plog.db.PlayersPerPlay;
 
@@ -57,7 +58,11 @@ public class BGGUtils {
                 nvps.add(new BasicNameValuePair("playid", playToLog.bggPlayID));
             }
             //nvps.add(new BasicNameValuePair("length", String.valueOf(60)));
-            nvps.add(new BasicNameValuePair("location", "Plog"));
+            if (playToLog.playLocation == null) {
+                nvps.add(new BasicNameValuePair("location", "Plog"));
+            }else{
+                nvps.add(new BasicNameValuePair("location", Location.findById(Location.class, playToLog.playLocation.getId()).locationName));
+            }
             nvps.add(new BasicNameValuePair("quantity", String.valueOf(1)));
             nvps.add(new BasicNameValuePair("incomplete", "0"));
             nvps.add(new BasicNameValuePair("nowinstats", "0"));

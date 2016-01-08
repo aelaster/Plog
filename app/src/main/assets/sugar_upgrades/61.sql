@@ -1,0 +1,1 @@
+alter table PLAY add PLAY_LOCATION INTEGER;

@@ -260,7 +260,7 @@ public class SyncPlaysTask extends AsyncTask<String, String, String> {
 
                             //add the play
                             if (existingPlay == null) {
-                                newPlay = new Play(playToAdd.playDate, playToAdd.playComment, "", playToAdd.playID);
+                                newPlay = new Play(playToAdd.playDate, playToAdd.playComment, "", playToAdd.playID, null);
                                 newPlay.save();
                             }else{
                                 existingPlay.playDate = playToAdd.playDate;

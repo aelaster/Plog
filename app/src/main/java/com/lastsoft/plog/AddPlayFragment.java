@@ -30,6 +30,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -52,6 +53,7 @@ import com.kbeanie.imagechooser.api.ImageChooserManager;
 import com.lastsoft.plog.db.Game;
 import com.lastsoft.plog.db.GameGroup;
 import com.lastsoft.plog.db.GamesPerPlay;
+import com.lastsoft.plog.db.Location;
 import com.lastsoft.plog.db.Play;
 import com.lastsoft.plog.db.Player;
 import com.lastsoft.plog.db.PlayersPerPlay;
@@ -91,6 +93,8 @@ public class AddPlayFragment extends Fragment implements
     Activity mActivity;
     String mCurrentPhotoPath = "";
     String mCurrentPhotoName = "";
+    Location locationId = null;
+    String locationName = "";
     private OnFragmentInteractionListener mListener;
     int cx, cy;
     File f;
@@ -100,7 +104,7 @@ public class AddPlayFragment extends Fragment implements
     String gameName;
     long playID;
     long copyPlayID = -1;
-    TextView textViewDate;
+    TextView textViewDate, textViewLocation;
     View expansionButton;
     static boolean[] checkedItems;
     ArrayList<Integer> playersID;
@@ -120,6 +124,8 @@ public class AddPlayFragment extends Fragment implements
 
 
     List<Game> expansions;
+
+     int PLACE_PICKER_REQUEST = 2;
 
     public static AddPlayFragment newInstance(int centerX, int centerY, boolean doAccelerate, String mGameName, long playID, boolean copyPlay) {
         AddPlayFragment fragment = new AddPlayFragment();
@@ -211,26 +217,7 @@ public class AddPlayFragment extends Fragment implements
         mContainerView_Players = (ViewGroup) rootView.findViewById(R.id.container_players);
         mContainerView_Expansions = (ViewGroup) rootView.findViewById(R.id.container_expansions);
 
-        if (((MainActivity) mActivity).mGoogleApiClient.isConnected()) {
-            PendingResult<PlaceLikelihoodBuffer> result = Places.PlaceDetectionApi
-                    .getCurrentPlace(((MainActivity) mActivity).mGoogleApiClient, null);
-            result.setResultCallback(new ResultCallback<PlaceLikelihoodBuffer>() {
-                @Override
-                public void onResult(PlaceLikelihoodBuffer likelyPlaces) {
-                    for (PlaceLikelihood placeLikelihood : likelyPlaces) {
-                        Log.i("V1", String.format("Place '%s' with " +
-                                        "likelihood: %g",
-                                //placeLikelihood.getPlace().getAddress(),
-                                //placeLikelihood.getPlace().getId(),
-                                placeLikelihood.getPlace().getName(),
-                                placeLikelihood.getLikelihood()));
-                    }
-                    likelyPlaces.release();
-                }
-            });
-        }else{
-            Log.d("V1", "not connected");
-        }
+
 
         View addButton = rootView.findViewById(R.id.addButton);
         addButton.setOnClickListener(new View.OnClickListener() {
@@ -333,17 +320,59 @@ public class AddPlayFragment extends Fragment implements
         locationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                int PLACE_PICKER_REQUEST = 2;
-                try {
-                    PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
-                    startActivityForResult(builder.build(mActivity), PLACE_PICKER_REQUEST);
-                }catch (Exception ignored){
-
+                if (((MainActivity) mActivity).mGoogleApiClient.isConnected()) {
+                    PendingResult<PlaceLikelihoodBuffer> result = Places.PlaceDetectionApi
+                            .getCurrentPlace(((MainActivity) mActivity).mGoogleApiClient, null);
+                    result.setResultCallback(new ResultCallback<PlaceLikelihoodBuffer>() {
+                        @Override
+                        public void onResult(PlaceLikelihoodBuffer likelyPlaces) {
+                            Place foundPlace = null;
+                            for (PlaceLikelihood placeLikelihood : likelyPlaces) {
+                                Log.i("V1", String.format("Place '%s' with " +
+                                                "likelihood: %g",
+                                //placeLikelihood.getPlace().getAddress(),
+                                //placeLikelihood.getPlace().getId(),
+                                placeLikelihood.getPlace().getName(),
+                                placeLikelihood.getLikelihood()));
+                                if (Location.findLocationByAddress(placeLikelihood.getPlace().getAddress().toString()) != null){
+                                    foundPlace = placeLikelihood.getPlace().freeze();
+                                    break;
+                                }else if (Location.findLocationByPlaceID(placeLikelihood.getPlace().getId().toString()) != null){
+                                    foundPlace = placeLikelihood.getPlace().freeze();
+                                    break;
+                                }else if (Location.findLocationByName(placeLikelihood.getPlace().getName().toString()) != null){
+                                    foundPlace = placeLikelihood.getPlace().freeze();
+                                    break;
+                                }
+                            }
+                            if (foundPlace != null){
+                                //we found a saved location that is equal to a spot where we are at
+                                //confirm with user
+                                LocationDialogFragment newFragment = new LocationDialogFragment(foundPlace).newInstance(0, foundPlace);
+                                newFragment.show(((MainActivity) mActivity).getSupportFragmentManager(), "locationPicker");
+                            }else{
+                                //we did not find a location, so we should ask the user to pick one
+                                List<Location> locations = Location.listAll(Location.class);
+                                if (locations.size() == 0){
+                                    //there are no saved locations, so go right into place picker
+                                    openPlacePicker();
+                                }else{
+                                    //there are saved locations, so pop dialog, asking them to choose one
+                                    LocationDialogFragment newFragment = new LocationDialogFragment(null).newInstance(1, null);
+                                    newFragment.show(((MainActivity) mActivity).getSupportFragmentManager(), "locationPicker");
+                                }
+                            }
+                            likelyPlaces.release();
+                        }
+                    });
+                }else{
+                    Log.d("V1", "not connected");
                 }
             }
         });
 
         textViewDate = (TextView) rootView.findViewById(R.id.textViewDate);
+        textViewLocation = (TextView) rootView.findViewById(R.id.locationName);
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         try {
@@ -391,6 +420,8 @@ public class AddPlayFragment extends Fragment implements
                 ImageLoader.getInstance().displayImage("file://" + mCurrentPhotoPath, playPhoto, options);
 
             }
+
+            textViewLocation.setText(Location.findById(Location.class, editPlay.playLocation.getId()).locationName);
 
             //players
             List<PlayersPerPlay> players = PlayersPerPlay.getPlayers(editPlay);
@@ -478,7 +509,7 @@ public class AddPlayFragment extends Fragment implements
         scoreValue.setSelectAllOnFocus(true);
         //if (addedPlayer.score != -9999999) {
         NumberFormat nf = new DecimalFormat("###.#");
-        scoreValue.setText(""+nf.format(addedPlayer.score));
+        scoreValue.setText("" + nf.format(addedPlayer.score));
         //}
 
 
@@ -553,6 +584,8 @@ public class AddPlayFragment extends Fragment implements
                 .cacheInMemory(false)
                 .considerExifParams(true)
                 .build();
+        Log.d("V1", "requestCode = " + requestCode);
+        Log.d("V1", "resultCode = " + resultCode);
         if (requestCode == 0 && resultCode == -1) {
             //Log.d("V1", "mCurrentPhotoPath=" + mCurrentPhotoPath);
             makeAThumb();
@@ -562,11 +595,39 @@ public class AddPlayFragment extends Fragment implements
             imageChooserManager.submit(requestCode, data);
         }else if (requestCode == 2) {
             if (resultCode == -1) {
+                // this is the place that the user selected
                 Place place = PlacePicker.getPlace(data, mActivity);
-                String toastMsg = String.format("Place: %s", place.getName());
-                String toastMsg2 = String.format("Place: %s", place.getAddress());
-                Toast.makeText(mActivity, toastMsg, Toast.LENGTH_LONG).show();
-                Toast.makeText(mActivity, toastMsg2, Toast.LENGTH_LONG).show();
+                if (!place.getAddress().toString().contains(place.getName().toString())){
+                    //address does not contain place name, which means the place name is set, so no confirmation is needed
+                    //check to see if it already exists
+                    Location checker = Location.findLocationByName(place.getName().toString());
+                    if (checker != null){
+                        //we found a location with this name already, so we'll just use it
+                        //set this as the location for this play
+                        locationId = checker;
+                        textViewLocation.setText(checker.locationName);
+                    }else {
+                        Location addMe = new Location(place.getName().toString(), place.getAddress().toString(), place.getId(), place.getLatLng().latitude, place.getLatLng().longitude);
+                        addMe.save();
+                        //set this as the location for this play
+                        locationId = addMe;
+                        textViewLocation.setText(addMe.locationName);
+                    }
+                }else{
+                    //address contains place name, meaning the place name is just an address
+
+                    Location checker = Location.findLocationByAddress(place.getName().toString());
+                    if (checker != null){
+                        //we found a location with this address already, so we'll just use it
+                        //set this as the location for this play
+                        locationId = checker;
+                        textViewLocation.setText(checker.locationName);
+                    }else {
+                        //we need a place name added
+                        LocationDialogFragment newFragment = new LocationDialogFragment(place).newInstance(2, place);
+                        newFragment.show(((MainActivity) mActivity).getSupportFragmentManager(), "locationPicker");
+                    }
+                }
             }
         }
     }
@@ -661,10 +722,11 @@ public class AddPlayFragment extends Fragment implements
                             savePlay.playDate = date1;
                             savePlay.playNotes = notesText.getText().toString();
                             savePlay.playPhoto = mCurrentPhotoName;
+                            savePlay.playLocation = locationId;
                             savePlay.save();
                             thePlay = savePlay;
                         }else{
-                            Play newPlay = new Play(date1, notesText.getText().toString(), mCurrentPhotoName);
+                            Play newPlay = new Play(date1, notesText.getText().toString(), mCurrentPhotoName, locationId);
                             newPlay.save();
                             thePlay = newPlay;
                         }
@@ -1246,6 +1308,204 @@ public class AddPlayFragment extends Fragment implements
                     });
 
             return builder.create();
+        }
+    }
+
+     public class LocationDialogFragment extends DialogFragment {
+         @Override
+         public void onPause() {
+             super.onPause();
+             try {
+                 InputMethodManager inputManager = (InputMethodManager)
+                         mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
+
+                 inputManager.hideSoftInputFromWindow(mActivity.getCurrentFocus().getWindowToken(),
+                         InputMethodManager.HIDE_NOT_ALWAYS);
+             } catch (Exception e) {
+             }
+         }
+
+         ArrayList<GameGroup> addedGroups;
+         ArrayList<CharSequence> theYears;
+         Place thePlace;
+         View inflator = null;
+
+         public LocationDialogFragment(Place place) {
+             super();
+             this.thePlace = place;
+         }
+
+         public LocationDialogFragment newInstance(int dialogType, Place thePlace) {
+             LocationDialogFragment frag = new LocationDialogFragment(thePlace);
+             Bundle args = new Bundle();
+             args.putInt("dialogType", dialogType);
+             frag.setArguments(args);
+             return frag;
+         }
+
+         @Override
+         public Dialog onCreateDialog(Bundle savedInstanceState) {
+             final int dialogType = getArguments().getInt("dialogType");
+             /*
+             0 = confirm found location
+             1 = list of saved locations, with add new on top
+             2 = set place name
+              */
+             AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
+             //Log.d("V1", "dialogType=" + dialogType);
+             if (dialogType == 0){
+                 //Log.d("V1", "in here");
+                 builder.setTitle(getString(R.string.are_you_at) + thePlace.getName().toString() + "?")
+                 .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                     @Override
+                     public void onClick(DialogInterface dialog, int id) {
+                         //not there, offer them the location chooser
+                         dialog.dismiss();
+                         LocationDialogFragment newFragment = new LocationDialogFragment(null).newInstance(1, null);
+                         newFragment.show(((MainActivity) mActivity).getSupportFragmentManager(), "locationPicker");
+                     }
+                 })
+                 .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                     @Override
+                     public void onClick(DialogInterface dialog, int id) {
+
+                     }
+                 });
+             }else if (dialogType == 1){
+                 //List<String> locations = Location.getAllLocationNames();
+                 //locations.add(0, "Add New");
+
+                 List<Location> theLocations = Location.listAll(Location.class);
+                 final List<String> locations = new ArrayList<>();
+                 for (Location aLocation:theLocations){
+                     locations.add(aLocation.locationName);
+                 }
+                 locations.add(getString(R.string.add_new));
+                 builder.setTitle(R.string.choose_location)
+                     .setItems(locations.toArray(new CharSequence[locations.size()]), new DialogInterface.OnClickListener() {
+                         public void onClick(DialogInterface dialog, int item) {
+                             dialog.dismiss();
+                             if (item == locations.size()-1) {
+                                 //trying to add a new one
+                                 openPlacePicker();
+                             } else {
+                                 //selected a location
+
+                                 //set the location to be output to the screen
+                                 Location useMe = Location.findLocationByName(locations.get(item));
+                                 locationId = useMe;
+                                 textViewLocation.setText(useMe.locationName);
+                                 //save the location in a variable, to be saved to the play
+                             }
+                         }
+                     })
+                     .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                         @Override
+                         public void onClick(DialogInterface dialog, int id) {
+                         }
+                     });
+             }else if (dialogType == 2){
+                 //we have to set a place name here
+                 LayoutInflater inflater = getActivity().getLayoutInflater();
+                 inflator = inflater.inflate(R.layout.dialog_location_name, null);
+                 builder.setView(inflator)
+                         // Add action buttons
+                         .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                             @Override
+                             public void onClick(DialogInterface dialog, int id) {
+
+
+                             }
+                         })
+                         .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                             public void onClick(DialogInterface dialog, int id) {
+                                 try {
+                                     InputMethodManager inputManager = (InputMethodManager)
+                                             mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
+
+                                     inputManager.hideSoftInputFromWindow(mActivity.getCurrentFocus().getWindowToken(),
+                                             InputMethodManager.HIDE_NOT_ALWAYS);
+                                 } catch (Exception e) {
+                                 }
+                                 LocationDialogFragment.this.getDialog().dismiss();
+                             }
+                         });
+                 //then we will save it as the name for the location
+                 //then we will use it as the location for this play
+             }
+             return builder.create();
+         }
+
+         @Override
+         public void onStart()
+         {
+             final int dialogType = getArguments().getInt("dialogType");
+             super.onStart();    //super.onStart() is where dialog.show() is actually called on the underlying dialog, so we have to do it after this point
+             AlertDialog d = (AlertDialog)getDialog();
+             if(d != null)
+             {
+                 Button positiveButton = (Button) d.getButton(Dialog.BUTTON_POSITIVE);
+                 positiveButton.setOnClickListener(new View.OnClickListener()
+                 {
+                     @Override
+                     public void onClick(View v)
+                     {
+                         Boolean wantToCloseDialog = false;
+
+                         if (dialogType == 0){
+                             //set this
+                             LocationDialogFragment.this.getDialog().dismiss();
+                             Location useMe = Location.findLocationByName(thePlace.getName().toString());
+                             locationId = useMe;
+
+                             textViewLocation.setText(useMe.locationName);
+                         }else if (dialogType == 2){
+                             EditText edit = (EditText) inflator.findViewById(R.id.locationName);
+                             String text = edit.getText().toString();
+
+                             //check to see if this name already exists
+                             Location checker = Location.findLocationByName(text);
+                             if (checker != null) {
+                                 //this name already exists.  toast the user and let them try it again
+                                 Toast.makeText(mActivity, getString(R.string.location_name_exists), Toast.LENGTH_LONG).show();
+                                 edit.selectAll();
+                             }else{
+                                 try {
+                                     InputMethodManager inputManager = (InputMethodManager)
+                                             mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
+
+                                     inputManager.hideSoftInputFromWindow(mActivity.getCurrentFocus().getWindowToken(),
+                                             InputMethodManager.HIDE_NOT_ALWAYS);
+                                 } catch (Exception e) {
+                                 }
+                                 LocationDialogFragment.this.getDialog().dismiss();
+                                 //then we will save it as the name for the new location
+                                 Location addMe = new Location(text, thePlace.getAddress().toString(), thePlace.getId(), thePlace.getLatLng().latitude, thePlace.getLatLng().longitude);
+                                 addMe.save();
+                                 //then we will use it as the location for this play
+                                 locationId = addMe;
+                                 textViewLocation.setText(addMe.locationName);
+                                 //set the location to be output to the screen
+                             }
+
+
+                         }
+
+                         if(wantToCloseDialog)
+                             dismiss();
+                     }
+                 });
+             }
+         }
+
+     }
+
+    public void openPlacePicker(){
+        try {
+            PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+            startActivityForResult(builder.build(mActivity), PLACE_PICKER_REQUEST);
+        }catch (Exception ignored){
+
         }
     }
 
