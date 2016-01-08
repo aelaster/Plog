@@ -61,7 +61,12 @@ public class BGGUtils {
             if (playToLog.playLocation == null) {
                 nvps.add(new BasicNameValuePair("location", "Plog"));
             }else{
-                nvps.add(new BasicNameValuePair("location", Location.findById(Location.class, playToLog.playLocation.getId()).locationName));
+                Location useMe = Location.findById(Location.class, playToLog.playLocation.getId());
+                if(useMe != null){
+                    nvps.add(new BasicNameValuePair("location", useMe.locationName));
+                }else {
+                    nvps.add(new BasicNameValuePair("location", "Plog"));
+                }
             }
             nvps.add(new BasicNameValuePair("quantity", String.valueOf(1)));
             nvps.add(new BasicNameValuePair("incomplete", "0"));

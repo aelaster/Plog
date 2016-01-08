@@ -421,7 +421,12 @@ public class AddPlayFragment extends Fragment implements
 
             }
 
-            textViewLocation.setText(Location.findById(Location.class, editPlay.playLocation.getId()).locationName);
+            if (editPlay.playLocation != null) {
+                Location useMe = Location.findById(Location.class, editPlay.playLocation.getId());
+                if (useMe != null) {
+                    textViewLocation.setText(useMe.locationName);
+                }
+            }
 
             //players
             List<PlayersPerPlay> players = PlayersPerPlay.getPlayers(editPlay);
