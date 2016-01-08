@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import com.lastsoft.plog.db.Game;
 import com.lastsoft.plog.db.GamesPerPlay;
+import com.lastsoft.plog.db.Location;
 import com.lastsoft.plog.db.Play;
 import com.lastsoft.plog.db.Player;
 import com.lastsoft.plog.db.PlayersPerPlay;
@@ -203,6 +204,9 @@ public class ViewPlayFragment_Pages extends Fragment {
         playDate = (TextView) viewPlayLayout.findViewById(R.id.gameDate);
         DateFormat outputFormatter = new SimpleDateFormat("MM/dd/yyyy");
         String output = outputFormatter.format(thisPlay.playDate); // Output : 01/20/2010
+        if (thisPlay.playLocation != null){
+            output = output + " at " + Location.findById(Location.class, thisPlay.playLocation.getId()).locationName;
+        }
         playDate.setText(output);
         playDate.setTransitionName(dateTransID);
 

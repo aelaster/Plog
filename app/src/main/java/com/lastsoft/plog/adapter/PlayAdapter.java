@@ -41,6 +41,7 @@ import com.lastsoft.plog.R;
 import com.lastsoft.plog.db.Game;
 import com.lastsoft.plog.db.GameGroup;
 import com.lastsoft.plog.db.GamesPerPlay;
+import com.lastsoft.plog.db.Location;
 import com.lastsoft.plog.db.Play;
 import com.lastsoft.plog.db.Player;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -288,6 +289,10 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
                 output_date = mActivity.getString( R.string.played_label) + outputFormatter.format(theDate); // Output : 01/20/2012
             }
             //String output_date = outputFormatter.format(theDate); // Output : 01/20/2012
+
+            if (plays.get(position).playLocation != null){
+                output_date = output_date + " at " + Location.findById(Location.class, plays.get(position).playLocation.getId()).locationName;
+            }
 
             viewHolder.getGameNameView().setText(GamesPerPlay.getBaseGame(plays.get(position)).gameName);
             viewHolder.getPlayDateView().setText(output_date);
