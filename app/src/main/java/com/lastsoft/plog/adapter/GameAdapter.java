@@ -137,7 +137,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
         this.notifyDataSetChanged();
     }
 
-    public List<Game> generateGameList(String mSearchQuery, int playListType, int sortType){
+    public List<Game> generateGameList(String mSearchQuery, int playListType, int sortType, int currentYear){
         /*
         SortType
         0 = Alpha AZ
@@ -147,7 +147,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
          */
 
         Calendar calendar = Calendar.getInstance();
-        int year = calendar.get(Calendar.YEAR);
+        int year = currentYear;
 
         List<Game> games_out;
         switch (playListType) {
@@ -212,7 +212,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
         fragmentName = mFragmentName;
         currentYear = mCurrentYear;
 
-        games = generateGameList(mSearchQuery, mPlayListType, mSortType);
+        games = generateGameList(mSearchQuery, mPlayListType, mSortType, mCurrentYear);
 
         options = new DisplayImageOptions.Builder()
                 .cacheOnDisk(true)

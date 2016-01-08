@@ -442,7 +442,7 @@ public class GamesFragment extends Fragment{
                         switch (item.getItemId()) {
                             case R.id.sort_az:
                                 sortType = 0;
-                                mAdapter.updateData(mAdapter.generateGameList(mSearchQuery, playListType, sortType));
+                                mAdapter.updateData(mAdapter.generateGameList(mSearchQuery, playListType, sortType, currentYear));
                                 mRecyclerView.scrollToPosition(0);
                                 if (mSearch != null) {
                                     mSearch.setHint(getString(R.string.filter) + mAdapter.getItemCount() + getString(R.string.filter_games));
@@ -450,27 +450,27 @@ public class GamesFragment extends Fragment{
                                 return true;
                             case R.id.sort_za:
                                 sortType = 1;
-                                mAdapter.updateData(mAdapter.generateGameList(mSearchQuery, playListType, sortType));
+                                mAdapter.updateData(mAdapter.generateGameList(mSearchQuery, playListType, sortType, currentYear));
                                 mRecyclerView.scrollToPosition(0);
                                 return true;
                             case R.id.sort_plays_x0:
                                 sortType = 2;
-                                mAdapter.updateData(mAdapter.generateGameList(mSearchQuery, playListType, sortType));
+                                mAdapter.updateData(mAdapter.generateGameList(mSearchQuery, playListType, sortType, currentYear));
                                 mRecyclerView.scrollToPosition(0);
                                 return true;
                             case R.id.sort_plays_0x:
                                 sortType = 3;
-                                mAdapter.updateData(mAdapter.generateGameList(mSearchQuery, playListType, sortType));
+                                mAdapter.updateData(mAdapter.generateGameList(mSearchQuery, playListType, sortType, currentYear));
                                 mRecyclerView.scrollToPosition(0);
                                 return true;
                             case R.id.sort_last_played_newold:
                                 sortType = 4;
-                                mAdapter.updateData(mAdapter.generateGameList(mSearchQuery, playListType, sortType));
+                                mAdapter.updateData(mAdapter.generateGameList(mSearchQuery, playListType, sortType, currentYear));
                                 mRecyclerView.scrollToPosition(0);
                                 return true;
                             case R.id.sort_last_played_oldnew:
                                 sortType = 5;
-                                mAdapter.updateData(mAdapter.generateGameList(mSearchQuery, playListType, sortType));
+                                mAdapter.updateData(mAdapter.generateGameList(mSearchQuery, playListType, sortType, currentYear));
                                 mRecyclerView.scrollToPosition(0);
                                 return true;
                         }
@@ -494,7 +494,7 @@ public class GamesFragment extends Fragment{
                     item.setTitle(getString(R.string.show_expansions));
                     item.setIcon(R.drawable.ic_visibility);
                     playListType = playListType_Holder;
-                    mAdapter.updateData(mAdapter.generateGameList(mSearchQuery, playListType, sortType));
+                    mAdapter.updateData(mAdapter.generateGameList(mSearchQuery, playListType, sortType, currentYear));
                     if (mSearch != null) {
                         mSearch.setHint(getString(R.string.filter) + mAdapter.getItemCount() + getString(R.string.filter_games));
                     }
@@ -511,7 +511,7 @@ public class GamesFragment extends Fragment{
                     }else {
                         playListType = 3;
                     }
-                    mAdapter.updateData(mAdapter.generateGameList(mSearchQuery, playListType, sortType));
+                    mAdapter.updateData(mAdapter.generateGameList(mSearchQuery, playListType, sortType, currentYear));
                     if (mSearch != null) {
                         mSearch.setHint(getString(R.string.filter) + mAdapter.getItemCount() + getString(R.string.filter_games));
                     }
@@ -622,7 +622,7 @@ public class GamesFragment extends Fragment{
 
     protected void updateDataset(){
         if (mAdapter != null) {
-            mAdapter.updateData(mAdapter.generateGameList(mSearchQuery, playListType, sortType));
+            mAdapter.updateData(mAdapter.generateGameList(mSearchQuery, playListType, sortType, currentYear));
             if (mSearch != null) {
                 mSearch.setHint(getString(R.string.filter) + mAdapter.getItemCount() + getString(R.string.filter_games));
             }

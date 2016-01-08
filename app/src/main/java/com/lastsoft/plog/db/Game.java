@@ -372,6 +372,7 @@ public class Game extends SugarRecord<Game> {
     }
 
     public static List<Game> getUniqueGames_GameGroup(GameGroup group, int sortType, int year){
+        Log.d("V1", "year = " + year);
         String query;
         query = " SELECT "+ StringUtil.toSQLName("Game") + ".*, COUNT(" + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + ") AS " + StringUtil.toSQLName("playCount") + ", MAX(" + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("playDate") + ") AS " + StringUtil.toSQLName("recentPlay") +
                 " FROM " + StringUtil.toSQLName("Game") +

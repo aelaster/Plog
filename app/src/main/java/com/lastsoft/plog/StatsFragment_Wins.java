@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -79,9 +80,9 @@ public class StatsFragment_Wins extends Fragment {
                 ArrayList<String> theYears = new ArrayList<String>();
 
                 Calendar calendar = Calendar.getInstance();
-                year = calendar.get(Calendar.YEAR);
+                //year = calendar.get(Calendar.YEAR);
                 theYears.add("All Time");
-                for (int i = year; i >= 2014; i--){
+                for (int i = calendar.get(Calendar.YEAR); i >= 2014; i--){
                     theYears.add(i+"");
                 }
                 year = 0;
@@ -475,6 +476,7 @@ public class StatsFragment_Wins extends Fragment {
                                 ((MainActivity) mActivity).openPlays(gameGroup.getId()+"", false, 1, getString(R.string.title_statistics), year);
                                 break;
                             case 1:
+                                Log.d("V1", "year = " + year);
                                 //((MainActivity) mActivity).openPlays(games.get(position).gameName, false);
                                 ((MainActivity) mActivity).openGames(gameGroup.getId()+"", false, 1, getString(R.string.title_statistics), year);
                                 break;
