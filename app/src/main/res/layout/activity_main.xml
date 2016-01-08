@@ -6,8 +6,31 @@
 
     <!-- As the main content view, the view below consumes the entire
          space available using match_parent in both dimensions. -->
+
+
     <FrameLayout android:id="@+id/container" android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent" android:background="@color/cardview_initial_background">
+            <LinearLayout
+                android:id="@+id/progressContainer"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:visibility="visible" >
+
+                <ProgressBar
+                    style="?android:attr/progressBarStyleLarge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:id="@+id/LoadingText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="20dp" >
+                </TextView>
+            </LinearLayout>
+        </FrameLayout>
 
     <!-- android:layout_gravity="start" tells DrawerLayout to treat
          this as a sliding drawer on the left side for left-to-right
@@ -32,5 +55,8 @@
             android:layout_gravity="center" android:gravity="center" android:background="#8b8b8b" android:layout_height="wrap_content"
             android:padding="5dp" android:textColor="@color/white"/>
     </LinearLayout>
+
+
+
 
 </android.support.v4.widget.DrawerLayout>

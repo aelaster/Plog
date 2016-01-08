@@ -37,7 +37,12 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.PlaceLikelihood;
+import com.google.android.gms.location.places.PlaceLikelihoodBuffer;
+import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.kbeanie.imagechooser.api.BChooserPreferences;
 import com.kbeanie.imagechooser.api.ChooserType;
@@ -81,7 +86,9 @@ import java.util.List;
  * create an instance of this fragment.
  */
 public class AddPlayFragment extends Fragment implements
-        ImageChooserListener {
+        ImageChooserListener
+         {
+    Activity mActivity;
     String mCurrentPhotoPath = "";
     String mCurrentPhotoName = "";
     private OnFragmentInteractionListener mListener;
@@ -110,6 +117,7 @@ public class AddPlayFragment extends Fragment implements
 
     private ViewGroup mContainerView_Players;
     private ViewGroup mContainerView_Expansions;
+
 
     List<Game> expansions;
 
@@ -202,6 +210,27 @@ public class AddPlayFragment extends Fragment implements
 
         mContainerView_Players = (ViewGroup) rootView.findViewById(R.id.container_players);
         mContainerView_Expansions = (ViewGroup) rootView.findViewById(R.id.container_expansions);
+
+        if (((MainActivity) mActivity).mGoogleApiClient.isConnected()) {
+            PendingResult<PlaceLikelihoodBuffer> result = Places.PlaceDetectionApi
+                    .getCurrentPlace(((MainActivity) mActivity).mGoogleApiClient, null);
+            result.setResultCallback(new ResultCallback<PlaceLikelihoodBuffer>() {
+                @Override
+                public void onResult(PlaceLikelihoodBuffer likelyPlaces) {
+                    for (PlaceLikelihood placeLikelihood : likelyPlaces) {
+                        Log.i("V1", String.format("Place '%s' with " +
+                                        "likelihood: %g",
+                                //placeLikelihood.getPlace().getAddress(),
+                                //placeLikelihood.getPlace().getId(),
+                                placeLikelihood.getPlace().getName(),
+                                placeLikelihood.getLikelihood()));
+                    }
+                    likelyPlaces.release();
+                }
+            });
+        }else{
+            Log.d("V1", "not connected");
+        }
 
         View addButton = rootView.findViewById(R.id.addButton);
         addButton.setOnClickListener(new View.OnClickListener() {
@@ -796,7 +825,7 @@ public class AddPlayFragment extends Fragment implements
         }
     }
 
-    Activity mActivity;
+
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);

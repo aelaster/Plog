@@ -36,6 +36,9 @@ import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.places.Places;
 import com.lastsoft.plog.adapter.PlayAdapter;
 import com.lastsoft.plog.db.Game;
 import com.lastsoft.plog.db.GameGroup;
@@ -74,7 +77,8 @@ public class MainActivity extends AppCompatActivity
         PlayersFragment.OnFragmentInteractionListener,
         GamesFragment.OnFragmentInteractionListener,
         StatsFragment.OnFragmentInteractionListener,
-        BGGLogInHelper.LogInListener {
+        BGGLogInHelper.LogInListener,
+        GoogleApiClient.OnConnectionFailedListener{
 
     static final String EXTRA_CURRENT_ITEM_POSITION = "extra_current_item_position";
     static final String EXTRA_OLD_ITEM_POSITION = "extra_old_item_position";
@@ -92,6 +96,7 @@ public class MainActivity extends AppCompatActivity
     StatsFragment mStatsFragment;
     PlayAdapter mPlayAdapter;
     protected PostMortemReportExceptionHandler mDamageReport = new PostMortemReportExceptionHandler(this);
+    public GoogleApiClient mGoogleApiClient;
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -106,7 +111,6 @@ public class MainActivity extends AppCompatActivity
     private boolean mIsReentering;
     public BGGLogInHelper mLogInHelper;
     public int currentFragmentCode = 4;
-    //private GoogleApiClient mGoogleApiClient;
 
     private final SharedElementCallback mCallback = new SharedElementCallback() {
         @Override
@@ -144,6 +148,11 @@ public class MainActivity extends AppCompatActivity
 
         setExitSharedElementCallback(mCallback);
         mDamageReport.initialize();
+
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(Places.PLACE_DETECTION_API)
+                .enableAutoManage(this, 0, this)
+                .build();
 
         mLogInHelper = new BGGLogInHelper(this, this);
 
@@ -803,6 +812,11 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onNeedCredentials() {
+
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
 
     }
 
