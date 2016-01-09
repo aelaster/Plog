@@ -28,17 +28,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 import android.util.Pair;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.CheckBox;
 import android.widget.TextView;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.places.Places;
 import com.lastsoft.plog.adapter.PlayAdapter;
 import com.lastsoft.plog.db.Game;
 import com.lastsoft.plog.db.GameGroup;
@@ -77,8 +76,8 @@ public class MainActivity extends AppCompatActivity
         PlayersFragment.OnFragmentInteractionListener,
         GamesFragment.OnFragmentInteractionListener,
         StatsFragment.OnFragmentInteractionListener,
-        BGGLogInHelper.LogInListener,
-        GoogleApiClient.OnConnectionFailedListener{
+        BGGLogInHelper.LogInListener
+        {
 
     static final String EXTRA_CURRENT_ITEM_POSITION = "extra_current_item_position";
     static final String EXTRA_OLD_ITEM_POSITION = "extra_old_item_position";
@@ -96,7 +95,6 @@ public class MainActivity extends AppCompatActivity
     StatsFragment mStatsFragment;
     PlayAdapter mPlayAdapter;
     protected PostMortemReportExceptionHandler mDamageReport = new PostMortemReportExceptionHandler(this);
-    public GoogleApiClient mGoogleApiClient;
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -148,11 +146,6 @@ public class MainActivity extends AppCompatActivity
 
         setExitSharedElementCallback(mCallback);
         mDamageReport.initialize();
-
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addApi(Places.PLACE_DETECTION_API)
-                .enableAutoManage(this, 0, this)
-                .build();
 
         mLogInHelper = new BGGLogInHelper(this, this);
 
@@ -815,10 +808,6 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-
-    }
 
     public class DeleteGroupFragment extends DialogFragment {
         public DeleteGroupFragment newInstance(long groupId) {
@@ -926,20 +915,26 @@ public class MainActivity extends AppCompatActivity
             // Use the Builder class for convenient dialog construction
             final long gameId = getArguments().getLong("gameId");
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            LayoutInflater inflater = getActivity().getLayoutInflater();
+            final View inflator = inflater.inflate(R.layout.dialog_delete_game_bgg, null);
             builder.setTitle(R.string.delete);
-            builder.setMessage(R.string.confirm_delete_game)
-                    .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            Game deleteMe = Game.findById(Game.class, gameId);
-
-                            //Log.d("V1", "has game been played? = " + GamesPerPlay.hasGameBeenPlayed(deleteMe));
+            builder.setMessage(R.string.confirm_delete_game);
+            builder.setView(inflator)
+                 // Add action buttons
+                 .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                     @Override
+                     public void onClick(DialogInterface dialog, int id) {
+                         Game deleteMe = Game.findById(Game.class, gameId);
                             //check if this game has been played
                             //if so, can't delete
                             if (!GamesPerPlay.hasGameBeenPlayed(deleteMe)){
                                 deleteMe.delete();
 
                                 //delete from BGG
-                                updateGameViaBGG(deleteMe.gameName, deleteMe.gameBGGID, deleteMe.gameBGGCollectionID, false, true);
+                                CheckBox deleteBox = (CheckBox) inflator.findViewById(R.id.deleteCheckbox);
+                                if (deleteBox.isChecked()) {
+                                    updateGameViaBGG(deleteMe.gameName, deleteMe.gameBGGID, deleteMe.gameBGGCollectionID, false, true);
+                                }
                             }else{
                                 Snackbar
                                         .make(mGamesFragment.mCoordinatorLayout,
@@ -951,13 +946,13 @@ public class MainActivity extends AppCompatActivity
                             onFragmentInteraction("refresh_games");
                             //onBackPressed();
                             dismiss();
-                        }
-                    })
-                    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            dismiss();
-                        }
-                    });
+                     }
+                 })
+                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                     public void onClick(DialogInterface dialog, int id) {
+                         dismiss();
+                     }
+                 });
             // Create the AlertDialog object and return it
             return builder.create();
         }

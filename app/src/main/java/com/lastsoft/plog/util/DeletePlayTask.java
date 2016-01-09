@@ -2,7 +2,6 @@ package com.lastsoft.plog.util;
 
 import android.content.Context;
 import android.os.AsyncTask;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.lastsoft.plog.R;
@@ -40,7 +39,6 @@ public class DeletePlayTask extends AsyncTask<String, Void, String> {
 
         BGGLogInHelper helper = new BGGLogInHelper(theContext, null);
         if (helper.checkCookies()) {
-            Log.d("V1", "play to log = " + playToLog[0]);
             UrlEncodedFormEntity entity;
             List<NameValuePair> nvps = new ArrayList<NameValuePair>();
             //nvps.add(new BasicNameValuePair("ajax", "1"));

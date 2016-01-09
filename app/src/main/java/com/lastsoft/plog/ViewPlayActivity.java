@@ -15,6 +15,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.FileProvider;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
@@ -271,7 +272,20 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
             public boolean onMenuItemClick(MenuItem item) {
                 int id = item.getItemId();
                 long menuPlayId = mPlayAdapter.plays.get(mPager.getCurrentItem()).getId();
-                if (id == R.id.edit_play) {
+                if (id == R.id.view_image) {
+                    //openAddPlay(GamesPerPlay.getBaseGame(Play.findById(Play.class, menuPlayId)).gameName, menuPlayId);
+                    String[] photoParts = Play.findById(Play.class, menuPlayId).playPhoto.split("/");
+                    File newFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)+"/Plog/",photoParts[photoParts.length-1]);
+                    Uri contentUri = FileProvider.getUriForFile(getApplicationContext(), "com.lastsoft.plog.fileprovider", newFile);
+                    //Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI.buildUpon().appendPath("Pictures/" + photoParts[photoParts.length - 1]).build();
+                    //Log.d("V1", uri.toString());
+                    Intent intent = new Intent();
+                    intent.setAction(Intent.ACTION_VIEW);
+                    intent.setDataAndType(contentUri, "image/*");
+                    intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    startActivity(intent);
+                    return true;
+                } else if (id == R.id.edit_play) {
                     toolbar.setVisibility(View.GONE);
                     openAddPlay(GamesPerPlay.getBaseGame(Play.findById(Play.class, menuPlayId)).gameName, menuPlayId);
                     return true;

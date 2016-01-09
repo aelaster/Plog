@@ -33,7 +33,7 @@
             android:id="@+id/score"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:maxLength="3"
+            android:maxLength="5"
             android:layout_gravity="center_vertical"
             android:inputType="numberDecimal|numberSigned"
             android:layout_toRightOf="@id/color"

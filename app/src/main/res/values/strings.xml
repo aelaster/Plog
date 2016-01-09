@@ -101,7 +101,7 @@
     <string name="choose_photo">Choose Photo</string>
     <string name="game_photo">Game Photo:</string>
     <string name="name_taken">Name taken</string>
-    <string name="choose_location">Choose Location</string>
+    <string name="choose_location">Where are you?</string>
     <string name="are_you_at">"Are you at "</string>
     <string name="add_new">Add New</string>
     <string name="enter_location_name">Enter Location Name</string>
@@ -208,9 +208,12 @@
     <string name="sort_last_played_oldnew">Last Played (Old->New)</string>
 
     <string name="sort">Sort</string>
+    <string name="delete_game_bgg">Delete game from BGG?</string>
+    <string name="view_image">View Image</string>
 
     <string name="title_pref_behavior">App Behavior</string>
     <string name="title_solo_remove_bucket_list">Remove Solo Plays from Bucket List</string>
+    <string name="title_last_used_location">Default to last used location</string>
     <string name="title_bucket_list_weight">Weigh Random Bucket List Games</string>
     <string name="summary_bucket_list_weight">Games are weighted according to how long ago they were added</string>
 

@@ -1,5 +1,7 @@
 package com.lastsoft.plog.db;
 
+import android.util.Log;
+
 import com.orm.StringUtil;
 import com.orm.SugarRecord;
 
@@ -51,10 +53,29 @@ public class Location extends SugarRecord<Location> {
         }
     }
 
-    public static List getAllLocationNames(){
+    public static Location findLocationByLatLng(double lat, double lng){
+        //List<Location> queery = Location.find(Location.class, StringUtil.toSQLName("locationLat") + " = ? and " + StringUtil.toSQLName("locationLong") + " = ?", ""+lat, ""+lng);
         String query;
-        query = " SELECT " + StringUtil.toSQLName("Location") + "." + StringUtil.toSQLName("locationName") +
+        query = " SELECT " + StringUtil.toSQLName("Location") + ".*" +
+                " FROM " + StringUtil.toSQLName("Location") +
+                " WHERE ROUND(" + StringUtil.toSQLName("locationLat") + ",4) = " + lat + " and ROUND(" + StringUtil.toSQLName("locationLong") + ",4) = " + lng;
+        Log.d("V1", "lat = " + lat);
+        Log.d("V1", "lng = " + lng);
+        Log.d("V1", query);
+        List<Location> queery = Location.findWithQuery(Location.class, query);
+        if (queery.size() > 0) {
+            return queery.get(0);
+        } else {
+            return null;
+        }
+    }
+
+    public static List getAllLocations(){
+        String query;
+        query = " SELECT " + StringUtil.toSQLName("Location") + ".*" +
                 " FROM " + StringUtil.toSQLName("Location");
+        query = query + " GROUP BY " + StringUtil.toSQLName("Location") + "." + StringUtil.toSQLName("id") +
+            " ORDER BY " + StringUtil.toSQLName("Location") + "." + StringUtil.toSQLName("locationName") + " ASC";
         return Location.findWithQuery(Location.class, query);
     }
 }

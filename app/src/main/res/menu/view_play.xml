@@ -1,6 +1,8 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools" tools:context=".MainActivity">
+    <item android:id="@+id/view_image" android:title="@string/view_image"
+        app:showAsAction="ifRoom" android:icon="@drawable/ic_settings_overscan"/>
     <item android:id="@+id/share_play" android:title="@string/share_play"
         app:showAsAction="ifRoom" android:icon="@drawable/ic_action_share"/>
     <item android:id="@+id/edit_play" android:title="@string/edit_play"

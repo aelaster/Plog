@@ -1,14 +1,11 @@
 package com.lastsoft.plog;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.graphics.Typeface;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.FileProvider;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -159,25 +156,6 @@ public class ViewPlayFragment_Pages extends Fragment {
         if (thisPlay.playPhoto != null && !thisPlay.playPhoto.equals("") && new File(playPhoto).exists()){
             ImageLoader.getInstance().displayImage("file://" + playPhoto, playImage, options);
             //Picasso.with(mActivity).load(thisPlay.playPhoto).fit().into(playImage);
-
-            playImage.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (progressContainer.getVisibility() != View.VISIBLE) {
-                        progressContainer.setVisibility(View.VISIBLE);
-                        String[] photoParts = thisPlay.playPhoto.split("/");
-                        File newFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)+"/Plog/",photoParts[photoParts.length-1]);
-                        Uri contentUri = FileProvider.getUriForFile(getActivity().getApplicationContext(), "com.lastsoft.plog.fileprovider", newFile);
-                        //Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI.buildUpon().appendPath("Pictures/" + photoParts[photoParts.length - 1]).build();
-                        //Log.d("V1", uri.toString());
-                        Intent intent = new Intent();
-                        intent.setAction(Intent.ACTION_VIEW);
-                        intent.setDataAndType(contentUri, "image/*");
-                        intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                        startActivity(intent);
-                    }
-                }
-            });
         }else{
             String gameThumb = GamesPerPlay.getBaseGame(thisPlay).gameThumb;
             if (gameThumb != null && !gameThumb.equals("")) {
@@ -186,8 +164,6 @@ public class ViewPlayFragment_Pages extends Fragment {
             }else{
                 playImage.setImageDrawable(null);
             }
-            playImage.setOnClickListener(null);
-
         }
 
         //get game for this play
