@@ -245,12 +245,18 @@ public class StatsFragment_Wins extends Fragment {
                     e.printStackTrace();
                 }
             }else {
-                theGroup = GameGroup.refreshStats(theGroup, year);
-                totalPlays = theGroup.totalPlays;
-                totalUnique = theGroup.uniqueGames;
+                GameGroup theGroupHolder;
+                theGroupHolder = GameGroup.refreshStats(theGroup, year);
+                if (theGroupHolder != null) {
+                    totalPlays = theGroupHolder.totalPlays;
+                    totalUnique = theGroupHolder.uniqueGames;
+                }else{
+                    totalPlays = 0;
+                    totalUnique = 0;
+                }
                 totalUnplayed = Game.getUnplayedGames_GameGroup(GameGroup.findById(GameGroup.class, theGroup.getId()), 0, false, year).size();
                 try {
-                    for (int i = 0; i < groupPlayers.size(); i++){
+                    for (int i = 0; i < groupPlayers.size(); i++) {
                         Player thisPlayer = Player.findById(Player.class, groupPlayers.get(i).getId());
                         //regular wins
                         int regularWins = Play.totalWins_GameGroup_Player(theGroup, thisPlayer, 0, year).size();
@@ -267,6 +273,7 @@ public class StatsFragment_Wins extends Fragment {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+
             }
 
             return output;
@@ -324,23 +331,44 @@ public class StatsFragment_Wins extends Fragment {
 
                 for (int x = 0; x < result.size(); x++) {
                     if (theGroup.getId() == 0) {
-                        addStat(-1, result.get(x).player.playerName + " " + getString(R.string.stats_regular_wins) + getString(R.string.percentage), roundTwoDecimals((((result.get(x).regularWins) * 100.0 / result.get(x).playerPlayed))) + "%", result.get(x).player.getId() + "");
+                        if (result.get(x).playerPlayed > 0) {
+                            addStat(-1, result.get(x).player.playerName + " " + getString(R.string.stats_regular_wins) + getString(R.string.percentage), roundTwoDecimals((((result.get(x).regularWins) * 100.0 / result.get(x).playerPlayed))) + "%", result.get(x).player.getId() + "");
+                        }else{
+                            //addStat(-1, result.get(x).player.playerName + " " + getString(R.string.stats_regular_wins) + getString(R.string.percentage), "0%", result.get(x).player.getId() + "");
+                        }
                     } else {
-                        addStat(-1, result.get(x).player.playerName + " " + getString(R.string.stats_total_wins) + getString(R.string.percentage), roundTwoDecimals((((result.get(x).asteriskWins + result.get(x).regularWins) * 100.0 / result.get(x).totalPlays))) + "%", result.get(x).player.getId() + "");
-                        addStat(7, result.get(x).player.playerName + " " + getString(R.string.stats_regular_wins) + getString(R.string.percentage), roundTwoDecimals(((result.get(x).regularWins * 100.0 / result.get(x).totalPlays))) + "%", result.get(x).player.getId() + "");
-                        if (result.get(x).asteriskWins > 0) {
-                            addStat(-1, result.get(x).player.playerName + " " + getString(R.string.stats_asterisk_wins) + getString(R.string.percentage), roundTwoDecimals((((result.get(x).asteriskWins) * 100.0 / result.get(x).totalPlays))) + "%", result.get(x).player.getId() + "");
+                        if (result.get(x).totalPlays > 0){
+                            addStat(-1, result.get(x).player.playerName + " " + getString(R.string.stats_total_wins) + getString(R.string.percentage), roundTwoDecimals((((result.get(x).asteriskWins + result.get(x).regularWins) * 100.0 / result.get(x).totalPlays))) + "%", result.get(x).player.getId() + "");
+                            addStat(7, result.get(x).player.playerName + " " + getString(R.string.stats_regular_wins) + getString(R.string.percentage), roundTwoDecimals(((result.get(x).regularWins * 100.0 / result.get(x).totalPlays))) + "%", result.get(x).player.getId() + "");
+                            if (result.get(x).asteriskWins > 0) {
+                                addStat(-1, result.get(x).player.playerName + " " + getString(R.string.stats_asterisk_wins) + getString(R.string.percentage), roundTwoDecimals((((result.get(x).asteriskWins) * 100.0 / result.get(x).totalPlays))) + "%", result.get(x).player.getId() + "");
+                            }
+                        }else{
+                            /*addStat(-1, result.get(x).player.playerName + " " + getString(R.string.stats_total_wins) + getString(R.string.percentage), "0%", result.get(x).player.getId() + "");
+                            addStat(7, result.get(x).player.playerName + " " + getString(R.string.stats_regular_wins) + getString(R.string.percentage), "0%", result.get(x).player.getId() + "");
+                            if (result.get(x).asteriskWins > 0) {
+                                addStat(-1, result.get(x).player.playerName + " " + getString(R.string.stats_asterisk_wins) + getString(R.string.percentage), "0%", result.get(x).player.getId() + "");
+                            }*/
                         }
                     }
 
 
-                    if (sharedCounter > 0) {
-                        addStat(-1, getString(R.string.stats_shared_wins) + getString(R.string.percentage), roundTwoDecimals(((sharedCounter * 100.0 / result.get(0).totalPlays))) + "%", "");
+
+                }
+                if (sharedCounter > 0) {
+                        if (result.get(0).totalPlays > 0) {
+                            addStat(-1, getString(R.string.stats_shared_wins) + getString(R.string.percentage), roundTwoDecimals(((sharedCounter * 100.0 / result.get(0).totalPlays))) + "%", "");
+                        }else{
+                            addStat(-1, getString(R.string.stats_shared_wins) + getString(R.string.percentage), "0%", "");
+                        }
                     }
                     if (loserCounter > 0) {
-                        addStat(-1, getString(R.string.stats_total_losses) + getString(R.string.percentage), roundTwoDecimals(((loserCounter * 100.0 / result.get(0).totalPlays))) + "%", "");
+                        if (result.get(0).totalPlays > 0) {
+                            addStat(-1, getString(R.string.stats_total_losses) + getString(R.string.percentage), roundTwoDecimals(((loserCounter * 100.0 / result.get(0).totalPlays))) + "%", "");
+                        }else{
+                            addStat(-1, getString(R.string.stats_total_losses) + getString(R.string.percentage), "0%", "");
+                        }
                     }
-                }
             }
             mydialog.dismiss();
         }

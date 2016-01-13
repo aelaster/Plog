@@ -66,7 +66,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
-import xyz.danoz.recyclerviewfastscroller.vertical.VerticalRecyclerViewFastScroller;
+//import xyz.danoz.recyclerviewfastscroller.vertical.VerticalRecyclerViewFastScroller;
 
 public class GamesFragment extends Fragment{
 
@@ -110,7 +110,7 @@ public class GamesFragment extends Fragment{
     FloatingActionButton addPlayer;
     private String fragmentName = "";
     int fabMargin;
-    VerticalRecyclerViewFastScroller fastScroller;
+    //VerticalRecyclerViewFastScroller fastScroller;
 
 
     public static GamesFragment newInstance(boolean fromDrawer, String searchQuery, int playListType, String fragmentName, int currentYear) {
@@ -173,17 +173,17 @@ public class GamesFragment extends Fragment{
             }
         });
 
-        fastScroller = (VerticalRecyclerViewFastScroller) rootView.findViewById(R.id.fastscroller);
+        //fastScroller = (VerticalRecyclerViewFastScroller) rootView.findViewById(R.id.fastscroller);
 
         // Connect the recycler to the scroller (to let the scroller scroll the list)
         //fastScroller.setRecyclerView(mRecyclerView, pullToRefreshView);
 
         // Connect the scroller to the recycler (to let the recycler scroll the scroller's handle)
-        mRecyclerView.setOnScrollListener(fastScroller.getOnScrollListener());
+        //mRecyclerView.setOnScrollListener(fastScroller.getOnScrollListener());
 
         addPlayer = (FloatingActionButton) rootView.findViewById(R.id.add_game);
         if (fromDrawer && playListType != 2) {
-            fastScroller.setRecyclerView(mRecyclerView, pullToRefreshView);
+            //fastScroller.setRecyclerView(mRecyclerView, pullToRefreshView);
             addPlayer.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -222,7 +222,7 @@ public class GamesFragment extends Fragment{
                 params.setBehavior(behavior);
 
             }
-            fastScroller.setRecyclerView(mRecyclerView, null);
+            //fastScroller.setRecyclerView(mRecyclerView, null);
             pullToRefreshView.setEnabled(false);
             addPlayer.setVisibility(View.GONE);
         }
@@ -306,7 +306,7 @@ public class GamesFragment extends Fragment{
                         //mActivity.onBackPressed();
                     }
 
-                    fastScroller.scrollHider();
+                    //fastScroller.scrollHider();
 
                     InputMethodManager inputManager = (InputMethodManager)
                             mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);

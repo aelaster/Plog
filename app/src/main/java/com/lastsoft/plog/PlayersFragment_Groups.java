@@ -34,8 +34,6 @@ import net.i2p.android.ext.floatingactionbutton.FloatingActionsMenu;
 
 import java.util.List;
 
-import xyz.danoz.recyclerviewfastscroller.vertical.VerticalRecyclerViewFastScroller;
-
 /**
  * Demonstrates the use of {@link RecyclerView} with a {@link LinearLayoutManager} and a
  * {@link GridLayoutManager}.
@@ -89,13 +87,13 @@ public class PlayersFragment_Groups extends Fragment{
 
         // BEGIN_INCLUDE(initializeRecyclerView)
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerView);
-        VerticalRecyclerViewFastScroller fastScroller = (VerticalRecyclerViewFastScroller) rootView.findViewById(R.id.fastscroller);
+        //VerticalRecyclerViewFastScroller fastScroller = (VerticalRecyclerViewFastScroller) rootView.findViewById(R.id.fastscroller);
 
         // Connect the recycler to the scroller (to let the scroller scroll the list)
-        fastScroller.setRecyclerView(mRecyclerView, null);
+        //fastScroller.setRecyclerView(mRecyclerView, null);
 
         // Connect the scroller to the recycler (to let the recycler scroll the scroller's handle)
-        mRecyclerView.setOnScrollListener(fastScroller.getOnScrollListener());
+        //mRecyclerView.setOnScrollListener(fastScroller.getOnScrollListener());
 
         // LinearLayoutManager is used here, this will layout the elements in a similar fashion
         // to the way ListView would layout elements. The RecyclerView.LayoutManager defines how

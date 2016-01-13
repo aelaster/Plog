@@ -47,8 +47,6 @@ import android.widget.RelativeLayout;
 import com.lastsoft.plog.adapter.PlayAdapter;
 import com.lastsoft.plog.util.MyRecyclerScroll;
 
-import xyz.danoz.recyclerviewfastscroller.vertical.VerticalRecyclerViewFastScroller;
-
 public class PlaysFragment extends Fragment{
 
     private static final String TAG = "PlaysFragment";
@@ -129,10 +127,10 @@ public class PlaysFragment extends Fragment{
         // BEGIN_INCLUDE(initializeRecyclerView)
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerView);
         mRecyclerView.setBackgroundColor(getResources().getColor(R.color.cardview_initial_background));
-        VerticalRecyclerViewFastScroller fastScroller = (VerticalRecyclerViewFastScroller) rootView.findViewById(R.id.fastscroller);
+        //VerticalRecyclerViewFastScroller fastScroller = (VerticalRecyclerViewFastScroller) rootView.findViewById(R.id.fastscroller);
 
         // Connect the recycler to the scroller (to let the scroller scroll the list)
-        fastScroller.setRecyclerView(mRecyclerView, null);
+        //fastScroller.setRecyclerView(mRecyclerView, null);
 
         addPlay = (FloatingActionButton) rootView.findViewById(R.id.add_play);
         if (fromDrawer && playListType != 2) {
@@ -166,7 +164,7 @@ public class PlaysFragment extends Fragment{
         });
 
         // Connect the scroller to the recycler (to let the recycler scroll the scroller's handle)
-        mRecyclerView.addOnScrollListener(fastScroller.getOnScrollListener());
+        //mRecyclerView.addOnScrollListener(fastScroller.getOnScrollListener());
 
         // LinearLayoutManager is used here, this will layout the elements in a similar fashion
         // to the way ListView would layout elements. The RecyclerView.LayoutManager defines how
@@ -184,11 +182,11 @@ public class PlaysFragment extends Fragment{
 
         //mAdapter = new PlayAdapter(mActivity, this);
 
-        if (((MainActivity)mActivity).mPlayAdapter != null) {
+        /*if (((MainActivity)mActivity).mPlayAdapter != null) {
             mAdapter = ((MainActivity) mActivity).mPlayAdapter;
-        }else{
+        }else{*/
             mAdapter = ((MainActivity) mActivity).initPlayAdapter(mSearchQuery, fromDrawer, playListType, currentYear);
-        }
+        //}
         // Set CustomAdapter as the adapter for RecyclerView.
         mRecyclerView.setAdapter(mAdapter);
         // END_INCLUDE(initializeRecyclerView)

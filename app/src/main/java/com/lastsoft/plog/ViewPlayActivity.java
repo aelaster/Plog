@@ -274,7 +274,7 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
                 long menuPlayId = mPlayAdapter.plays.get(mPager.getCurrentItem()).getId();
                 if (id == R.id.view_image) {
                     //openAddPlay(GamesPerPlay.getBaseGame(Play.findById(Play.class, menuPlayId)).gameName, menuPlayId);
-                    String[] photoParts = Play.findById(Play.class, menuPlayId).playPhoto.split("/");
+                    String[] photoParts = mPlayAdapter.plays.get(mPager.getCurrentItem()).playPhoto.split("/");
                     File newFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)+"/Plog/",photoParts[photoParts.length-1]);
                     Uri contentUri = FileProvider.getUriForFile(getApplicationContext(), "com.lastsoft.plog.fileprovider", newFile);
                     //Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI.buildUpon().appendPath("Pictures/" + photoParts[photoParts.length - 1]).build();

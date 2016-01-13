@@ -734,7 +734,11 @@ public class Play extends SugarRecord<Play> {
                 " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("game") + " = " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("id") +
                 " INNER JOIN "+ StringUtil.toSQLName("PlayersPerPlay") + " P " +
                 " ON PP." + StringUtil.toSQLName("id") + " = P." + StringUtil.toSQLName("play") +
-                " WHERE P." + StringUtil.toSQLName("score") + " < P." + StringUtil.toSQLName("playHighScore") +
+                " WHERE ((P." + StringUtil.toSQLName("score") + " < P." + StringUtil.toSQLName("playHighScore") +
+                " AND P." + StringUtil.toSQLName("playHighScore") + " > P." + StringUtil.toSQLName("playLowScore") + ") " +
+                " OR (P." + StringUtil.toSQLName("score") + " = P." + StringUtil.toSQLName("playLowScore") +
+                " AND P." + StringUtil.toSQLName("playHighScore") + " = P." + StringUtil.toSQLName("playLowScore") + ") " +
+                " AND P." + StringUtil.toSQLName("playHighScore") + " = 0) " +
                 " AND " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("expansionFlag") + " = 0 " +
                 " AND P." + StringUtil.toSQLName("player") + " in " +
                 " (SELECT " + StringUtil.toSQLName("player") +

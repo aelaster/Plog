@@ -240,6 +240,7 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
         sortType = mSortType;
         fromDrawer = mFromDrawer;
         currentYear = mCurrentYear;
+        searchQuery = mSearchQuery;
 
         plays = generatePlayData(mSearchQuery, mPlayListType, mSortType, mCurrentYear);
 
@@ -309,7 +310,7 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
                         return;
                     }
                     mLastClickTime = SystemClock.elapsedRealtime();
-                    ((MainActivity) mActivity).onPlayClicked(plays.get(position), mFragment, viewHolder.getImageView(), viewHolder.getGameNameView(), viewHolder.getPlayDateView(), position, fromDrawer, playListType, sortType);
+                    ((MainActivity) mActivity).onPlayClicked(plays.get(position), mFragment, viewHolder.getImageView(), viewHolder.getGameNameView(), viewHolder.getPlayDateView(), position, fromDrawer, playListType, sortType, searchQuery);
                 }
             });
             viewHolder.getOverflowLayout().setOnClickListener(new View.OnClickListener() {

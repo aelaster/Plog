@@ -154,6 +154,7 @@ public class MainActivity extends AppCompatActivity
 
         if (savedInstanceState != null) {
             currentFragmentCode = savedInstanceState.getInt(CURRENT_FRAGMENT_CODE);
+            mSearchQuery = getIntent().getExtras().getString("searchQuery");
         }
 
 
@@ -206,6 +207,7 @@ public class MainActivity extends AppCompatActivity
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(CURRENT_FRAGMENT_CODE, currentFragmentCode);
+        outState.putString("searchQuery", mSearchQuery);
     }
 
     @Override
@@ -242,8 +244,8 @@ public class MainActivity extends AppCompatActivity
     private String mSearchQuery;
     public PlayAdapter initPlayAdapter(String searchQuery, boolean fromDrawer, int playListType, int currentYear){
         mSearchQuery = searchQuery;
-        mPlayAdapter = new PlayAdapter(this, mPlaysFragment, searchQuery, fromDrawer, playListType, 0, currentYear);
-        return mPlayAdapter;
+        return new PlayAdapter(this, mPlaysFragment, searchQuery, fromDrawer, playListType, 0, currentYear);
+        //return mPlayAdapter;
     }
 
     @Override
@@ -515,6 +517,7 @@ public class MainActivity extends AppCompatActivity
                 actionBar.setTitle(mTitle);
             } else if (fragmentCode == 6) {
                 //plays
+                initPlayAdapter(mSearchQuery, false, 0, CurrentYear);
                 mNavigationDrawerFragment.mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
                 mNavigationDrawerFragment.mDrawerToggle.setDrawerIndicatorEnabled(true);
                 actionBar.setDisplayShowCustomEnabled(true);
@@ -522,6 +525,11 @@ public class MainActivity extends AppCompatActivity
                 actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
                 mTitle = getString(R.string.title_plays);
                 actionBar.setTitle(mTitle);
+                PlaysFragment playsFrag = (PlaysFragment)
+                    getSupportFragmentManager().findFragmentByTag("plays");
+                if (playsFrag != null) {
+                    mPlaysFragment = playsFrag;
+                }
             } else if (fragmentCode == 7) {
                 //stats
                 mNavigationDrawerFragment.mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
@@ -645,6 +653,12 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        //Log.d("V1", "mPlayAdapter length = " + mPlayAdapter.getItemCount());
+    }
+
     public void openAddPlayer(Fragment mFragment, long playerID){
 
         FragmentManager fragmentManager = getSupportFragmentManager();
@@ -675,18 +689,15 @@ public class MainActivity extends AppCompatActivity
 
 
     int firstVisible, lastVisible;
-    public void onPlayClicked(Play clickedPlay, Fragment mFragment, final View view, final View nameView, final View dateView, int position, boolean fromDrawer, int playListType, int sortType){
-
+    public void onPlayClicked(Play clickedPlay, Fragment mFragment, final View view, final View nameView, final View dateView, int position, boolean fromDrawer, int playListType, int sortType, String theSearchQuery){
         mIsReentering = false;
-
-
         firstVisible = ((LinearLayoutManager) mPlaysFragment.mRecyclerView.getLayoutManager())
                 .findFirstCompletelyVisibleItemPosition();
         lastVisible = ((LinearLayoutManager) mPlaysFragment.mRecyclerView.getLayoutManager())
                 .findLastCompletelyVisibleItemPosition();
 
         Intent intent = new Intent(MainActivity.this, ViewPlayActivity.class);
-        intent.putExtra("searchQuery", mSearchQuery);
+        intent.putExtra("searchQuery", theSearchQuery);
         intent.putExtra("playID", clickedPlay.getId());
         intent.putExtra("imageTransID", view.getTransitionName());
         intent.putExtra("nameTransID", nameView.getTransitionName());
