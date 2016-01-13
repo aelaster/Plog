@@ -155,7 +155,7 @@ public class ViewPlayFragment_Pages extends Fragment {
                 Environment.DIRECTORY_PICTURES) + "/Plog/" + thisPlay.playPhoto;
         if (thisPlay.playPhoto != null && !thisPlay.playPhoto.equals("") && new File(playPhoto).exists()){
             ImageLoader.getInstance().displayImage("file://" + playPhoto, playImage, options);
-            //Picasso.with(mActivity).load(thisPlay.playPhoto).fit().into(playImage);
+            //Picasso.with(mActivity).load("file://" + playPhoto).fit().into(playImage);
         }else{
             String gameThumb = GamesPerPlay.getBaseGame(thisPlay).gameThumb;
             if (gameThumb != null && !gameThumb.equals("")) {

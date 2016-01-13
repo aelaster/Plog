@@ -36,6 +36,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.RecyclerView.OnScrollListener;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -57,6 +58,7 @@ import com.lastsoft.plog.adapter.GameAdapter;
 import com.lastsoft.plog.db.Game;
 import com.lastsoft.plog.util.LoadGamesTask;
 import com.lastsoft.plog.util.MyRecyclerScroll;
+import com.pluscubed.recyclerfastscroll.RecyclerFastScroller;
 
 import java.io.File;
 import java.io.IOException;
@@ -173,6 +175,20 @@ public class GamesFragment extends Fragment{
             }
         });
 
+        mRecyclerView.setOnScrollListener(new OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                boolean enable = false;
+                boolean firstItemVisiblePull = recyclerView.getChildPosition(recyclerView.getChildAt(0)) == 0;
+                boolean topOfFirstItemVisiblePull = recyclerView.getChildAt(0).getTop() == recyclerView.getChildAt(0).getTop();;
+                enable = firstItemVisiblePull && topOfFirstItemVisiblePull;
+                pullToRefreshView.setEnabled(enable);
+            }
+        });
+
+        RecyclerFastScroller fastScroller = (RecyclerFastScroller) rootView.findViewById(R.id.fastscroller);
+        fastScroller.attachRecyclerView(mRecyclerView);
         //fastScroller = (VerticalRecyclerViewFastScroller) rootView.findViewById(R.id.fastscroller);
 
         // Connect the recycler to the scroller (to let the scroller scroll the list)

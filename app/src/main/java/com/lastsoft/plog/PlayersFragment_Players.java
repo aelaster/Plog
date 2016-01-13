@@ -30,6 +30,7 @@ import android.view.ViewGroup;
 import com.lastsoft.plog.adapter.PlayerAdapter;
 import com.lastsoft.plog.db.Player;
 import com.lastsoft.plog.util.MyRecyclerScroll;
+import com.pluscubed.recyclerfastscroll.RecyclerFastScroller;
 
 import net.i2p.android.ext.floatingactionbutton.FloatingActionsMenu;
 
@@ -89,6 +90,8 @@ public class PlayersFragment_Players extends Fragment{
 
         // BEGIN_INCLUDE(initializeRecyclerView)
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerView);
+        RecyclerFastScroller fastScroller = (RecyclerFastScroller) rootView.findViewById(R.id.fastscroller);
+        fastScroller.attachRecyclerView(mRecyclerView);
         //VerticalRecyclerViewFastScroller fastScroller = (VerticalRecyclerViewFastScroller) rootView.findViewById(R.id.fastscroller);
 
         // Connect the recycler to the scroller (to let the scroller scroll the list)

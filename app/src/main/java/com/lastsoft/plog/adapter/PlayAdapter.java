@@ -329,16 +329,16 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
                 if (gameThumb != null && !gameThumb.equals("")) {
                     //ImageLoader.getInstance().displayImage("http:" + GamesPerPlay.getBaseGame(plays.get(position)).gameThumb, viewHolder.getImageView(), options);
                     //ImageLoader.getInstance().loadImage("http:" + GamesPerPlay.getBaseGame(plays.get(position)).gameThumb, options, null);
-                    Picasso.with(mActivity).load("http:" + GamesPerPlay.getBaseGame(plays.get(position)).gameThumb).into(viewHolder.getImageView());
+                    Picasso.with(mActivity).load("http:" + GamesPerPlay.getBaseGame(plays.get(position)).gameThumb).fit().into(viewHolder.getImageView());
                 }else{
                     viewHolder.getImageView().setImageDrawable(null);
                 }
             }else{
                 String thumbPath =  playPhoto.substring(0, playPhoto.length() - 4) + "_thumb6.jpg";
                 if (new File(thumbPath).exists()) {
-                    ImageLoader.getInstance().displayImage("file://" + thumbPath, viewHolder.getImageView(), options);
-                    ImageLoader.getInstance().loadImage("file://" + playPhoto, options, null);
-                    //Picasso.with(mActivity).load("file://" + thumbPath).into(viewHolder.getImageView());
+                    //ImageLoader.getInstance().displayImage("file://" + thumbPath, viewHolder.getImageView(), options);
+                    //ImageLoader.getInstance().loadImage("file://" + playPhoto, options, null);
+                    Picasso.with(mActivity).load("file://" + thumbPath).into(viewHolder.getImageView());
                 }else{
                     ImageLoader.getInstance().displayImage("file://" + playPhoto, viewHolder.getImageView(), options);
                     //Picasso.with(mActivity).load(playPhoto).fit().into(viewHolder.getImageView());

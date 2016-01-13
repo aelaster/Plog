@@ -46,6 +46,7 @@ import android.widget.RelativeLayout;
 
 import com.lastsoft.plog.adapter.PlayAdapter;
 import com.lastsoft.plog.util.MyRecyclerScroll;
+import com.pluscubed.recyclerfastscroll.RecyclerFastScroller;
 
 public class PlaysFragment extends Fragment{
 
@@ -127,10 +128,10 @@ public class PlaysFragment extends Fragment{
         // BEGIN_INCLUDE(initializeRecyclerView)
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerView);
         mRecyclerView.setBackgroundColor(getResources().getColor(R.color.cardview_initial_background));
-        //VerticalRecyclerViewFastScroller fastScroller = (VerticalRecyclerViewFastScroller) rootView.findViewById(R.id.fastscroller);
+        RecyclerFastScroller fastScroller = (RecyclerFastScroller) rootView.findViewById(R.id.fastscroller);
 
         // Connect the recycler to the scroller (to let the scroller scroll the list)
-        //fastScroller.setRecyclerView(mRecyclerView, null);
+        fastScroller.attachRecyclerView(mRecyclerView);
 
         addPlay = (FloatingActionButton) rootView.findViewById(R.id.add_play);
         if (fromDrawer && playListType != 2) {
@@ -195,10 +196,10 @@ public class PlaysFragment extends Fragment{
             mSearch.setHint(getString(R.string.filter) + mAdapter.getItemCount() + getString(R.string.filter_plays));
         }
 
-        //boolean pauseOnScroll = true; // or true
-        //boolean pauseOnFling = true; // or false
-        //NewPauseOnScrollListener listener = new NewPauseOnScrollListener(ImageLoader.getInstance(), pauseOnScroll, pauseOnFling);
-        //mRecyclerView.addOnScrollListener(listener);
+        /*boolean pauseOnScroll = true; // or true
+        boolean pauseOnFling = true; // or false
+        NewPauseOnScrollListener listener = new NewPauseOnScrollListener(ImageLoader.getInstance(), pauseOnScroll, pauseOnFling);
+        mRecyclerView.addOnScrollListener(listener);*/
 
         if (!fromDrawer){
             RelativeLayout playsLayout = (RelativeLayout) rootView.findViewById(R.id.playsLayout);
