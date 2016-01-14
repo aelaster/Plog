@@ -154,7 +154,7 @@ public class MainActivity extends AppCompatActivity
 
         if (savedInstanceState != null) {
             currentFragmentCode = savedInstanceState.getInt(CURRENT_FRAGMENT_CODE);
-            mSearchQuery = getIntent().getExtras().getString("searchQuery");
+            mSearchQuery = savedInstanceState.getString("searchQuery");
         }
 
 

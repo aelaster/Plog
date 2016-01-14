@@ -15,6 +15,7 @@ import android.widget.ArrayAdapter;
 
 import com.google.gson.Gson;
 import com.lastsoft.plog.db.GameGroup;
+import com.lastsoft.plog.db.TenByTen;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -187,7 +188,11 @@ public class StatsFragment extends Fragment {
 
         @Override
         public int getCount() {
-            return 2;
+            if (TenByTen.hasATenByTen(theGroup)){
+                return 2;
+            }else{
+                return 1;
+            }
         }
 
         @Override

@@ -40,6 +40,21 @@ public class TenByTen extends SugarRecord<TenByTen> {
                 " order by " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " ASC ", ""+group.getId(), ""+year);
     }
 
+    public static boolean hasATenByTen(GameGroup group){
+        String query = " SELECT * " +
+                " FROM " + StringUtil.toSQLName("TenByTen") +
+                " INNER JOIN " + StringUtil.toSQLName("Game") +
+                " ON " + StringUtil.toSQLName("TenByTen") + "." + StringUtil.toSQLName("game") + " = " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("id") +
+                " and " + StringUtil.toSQLName("TenByTen") + "." + StringUtil.toSQLName("gameGroup") + " = ? " +
+                " order by " + StringUtil.toSQLName("Game") + "." + StringUtil.toSQLName("gameName") + " ASC ";
+        List<TenByTen> queery = TenByTen.findWithQuery(TenByTen.class, query, ""+group.getId());
+        if (queery.size() > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public static void deleteTenByTen(long gameID, int year) {
         TenByTen.findWithQuery(TenByTen.class, "DELETE FROM " + StringUtil.toSQLName("TenByTen") + " where " + StringUtil.toSQLName("game") + " = ?" +
                 " and " + StringUtil.toSQLName("TenByTen") + "." + StringUtil.toSQLName("year") + " = ? ", gameID + "", year + "");
