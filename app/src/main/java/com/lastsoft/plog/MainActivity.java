@@ -169,7 +169,7 @@ public class MainActivity extends AppCompatActivity
         }else{
             setContentView(R.layout.activity_main);
 
-            ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this)
+            ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getApplicationContext())
                     .memoryCacheSize(41943040)
                     .diskCacheSize(104857600)
                     .threadPoolSize(10)
@@ -230,6 +230,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        System.gc();
         if (mDamageReport != null) {
             mDamageReport.restoreOriginalHandler();
             mDamageReport = null;

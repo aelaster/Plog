@@ -39,6 +39,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.OnScrollListener;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -171,21 +172,11 @@ public class GamesFragment extends Fragment{
 
             @Override
             public void onRefresh() {
-                initDataset();
+                initDataset(true);
             }
         });
 
-        mRecyclerView.setOnScrollListener(new OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                boolean enable = false;
-                boolean firstItemVisiblePull = recyclerView.getChildPosition(recyclerView.getChildAt(0)) == 0;
-                boolean topOfFirstItemVisiblePull = recyclerView.getChildAt(0).getTop() == recyclerView.getChildAt(0).getTop();;
-                enable = firstItemVisiblePull && topOfFirstItemVisiblePull;
-                pullToRefreshView.setEnabled(enable);
-            }
-        });
+
 
         RecyclerFastScroller fastScroller = (RecyclerFastScroller) rootView.findViewById(R.id.fastscroller);
         fastScroller.attachRecyclerView(mRecyclerView);
@@ -200,6 +191,17 @@ public class GamesFragment extends Fragment{
         addPlayer = (FloatingActionButton) rootView.findViewById(R.id.add_game);
         if (fromDrawer && playListType != 2) {
             //fastScroller.setRecyclerView(mRecyclerView, pullToRefreshView);
+            mRecyclerView.setOnScrollListener(new OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                    super.onScrolled(recyclerView, dx, dy);
+                    boolean enable = false;
+                    boolean firstItemVisiblePull = recyclerView.getChildPosition(recyclerView.getChildAt(0)) == 0;
+                    boolean topOfFirstItemVisiblePull = recyclerView.getChildAt(0).getTop() == recyclerView.getChildAt(0).getTop();;
+                    enable = firstItemVisiblePull && topOfFirstItemVisiblePull;
+                    pullToRefreshView.setEnabled(enable);
+                }
+            });
             addPlayer.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -332,7 +334,7 @@ public class GamesFragment extends Fragment{
                     mSearch.clearFocus();
                     mRecyclerView.requestFocus();
 
-                    initDataset();
+                    initDataset(false);
 
                     if (mSearch != null) {
                         mSearch.setHint(getString(R.string.filter) + mAdapter.getItemCount() + getString(R.string.filter_games));
@@ -344,7 +346,7 @@ public class GamesFragment extends Fragment{
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
         if (Game.findBaseGames("", sortType, year).size() == 0){
-            initDataset();
+            initDataset(false);
         }else {
             mText.setVisibility(View.GONE);
             mProgress.setVisibility(View.GONE);
@@ -619,8 +621,8 @@ public class GamesFragment extends Fragment{
 
 
     GamesLoader myTask;
-    private void initDataset() {
-        myTask = new GamesLoader(mActivity);
+    private void initDataset(boolean notify) {
+        myTask = new GamesLoader(mActivity, notify);
         try {
             myTask.execute();
 
@@ -631,7 +633,7 @@ public class GamesFragment extends Fragment{
 
     protected void refreshDataset(boolean reInit){
         if (reInit) {
-            initDataset();
+            initDataset(true);
         }
         updateDataset();
     }
@@ -643,7 +645,7 @@ public class GamesFragment extends Fragment{
                 mSearch.setHint(getString(R.string.filter) + mAdapter.getItemCount() + getString(R.string.filter_games));
             }
         }else{
-            initDataset();
+            initDataset(false);
         }
     }
 
@@ -652,14 +654,16 @@ public class GamesFragment extends Fragment{
     }
 
     public class GamesLoader extends LoadGamesTask {
-        public GamesLoader(Context context) {
+        private boolean notify;
+        public GamesLoader(Context context, boolean notify) {
             super(context);
+            this.notify = notify;
         }
 
         @Override
         protected void onPostExecute(final String result) {
             pullToRefreshView.setRefreshing(false);
-            if (result.equals("true")) {
+            if (result.equals("true") && notify) {
                 //Toast.makeText(theContext, theContext.getString(R.string.bgg_process_notice), Toast.LENGTH_LONG).show();
                 //go again
                 //wait a few seconds before tryi
@@ -719,17 +723,20 @@ public class GamesFragment extends Fragment{
     private File createImageFile() throws IOException {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "Plog/PLAY_" + timeStamp + "_";
+        String fileName = "PLAY_" + timeStamp + "_";
+        String imageFileName = fileName;
         File storageDir = Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_PICTURES);
+        File plogDir = new File(storageDir, "/Plog/");
         File image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
+                imageFileName,
+                ".jpg",
+                plogDir
         );
 
         // Save a file: path for use with ACTION_VIEW intents
-        mCurrentPhotoPath = "file://" + image.getAbsolutePath();
+        mCurrentPhotoPath = Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES) + "/Plog/" + image.getName();
         return image;
     }
 

@@ -186,6 +186,8 @@ public class LoadGamesTask extends AsyncTask<String, Void, String> {
                         }
                     }
                 }
+            }else{
+                Toast.makeText(theContext, theContext.getString(R.string.no_default_player), Toast.LENGTH_LONG).show();
             }
         } catch (Exception e) {
             e.printStackTrace();

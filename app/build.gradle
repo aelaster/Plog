@@ -2,14 +2,14 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "22.0.1"
+    buildToolsVersion "24.0.3"
 
     defaultConfig {
         applicationId "com.lastsoft.plog"
         minSdkVersion 21
         targetSdkVersion 22
-        versionCode 61
-        versionName "0.0.60"
+        versionCode 63
+        versionName "0.0.62"
         multiDexEnabled true
     }
     buildTypes {

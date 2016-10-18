@@ -26,6 +26,7 @@ import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -83,7 +84,7 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
      * Provide a reference to the type of views that you are using (custom ViewHolder)
      */
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        private final TextView gameNameView;
+        private final TextView gameNameView, playDescView;
         private final TextView playDateView, playWinnerView;
         private final ImageView imageView;
         private final LinearLayout overflowLayout;
@@ -94,6 +95,7 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
             super(v);
             // Define click listener for the ViewHolder's View.
             gameNameView = (TextView) v.findViewById(R.id.gameName);
+            playDescView = (TextView) v.findViewById(R.id.playDesc);
             playDateView = (TextView) v.findViewById(R.id.playDate);
             playWinnerView = (TextView) v.findViewById(R.id.playWinner);
             imageView = (ImageView) v.findViewById(R.id.imageView1);
@@ -113,6 +115,9 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
         }
         public TextView getGameNameView() {
             return gameNameView;
+        }
+        public TextView getPlayDescView() {
+            return playDescView;
         }
         public LinearLayout getOverflowLayout() {
             return overflowLayout;
@@ -293,6 +298,14 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
 
             if (plays.get(position).playLocation != null){
                 output_date = output_date + " at " + Location.findById(Location.class, plays.get(position).playLocation.getId()).locationName;
+            }
+
+            if (plays.get(position).playNotes != null && !plays.get(position).playNotes.equals("")){
+                viewHolder.getPlayDescView().setVisibility(View.VISIBLE);
+                viewHolder.getPlayDescView().setText("\""+ plays.get(position).playNotes + "\"");
+            }else{
+                Log.d("V1", "gone");
+                viewHolder.getPlayDescView().setVisibility(View.GONE);
             }
 
             viewHolder.getGameNameView().setText(GamesPerPlay.getBaseGame(plays.get(position)).gameName);

@@ -295,14 +295,18 @@ public class AddPlayFragment extends Fragment implements
                         photoFile = createImageFile();
                     } catch (IOException ex) {
                         // Error occurred while creating the File
+                        ex.printStackTrace();
 
                     }
                     // Continue only if the File was successfully created
                     if (photoFile != null) {
                         photoUri = Uri.fromFile(photoFile);
+                        Log.d("V1", "photoUri = " + photoUri);
                         takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,
                                 photoUri);
                         startActivityForResult(takePictureIntent, 0);
+                    }else{
+                        Log.d("V1", "photofile is null");
                     }
                 }
             }
@@ -612,14 +616,17 @@ public class AddPlayFragment extends Fragment implements
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String fileName = "PLAY_" + timeStamp + "_";
-        String imageFileName = "Plog/" + fileName;
+        String imageFileName = fileName;
         File storageDir = Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_PICTURES);
+        File plogDir = new File(storageDir, "/Plog/");
         File image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
+                imageFileName,
+                ".jpg",
+                plogDir
         );
+
+        //File image = new File(storageDir + "/" + imageFileName + ".jpg");
 
         // Save a file: path for use with ACTION_VIEW intents
         mCurrentPhotoName = image.getName();
@@ -630,12 +637,16 @@ public class AddPlayFragment extends Fragment implements
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d("V1", "requestCode=" + requestCode);
+        Log.d("V1", "resultCode=" + resultCode);
         DisplayImageOptions options = new DisplayImageOptions.Builder()
                 .cacheOnDisk(false)
                 .cacheInMemory(false)
                 .considerExifParams(true)
                 .build();
-        if (requestCode == 0 && resultCode == -1) {
+        if (requestCode == 0 && resultCode == 0) {
+            mCurrentPhotoName = "";
+        }else if (requestCode == 0 && resultCode == -1) {
             //Log.d("V1", "mCurrentPhotoPath=" + mCurrentPhotoPath);
             makeAThumb();
             ImageLoader.getInstance().displayImage("file://" + mCurrentPhotoPath, playPhoto, options);
@@ -1450,7 +1461,11 @@ public class AddPlayFragment extends Fragment implements
                          //not there, offer them the location chooser
                          dialog.dismiss();
                          LocationDialogFragment newFragment = new LocationDialogFragment(null, null).newInstance(1, null, null);
-                         newFragment.show(((MainActivity) mActivity).getSupportFragmentManager(), "locationPicker");
+                         if (mActivity instanceof MainActivity) {
+                             newFragment.show(((MainActivity) mActivity).getSupportFragmentManager(), "locationPicker");
+                         }else{
+                             newFragment.show(((ViewPlayActivity) mActivity).getSupportFragmentManager(), "locationPicker");
+                         }
                      }
                  })
                  .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {

@@ -100,7 +100,16 @@ public class BGGUtils {
                 nvps.add(new BasicNameValuePair("playid", expansionGame.bggPlayId));
             }
             //nvps.add(new BasicNameValuePair("length", String.valueOf(60)));
-            nvps.add(new BasicNameValuePair("location", "Plog"));
+            if (playToLog.playLocation == null) {
+                nvps.add(new BasicNameValuePair("location", "Plog"));
+            }else{
+                Location useMe = Location.findById(Location.class, playToLog.playLocation.getId());
+                if(useMe != null){
+                    nvps.add(new BasicNameValuePair("location", useMe.locationName));
+                }else {
+                    nvps.add(new BasicNameValuePair("location", "Plog"));
+                }
+            }
             nvps.add(new BasicNameValuePair("quantity", String.valueOf(1)));
             nvps.add(new BasicNameValuePair("incomplete", "0"));
             nvps.add(new BasicNameValuePair("nowinstats", "0"));
