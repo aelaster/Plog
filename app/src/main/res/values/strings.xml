@@ -148,7 +148,7 @@
 
     <string name="bgg_process_notice">BGG is processing this request.  Try again if your collection is not updated.</string>
 
-    <string name="no_default_player">There isn't a default player set.  Go to Players and set a player as default.</string>
+    <string name="no_default_player">There isn\'t a default player set.  Go to Players and set a player as default.</string>
 
     <string name="confirm_delete_game">Are you sure you want to delete this game?</string>
     <string name="confirm_delete_group">Are you sure you want to delete this group?</string>

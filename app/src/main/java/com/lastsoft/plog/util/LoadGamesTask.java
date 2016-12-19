@@ -71,12 +71,49 @@ public class LoadGamesTask extends AsyncTask<String, Void, String> {
         }
     }
 
+    private String getExpansionsCollection(String bggUsername){
+        try {
+            URL url = null;
+            URLConnection ucon = null;
+            url = new URL("https://www.boardgamegeek.com/xmlapi2/collection?username=" + bggUsername + "&subtype=boardgameexpansion");
+            ucon = url.openConnection();
+            ucon.setConnectTimeout(3000);
+            ucon.setReadTimeout(3000);
+                     /* Define InputStreams to read
+                        * from the URLConnection. */
+            InputStream is = ucon.getInputStream();
+            BufferedInputStream bis = new BufferedInputStream(is, 1024);
+
+                       /* Read bytes to the Buffer until
+                        * there is nothing more to read(-1). */
+            ByteArrayBuffer baf = new ByteArrayBuffer(1024);
+            int current = 0;
+            while ((current = bis.read()) != -1) {
+                baf.append((byte) current);
+            }
+
+            String myString = new String(baf.toByteArray());
+            bis.close();
+            is.close();
+
+            return myString;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return "will be processed";
+        }catch (Exception e) {
+            e.printStackTrace();
+            return "will be processed";
+        }
+    }
+
     // automatically done on worker thread (separate from UI thread)
     @Override
     protected String doInBackground(final String... args) {
 
         String myString = "";
+        String myString2 = "";
         String bggProcess = "false";
+        String bggProcess2 = "false";
 
         try {
 
@@ -130,35 +167,20 @@ public class LoadGamesTask extends AsyncTask<String, Void, String> {
 
 
                         // then we go through and flag every expansion in my collection
-                        url = new URL("https://www.boardgamegeek.com/xmlapi2/collection?username=" + defaultPlayer.bggUsername + "&subtype=boardgameexpansion");
-                        URLConnection ucon = url.openConnection();
-                        ucon.setConnectTimeout(3000);
-                        ucon.setReadTimeout(30000);
-                     /* Define InputStreams to read
-                        * from the URLConnection. */
-                        InputStream is = ucon.getInputStream();
-                        BufferedInputStream bis = new BufferedInputStream(is, 1024);
-
-                       /* Read bytes to the Buffer until
-                        * there is nothing more to read(-1). */
-                        ByteArrayBuffer baf = new ByteArrayBuffer(1024);
-                        int current = 0;
-                        while ((current = bis.read()) != -1) {
-                            baf.append((byte) current);
+                        myString2 = getExpansionsCollection(defaultPlayer.bggUsername);
+                        //Log.d("V1", myString);
+                        if (myString2 != null && myString2.contains("will be processed")){
+                            //do it again
+                            bggProcess = "true";
                         }
 
-                        myString = new String(baf.toByteArray());
-
-                        bis.close();
-                        is.close();
-
-                        if (myString != null) {
+                        if (myString2 != null && !bggProcess.equals("true")) {
 
                             factory = XmlPullParserFactory.newInstance();
                             factory.setNamespaceAware(true);
                             parser = factory.newPullParser();
                             parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
-                            parser.setInput(new StringReader(myString));
+                            parser.setInput(new StringReader(myString2));
                             //parser.nextTag();
                             // parser.require(XmlPullParser.START_TAG, null, "items");
 
@@ -197,7 +219,6 @@ public class LoadGamesTask extends AsyncTask<String, Void, String> {
 
     @Override
     protected void onPostExecute(final String result) {
-        Log.d("V1", "result = " + result);
         if (result.equals("true")) {
             Toast.makeText(theContext, theContext.getString(R.string.bgg_process_notice), Toast.LENGTH_LONG).show();
         }
@@ -286,6 +307,8 @@ public class LoadGamesTask extends AsyncTask<String, Void, String> {
 
         if (gameOwn.equals("1")) {
             Game updateMe = Game.findGameByName(gameName);
+            //Log.d("V1", updateMe.gameName);
+            //Log.d("V1", ""+updateMe.expansionFlag);
             if (updateMe != null && !updateMe.expansionFlag) {
                 updateMe.collectionFlag = true;
                 updateMe.expansionFlag = true;
