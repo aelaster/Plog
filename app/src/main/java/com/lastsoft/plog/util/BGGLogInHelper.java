@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.lastsoft.plog.db.Player;
 
@@ -19,6 +20,7 @@ import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
+import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -104,7 +106,7 @@ public class BGGLogInHelper {
 
 
             final DefaultHttpClient client = (DefaultHttpClient) HttpUtils.createHttpClient(mContext, false);
-            final HttpPost post = new HttpPost("http://www.boardgamegeek.com/login");
+            final HttpPost post = new HttpPost("https://www.boardgamegeek.com/login");
             List<NameValuePair> pair = new ArrayList<NameValuePair>();
             pair.add(new BasicNameValuePair("username", mUsername));
             pair.add(new BasicNameValuePair("password", mPassword));
@@ -120,6 +122,7 @@ public class BGGLogInHelper {
             HttpResponse response;
             try {
                 response = client.execute(post);
+                //Log.d("V1" ,"login response = " + EntityUtils.toString(response.getEntity()));
             } catch (ClientProtocolException e) {
                 return e.toString();
             } catch (IOException e) {

@@ -39,8 +39,8 @@ import java.util.zip.GZIPInputStream;
 public class HttpUtils {
     private final static String TAG = "HttpUtils";
 
-    public static final String BASE_URL = "http://boardgamegeek.com/xmlapi/";
-    public static final String BASE_URL_2 = "http://boardgamegeek.com/xmlapi2/";
+    public static final String BASE_URL = "https://boardgamegeek.com/xmlapi/";
+    public static final String BASE_URL_2 = "https://boardgamegeek.com/xmlapi2/";
 
     private static final int TIMEOUT_SECS = 60;
     private static final int BUFFER_SIZE = 8192;

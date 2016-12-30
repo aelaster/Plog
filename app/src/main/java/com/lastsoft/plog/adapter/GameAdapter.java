@@ -411,7 +411,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
                          }
                          return true;
                      case R.id.open_bgg:
-                         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://bgg.cc/boardgame/" + games.get(position).gameBGGID));
+                         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://bgg.cc/boardgame/" + games.get(position).gameBGGID));
                          mActivity.startActivity(browserIntent);
                          return true;
                      case R.id.update_bgg:

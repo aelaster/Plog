@@ -191,7 +191,7 @@ public class UpdateBGGTask extends AsyncTask<String, Void, String> {
                     nvps.add(new BasicNameValuePair("action", "delete"));
                     try {
                         entity = new UrlEncodedFormEntity(nvps, HTTP.UTF_8);
-                        HttpPost post = new HttpPost("http://www.boardgamegeek.com/geekcollection.php");
+                        HttpPost post = new HttpPost("https://www.boardgamegeek.com/geekcollection.php");
                         post.setEntity(entity);
                         HttpClient mClient = HttpUtils.createHttpClient(theContext, helper.getCookieStore());
                         HttpResponse response = mClient.execute(post);
@@ -226,7 +226,7 @@ public class UpdateBGGTask extends AsyncTask<String, Void, String> {
                     nvps.add(new BasicNameValuePair("action", "savedata"));
                     try {
                         entity = new UrlEncodedFormEntity(nvps, HTTP.UTF_8);
-                        HttpPost post = new HttpPost("http://www.boardgamegeek.com/geekcollection.php");
+                        HttpPost post = new HttpPost("https://www.boardgamegeek.com/geekcollection.php");
                         post.setEntity(entity);
                         HttpClient mClient = HttpUtils.createHttpClient(theContext, helper.getCookieStore());
                         HttpResponse response = mClient.execute(post);
