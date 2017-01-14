@@ -63,6 +63,7 @@
     <string name="show_expansions">Show Expansions</string>
     <string name="hide_expansions">Hide Expansions</string>
     <string name="unable_remove_game">Unable to remove played games</string>
+    <string name="unable_find_game">Unable to find game on BGG.</string>
 
     <string name="is_expansion">Is Expansion</string>
     <string name="color">Color</string>

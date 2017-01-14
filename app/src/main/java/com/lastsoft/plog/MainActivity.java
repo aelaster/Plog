@@ -1326,6 +1326,15 @@ public class MainActivity extends AppCompatActivity
                     newFragment.show(getSupportFragmentManager(), "gamePicker");
                 }
                 //onFragmentInteraction("update_games");
+            }else{
+                Game deleteMe = Game.findById(Game.class, gameId);
+                deleteMe.delete();
+                onFragmentInteraction("refresh_games");
+                Snackbar
+                        .make(mGamesFragment.mCoordinatorLayout,
+                                getString(R.string.unable_find_game),
+                                Snackbar.LENGTH_LONG)
+                        .show(); // Do not forget to show!
             }
         }
     }
