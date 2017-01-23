@@ -498,6 +498,7 @@ public class StatsFragment_Wins extends Fragment {
                 newView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
+
                         switch (statType) {
                             case 0:
                                 //((MainActivity) mActivity).openPlays(games.get(position).gameName, false);

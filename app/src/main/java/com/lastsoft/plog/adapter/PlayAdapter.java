@@ -323,7 +323,7 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
                         return;
                     }
                     mLastClickTime = SystemClock.elapsedRealtime();
-                    ((MainActivity) mActivity).onPlayClicked(plays.get(position), mFragment, viewHolder.getImageView(), viewHolder.getGameNameView(), viewHolder.getPlayDateView(), position, fromDrawer, playListType, sortType, searchQuery);
+                    ((MainActivity) mActivity).onPlayClicked(plays.get(position), mFragment, viewHolder.getImageView(), viewHolder.getGameNameView(), viewHolder.getPlayDateView(), position, fromDrawer, playListType, sortType, searchQuery, currentYear);
                 }
             });
             viewHolder.getOverflowLayout().setOnClickListener(new View.OnClickListener() {

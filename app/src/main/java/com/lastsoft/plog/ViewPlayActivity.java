@@ -26,6 +26,7 @@ import android.transition.Fade;
 import android.transition.Slide;
 import android.transition.Transition;
 import android.transition.TransitionSet;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
@@ -321,6 +322,7 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
 
 
         //setBackgroundColor(getResources().getColor(R.color.cardview_initial_background));
+        Log.d("V1", "viewplay current year = " + currentYear);
         mPlayAdapter = new PlayAdapter(this, null, searchQuery, fromDrawer, playListType, sortType, currentYear);
         // Instantiate a ViewPager and a PagerAdapter.
         mPager = (CustomViewPager) findViewById(R.id.pager);

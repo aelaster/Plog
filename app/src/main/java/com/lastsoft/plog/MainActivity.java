@@ -690,7 +690,7 @@ public class MainActivity extends AppCompatActivity
 
 
     int firstVisible, lastVisible;
-    public void onPlayClicked(Play clickedPlay, Fragment mFragment, final View view, final View nameView, final View dateView, int position, boolean fromDrawer, int playListType, int sortType, String theSearchQuery){
+    public void onPlayClicked(Play clickedPlay, Fragment mFragment, final View view, final View nameView, final View dateView, int position, boolean fromDrawer, int playListType, int sortType, String theSearchQuery, int currentYear){
         mIsReentering = false;
         firstVisible = ((LinearLayoutManager) mPlaysFragment.mRecyclerView.getLayoutManager())
                 .findFirstCompletelyVisibleItemPosition();
@@ -707,6 +707,7 @@ public class MainActivity extends AppCompatActivity
         intent.putExtra("fromDrawer", fromDrawer);
         intent.putExtra("playListType", playListType);
         intent.putExtra("sortType", sortType);
+        intent.putExtra("currentYear", currentYear);
 
         View decor = getWindow().getDecorView();
         View statusBar = decor.findViewById(android.R.id.statusBarBackground);
