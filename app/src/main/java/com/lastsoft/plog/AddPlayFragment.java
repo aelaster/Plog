@@ -34,6 +34,7 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -657,7 +658,8 @@ public class AddPlayFragment extends Fragment implements
             if (resultCode == -1) {
                 // this is the place that the user selected
                 Place place = PlacePicker.getPlace(data, mActivity);
-                if (!place.getAddress().toString().contains(place.getName().toString())){
+
+                if (!place.getAddress().toString().contains(place.getName().toString()) && !place.getName().toString().contains("°")){
                     //address does not contain place name, which means the place name is set, so no confirmation is needed
                     //check to see if it already exists
                     Location checker = Location.findLocationByName(place.getName().toString());
@@ -675,7 +677,6 @@ public class AddPlayFragment extends Fragment implements
                     }
                 }else{
                     //address contains place name, meaning the place name is just an address
-
                     Location checker = Location.findLocationByAddress(place.getName().toString());
                     if (checker != null){
                         //we found a location with this address already, so we'll just use it
@@ -1542,7 +1543,32 @@ public class AddPlayFragment extends Fragment implements
                  //then we will save it as the name for the location
                  //then we will use it as the location for this play
              }
-             return builder.create();
+
+             final AlertDialog ad = builder.create();
+             ad.setOnShowListener(new DialogInterface.OnShowListener()
+             {
+                 @Override
+                 public void onShow(DialogInterface dialog)
+                 {
+                     final ListView lv = ad.getListView(); //this is a ListView with your "buds" in it
+                     if (lv != null) {
+                         lv.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                             @Override
+                             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                                 String selectedFromList = (String) (lv.getItemAtPosition(position));
+                                 if (!selectedFromList.equals(getString(R.string.add_new)) && !selectedFromList.equals(getString(R.string.add_new))) {
+                                     //Log.d("Long Click!", "List Item #" + selectedFromList + " was long clicked");
+                                     Location useMe = Location.findLocationByName(selectedFromList);
+                                     useMe.delete();
+                                 }
+                                 LocationDialogFragment.this.getDialog().dismiss();
+                                 return true;
+                             }
+                         });
+                     }
+                 }
+             });
+             return ad;
          }
 
          @Override

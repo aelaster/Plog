@@ -18,7 +18,9 @@ package com.lastsoft.plog;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.SwipeDismissBehavior;
@@ -34,6 +36,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
@@ -132,6 +135,28 @@ public class PlaysFragment extends Fragment{
 
         // Connect the recycler to the scroller (to let the scroller scroll the list)
         fastScroller.attachRecyclerView(mRecyclerView);
+        fastScroller.setOnHandleTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                SharedPreferences app_preferences;
+                SharedPreferences.Editor editor;
+                app_preferences = PreferenceManager.getDefaultSharedPreferences(mActivity);
+                editor = app_preferences.edit();
+                if ((motionEvent.getAction() == MotionEvent.ACTION_DOWN)) {
+                    editor.putBoolean("fastScrolling", true);
+                    editor.commit();
+                } else if ((motionEvent.getAction() == MotionEvent.ACTION_UP)) {
+                    editor.putBoolean("fastScrolling", false);
+                    editor.commit();
+                    //mAdapter = ((MainActivity) mActivity).initPlayAdapter(mSearchQuery, fromDrawer, playListType, currentYear);
+                    //mRecyclerView.setAdapter(mAdapter);
+                    //mAdapter.updateData(mAdapter.generatePlayData(mSearchQuery, playListType, sortType, currentYear));
+                    mAdapter.notifyItemRangeChanged(0, mAdapter.getItemCount());
+                }
+
+                return false;
+            }
+        });
 
         addPlay = (FloatingActionButton) rootView.findViewById(R.id.add_play);
         if (fromDrawer && playListType != 2) {

@@ -209,7 +209,9 @@ public class LoadGamesTask extends AsyncTask<String, Void, String> {
                     }
                 }
             }else{
-                Toast.makeText(theContext, theContext.getString(R.string.no_default_player), Toast.LENGTH_LONG).show();
+                //Toast.makeText(theContext, theContext.getString(R.string.no_default_player), Toast.LENGTH_LONG).show();
+                //return "derp";
+                bggProcess = "derp";
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -219,8 +221,11 @@ public class LoadGamesTask extends AsyncTask<String, Void, String> {
 
     @Override
     protected void onPostExecute(final String result) {
+        Log.d("V1", result);
         if (result.equals("true")) {
             Toast.makeText(theContext, theContext.getString(R.string.bgg_process_notice), Toast.LENGTH_LONG).show();
+        }else if (result.equals("derp")){
+            Toast.makeText(theContext, theContext.getString(R.string.no_default_player), Toast.LENGTH_LONG).show();
         }
     }
 

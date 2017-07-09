@@ -264,8 +264,11 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
         if (games.get(position).gameThumb != null  && !games.get(position).gameThumb.equals("")) {
             //Log.d("V1", "gameThumb = " + games.get(position).gameThumb);
             //ImageLoader.getInstance().displayImage("http:" + games.get(position).gameThumb, viewHolder.getImageView(), options);
-            Picasso.with(mActivity).load("http:" + games.get(position).gameThumb).into(viewHolder.getImageView());
-
+            if (games.get(position).gameThumb.contains("http")) {
+                Picasso.with(mActivity).load(games.get(position).gameThumb).into(viewHolder.getImageView());
+            }else {
+                Picasso.with(mActivity).load("http:" + games.get(position).gameThumb).into(viewHolder.getImageView());
+            }
         } else {
             viewHolder.getImageView().setImageDrawable(null);
         }

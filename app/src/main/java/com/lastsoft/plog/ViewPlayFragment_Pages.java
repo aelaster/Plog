@@ -157,9 +157,13 @@ public class ViewPlayFragment_Pages extends Fragment {
             ImageLoader.getInstance().displayImage("file://" + playPhoto, playImage, options);
             //Picasso.with(mActivity).load("file://" + playPhoto).fit().into(playImage);
         }else{
-            String gameThumb = GamesPerPlay.getBaseGame(thisPlay).gameThumb;
-            if (gameThumb != null && !gameThumb.equals("")) {
-                ImageLoader.getInstance().displayImage("http:" + gameThumb, playImage, options);
+            String gameImage = GamesPerPlay.getBaseGame(thisPlay).gameImage;
+            if (gameImage != null && !gameImage.equals("")) {
+                if (gameImage.contains("http")) {
+                    ImageLoader.getInstance().displayImage(gameImage, playImage, options);
+                }else {
+                    ImageLoader.getInstance().displayImage("http:" + gameImage, playImage, options);
+                }
                 //Picasso.with(mActivity).load("http:" + GamesPerPlay.getBaseGame(thisPlay).gameThumb).fit().into(playImage);
             }else{
                 playImage.setImageDrawable(null);
