@@ -54,6 +54,7 @@ import com.lastsoft.plog.dialogs.DeletePlayDialogFragment;
 import com.lastsoft.plog.dialogs.DeletePlayerDialogFragment;
 import com.lastsoft.plog.dialogs.GameChooserDialogFragment;
 import com.lastsoft.plog.dialogs.TenByTenDialogFragment;
+import com.lastsoft.plog.util.AppUtils;
 import com.lastsoft.plog.util.BGGLogInHelper;
 import com.lastsoft.plog.util.DeletePlayTask;
 import com.lastsoft.plog.util.NotificationFragment;
@@ -876,64 +877,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onPositiveClick_DeletePlay(long playId) {
-        Play deleteMe = Play.findById(Play.class, playId);
-
-        //delete PlayersPerPlay
-        List<PlayersPerPlay> players = PlayersPerPlay.getPlayers(deleteMe);
-        for(PlayersPerPlay player:players){
-            player.delete();
-        }
-        //delete GamesPerPay
-        List<GamesPerPlay> games = GamesPerPlay.getGames(deleteMe);
-        for(GamesPerPlay game:games){
-            if (game.expansionFlag == true){
-                if (game.bggPlayId != null && !game.bggPlayId.equals("")){
-                    DeletePlayTask deletePlay = new DeletePlayTask(this);
-                    try {
-                        deletePlay.execute(game.bggPlayId);
-                    } catch (Exception e) {
-
-                    }
-                }
-            }
-            game.delete();
-        }
-
-        //delete plays_per_game_group
-        List<PlaysPerGameGroup> plays = PlaysPerGameGroup.getPlays(deleteMe);
-        for(PlaysPerGameGroup play:plays){
-            play.delete();
-        }
-
-        //delete play image
-        if(deleteMe.playPhoto != null && !deleteMe.playPhoto.equals("")) {
-            String deletePhoto =  Environment.getExternalStoragePublicDirectory(
-                    Environment.DIRECTORY_PICTURES) + "/Plog/" + deleteMe.playPhoto;
-            File deleteImage = new File(deletePhoto);
-            if (deleteImage.exists()) {
-                deleteImage.delete();
-            }
-
-            //delete play image thumb
-            File deleteImage_thumb = new File(deletePhoto.substring(0, deletePhoto.length() - 4) + "_thumb6.jpg");
-            if (deleteImage_thumb.exists()) {
-                deleteImage_thumb.delete();
-            }
-        }
-
-        //delete play from bgg
-        if (deleteMe.bggPlayID != null && !deleteMe.bggPlayID.equals("")){
-            DeletePlayTask deletePlay = new DeletePlayTask(this);
-            try {
-                deletePlay.execute(deleteMe.bggPlayID);
-            } catch (Exception e) {
-
-            }
-        }
-
-        //delete play
-        deleteMe.delete();
-
+        AppUtils.deletePlay(this, playId);
         onFragmentInteraction("refresh_plays");
     }
 

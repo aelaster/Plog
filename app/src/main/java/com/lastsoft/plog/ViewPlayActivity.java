@@ -41,6 +41,8 @@ import com.lastsoft.plog.db.GamesPerPlay;
 import com.lastsoft.plog.db.Play;
 import com.lastsoft.plog.db.PlayersPerPlay;
 import com.lastsoft.plog.db.PlaysPerGameGroup;
+import com.lastsoft.plog.dialogs.DeletePlayDialogFragment;
+import com.lastsoft.plog.util.AppUtils;
 import com.lastsoft.plog.util.CustomViewPager;
 import com.lastsoft.plog.util.DeletePlayTask;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -53,7 +55,9 @@ import java.util.Map;
 import static com.lastsoft.plog.MainActivity.EXTRA_CURRENT_ITEM_POSITION;
 import static com.lastsoft.plog.MainActivity.EXTRA_OLD_ITEM_POSITION;
 
-public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragment.OnFragmentInteractionListener {
+public class ViewPlayActivity extends AppCompatActivity implements
+        AddPlayFragment.OnFragmentInteractionListener,
+        DeletePlayDialogFragment.OnDialogButtonClickListener{
     private long playID;
     String imageTransID;
     String nameTransID;
@@ -411,107 +415,19 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
 
 
     public void deletePlay(long playID){
-        DeletePlayFragment newFragment = new DeletePlayFragment().newInstance(playID);
+        DeletePlayDialogFragment newFragment = new DeletePlayDialogFragment().newInstance(playID);
         newFragment.show(getSupportFragmentManager(), "deletePlay");
     }
 
-
-    public class DeletePlayFragment extends DialogFragment {
-        public DeletePlayFragment newInstance(long playID) {
-            DeletePlayFragment frag = new DeletePlayFragment();
-            Bundle args = new Bundle();
-            args.putLong("playID", playID);
-            frag.setArguments(args);
-            return frag;
-        }
-
-
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            // Use the Builder class for convenient dialog construction
-            final long playID2 = getArguments().getLong("playID");
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setTitle(R.string.delete);
-            builder.setMessage(R.string.confirm_delete_play)
-                    .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            Play deleteMe = Play.findById(Play.class, playID2);
-
-                            //delete PlayersPerPlay
-                            List<PlayersPerPlay> players = PlayersPerPlay.getPlayers(deleteMe);
-                            for(PlayersPerPlay player:players){
-                                player.delete();
-                            }
-                            //delete GamesPerPay
-                            List<GamesPerPlay> games = GamesPerPlay.getGames(deleteMe);
-                            for(GamesPerPlay game:games){
-                                if (game.expansionFlag == true){
-                                    if (game.bggPlayId != null && !game.bggPlayId.equals("")){
-                                        DeletePlayTask deletePlay = new DeletePlayTask(getActivity());
-                                        try {
-                                            deletePlay.execute(game.bggPlayId);
-                                        } catch (Exception e) {
-
-                                        }
-                                    }
-                                }
-                                game.delete();
-                            }
-
-                            //delete plays_per_game_group
-                            List<PlaysPerGameGroup> plays = PlaysPerGameGroup.getPlays(deleteMe);
-                            for(PlaysPerGameGroup play:plays){
-                                play.delete();
-                            }
-
-                            //delete play image
-                            if(deleteMe.playPhoto != null && !deleteMe.playPhoto.equals("")) {
-                                String deletePhoto =  Environment.getExternalStoragePublicDirectory(
-                                        Environment.DIRECTORY_PICTURES) + "/Plog/" + deleteMe.playPhoto;
-                                File deleteImage = new File(deletePhoto);
-                                if (deleteImage.exists()) {
-                                    deleteImage.delete();
-                                }
-
-                                //delete play image thumb
-                                File deleteImage_thumb = new File(deletePhoto.substring(0, deletePhoto.length() - 4) + "_thumb6.jpg");
-                                if (deleteImage_thumb.exists()) {
-                                    deleteImage_thumb.delete();
-                                }
-                            }
-
-                            //delete play from bgg
-                            if (deleteMe.bggPlayID != null && !deleteMe.bggPlayID.equals("")){
-                                DeletePlayTask deletePlay = new DeletePlayTask(getActivity());
-                                try {
-                                    deletePlay.execute(deleteMe.bggPlayID);
-                                } catch (Exception e) {
-
-                                }
-                            }
-
-                            //delete play
-                            deleteMe.delete();
-
-                            mPlayAdapter = new PlayAdapter(getActivity(), null, searchQuery, fromDrawer, playListType, sortType, currentYear);
-                            mPagerAdapter.notifyDataSetChanged();
-                            if (mPlayAdapter.getItemCount() == 0){
-                                onBackPressed();
-                            }
-
-                            dismiss();
-                        }
-                    })
-                    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            dismiss();
-                        }
-                    });
-            // Create the AlertDialog object and return it
-            return builder.create();
+    @Override
+    public void onPositiveClick_DeletePlay(long playId) {
+        AppUtils.deletePlay(this, playId);
+        mPlayAdapter = new PlayAdapter(this, null, searchQuery, fromDrawer, playListType, sortType, currentYear);
+        mPagerAdapter.notifyDataSetChanged();
+        if (mPlayAdapter.getItemCount() == 0){
+            onBackPressed();
         }
     }
-
 
     private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
         ViewPlayFragment_Pages mCurrentFragment;

@@ -61,6 +61,7 @@ import com.lastsoft.plog.db.Play;
 import com.lastsoft.plog.db.Player;
 import com.lastsoft.plog.db.PlayersPerPlay;
 import com.lastsoft.plog.db.PlaysPerGameGroup;
+import com.lastsoft.plog.dialogs.DatePickerDialogFragment;
 import com.lastsoft.plog.util.DeletePlayTask;
 import com.lastsoft.plog.util.LoadExpansionsTask;
 import com.lastsoft.plog.util.PostPlayTask;
@@ -114,7 +115,7 @@ public class AddPlayFragment extends Fragment implements
     static boolean[] checkedItems;
     ArrayList<Integer> playersID;
     ArrayList<String> playersName;
-    static String gameDate;
+    String gameDate;
     static ArrayList<Game> addedExpansions;
     ImageView playPhoto;
     Uri photoUri;
@@ -318,7 +319,7 @@ public class AddPlayFragment extends Fragment implements
         dateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DatePickerFragment newFragment = new DatePickerFragment();
+                DatePickerDialogFragment newFragment = new DatePickerDialogFragment().newInstance(gameDate);
                 if (mActivity instanceof MainActivity) {
                     newFragment.show(((MainActivity) mActivity).getSupportFragmentManager(), "datePicker");
                 } else {
@@ -1017,6 +1018,11 @@ public class AddPlayFragment extends Fragment implements
 
      }
 
+     public void setDate(String game, String output){
+         gameDate = game;
+         textViewDate.setText(output);
+     }
+
      public class PlayPoster extends PostPlayTask {
         public PlayPoster(Context context, String bggUsername) {
             super(context, bggUsername);
@@ -1062,50 +1068,6 @@ public class AddPlayFragment extends Fragment implements
 
     public interface OnFragmentInteractionListener {
         void onFragmentInteraction(String string);
-    }
-
-    public class DatePickerFragment extends DialogFragment
-            implements DatePickerDialog.OnDateSetListener {
-
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            // Use the current date as the default date in the picker
-
-            try {
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                Date date1 = dateFormat.parse(gameDate);
-
-                final Calendar c = Calendar.getInstance();
-                c.setTime(date1);
-                int year = c.get(Calendar.YEAR);
-                int month = c.get(Calendar.MONTH);
-                int day = c.get(Calendar.DAY_OF_MONTH);
-                // Create a new instance of DatePickerDialog and return it
-                return new DatePickerDialog(mActivity, this, year, month, day);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-
-            return null;
-
-        }
-
-        public void onDateSet(DatePicker view, int year, int month, int day) {
-            // Do something with the date chosen by the user
-            if (String.valueOf(month+1).length()==1) {
-                gameDate = year + "-0" + (month + 1) + "-" + day;
-            }else{
-                gameDate = year + "-" + (month + 1) + "-" + day;
-            }
-
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            try {
-                Date date1 = dateFormat.parse(gameDate);
-                DateFormat outputFormatter = new SimpleDateFormat("MM/dd/yyyy");
-                String output_date = outputFormatter.format(date1); // Output : 01/20/2012
-                textViewDate.setText(output_date);
-            }catch (ParseException ignored) {}
-        }
     }
 
     /*
@@ -1231,9 +1193,9 @@ public class AddPlayFragment extends Fragment implements
                             public void onClick(View view) {
                                 CheckBoxAlertDialogFragment newFragment = new CheckBoxAlertDialogFragment().newInstance(checkedItems, gameName);
                                 if (mActivity instanceof MainActivity) {
-                                    newFragment.show(((MainActivity) mActivity).getSupportFragmentManager(), "datePicker");
+                                    newFragment.show(((MainActivity) mActivity).getSupportFragmentManager(), "checkboxAlert");
                                 } else {
-                                    newFragment.show(((ViewPlayActivity) mActivity).getSupportFragmentManager(), "datePicker");
+                                    newFragment.show(((ViewPlayActivity) mActivity).getSupportFragmentManager(), "checkboxAlert");
                                 }
                             }
                         });

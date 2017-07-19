@@ -22,6 +22,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.lastsoft.plog.db.Player;
+import com.lastsoft.plog.dialogs.SetupWizardDialogFragment;
 import com.lastsoft.plog.util.LoadGamesTask;
 import com.lastsoft.plog.wizard.model.AbstractWizardModel;
 import com.lastsoft.plog.wizard.model.CustomerInfoPage;
@@ -39,7 +40,8 @@ import java.util.List;
 public class SetupWizardFragment extends Fragment implements
         PageFragmentCallbacks,
         ReviewFragment.Callbacks,
-        ModelCallbacks {
+        ModelCallbacks,
+        SetupWizardDialogFragment.OnDialogButtonClickListener{
     private ViewPager mPager;
     private MyPagerAdapter mPagerAdapter;
 
@@ -117,62 +119,8 @@ public class SetupWizardFragment extends Fragment implements
                     @Override
                     public void onClick(View view) {
                         if (mPager.getCurrentItem() == mCurrentPageSequence.size()) {
-                            DialogFragment dg = new DialogFragment() {
-                                @Override
-                                public Dialog onCreateDialog(Bundle savedInstanceState) {
-                                    return new AlertDialog.Builder(getActivity())
-                                    .setMessage(R.string.submit_confirm_message)
-                                    .setPositiveButton(R.string.submit_confirm_button, new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialogInterface, int i) {
-                                            String userName = mWizardModel.findByKey("Enter your name.  You will be the first player entered.  Your BGG Name will be used to pull your collection.  Your BGG Password will be used to log your plays.").getData().getString(CustomerInfoPage.NAME_DATA_KEY);
-                                            if (userName != null) {
-                                                //add theis player
-                                                String bggInfo = mWizardModel.findByKey("Enter your name.  You will be the first player entered.  Your BGG Name will be used to pull your collection.  Your BGG Password will be used to log your plays.").getData().getString(CustomerInfoPage.EMAIL_DATA_KEY);
-                                                String bggInfo_pw = mWizardModel.findByKey("Enter your name.  You will be the first player entered.  Your BGG Name will be used to pull your collection.  Your BGG Password will be used to log your plays.").getData().getString(CustomerInfoPage.PASSWORD_DATA_KEY);
-                                                boolean nameTakenFlag = false;
-                                                //if this new player's name already exists
-                                                if (Player.playerExists(userName)) {
-                                                    nameTakenFlag = true;
-                                                }
-                                                if (nameTakenFlag) {
-                                                    Toast.makeText(mActivity, getString(R.string.name_taken), Toast.LENGTH_SHORT).show();
-                                                } else {
-                                                    Player player;
-                                                    player = Player.findPlayerByName(userName);
-                                                    if (player == null){
-                                                        player = new Player(userName, bggInfo, bggInfo_pw);
-                                                        player.save();
-                                                    }else{
-                                                        player.bggUsername = bggInfo;
-                                                        player.bggPassword = bggInfo_pw;
-                                                        player.save();
-                                                    }
-
-                                                    if (bggInfo != null) {
-                                                        //set app preference
-                                                        SharedPreferences app_preferences;
-                                                        SharedPreferences.Editor editor;
-                                                        app_preferences = PreferenceManager.getDefaultSharedPreferences(mActivity);
-                                                        editor = app_preferences.edit();
-                                                        editor.putLong("defaultPlayer", player.getId());
-                                                        editor.commit();
-                                                    }
-                                                    GamesLoader initDb = new GamesLoader(getActivity());
-                                                    try {
-                                                        initDb.execute();
-                                                    } catch (Exception e) {
-
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    })
-                                    .setNegativeButton(android.R.string.cancel, null)
-                                    .create();
-                                }
-                            };
-                            dg.show(((MainActivity)mActivity).getSupportFragmentManager(), "place_order_dialog");
+                            SetupWizardDialogFragment newFragment = new SetupWizardDialogFragment();
+                            newFragment.show(((MainActivity)mActivity).getSupportFragmentManager(), "place_order_dialog");
                         } else {
                             if (mEditingAfterReview) {
                                 mPager.setCurrentItem(mPagerAdapter.getCount() - 1);
@@ -307,6 +255,51 @@ public class SetupWizardFragment extends Fragment implements
         }
 
         return false;
+    }
+
+    @Override
+    public void onPositiveClick_SetupWizard() {
+        String userName = mWizardModel.findByKey("Enter your name.  You will be the first player entered.  Your BGG Name will be used to pull your collection.  Your BGG Password will be used to log your plays.").getData().getString(CustomerInfoPage.NAME_DATA_KEY);
+        if (userName != null) {
+            //add theis player
+            String bggInfo = mWizardModel.findByKey("Enter your name.  You will be the first player entered.  Your BGG Name will be used to pull your collection.  Your BGG Password will be used to log your plays.").getData().getString(CustomerInfoPage.EMAIL_DATA_KEY);
+            String bggInfo_pw = mWizardModel.findByKey("Enter your name.  You will be the first player entered.  Your BGG Name will be used to pull your collection.  Your BGG Password will be used to log your plays.").getData().getString(CustomerInfoPage.PASSWORD_DATA_KEY);
+            boolean nameTakenFlag = false;
+            //if this new player's name already exists
+            if (Player.playerExists(userName)) {
+                nameTakenFlag = true;
+            }
+            if (nameTakenFlag) {
+                Toast.makeText(mActivity, getString(R.string.name_taken), Toast.LENGTH_SHORT).show();
+            } else {
+                Player player;
+                player = Player.findPlayerByName(userName);
+                if (player == null){
+                    player = new Player(userName, bggInfo, bggInfo_pw);
+                    player.save();
+                }else{
+                    player.bggUsername = bggInfo;
+                    player.bggPassword = bggInfo_pw;
+                    player.save();
+                }
+
+                if (bggInfo != null) {
+                    //set app preference
+                    SharedPreferences app_preferences;
+                    SharedPreferences.Editor editor;
+                    app_preferences = PreferenceManager.getDefaultSharedPreferences(mActivity);
+                    editor = app_preferences.edit();
+                    editor.putLong("defaultPlayer", player.getId());
+                    editor.commit();
+                }
+                GamesLoader initDb = new GamesLoader(getActivity());
+                try {
+                    initDb.execute();
+                } catch (Exception e) {
+
+                }
+            }
+        }
     }
 
     public class MyPagerAdapter extends FragmentStatePagerAdapter {

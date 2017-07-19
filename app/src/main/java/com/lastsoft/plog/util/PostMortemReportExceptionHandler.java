@@ -59,7 +59,7 @@ public class PostMortemReportExceptionHandler implements UncaughtExceptionHandle
 	}
 
 	/**
-	 * Call this method at the end of the protected code, usually in {@link finalize()}.
+	 * Call this method at the end of the protected code.
 	 */
 	public void restoreOriginalHandler() {
 		if (Thread.getDefaultUncaughtExceptionHandler().equals(this))
