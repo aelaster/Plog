@@ -5,36 +5,36 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+
 import com.lastsoft.plog.R;
 
-public final class DeleteGroupDialogFragment extends DialogFragment {
+public final class DeletePlayDialogFragment extends DialogFragment {
 
     public interface OnDialogButtonClickListener {
-        void onPositiveClick(long groupId);
-        void onNegativeClick();
+        void onPositiveClick_DeletePlay(long playId);
     }
 
-    public static DeleteGroupDialogFragment newInstance(long groupId) {
-        DeleteGroupDialogFragment frag = new DeleteGroupDialogFragment();
+    public static DeletePlayDialogFragment newInstance(long playId) {
+        DeletePlayDialogFragment frag = new DeletePlayDialogFragment();
         Bundle args = new Bundle();
-        args.putLong("groupId", groupId);
+        args.putLong("playId", playId);
         frag.setArguments(args);
         return frag;
     }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        final long groupId = getArguments().getLong("groupId");
+        final long playId = getArguments().getLong("playId");
         final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(R.string.delete);
-        builder.setMessage(R.string.confirm_delete_group);
+        builder.setMessage(R.string.confirm_delete_play);
         builder.setPositiveButton(
                 R.string.ok,
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         OnDialogButtonClickListener listener = (OnDialogButtonClickListener) getTargetFragment();
-                        listener.onPositiveClick(groupId);
+                        listener.onPositiveClick_DeletePlay(playId);
                         dialog.dismiss();
                     }
                 }
@@ -45,8 +45,6 @@ public final class DeleteGroupDialogFragment extends DialogFragment {
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        OnDialogButtonClickListener listener = (OnDialogButtonClickListener) getTargetFragment();
-                        listener.onNegativeClick();
                         dialog.dismiss();
                     }
                 }

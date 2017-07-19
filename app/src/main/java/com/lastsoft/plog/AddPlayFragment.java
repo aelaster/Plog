@@ -1354,8 +1354,6 @@ public class AddPlayFragment extends Fragment implements
              }
          }
 
-         ArrayList<GameGroup> addedGroups;
-         ArrayList<CharSequence> theYears;
          Place thePlace;
          Location theLocation;
          View inflator = null;
