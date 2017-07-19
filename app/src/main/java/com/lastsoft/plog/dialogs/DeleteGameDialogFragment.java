@@ -40,7 +40,7 @@ public final class DeleteGameDialogFragment extends DialogFragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         CheckBox deleteBox = (CheckBox) inflator.findViewById(R.id.deleteCheckbox);
-                        OnDialogButtonClickListener listener = (OnDialogButtonClickListener) getTargetFragment();
+                        OnDialogButtonClickListener listener = (OnDialogButtonClickListener) getActivity();
                         listener.onPositiveClick_DeleteGame(gameId, deleteBox.isChecked());
                         dialog.dismiss();
                     }

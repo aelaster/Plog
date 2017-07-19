@@ -33,7 +33,7 @@ public final class DeletePlayDialogFragment extends DialogFragment {
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        OnDialogButtonClickListener listener = (OnDialogButtonClickListener) getTargetFragment();
+                        OnDialogButtonClickListener listener = (OnDialogButtonClickListener) getActivity();
                         listener.onPositiveClick_DeletePlay(playId);
                         dialog.dismiss();
                     }

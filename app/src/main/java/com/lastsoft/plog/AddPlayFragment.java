@@ -61,7 +61,9 @@ import com.lastsoft.plog.db.Play;
 import com.lastsoft.plog.db.Player;
 import com.lastsoft.plog.db.PlayersPerPlay;
 import com.lastsoft.plog.db.PlaysPerGameGroup;
+import com.lastsoft.plog.dialogs.CheckBoxAlertDialogFragment;
 import com.lastsoft.plog.dialogs.DatePickerDialogFragment;
+import com.lastsoft.plog.dialogs.LocationDialogFragment;
 import com.lastsoft.plog.util.DeletePlayTask;
 import com.lastsoft.plog.util.LoadExpansionsTask;
 import com.lastsoft.plog.util.PostPlayTask;
@@ -94,7 +96,9 @@ import java.util.List;
  * create an instance of this fragment.
  */
 public class AddPlayFragment extends Fragment implements
-        ImageChooserListener, GoogleApiClient.ConnectionCallbacks
+        ImageChooserListener, GoogleApiClient.ConnectionCallbacks,
+        CheckBoxAlertDialogFragment.OnDialogButtonClickListener,
+        LocationDialogFragment.OnDialogButtonClickListener
          {
     Activity mActivity;
     String mCurrentPhotoPath = "";
@@ -336,7 +340,8 @@ public class AddPlayFragment extends Fragment implements
                     //first, check for last known latlng
                     Location lastKnown = Location.findLocationByLatLng(round(lastKnownLocation.getLatitude(), 4), round(lastKnownLocation.getLongitude(), 4));
                     if (lastKnown != null){
-                        LocationDialogFragment newFragment = new LocationDialogFragment(null, lastKnown).newInstance(3, null, lastKnown);
+                        LocationDialogFragment newFragment = new LocationDialogFragment().newInstance(3, null, lastKnown);
+                        newFragment.setTargetFragment(AddPlayFragment.this, 1);
                         if (mActivity instanceof MainActivity) {
                             newFragment.show(((MainActivity) mActivity).getSupportFragmentManager(), "locationPicker");
                         } else {
@@ -368,7 +373,8 @@ public class AddPlayFragment extends Fragment implements
                                 if (foundPlace != null) {
                                     //we found a saved location that is equal to a spot where we are at
                                     //confirm with user
-                                    LocationDialogFragment newFragment = new LocationDialogFragment(foundPlace, null).newInstance(0, foundPlace, null);
+                                    LocationDialogFragment newFragment = new LocationDialogFragment().newInstance(0, foundPlace, null);
+                                    newFragment.setTargetFragment(AddPlayFragment.this, 1);
                                     if (mActivity instanceof MainActivity) {
                                         newFragment.show(((MainActivity) mActivity).getSupportFragmentManager(), "locationPicker");
                                     } else {
@@ -382,7 +388,8 @@ public class AddPlayFragment extends Fragment implements
                                         openPlacePicker();
                                     } else {
                                         //there are saved locations, so pop dialog, asking them to choose one
-                                        LocationDialogFragment newFragment = new LocationDialogFragment(null, null).newInstance(1, null, null);
+                                        LocationDialogFragment newFragment = new LocationDialogFragment().newInstance(1, null, null);
+                                        newFragment.setTargetFragment(AddPlayFragment.this, 1);
                                         if (mActivity instanceof MainActivity) {
                                             newFragment.show(((MainActivity) mActivity).getSupportFragmentManager(), "locationPicker");
                                         } else {
@@ -662,7 +669,8 @@ public class AddPlayFragment extends Fragment implements
                         textViewLocation.setText(checker.locationName);
                     }else {
                         //we need a place name added
-                        LocationDialogFragment newFragment = new LocationDialogFragment(place, null).newInstance(2, place, null);
+                        LocationDialogFragment newFragment = new LocationDialogFragment().newInstance(2, place, null);
+                        newFragment.setTargetFragment(AddPlayFragment.this, 1);
                         if (mActivity instanceof MainActivity) {
                             newFragment.show(((MainActivity) mActivity).getSupportFragmentManager(), "locationPicker");
                         } else {
@@ -1023,6 +1031,23 @@ public class AddPlayFragment extends Fragment implements
          textViewDate.setText(output);
      }
 
+     @Override
+     public void onPositiveClick_CheckBoxAlert(List<String> addedExpansions) {
+         clearGames();
+         // User clicked OK, so save the checkedItems results
+         for (int i = 0; i < addedExpansions.size(); i++){
+             Game addMe = Game.findGameByName(addedExpansions.get(i));
+             addGame(addMe);
+         }
+     }
+
+     @Override
+     public void onItemClick_Location(String locationName) {
+         Location useMe = Location.findLocationByName(locationName);
+         locationId = useMe;
+         textViewLocation.setText(useMe.locationName);
+     }
+
      public class PlayPoster extends PostPlayTask {
         public PlayPoster(Context context, String bggUsername) {
             super(context, bggUsername);
@@ -1191,7 +1216,15 @@ public class AddPlayFragment extends Fragment implements
                         expansionButton.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
-                                CheckBoxAlertDialogFragment newFragment = new CheckBoxAlertDialogFragment().newInstance(checkedItems, gameName);
+
+                                List<String> expansionNames = new ArrayList<>();
+                                for(Game expansion:expansions){
+                                    expansionNames.add(expansion.gameName);
+                                }
+                                String[] namesArr = expansionNames.toArray(new String[expansionNames.size()]);
+
+                                CheckBoxAlertDialogFragment newFragment = new CheckBoxAlertDialogFragment().newInstance(checkedItems, gameName, namesArr);
+                                newFragment.setTargetFragment(AddPlayFragment.this, 0);
                                 if (mActivity instanceof MainActivity) {
                                     newFragment.show(((MainActivity) mActivity).getSupportFragmentManager(), "checkboxAlert");
                                 } else {
@@ -1236,306 +1269,14 @@ public class AddPlayFragment extends Fragment implements
         }
     }
 
-    public class CheckBoxAlertDialogFragment extends DialogFragment {
+     public void openPlacePicker(){
+         try {
+             PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+             startActivityForResult(builder.build(getActivity()), PLACE_PICKER_REQUEST);
+         }catch (Exception ignored){
 
-
-
-        public CheckBoxAlertDialogFragment newInstance(boolean[] checkedItems, String gameName) {
-            CheckBoxAlertDialogFragment frag = new CheckBoxAlertDialogFragment();
-            Bundle args = new Bundle();
-            args.putBooleanArray("checkedItem", checkedItems);
-            args.putString("gameName", gameName);
-
-            frag.setArguments(args);
-            return frag;
-        }
-
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            final String gameName = getArguments().getString("gameName");
-
-            List<String> expansionNames = new ArrayList<>();
-            for(Game expansion:expansions){
-                expansionNames.add(expansion.gameName);
-            }
-
-            AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
-            // Set the dialog title
-            builder.setTitle(R.string.choose_expansions)
-                    // Specify the list array, the items to be selected by default (null for none),
-                    // and the listener through which to receive callbacks when items are selected
-                    .setMultiChoiceItems(expansionNames.toArray(new CharSequence[expansionNames.size()]), checkedItems,
-                            new DialogInterface.OnMultiChoiceClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which,
-                                                    boolean isChecked) {
-                                checkedItems[which] = isChecked;
-                                Game checked = expansions.get(which);
-                                if (isChecked){
-                                    addedExpansions.add(checked);
-                                }else{
-                                    addedExpansions.remove(checked);
-                                }
-                                }
-                            })
-                            // Set the action buttons
-                    .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int id) {
-                            clearGames();
-                            // User clicked OK, so save the checkedItems results somewhere
-                            // or return them to the component that opened the dialog
-                            for (int i = 0; i < addedExpansions.size(); i++){
-                                Game addMe = addedExpansions.get(i);
-                                addGame(addMe);
-                            }
-                        }
-                    })
-                    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int id) {
-
-                        }
-                    });
-
-            return builder.create();
-        }
-    }
-
-     public class LocationDialogFragment extends DialogFragment {
-         @Override
-         public void onPause() {
-             super.onPause();
-             try {
-                 InputMethodManager inputManager = (InputMethodManager)
-                         mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
-
-                 inputManager.hideSoftInputFromWindow(mActivity.getCurrentFocus().getWindowToken(),
-                         InputMethodManager.HIDE_NOT_ALWAYS);
-             } catch (Exception e) {
-             }
          }
-
-         Place thePlace;
-         Location theLocation;
-         View inflator = null;
-
-         public LocationDialogFragment(Place place, Location location) {
-             super();
-             this.thePlace = place;
-             this.theLocation = location;
-         }
-
-         public LocationDialogFragment newInstance(int dialogType, Place thePlace, Location theLocation) {
-             LocationDialogFragment frag = new LocationDialogFragment(thePlace, theLocation);
-             Bundle args = new Bundle();
-             args.putInt("dialogType", dialogType);
-             frag.setArguments(args);
-             return frag;
-         }
-
-         @Override
-         public Dialog onCreateDialog(Bundle savedInstanceState) {
-             final int dialogType = getArguments().getInt("dialogType");
-             /*
-             0 = confirm found place
-             1 = list of saved locations, with add new on top
-             2 = set place name
-             3 = confirm found location
-              */
-             AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
-             if (dialogType == 0 || dialogType == 3){
-                 if (dialogType == 0) {
-                     builder.setTitle(getString(R.string.are_you_at) + thePlace.getName().toString() + "?");
-                 }else{
-                     builder.setTitle(getString(R.string.are_you_at) + theLocation.locationName + "?");
-                 }
-                 builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-                     @Override
-                     public void onClick(DialogInterface dialog, int id) {
-                         //not there, offer them the location chooser
-                         dialog.dismiss();
-                         LocationDialogFragment newFragment = new LocationDialogFragment(null, null).newInstance(1, null, null);
-                         if (mActivity instanceof MainActivity) {
-                             newFragment.show(((MainActivity) mActivity).getSupportFragmentManager(), "locationPicker");
-                         }else{
-                             newFragment.show(((ViewPlayActivity) mActivity).getSupportFragmentManager(), "locationPicker");
-                         }
-                     }
-                 })
-                 .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-                     @Override
-                     public void onClick(DialogInterface dialog, int id) {
-
-                     }
-                 });
-             }else if (dialogType == 1){
-                 List<Location> theLocations = Location.getAllLocations();
-                 final List<String> locations = new ArrayList<>();
-                 for (Location aLocation:theLocations){
-                     locations.add(aLocation.locationName);
-                 }
-                 locations.add(getString(R.string.add_new));
-                 locations.add(getString(R.string.none));
-                 builder.setTitle(R.string.choose_location)
-                     .setItems(locations.toArray(new CharSequence[locations.size()]), new DialogInterface.OnClickListener() {
-                         public void onClick(DialogInterface dialog, int item) {
-                             dialog.dismiss();
-                             if (item == locations.size()-1) {
-                                 //setting blank
-                                 locationId = null;
-                                 textViewLocation.setText("");
-                             }else if (item == locations.size()-2) {
-                                 //trying to add a new one
-                                 openPlacePicker();
-                             } else {
-                                 //selected a location
-
-                                 //set the location to be output to the screen
-                                 Location useMe = Location.findLocationByName(locations.get(item));
-                                 locationId = useMe;
-                                 textViewLocation.setText(useMe.locationName);
-                                 //save the location in a variable, to be saved to the play
-                             }
-                         }
-                     })
-                     .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                         @Override
-                         public void onClick(DialogInterface dialog, int id) {
-                         }
-                     });
-             }else if (dialogType == 2){
-                 //we have to set a place name here
-                 LayoutInflater inflater = getActivity().getLayoutInflater();
-                 inflator = inflater.inflate(R.layout.dialog_location_name, null);
-                 builder.setView(inflator)
-                     // Add action buttons
-                     .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                         @Override
-                         public void onClick(DialogInterface dialog, int id) {
-
-
-                         }
-                     })
-                     .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                         public void onClick(DialogInterface dialog, int id) {
-                             try {
-                                 InputMethodManager inputManager = (InputMethodManager)
-                                         mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
-
-                                 inputManager.hideSoftInputFromWindow(mActivity.getCurrentFocus().getWindowToken(),
-                                         InputMethodManager.HIDE_NOT_ALWAYS);
-                             } catch (Exception e) {
-                             }
-                             LocationDialogFragment.this.getDialog().dismiss();
-                         }
-                     });
-                 //then we will save it as the name for the location
-                 //then we will use it as the location for this play
-             }
-
-             final AlertDialog ad = builder.create();
-             ad.setOnShowListener(new DialogInterface.OnShowListener()
-             {
-                 @Override
-                 public void onShow(DialogInterface dialog)
-                 {
-                     final ListView lv = ad.getListView(); //this is a ListView with your "buds" in it
-                     if (lv != null) {
-                         lv.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-                             @Override
-                             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                                 String selectedFromList = (String) (lv.getItemAtPosition(position));
-                                 if (!selectedFromList.equals(getString(R.string.add_new)) && !selectedFromList.equals(getString(R.string.add_new))) {
-                                     Location useMe = Location.findLocationByName(selectedFromList);
-                                     useMe.delete();
-                                 }
-                                 LocationDialogFragment.this.getDialog().dismiss();
-                                 return true;
-                             }
-                         });
-                     }
-                 }
-             });
-             return ad;
-         }
-
-         @Override
-         public void onStart()
-         {
-             final int dialogType = getArguments().getInt("dialogType");
-             super.onStart();    //super.onStart() is where dialog.show() is actually called on the underlying dialog, so we have to do it after this point
-             AlertDialog d = (AlertDialog)getDialog();
-             if(d != null)
-             {
-                 Button positiveButton = (Button) d.getButton(Dialog.BUTTON_POSITIVE);
-                 positiveButton.setOnClickListener(new View.OnClickListener()
-                 {
-                     @Override
-                     public void onClick(View v)
-                     {
-                         Boolean wantToCloseDialog = false;
-
-                         if (dialogType == 0 || dialogType == 3){
-                             //set this
-                             LocationDialogFragment.this.getDialog().dismiss();
-                             Location useMe;
-                             if (dialogType == 0) {
-                                 useMe = Location.findLocationByName(thePlace.getName().toString());
-                             }else{
-                                 useMe = theLocation;
-                             }
-                             locationId = useMe;
-                             textViewLocation.setText(useMe.locationName);
-                         }else if (dialogType == 2){
-                             EditText edit = (EditText) inflator.findViewById(R.id.locationName);
-                             String text = edit.getText().toString();
-
-                             //check to see if this name already exists
-                             Location checker = Location.findLocationByName(text);
-                             if (checker != null) {
-                                 //this name already exists.  toast the user and let them try it again
-                                 Toast.makeText(mActivity, getString(R.string.location_name_exists), Toast.LENGTH_LONG).show();
-                                 edit.selectAll();
-                             }else{
-                                 try {
-                                     InputMethodManager inputManager = (InputMethodManager)
-                                             mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
-
-                                     inputManager.hideSoftInputFromWindow(mActivity.getCurrentFocus().getWindowToken(),
-                                             InputMethodManager.HIDE_NOT_ALWAYS);
-                                 } catch (Exception e) {
-                                 }
-                                 LocationDialogFragment.this.getDialog().dismiss();
-                                 //then we will save it as the name for the new location
-                                 Location addMe = new Location(text, thePlace.getAddress().toString(), thePlace.getId(), thePlace.getLatLng().latitude, thePlace.getLatLng().longitude);
-                                 addMe.save();
-                                 //then we will use it as the location for this play
-                                 locationId = addMe;
-                                 textViewLocation.setText(addMe.locationName);
-                                 //set the location to be output to the screen
-                             }
-
-
-                         }
-
-                         if(wantToCloseDialog)
-                             dismiss();
-                     }
-                 });
-             }
-         }
-
      }
-
-    public void openPlacePicker(){
-        try {
-            PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
-            startActivityForResult(builder.build(mActivity), PLACE_PICKER_REQUEST);
-        }catch (Exception ignored){
-
-        }
-    }
 
      public static double round(double value, int places) {
          if (places < 0) throw new IllegalArgumentException();

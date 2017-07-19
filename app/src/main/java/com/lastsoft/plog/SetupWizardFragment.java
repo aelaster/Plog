@@ -120,6 +120,7 @@ public class SetupWizardFragment extends Fragment implements
                     public void onClick(View view) {
                         if (mPager.getCurrentItem() == mCurrentPageSequence.size()) {
                             SetupWizardDialogFragment newFragment = new SetupWizardDialogFragment();
+                            newFragment.setTargetFragment(SetupWizardFragment.this, 0);
                             newFragment.show(((MainActivity)mActivity).getSupportFragmentManager(), "place_order_dialog");
                         } else {
                             if (mEditingAfterReview) {

@@ -62,7 +62,7 @@ public final class GameChooserDialogFragment extends DialogFragment {
                                     updateMe.gameName = gameName;
                                     updateMe.save();
                                 }
-                                OnDialogButtonClickListener listener = (OnDialogButtonClickListener) getTargetFragment();
+                                OnDialogButtonClickListener listener = (OnDialogButtonClickListener) getActivity();
                                 listener.onItemSelected_GameChooser(gameName, BGGID, "", addToCollection, false);
                                 dialogInterface.dismiss();
                             }
@@ -71,7 +71,7 @@ public final class GameChooserDialogFragment extends DialogFragment {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
                         if (gameId >= 0) {
-                            OnDialogButtonClickListener listener = (OnDialogButtonClickListener) getTargetFragment();
+                            OnDialogButtonClickListener listener = (OnDialogButtonClickListener) getActivity();
                             listener.onNegativeClick_GameChooser(gameId);
                             dialog.dismiss();
                         }
@@ -82,7 +82,7 @@ public final class GameChooserDialogFragment extends DialogFragment {
             @Override
             public void onDismiss(DialogInterface dialogInterface) {
                 if (gameId >= 0) {
-                    OnDialogButtonClickListener listener = (OnDialogButtonClickListener) getTargetFragment();
+                    OnDialogButtonClickListener listener = (OnDialogButtonClickListener) getActivity();
                     listener.onNegativeClick_GameChooser(gameId);
                     dialogInterface.dismiss();
                 }
