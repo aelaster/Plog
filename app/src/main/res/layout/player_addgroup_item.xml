@@ -14,7 +14,7 @@
         android:background="@drawable/ripple">
         <TextView
             android:id="@+id/group"
-            android:layout_width="fill_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:textColor="@color/black"
             android:layout_weight="1"/>
@@ -25,7 +25,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:scaleType="fitCenter"
-            android:paddingLeft="5dp"
+            android:paddingStart="5dp"
+            android:paddingEnd="5dp"
             android:src="@android:drawable/ic_menu_close_clear_cancel"
             />
 

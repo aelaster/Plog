@@ -39,7 +39,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.OnScrollListener;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -664,20 +663,12 @@ public class GamesFragment extends Fragment{
         protected void onPostExecute(final String result) {
             pullToRefreshView.setRefreshing(false);
             if (result.equals("derp")) {
-                //Toast.makeText(theContext, theContext.getString(R.string.bgg_process_notice), Toast.LENGTH_LONG).show();
-                //go again
-                //wait a few seconds before tryi
-                //initDataset();
                 Snackbar
                         .make(mCoordinatorLayout,
                                 theContext.getString(R.string.no_default_player),
                                 Snackbar.LENGTH_LONG)
                         .show(); // Do not forget to show!
             }else if (result.equals("true") && notify) {
-                //Toast.makeText(theContext, theContext.getString(R.string.bgg_process_notice), Toast.LENGTH_LONG).show();
-                //go again
-                //wait a few seconds before tryi
-                //initDataset();
                 Snackbar
                         .make(mCoordinatorLayout,
                                 theContext.getString(R.string.bgg_process_notice),
@@ -686,7 +677,6 @@ public class GamesFragment extends Fragment{
             }else {
                 myTask = null;
 
-                //mAdapter = new CustomAdapter(mDataset, mDataset_Thumb);
                 mAdapter = new GameAdapter(GamesFragment.this, mActivity, mSearchQuery, fromDrawer, playListType, sortType, fragmentName, currentYear);
                 // Set CustomAdapter as the adapter for RecyclerView.
                 mRecyclerView.setAdapter(mAdapter);

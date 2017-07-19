@@ -55,8 +55,6 @@ public class LoadExpansionsTask extends AsyncTask<String, Void, List<Game>> {
             bis.close();
             is.close();
 
-            //Log.d("V1", myString);
-
             return myString;
         } catch (MalformedURLException e) {
             e.printStackTrace();
@@ -84,15 +82,12 @@ public class LoadExpansionsTask extends AsyncTask<String, Void, List<Game>> {
                 XmlPullParser parser = factory.newPullParser();
                 parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
                 parser.setInput(new StringReader(myString));
-                //parser.nextTag();
-                // parser.require(XmlPullParser.START_TAG, null, "items");
 
                 while (parser.next() != XmlPullParser.END_DOCUMENT) {
                     if (parser.getEventType() != XmlPullParser.START_TAG) {
                         continue;
                     }
                     String name = parser.getName();
-                    //Log.d("V1", "name = " + name);
                     // Starts by looking for the entry tag
                     if (name.equals("items")) {
                     } else if (name.equals("item")) {
@@ -106,14 +101,6 @@ public class LoadExpansionsTask extends AsyncTask<String, Void, List<Game>> {
             e.printStackTrace();
         }
         return theGames;
-    }
-
-    @Override
-    protected void onPostExecute(final List<Game> result) {
-        /*Log.d("V1", "result = " + result);
-        if (result.equals("true")) {
-            Toast.makeText(theContext, theContext.getString(R.string.bgg_process_notice), Toast.LENGTH_LONG).show();
-        }*/
     }
 
     private List<Game> readEntry(XmlPullParser parser) throws XmlPullParserException, IOException {
@@ -149,37 +136,7 @@ public class LoadExpansionsTask extends AsyncTask<String, Void, List<Game>> {
 
     }
 
-    private void readEntry_Expansion(XmlPullParser parser) throws XmlPullParserException, IOException {
-        String gameName = "", gameOwn = "";
 
-        parser.require(XmlPullParser.START_TAG, null, "item");
-        while (parser.next() != XmlPullParser.END_TAG) {
-            if (parser.getEventType() != XmlPullParser.START_TAG) {
-                continue;
-            }
-            String name = parser.getName();
-
-
-            if (name.equals("name")) {
-                gameName = readName(parser);
-                //Log.d("V1", gameName);
-            }  else if (name.equals("status")) {
-                //gameOwn = readOwn(parser);
-                gameOwn = parser.getAttributeValue(null, "own");
-                skip(parser);
-            } else {
-                skip(parser);
-            }
-        }
-        parser.require(XmlPullParser.END_TAG, null, "item");
-        if (gameOwn.equals("1")) {
-            Game updateMe = Game.findGameByName(gameName);
-            if (updateMe != null && !updateMe.expansionFlag) {
-                updateMe.expansionFlag = true;
-                updateMe.save();
-            }
-        }
-    }
 
     private String readName(XmlPullParser parser) throws IOException, XmlPullParserException {
         parser.require(XmlPullParser.START_TAG, null, "name");

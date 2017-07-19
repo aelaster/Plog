@@ -28,7 +28,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-
 import com.lastsoft.plog.R;
 import com.lastsoft.plog.wizard.model.MultipleFixedChoicePage;
 import com.lastsoft.plog.wizard.model.Page;

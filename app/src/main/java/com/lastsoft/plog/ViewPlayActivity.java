@@ -84,10 +84,6 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
         public void onMapSharedElements(List<String> names, Map<String, View> sharedElements) {
             if (mIsReturning && mPlayAdapter.getItemCount() > 0) {
                 View sharedImageView = mPagerAdapter.getCurrentDetailsFragment().getSharedImageElement();
-                View sharedNameView = mPagerAdapter.getCurrentDetailsFragment().getSharedNameElement();
-                View sharedDateView = mPagerAdapter.getCurrentDetailsFragment().getSharedDateElement();
-                //Log.d("V1", "mCurrentPosition = " + mCurrentPosition);
-                //Log.d("V1", "mOriginalPosition = " + mOriginalPosition);
                 if (sharedImageView == null) {
                     // If shared view is null, then it has likely been scrolled off screen and
                     // recycled. In this case we cancel the shared element transition by
@@ -98,11 +94,7 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
                     names.clear();
                     sharedElements.clear();
                     names.add(sharedImageView.getTransitionName());
-                    //names.add(sharedNameView.getTransitionName());
-                    //names.add(sharedDateView.getTransitionName());
                     sharedElements.put(sharedImageView.getTransitionName(), sharedImageView);
-                    //sharedElements.put(sharedNameView.getTransitionName(), sharedNameView);
-                    //sharedElements.put(sharedDateView.getTransitionName(), sharedDateView);
                 }
             }
         }
@@ -142,11 +134,6 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
         TransitionSet enterTransition = new TransitionSet();
 
 
-        // Play a circular reveal animation starting beneath the shared element.
-        /*Transition circularReveal = new CircularReveal(sharedElement);
-        circularReveal.addTarget(rootView.findViewById(R.id.imageView1));
-        enterTransition.addTransition(circularReveal);*/
-
         // Slide the cards in through the bottom of the screen.
         Transition cardSlide = new Slide(Gravity.BOTTOM);
         cardSlide.addTarget(rootView.findViewById(R.id.container));
@@ -171,12 +158,6 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
                 gameDate.animate().alpha(1f).setDuration(res.getInteger(R.integer.text_background_fade_millis));
                 toolbar.animate().alpha(1f).setDuration(res.getInteger(R.integer.text_background_fade_millis));
             }
-
-            @Override
-            public void onTransitionEnd(Transition transition) {
-                //gameName.animate().alpha(1f).setDuration(res.getInteger(R.integer.text_background_fade_millis));
-                //gameDate.animate().alpha(1f).setDuration(res.getInteger(R.integer.text_background_fade_millis));
-            }
         });
 
         enterTransition.setDuration(getResources().getInteger(R.integer.transition_duration_millis));
@@ -190,29 +171,6 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
 
             TransitionSet returnTransition = new TransitionSet();
 
-            // Slide and fade the circular reveal container off the top of the screen.
-            /*TransitionSet slideFade = new TransitionSet();
-            slideFade.addTarget(rootView.findViewById(R.id.imageView1));
-            slideFade.addTransition(new Slide(Gravity.TOP));
-            slideFade.addTransition(new Fade());
-            returnTransition.addTransition(slideFade);*/
-
-            /*returnTransition.setOrdering(TransitionSet.ORDERING_TOGETHER);
-
-            Transition recolor = new Recolor();
-            recolor.addTarget(mPagerAdapter.getCurrentDetailsFragment().getSharedNameElement());
-            recolor.addTarget(mPagerAdapter.getCurrentDetailsFragment().getSharedDateElement());
-            returnTransition.addTransition(recolor);
-
-            Transition changeBounds = new ChangeBounds();
-            changeBounds.addTarget(mPagerAdapter.getCurrentDetailsFragment().getSharedNameElement());
-            changeBounds.addTarget(mPagerAdapter.getCurrentDetailsFragment().getSharedDateElement());
-            returnTransition.addTransition(changeBounds);
-
-            Transition textSize = new TextSizeTransition();
-            textSize.addTarget(mPagerAdapter.getCurrentDetailsFragment().getSharedNameElement());
-            textSize.addTarget(mPagerAdapter.getCurrentDetailsFragment().getSharedDateElement());
-            returnTransition.addTransition(textSize);*/
             try {
                 // Slide the cards off the bottom of the screen.
                 Transition cardSlide = new Slide(Gravity.BOTTOM);
@@ -274,12 +232,9 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
                 int id = item.getItemId();
                 long menuPlayId = mPlayAdapter.plays.get(mPager.getCurrentItem()).getId();
                 if (id == R.id.view_image) {
-                    //openAddPlay(GamesPerPlay.getBaseGame(Play.findById(Play.class, menuPlayId)).gameName, menuPlayId);
                     String[] photoParts = mPlayAdapter.plays.get(mPager.getCurrentItem()).playPhoto.split("/");
                     File newFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)+"/Plog/",photoParts[photoParts.length-1]);
                     Uri contentUri = FileProvider.getUriForFile(getApplicationContext(), "com.lastsoft.plog.fileprovider", newFile);
-                    //Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI.buildUpon().appendPath("Pictures/" + photoParts[photoParts.length - 1]).build();
-                    //Log.d("V1", uri.toString());
                     Intent intent = new Intent();
                     intent.setAction(Intent.ACTION_VIEW);
                     intent.setDataAndType(contentUri, "image/*");
@@ -320,13 +275,9 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
 
         postponeEnterTransition();
 
-
-        //setBackgroundColor(getResources().getColor(R.color.cardview_initial_background));
-        Log.d("V1", "viewplay current year = " + currentYear);
         mPlayAdapter = new PlayAdapter(this, null, searchQuery, fromDrawer, playListType, sortType, currentYear);
         // Instantiate a ViewPager and a PagerAdapter.
         mPager = (CustomViewPager) findViewById(R.id.pager);
-        //mPager.setBackgroundColor(getResources().getColor(R.color.cardview_initial_background));
         mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         mPager.setAdapter(mPagerAdapter);
         mPager.setCurrentItem(mCurrentPosition);
@@ -439,7 +390,6 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
     public void openAddPlay(String game_name, long playID){
 
         mPager.setPagingEnabled(false);
-        //mTitle = game_name;
 
         try{
             InputMethodManager inputManager = (InputMethodManager)
@@ -449,16 +399,10 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
                     InputMethodManager.HIDE_NOT_ALWAYS);
         }catch (Exception ignored){}
 
-        //mFragment.setExitTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.slide_top));
-
-
-
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction ft = fragmentManager.beginTransaction();
 
         mAddPlayFragment = AddPlayFragment.newInstance(0, 0, true, game_name, playID, false);
-        //mAddPlayFragment.setEnterTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.slide_bottom));
-        //mAddPlayFragment.setExitTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.slide_top));
         ft.setCustomAnimations(R.anim.slide_in_bottom, R.anim.slide_out_top, R.anim.slide_in_top, R.anim.slide_out_bottom);
         ft.add(R.id.swipeholder, mAddPlayFragment, "add_play");
         ft.addToBackStack("add_play");

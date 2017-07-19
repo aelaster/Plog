@@ -41,17 +41,11 @@ public class DeletePlayTask extends AsyncTask<String, Void, String> {
         if (helper.checkCookies()) {
             UrlEncodedFormEntity entity;
             List<NameValuePair> nvps = new ArrayList<NameValuePair>();
-            //nvps.add(new BasicNameValuePair("ajax", "1"));
-            //nvps.add(new BasicNameValuePair("action", "delete"));
-            //nvps.add(new BasicNameValuePair("playid", playToLog[0]));
 
             nvps.add(new BasicNameValuePair("finalize", "1"));
             nvps.add(new BasicNameValuePair("action", "delete"));
             nvps.add(new BasicNameValuePair("playid", playToLog[0]));
             nvps.add(new BasicNameValuePair("B1", "Yes"));
-
-            //action=delete&finalize=1&playid=17175171&B1=Yes
-
 
             try {
                 entity = new UrlEncodedFormEntity(nvps, HTTP.UTF_8);
@@ -68,8 +62,6 @@ public class DeletePlayTask extends AsyncTask<String, Void, String> {
 
                 }
 
-
-                //Log.d("V1", response.getStatusLine().);
             } catch (UnsupportedEncodingException e) {
             } catch (ClientProtocolException e) {
                 e.printStackTrace();
@@ -90,7 +82,4 @@ public class DeletePlayTask extends AsyncTask<String, Void, String> {
             Toast.makeText(theContext, theContext.getString(R.string.bgg_process_notice), Toast.LENGTH_LONG).show();
         }
     }
-
-
-
 }

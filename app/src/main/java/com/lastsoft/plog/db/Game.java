@@ -128,7 +128,6 @@ public class Game extends SugarRecord<Game> {
                 " where " + StringUtil.toSQLName("GamesPerPlay") + "." +  StringUtil.toSQLName("game") + " = ? " +
                 " AND STRFTIME('%Y', DATETIME(SUBSTR(" + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("playDate") + ",0, 11), 'unixepoch')) = ? ";
 
-        //Log.d("V1", query);
         return Game.findWithQuery(Game.class, query, game.getId().toString(), year + "").get(0);
     }
 
@@ -280,7 +279,6 @@ public class Game extends SugarRecord<Game> {
                 " AND STRFTIME('%Y', DATETIME(SUBSTR(P." + StringUtil.toSQLName("playDate") + ",0, 11), 'unixepoch')) = ? " +
                 " GROUP BY G." + StringUtil.toSQLName("gameName") +
                 " ORDER BY COUNT(G." + StringUtil.toSQLName("gameName") + ") DESC, G." + StringUtil.toSQLName("gameName");
-        Log.d("V1", qwoorty);
         return Game.findWithQuery(Game.class,
                 qwoorty, group.getId().toString(), year + "");
     }
@@ -363,7 +361,6 @@ public class Game extends SugarRecord<Game> {
                 break;
         }
 
-        //Log.d("V1", query);
         if (year > 0){
             return Game.findWithQuery(Game.class, query, group.getId().toString(), year+"");
         }else {

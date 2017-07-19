@@ -26,11 +26,6 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-    <!--<android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/pull_to_refresh_listview"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        >-->
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
@@ -40,15 +35,8 @@
             android:id="@+id/fastscroller"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
             android:layout_gravity="end" />
-    <!--<xyz.danoz.recyclerviewfastscroller.vertical.VerticalRecyclerViewFastScroller
-        android:id="@+id/fastscroller"
-        android:layout_width="10dp"
-        android:layout_height="match_parent"
-        android:layout_alignParentRight="true"
-        />-->
-    <!--</android.support.v4.widget.SwipeRefreshLayout>-->
     </RelativeLayout>
 
     <android.support.design.widget.FloatingActionButton

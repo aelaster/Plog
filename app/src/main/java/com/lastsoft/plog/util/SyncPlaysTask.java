@@ -146,7 +146,6 @@ public class SyncPlaysTask extends AsyncTask<String, String, String> {
             if (currentDefaultPlayer >=0 ) {
                 Player defaultPlayer = Player.findById(Player.class, currentDefaultPlayer);
                 if (defaultPlayer != null) {
-                    //Log.d("V1", "https://www.boardgamegeek.com/xmlapi2/collection?username=" + defaultPlayer.bggUsername);
                     //first we parse the BGG Plays XML and add plays to the app that are missing
                     boolean stopLooping = false;
                     while(!stopLooping) {
@@ -207,7 +206,6 @@ public class SyncPlaysTask extends AsyncTask<String, String, String> {
 
     @Override
     protected void onPostExecute(final String result) {
-        //Log.d("V1", result);
         mydialog.dismiss();
     }
 
@@ -230,10 +228,8 @@ public class SyncPlaysTask extends AsyncTask<String, String, String> {
                         continue;
                     }
                     String name = parser.getName();
-                    //Log.d("V1", "name = " + name);
                     // Starts by looking for the entry tag
                     if (name.equals("plays")) {
-                        //entries.add(readEntry(parser));
                         if (totalCount == 0) {
                             int holder = Integer.parseInt(readTotal(parser));
                             totalCount = holder;
@@ -242,10 +238,7 @@ public class SyncPlaysTask extends AsyncTask<String, String, String> {
                             Integer.parseInt(readTotal(parser));
                         }
 
-                        //mDataset = new String[total];
-                        //mDataset_Thumb = new String[total];
                     } else if (name.equals("play")) {
-                        //Log.d("V1", "name = " + mDataset[i]);
                         //build play to add, read from BGG
                         ArrayList<Long> addedUsers = new ArrayList<Long>();
                         AddPlay playToAdd = readEntry(parser, readPlayID(parser), readPlayDate(parser));
@@ -253,7 +246,6 @@ public class SyncPlaysTask extends AsyncTask<String, String, String> {
                         publishProgress("" + syncCounter, "" + totalCount_out);
 
                         if (playToAdd.theGame.expansionFlag == false) {
-                            //Log.d("V1", "Adding Base Game");
                             existingPlay = Play.findPlayByBGGID(playToAdd.playID);
                             //this is the base game
                             //we create a new play
@@ -322,7 +314,6 @@ public class SyncPlaysTask extends AsyncTask<String, String, String> {
                                 Game game = new Game(playToAdd.theGame.gameName, playToAdd.theGame.gameId, playToAdd.theGame.gameCollectionId, "", false);
                                 game.save();
                                 theGame = game;
-                                //updateGameViaBGG(playToAdd.theGame.gameId, playToAdd.theGame.gameName);
                                 publishProgress("", "", playToAdd.theGame.gameId, playToAdd.theGame.gameName);
                             }
 
@@ -362,7 +353,6 @@ public class SyncPlaysTask extends AsyncTask<String, String, String> {
                                     newGroupPlay.save();
                                 }
                             }
-                            //Log.d("V1", "Added " + playToAdd.theGame.gameName + " to play " + newPlay.getId());
 
                             //added the base game, check for out of order expansion
                             if (outOfOrderPlay != null) {
@@ -375,11 +365,9 @@ public class SyncPlaysTask extends AsyncTask<String, String, String> {
                                 outOfOrderPlay = null;
                             }
                         } else {
-                            //Log.d("V1", "Adding Expansion");
                             //this is an expansion, so we add it to the previous play
                             if (newPlay != null) {
                                 addExpansion(playToAdd, newPlay);
-                                //Log.d("V1", "Added " + playToAdd.theGame.gameName + " to play " + newPlay.getId());
                             }else{
                                 if (existingPlay != null){
                                     addExpansion(playToAdd, existingPlay);
@@ -408,7 +396,6 @@ public class SyncPlaysTask extends AsyncTask<String, String, String> {
             Game game = new Game(playToAdd.theGame.gameName, playToAdd.theGame.gameId, playToAdd.theGame.gameCollectionId, "", true);
             game.save();
             theGame = game;
-            //updateGameViaBGG(playToAdd.theGame.gameId, playToAdd.theGame.gameName);
             publishProgress("", "", playToAdd.theGame.gameId, playToAdd.theGame.gameName);
         }
         GamesPerPlay newExpansion = new GamesPerPlay(thePlay, theGame, true, playToAdd.theGame.gameId);

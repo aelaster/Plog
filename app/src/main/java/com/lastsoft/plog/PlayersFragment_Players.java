@@ -92,14 +92,6 @@ public class PlayersFragment_Players extends Fragment{
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerView);
         RecyclerFastScroller fastScroller = (RecyclerFastScroller) rootView.findViewById(R.id.fastscroller);
         fastScroller.attachRecyclerView(mRecyclerView);
-        //VerticalRecyclerViewFastScroller fastScroller = (VerticalRecyclerViewFastScroller) rootView.findViewById(R.id.fastscroller);
-
-        // Connect the recycler to the scroller (to let the scroller scroll the list)
-        //fastScroller.setRecyclerView(mRecyclerView, null);
-
-        // Connect the scroller to the recycler (to let the recycler scroll the scroller's handle)
-        //mRecyclerView.setOnScrollListener(fastScroller.getOnScrollListener());
-
 
         // LinearLayoutManager is used here, this will layout the elements in a similar fashion
         // to the way ListView would layout elements. The RecyclerView.LayoutManager defines how
@@ -208,7 +200,6 @@ public class PlayersFragment_Players extends Fragment{
             int i = 0;
             for(Player player:players){
                 mDataset[i] = player.playerName;
-                //Log.d("V1", "player name = " + player.playerName);
                 i++;
             }
         }

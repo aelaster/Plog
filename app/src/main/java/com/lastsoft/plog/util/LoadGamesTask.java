@@ -113,7 +113,6 @@ public class LoadGamesTask extends AsyncTask<String, Void, String> {
         String myString = "";
         String myString2 = "";
         String bggProcess = "false";
-        String bggProcess2 = "false";
 
         try {
 
@@ -126,9 +125,7 @@ public class LoadGamesTask extends AsyncTask<String, Void, String> {
             if (currentDefaultPlayer >=0 ) {
                 Player defaultPlayer = Player.findById(Player.class, currentDefaultPlayer);
                 if (defaultPlayer != null) {
-                    //Log.d("V1", "https://www.boardgamegeek.com/xmlapi2/collection?username=" + defaultPlayer.bggUsername);
                     myString = getGamesCollection(defaultPlayer.bggUsername);
-                    //Log.d("V1", myString);
                     if (myString != null && myString.contains("will be processed")){
                         //do it again
                         bggProcess = "true";
@@ -140,9 +137,6 @@ public class LoadGamesTask extends AsyncTask<String, Void, String> {
                         XmlPullParser parser = factory.newPullParser();
                         parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
                         parser.setInput(new StringReader(myString));
-                        //parser.nextTag();
-                        // parser.require(XmlPullParser.START_TAG, null, "items");
-
                         while (parser.next() != XmlPullParser.END_DOCUMENT) {
                             if (parser.getEventType() != XmlPullParser.START_TAG) {
                                 continue;
@@ -151,14 +145,8 @@ public class LoadGamesTask extends AsyncTask<String, Void, String> {
                             //Log.d("V1", "name = " + name);
                             // Starts by looking for the entry tag
                             if (name.equals("items")) {
-                                //entries.add(readEntry(parser));
-                                int total = 0;
-                                total = Integer.parseInt(readTotal(parser));
-
-                                //mDataset = new String[total];
-                                //mDataset_Thumb = new String[total];
+                                Integer.parseInt(readTotal(parser));
                             } else if (name.equals("item")) {
-                                //Log.d("V1", "name = " + mDataset[i]);
                                 readEntry(parser, readBGGID(parser), readBGGCollectionID(parser));
                             } else {
                                 skip(parser);
@@ -168,7 +156,6 @@ public class LoadGamesTask extends AsyncTask<String, Void, String> {
 
                         // then we go through and flag every expansion in my collection
                         myString2 = getExpansionsCollection(defaultPlayer.bggUsername);
-                        //Log.d("V1", myString);
                         if (myString2 != null && myString2.contains("will be processed")){
                             //do it again
                             bggProcess = "true";
@@ -181,25 +168,16 @@ public class LoadGamesTask extends AsyncTask<String, Void, String> {
                             parser = factory.newPullParser();
                             parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
                             parser.setInput(new StringReader(myString2));
-                            //parser.nextTag();
-                            // parser.require(XmlPullParser.START_TAG, null, "items");
 
                             while (parser.next() != XmlPullParser.END_DOCUMENT) {
                                 if (parser.getEventType() != XmlPullParser.START_TAG) {
                                     continue;
                                 }
                                 String name = parser.getName();
-                                //Log.d("V1", "name = " + name);
                                 // Starts by looking for the entry tag
                                 if (name.equals("items")) {
-                                    //entries.add(readEntry(parser));
-                                    int total = 0;
-                                    total = Integer.parseInt(readTotal(parser));
-
-                                    //mDataset = new String[total];
-                                    //mDataset_Thumb = new String[total];
+                                    Integer.parseInt(readTotal(parser));
                                 } else if (name.equals("item")) {
-                                    //Log.d("V1", "name = " + mDataset[i]);
                                     readEntry_Expansion(parser);
                                 } else {
                                     skip(parser);
@@ -209,8 +187,6 @@ public class LoadGamesTask extends AsyncTask<String, Void, String> {
                     }
                 }
             }else{
-                //Toast.makeText(theContext, theContext.getString(R.string.no_default_player), Toast.LENGTH_LONG).show();
-                //return "derp";
                 bggProcess = "derp";
             }
         } catch (Exception e) {
@@ -255,7 +231,6 @@ public class LoadGamesTask extends AsyncTask<String, Void, String> {
                     return null;
                 }
             } else if (name.equals("status")) {
-                //gameOwn = readOwn(parser);
                 gameOwn = parser.getAttributeValue(null, "own");
                 skip(parser);
             } else if (name.equals("thumbnail")) {
@@ -299,9 +274,7 @@ public class LoadGamesTask extends AsyncTask<String, Void, String> {
 
             if (name.equals("name")) {
                 gameName = readName(parser);
-                //Log.d("V1", gameName);
             }  else if (name.equals("status")) {
-                //gameOwn = readOwn(parser);
                 gameOwn = parser.getAttributeValue(null, "own");
                 skip(parser);
             } else {
@@ -312,8 +285,6 @@ public class LoadGamesTask extends AsyncTask<String, Void, String> {
 
         if (gameOwn.equals("1")) {
             Game updateMe = Game.findGameByName(gameName);
-            //Log.d("V1", updateMe.gameName);
-            //Log.d("V1", ""+updateMe.expansionFlag);
             if (updateMe != null && !updateMe.expansionFlag) {
                 updateMe.collectionFlag = true;
                 updateMe.expansionFlag = true;

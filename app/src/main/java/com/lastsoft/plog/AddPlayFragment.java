@@ -171,17 +171,10 @@ public class AddPlayFragment extends Fragment implements
                 .addConnectionCallbacks(this)
                 .addApi(Places.PLACE_DETECTION_API)
                 .addApi(LocationServices.API)
-                //.enableAutoManage(this, 0, this)
                 .build();
 
         colorSpinnerArrayAdapter = ArrayAdapter.createFromResource(mActivity, R.array.color_choices, android.R.layout.simple_spinner_item);
 
-
-        //ActionBar actionBar = ((MainActivity)mActivity).getSupportActionBar();
-        //actionBar.setDisplayShowCustomEnabled(false);
-
-        //expansions = Game.findExpansionsFor(gameName);
-        //checkedItems = new boolean[expansions.size()];
         addedUsers = new ArrayList<>();
         addedExpansions = new ArrayList<>();
         List<Player> players = Player.listPlayersAZ(0);
@@ -238,7 +231,6 @@ public class AddPlayFragment extends Fragment implements
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //listItems.add("Clicked : "+clickCounter++);
                 AddPlayer newUser = new AddPlayer(-1, "", "", 0);
                 adapter.add(newUser);
                 adapter.notifyDataSetChanged();
@@ -359,8 +351,6 @@ public class AddPlayFragment extends Fragment implements
                                 for (PlaceLikelihood placeLikelihood : likelyPlaces) {
                                     Log.i("V1", String.format("Place '%s' with " +
                                                     "likelihood: %g",
-                                            //placeLikelihood.getPlace().getAddress(),
-                                            //placeLikelihood.getPlace().getId(),
                                             placeLikelihood.getPlace().getName(),
                                             placeLikelihood.getLikelihood()));
                                     if (Location.findLocationByAddress(placeLikelihood.getPlace().getAddress().toString()) != null) {
@@ -425,17 +415,12 @@ public class AddPlayFragment extends Fragment implements
         arrayOfUsers = new ArrayList<>();
         // Create the adapter to convert the array to views
         adapter = new AddPlayerAdapter(mActivity, arrayOfUsers);
-        //expansionAdapter = new ExpansionsAdapter(mActivity, addedExpansions);
-        //ListView listView2 = (ListView) rootView.findViewById(R.id.addGameList);
-        //listView2.setAdapter(expansionAdapter);
-
 
         if (playID >= 0) {
             //we're editing a play
-            //Log.d("V1", "editing a play");
             Play editPlay = Play.findById(Play.class, playID);
-            //set up the values, based on DB
 
+            //set up the values, based on DB
             if (!copyPlay) {
                 //date
                 DateFormat outputFormatter = new SimpleDateFormat("MM/dd/yyyy");
@@ -471,7 +456,6 @@ public class AddPlayFragment extends Fragment implements
             List<PlayersPerPlay> players = PlayersPerPlay.getPlayers(editPlay);
             for (PlayersPerPlay player : players) {
                 Player thisPlayer = player.player;
-                //Log.d("V1", "score = " + player.score);
                 AddPlayer addedPlayer;
                 if (!copyPlay) {
                      addedPlayer = new AddPlayer(thisPlayer.getId(), thisPlayer.playerName, player.color, player.score); //id, name, color, score]
@@ -563,10 +547,8 @@ public class AddPlayFragment extends Fragment implements
         EditText scoreValue = (EditText) newView.findViewById(R.id.score);
         scoreValue.addTextChangedListener(new MyTextWatcher(player, addedPlayer));
         scoreValue.setSelectAllOnFocus(true);
-        //if (addedPlayer.score != -9999999) {
         NumberFormat nf = new DecimalFormat("###.#");
         scoreValue.setText("" + nf.format(addedPlayer.score));
-        //}
 
 
         Spinner color = (Spinner) newView.findViewById(R.id.color);
@@ -602,9 +584,6 @@ public class AddPlayFragment extends Fragment implements
                 mContainerView_Players.removeView(newView);
 
                 // If there are no rows remaining, show the empty view.
-                /*if (mContainerView.getChildCount() == 0) {
-                    findViewById(android.R.id.empty).setVisibility(View.VISIBLE);
-                }*/
             }
         });
 
@@ -627,8 +606,6 @@ public class AddPlayFragment extends Fragment implements
                 plogDir
         );
 
-        //File image = new File(storageDir + "/" + imageFileName + ".jpg");
-
         // Save a file: path for use with ACTION_VIEW intents
         mCurrentPhotoName = image.getName();
         mCurrentPhotoPath = Environment.getExternalStoragePublicDirectory(
@@ -648,7 +625,6 @@ public class AddPlayFragment extends Fragment implements
         if (requestCode == 0 && resultCode == 0) {
             mCurrentPhotoName = "";
         }else if (requestCode == 0 && resultCode == -1) {
-            //Log.d("V1", "mCurrentPhotoPath=" + mCurrentPhotoPath);
             makeAThumb();
             ImageLoader.getInstance().displayImage("file://" + mCurrentPhotoPath, playPhoto, options);
 
@@ -802,8 +778,6 @@ public class AddPlayFragment extends Fragment implements
                             newPlay.save();
                             thePlay = newPlay;
                         }
-                        //Log.d("V1","game date=" + gameDate);
-                        //Log.d("V1", "game notes=" + notesText.getText().toString());
 
                         //then add the players to the play
                         if (playID>=0) {
@@ -829,10 +803,8 @@ public class AddPlayFragment extends Fragment implements
 
                         for (int i = 0; i < adapter.getCount(); i++) {
                             AddPlayer thisGuy = adapter.getItem(i);
-                            //if (thisGuy.score != -9999999) {
                             PlayersPerPlay newPlayer = new PlayersPerPlay(Player.findById(Player.class, thisGuy.playerID), thePlay, thisGuy.score, thisGuy.color, highScore, lowScore);
                             newPlayer.save();
-                            //}
                         }
 
 
@@ -855,7 +827,6 @@ public class AddPlayFragment extends Fragment implements
                                 game.delete();
                             }
                         }else{//not a play yet, add the base game
-                            //Log.d("V1", "game name= " + gameName);
                             Game theGame = Game.findGameByName(gameName);
                             if (theGame != null) {
                                 GamesPerPlay newBaseGame = new GamesPerPlay(thePlay, theGame, false);
@@ -867,7 +838,6 @@ public class AddPlayFragment extends Fragment implements
                             Game addedExpansion = addedExpansions.get(i);
                             GamesPerPlay newExpansion = new GamesPerPlay(thePlay, addedExpansion, true);
                             newExpansion.save();
-                            //Log.d("V1", "Added Expansions = " + addedExpansion.gameName);
                         }
 
                         //lastly, check existing groups
@@ -912,8 +882,6 @@ public class AddPlayFragment extends Fragment implements
                         }
 
                         savedThis = true;
-                        //if (playID <= 0){
-                        //if (((MainActivity)mActivity).mLogInHelper.canLogIn()) {
 
                         long currentDefaultPlayer = app_preferences.getLong("defaultPlayer", -1);
                         if (currentDefaultPlayer >= 0) {
@@ -926,8 +894,6 @@ public class AddPlayFragment extends Fragment implements
 
                             }
                         }
-                        //}
-                        //}
                     } catch (ParseException e) {
                         e.printStackTrace();
                     }
@@ -941,12 +907,6 @@ public class AddPlayFragment extends Fragment implements
                 }else{
                     ((MainActivity) mActivity).notifyUser(0);
                 }
-
-                //removeYourself();
-                /*if (playID<0) {
-                    //((MainActivity) mActivity).getSupportActionBar().setDisplayShowCustomEnabled(true);
-                }else{*/
-
                 return true;
         }
 
@@ -997,9 +957,7 @@ public class AddPlayFragment extends Fragment implements
         super.onDetach();
 
         if (!savedThis && playID < 0){
-            //Log.d("V1", "we're gonna try and delete these pictures");
             if (mCurrentPhotoPath.length() > 0) {
-                //String fixedPath = mCurrentPhotoPath.substring(6, mCurrentPhotoPath.length());
                 String thumbPath = mCurrentPhotoPath.substring(0, mCurrentPhotoPath.length() - 4) + "_thumb6.jpg";
 
                 File deleteImage = new File(mCurrentPhotoPath);
@@ -1012,9 +970,7 @@ public class AddPlayFragment extends Fragment implements
                     deleteImage_thumb.delete();
                 }
             }
-        }/*else{
-            Log.d("V1", "we're NOOOOOOOTTTTTTT gonna try and delete these pictures");
-        }*/
+        }
 
         mListener = null;
         if (mActivity != null) {
@@ -1062,21 +1018,8 @@ public class AddPlayFragment extends Fragment implements
      }
 
      public class PlayPoster extends PostPlayTask {
-        //private final ProgressDialog mydialog;
         public PlayPoster(Context context, String bggUsername) {
             super(context, bggUsername);
-            //mydialog = new ProgressDialog(theContext);
-        }
-
-        // can use UI thread here
-        @Override
-        protected void onPreExecute() {
-        }
-
-
-        @Override
-        protected void onPostExecute(final String result) {
-            //mydialog.dismiss();
         }
     }
 
@@ -1224,8 +1167,6 @@ public class AddPlayFragment extends Fragment implements
                         int spinnerPostion = colorSpinnerArrayAdapter.getPosition(colorCheck.defaultColor);
                         colorSpinner.setSelection(spinnerPostion);
                         playerToUpdate.color = colorSpinner.getSelectedItem().toString();
-                        //playerToUpdate.color.setSelection(spinnerPostion);
-
                     }
                 }
             }
@@ -1260,7 +1201,6 @@ public class AddPlayFragment extends Fragment implements
         @Override
         public void afterTextChanged(Editable editable) {
             if (playerSpinner.getSelectedItem().toString().equals(playerToUpdate.playerName)) {
-                //Log.d("V1", playerToUpdate.playerName);
                 String score = editable.toString().trim();
                 if (!score.equals("")) {
                     if (!score.equals(".") && !score.equals("-") && !score.equals("-.")) {
@@ -1350,7 +1290,6 @@ public class AddPlayFragment extends Fragment implements
 
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
-            //final boolean[] checkedItems = getArguments().getBooleanArray("checkedItems");
             final String gameName = getArguments().getString("gameName");
 
             List<String> expansionNames = new ArrayList<>();
@@ -1368,15 +1307,13 @@ public class AddPlayFragment extends Fragment implements
                                 @Override
                                 public void onClick(DialogInterface dialog, int which,
                                                     boolean isChecked) {
-                                    checkedItems[which] = isChecked;
-                                    Game checked = expansions.get(which);
-                                    if (isChecked){
-                                        addedExpansions.add(checked);
-                                    }else{
-                                        addedExpansions.remove(checked);
-                                    }
-                                    //Log.d("V1", checked.gameName);
-                                    //Log.d("V1", "isChecked="+isChecked);
+                                checkedItems[which] = isChecked;
+                                Game checked = expansions.get(which);
+                                if (isChecked){
+                                    addedExpansions.add(checked);
+                                }else{
+                                    addedExpansions.remove(checked);
+                                }
                                 }
                             })
                             // Set the action buttons
@@ -1386,7 +1323,6 @@ public class AddPlayFragment extends Fragment implements
                             clearGames();
                             // User clicked OK, so save the checkedItems results somewhere
                             // or return them to the component that opened the dialog
-                            //Log.d("V1", "addedExpansions size = " + addedExpansions.size());
                             for (int i = 0; i < addedExpansions.size(); i++){
                                 Game addMe = addedExpansions.get(i);
                                 addGame(addMe);
@@ -1448,9 +1384,7 @@ public class AddPlayFragment extends Fragment implements
              3 = confirm found location
               */
              AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
-             //Log.d("V1", "dialogType=" + dialogType);
              if (dialogType == 0 || dialogType == 3){
-                 //Log.d("V1", "in here");
                  if (dialogType == 0) {
                      builder.setTitle(getString(R.string.are_you_at) + thePlace.getName().toString() + "?");
                  }else{
@@ -1476,10 +1410,6 @@ public class AddPlayFragment extends Fragment implements
                      }
                  });
              }else if (dialogType == 1){
-                 //List<String> locations = Location.getAllLocationNames();
-                 //locations.add(0, "Add New");
-
-                 //List<Location> theLocations = Location.listAll(Location.class);
                  List<Location> theLocations = Location.getAllLocations();
                  final List<String> locations = new ArrayList<>();
                  for (Location aLocation:theLocations){
@@ -1557,7 +1487,6 @@ public class AddPlayFragment extends Fragment implements
                              public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                                  String selectedFromList = (String) (lv.getItemAtPosition(position));
                                  if (!selectedFromList.equals(getString(R.string.add_new)) && !selectedFromList.equals(getString(R.string.add_new))) {
-                                     //Log.d("Long Click!", "List Item #" + selectedFromList + " was long clicked");
                                      Location useMe = Location.findLocationByName(selectedFromList);
                                      useMe.delete();
                                  }

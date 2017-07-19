@@ -62,7 +62,6 @@
                 android:layout_marginStart="24dp"
                 android:layout_marginTop="12dp"
                 android:lineSpacingMultiplier="1.2"
-                android:text="asdf"
                 android:textAppearance="@android:style/TextAppearance.Material.Medium"
                 android:textSize="20sp"/>
         </LinearLayout>

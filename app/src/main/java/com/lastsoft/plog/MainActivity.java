@@ -48,6 +48,7 @@ import com.lastsoft.plog.db.PlayersPerGameGroup;
 import com.lastsoft.plog.db.PlayersPerPlay;
 import com.lastsoft.plog.db.PlaysPerGameGroup;
 import com.lastsoft.plog.db.TenByTen;
+import com.lastsoft.plog.dialogs.DeleteGroupDialogFragment;
 import com.lastsoft.plog.util.BGGLogInHelper;
 import com.lastsoft.plog.util.DeletePlayTask;
 import com.lastsoft.plog.util.NotificationFragment;
@@ -76,7 +77,8 @@ public class MainActivity extends AppCompatActivity
         PlayersFragment.OnFragmentInteractionListener,
         GamesFragment.OnFragmentInteractionListener,
         StatsFragment.OnFragmentInteractionListener,
-        BGGLogInHelper.LogInListener
+        BGGLogInHelper.LogInListener,
+        DeleteGroupDialogFragment.OnDialogButtonClickListener
         {
 
     static final String EXTRA_CURRENT_ITEM_POSITION = "extra_current_item_position";
@@ -246,13 +248,11 @@ public class MainActivity extends AppCompatActivity
     public PlayAdapter initPlayAdapter(String searchQuery, boolean fromDrawer, int playListType, int currentYear){
         mSearchQuery = searchQuery;
         return new PlayAdapter(this, mPlaysFragment, searchQuery, fromDrawer, playListType, 0, currentYear);
-        //return mPlayAdapter;
     }
 
     @Override
     public void onNavigationDrawerItemSelected(int position) {
         // update the main content by replacing fragments
-        //Log.d("V1", ""+position);
         forceBack = false;
         usedFAB = false;
         try {
@@ -262,10 +262,7 @@ public class MainActivity extends AppCompatActivity
                 fragUp = false;
             }
 
-
-
             String positionName = mNavigationDrawerFragment.getPositionHeading(position);
-
             if (positionName.equals(getString(R.string.title_plays))) {
                 openPlays("", true, 0, getString(R.string.title_plays), CurrentYear);
             } else if (positionName.equals(getString(R.string.title_players))) {
@@ -414,16 +411,14 @@ public class MainActivity extends AppCompatActivity
 
         mPlaysFragment = PlaysFragment.newInstance(fromDrawer, searchQuery, playListType, fragmentName, currentYear);
         mPlayAdapter = initPlayAdapter(searchQuery, fromDrawer, playListType, currentYear);
-        //initPlayAdapter();
+
         FragmentTransaction ft = fragmentManager.beginTransaction();
         if (!fromDrawer){
             ft.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right);
             ft.addToBackStack("plays");
         }
 
-        //if (mStatsFragment != null && mStatsFragment.isVisible() && !fromDrawer) {
         if (!fromDrawer) {
-            //ft.hide(mStatsFragment);
             ft.add(R.id.container, mPlaysFragment, "plays");
         }else {
             ft.replace(R.id.container, mPlaysFragment, "plays");
@@ -447,7 +442,6 @@ public class MainActivity extends AppCompatActivity
     public void setTitle(String title){
         mTitle = title;
     }
-
 
     public void setUpActionBar(int fragmentCode){
 
@@ -550,8 +544,6 @@ public class MainActivity extends AppCompatActivity
                 mTitle = getString(R.string.title_plays);
             } else if (fragmentCode == 9) {
                 //set up
-                //mNavigationDrawerFragment.mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
-                //mNavigationDrawerFragment.mDrawerToggle.setDrawerIndicatorEnabled(true);
                 actionBar.setDisplayShowCustomEnabled(false);
                 actionBar.setDisplayShowTitleEnabled(true);
                 actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
@@ -595,7 +587,6 @@ public class MainActivity extends AppCompatActivity
             // if the drawer is not showing. Otherwise, let the drawer
             // decide what to show in the action bar.
 
-            //restoreActionBar();
             setUpActionBar(currentFragmentCode);
             return true;
         }
@@ -652,12 +643,6 @@ public class MainActivity extends AppCompatActivity
         if (playersFrag != null) {
             playersFrag.showFAB();
         }
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        //Log.d("V1", "mPlayAdapter length = " + mPlayAdapter.getItemCount());
     }
 
     public void openAddPlayer(Fragment mFragment, long playerID){
@@ -719,7 +704,6 @@ public class MainActivity extends AppCompatActivity
                 Pair.create(view, view.getTransitionName())
                 ,Pair.create(statusBar, statusBar.getTransitionName())
                 ,Pair.create(navBar, navBar.getTransitionName())
-                //,Pair.create(actionBar, actionBar.getTransitionName())
         );
         startActivity(intent, options.toBundle());
     }
@@ -759,16 +743,12 @@ public class MainActivity extends AppCompatActivity
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(mTitle);
 
-        //mFragment.setExitTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.slide_top));
-
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction ft = fragmentManager.beginTransaction();
 
         fragUp = true;
 
         mAddPlayFragment = AddPlayFragment.newInstance( 0,  0, true, game_name, playID, copyPlay);
-        //mAddPlayFragment.setEnterTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.slide_bottom));
-        //mAddPlayFragment.setExitTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.slide_top));
         ft.setCustomAnimations(R.anim.slide_in_bottom, R.anim.slide_out_top, R.anim.slide_in_top, R.anim.slide_out_bottom);
         ft.add(R.id.container, mAddPlayFragment, "add_play");
         ft.addToBackStack("add_play");
@@ -781,7 +761,6 @@ public class MainActivity extends AppCompatActivity
         //this is also a way to remove them from the table
         TenByTenDialogFragment newFragment = new TenByTenDialogFragment().newInstance(gameId, -1);
         newFragment.show(getSupportFragmentManager(), "tenByTenPicker");
-        //onBackPressed();
     }
 
     public void notifyUser(int notificationId){
@@ -795,7 +774,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void deleteGroup(long groupId){
-        DeleteGroupFragment newFragment = new DeleteGroupFragment().newInstance(groupId);
+        DeleteGroupDialogFragment newFragment = new DeleteGroupDialogFragment().newInstance(groupId);
         newFragment.show(getSupportFragmentManager(), "deleteGroup");
     }
 
@@ -821,45 +800,22 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+    // START DELETE GROUP DIALOG FRAGMENT
+    @Override
+    public void onPositiveClick(long groupId) {
+        RemoveGroupTask removeGroup = new RemoveGroupTask(MainActivity.this, GameGroup.findById(GameGroup.class, groupId));
+        try {
+            removeGroup.execute();
+        } catch (Exception ignored) {
 
-    public class DeleteGroupFragment extends DialogFragment {
-        public DeleteGroupFragment newInstance(long groupId) {
-            DeleteGroupFragment frag = new DeleteGroupFragment();
-            Bundle args = new Bundle();
-            args.putLong("groupId", groupId);
-            frag.setArguments(args);
-            return frag;
-        }
-
-
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            // Use the Builder class for convenient dialog construction
-            final long groupId = getArguments().getLong("groupId");
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setTitle(R.string.delete);
-            builder.setMessage(R.string.confirm_delete_group)
-                    .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            dismiss();
-                            RemoveGroupTask removeGroup = new RemoveGroupTask(MainActivity.this, GameGroup.findById(GameGroup.class, groupId));
-                            try {
-                                removeGroup.execute();
-                            } catch (Exception ignored) {
-
-                            }
-                        }
-                    })
-                    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            if (mAddGroupFragment != null) mAddGroupFragment.enableDelete();
-                            dismiss();
-                        }
-                    });
-            // Create the AlertDialog object and return it
-            return builder.create();
         }
     }
+
+    @Override
+    public void onNegativeClick() {
+        if (mAddGroupFragment != null) mAddGroupFragment.enableDelete();
+    }
+    // END DELETE GROUP DIALOG FRAGMENT
 
     public class RemoveGroupTask extends AsyncTask<Long, Void, Long[]> {
 
@@ -899,7 +855,6 @@ public class MainActivity extends AppCompatActivity
             }
 
             theGroup.delete();
-
             return null;
         }
 
@@ -957,7 +912,6 @@ public class MainActivity extends AppCompatActivity
                             }
 
                             onFragmentInteraction("refresh_games");
-                            //onBackPressed();
                             dismiss();
                      }
                  })
@@ -1206,7 +1160,6 @@ public class MainActivity extends AppCompatActivity
                             if (playersFrag.fabMenu.isExpanded()) {
                                 playersFrag.fabMenu.collapse();
                             } else {
-                                //mNavigationDrawerFragment.openDrawer();
                                 if (usedFAB){
                                     usedFAB = false;
                                     openPlays("", true, 0, getString(R.string.title_plays), CurrentYear);
@@ -1215,7 +1168,6 @@ public class MainActivity extends AppCompatActivity
                                 }
                             }
                         } else {
-                            //mNavigationDrawerFragment.openDrawer();
                             if (usedFAB){
                                 usedFAB = false;
                                 openPlays("", true, 0, getString(R.string.title_plays), CurrentYear);
@@ -1262,21 +1214,16 @@ public class MainActivity extends AppCompatActivity
     }
 
     protected void unbindDrawables(View view) {
-        //Log.d("V1", "unbinding drawables");
         if (view.getBackground() != null) {
             view.getBackground().setCallback(null);
         }
         if (view instanceof ViewGroup) {
             for (int i = 0; i < ((ViewGroup) view).getChildCount(); i++) {
-                //Log.d("V1", "unbinding drawables " + i);
                 unbindDrawables(((ViewGroup) view).getChildAt(i));
             }
             try{
                 ((ViewGroup) view).removeAllViews();
-                //Log.d("V1", "unbinding drawables x");
-            } catch (Exception e){
-                //Log.d("V1", "exception");
-            }
+            } catch (Exception e){}
         }
         System.gc();
     }
@@ -1299,7 +1246,7 @@ public class MainActivity extends AppCompatActivity
         boolean expansionFlag;
         long gameId;
         public GameList(Context context, boolean addToCollection, boolean expansionFlag, long gameId) {
-            super(context, addToCollection, expansionFlag);
+            super(context, expansionFlag);
             this.addToCollection = addToCollection;
             this.expansionFlag = expansionFlag;
             this.gameId = gameId;
@@ -1326,7 +1273,6 @@ public class MainActivity extends AppCompatActivity
                     GameChooserFragment newFragment = new GameChooserFragment().newInstance(theGames, theItems, theIDs, addToCollection, gameId);
                     newFragment.show(getSupportFragmentManager(), "gamePicker");
                 }
-                //onFragmentInteraction("update_games");
             }else{
                 Game deleteMe = Game.findById(Game.class, gameId);
                 deleteMe.delete();
@@ -1408,40 +1354,40 @@ public class MainActivity extends AppCompatActivity
 
                 // Set the dialog title
                 builder.setTitle(R.string.choose_groups)
-                        // Specify the list array, the items to be selected by default (null for none),
-                        // and the listener through which to receive callbacks when items are selected
-                        .setMultiChoiceItems(gameGroupNames.toArray(new CharSequence[gameGroupNames.size()]), checkedItems,
-                                new DialogInterface.OnMultiChoiceClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which,
-                                                        boolean isChecked) {
-                                        //checkedItems[which] = isChecked;
-                                        GameGroup checked = gameGroups.get(which);
-                                        if (isChecked) {
-                                            addedGroups.add(checked);
-                                        } else {
-                                            addedGroups.remove(checked);
-                                        }
-                                    }
-                                })
-                                // Set the action buttons
-                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    // Specify the list array, the items to be selected by default (null for none),
+                    // and the listener through which to receive callbacks when items are selected
+                    .setMultiChoiceItems(gameGroupNames.toArray(new CharSequence[gameGroupNames.size()]), checkedItems,
+                        new DialogInterface.OnMultiChoiceClickListener() {
                             @Override
-                            public void onClick(DialogInterface dialog, int id) {
-                                TenByTen.deleteTenByTen(gameId, selectedYear);
-
-                                for (int i = 0; i < addedGroups.size(); i++) {
-                                    TenByTen addMe = new TenByTen(theGame, addedGroups.get(i), selectedYear);
-                                    addMe.save();
+                            public void onClick(DialogInterface dialog, int which,
+                                                boolean isChecked) {
+                                //checkedItems[which] = isChecked;
+                                GameGroup checked = gameGroups.get(which);
+                                if (isChecked) {
+                                    addedGroups.add(checked);
+                                } else {
+                                    addedGroups.remove(checked);
                                 }
                             }
                         })
-                        .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int id) {
+                        // Set the action buttons
+                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        TenByTen.deleteTenByTen(gameId, selectedYear);
 
-                            }
-                        });
+                        for (int i = 0; i < addedGroups.size(); i++) {
+                            TenByTen addMe = new TenByTen(theGame, addedGroups.get(i), selectedYear);
+                            addMe.save();
+                        }
+                        }
+                    })
+                    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int id) {
+
+                        }
+                    });
             }
             return builder.create();
         }
@@ -1475,43 +1421,44 @@ public class MainActivity extends AppCompatActivity
             // Set the dialog title
             builder.setCancelable(false);
             builder.setTitle(R.string.choose_version)
-                    // Specify the list array, the items to be selected by default (null for none),
-                    // and the listener through which to receive callbacks when items are selected
-                    .setItems(theItems.toArray(new CharSequence[theItems.size()]),
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    String BGGID = theIDs.get(i);
-                                    String gameName = theGames.get(i);
-                                    Log.d("V1", "game name = " + gameName);
-                                    if (gameId >= 0) {
-                                        Game updateMe = Game.findById(Game.class, gameId);
-                                        updateMe.gameName = gameName;
-                                        updateMe.save();
-                                    }
-                                    updateGameViaBGG(gameName, BGGID, "", addToCollection, false);
-                                }
-                            })
-                    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int id) {
-                            if (gameId >= 0) {
-                                Game updateMe = Game.findById(Game.class, gameId);
-                                updateMe.delete();
-                                onFragmentInteraction("update_games");
-                            }
-                        }
-                    });
-                    builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                        @Override
-                        public void onDismiss(DialogInterface dialogInterface) {
-                            if (gameId >= 0) {
-                                Game updateMe = Game.findById(Game.class, gameId);
-                                updateMe.delete();
-                                onFragmentInteraction("update_games");
-                            }
-                        }
-                    });
+            // Specify the list array, the items to be selected by default (null for none),
+            // and the listener through which to receive callbacks when items are selected
+            .setItems(theItems.toArray(new CharSequence[theItems.size()]),
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                    String BGGID = theIDs.get(i);
+                    String gameName = theGames.get(i);
+                    Log.d("V1", "game name = " + gameName);
+                    if (gameId >= 0) {
+                        Game updateMe = Game.findById(Game.class, gameId);
+                        updateMe.gameName = gameName;
+                        updateMe.save();
+                    }
+                    updateGameViaBGG(gameName, BGGID, "", addToCollection, false);
+                    }
+                })
+            .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int id) {
+                if (gameId >= 0) {
+                    Game updateMe = Game.findById(Game.class, gameId);
+                    updateMe.delete();
+                    onFragmentInteraction("update_games");
+                }
+                }
+            });
+
+            builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                @Override
+                public void onDismiss(DialogInterface dialogInterface) {
+                if (gameId >= 0) {
+                    Game updateMe = Game.findById(Game.class, gameId);
+                    updateMe.delete();
+                    onFragmentInteraction("update_games");
+                }
+                }
+            });
             return builder.create();
         }
     }

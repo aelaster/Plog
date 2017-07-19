@@ -16,10 +16,10 @@
 
 package com.lastsoft.plog.wizard.model;
 
-import com.lastsoft.plog.wizard.ui.SingleChoiceFragment;
-
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
+
+import com.lastsoft.plog.wizard.ui.SingleChoiceFragment;
 
 import java.util.ArrayList;
 import java.util.List;

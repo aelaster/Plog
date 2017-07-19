@@ -1,7 +1,5 @@
 package com.lastsoft.plog.db;
 
-import android.util.Log;
-
 import com.orm.StringUtil;
 import com.orm.SugarRecord;
 import com.orm.query.Condition;

@@ -59,9 +59,6 @@ public class StatsFragment_TenByTen extends Fragment {
             mContainerView_Players = (ViewGroup) statsView.findViewById(R.id.container_players);
             //create dropdown
 
-
-
-
             final ViewGroup newView = (ViewGroup) LayoutInflater.from(mActivity).inflate(
                     R.layout.stats_viewstat_spinner, mContainerView_Players, false);
 
@@ -110,7 +107,6 @@ public class StatsFragment_TenByTen extends Fragment {
         List<TBTInfo> info = new ArrayList<TBTInfo>();
         int tbtCounts = 0;
         for (TenByTen ten : tens){
-            //gameTenByTen_GameGroup(GameGroup group, Game game, int year, int sortType){
             List<Play> plays = Play.gameTenByTen_GameGroup(gameGroup, ten.game, year, 0);
             if (plays.size() <= 10) { //count only uses the value if it's less than or equal to 10
                 tbtCounts = tbtCounts + plays.size();
@@ -118,7 +114,6 @@ public class StatsFragment_TenByTen extends Fragment {
                 tbtCounts = tbtCounts + 10;
             }
             info.add(new TBTInfo(year, ten.game.getId(), plays.size(), ten.game.gameName));
-            //addStat(ten.game.gameName, plays.size()+"", ten.game.getId()+"", year);
         }
         Collections.sort(info, new Comparator<TBTInfo>() {
             public int compare(TBTInfo left, TBTInfo right) {
@@ -126,23 +121,9 @@ public class StatsFragment_TenByTen extends Fragment {
             }
         });
         for (TBTInfo ten2 : info){
-            //addStat(ten.game.gameName, plays.size()+"", ten.game.getId()+"", year);
             addStat(ten2.gameName, ""+ten2.playsCount, ten2.gameID+"", ten2.year);
         }
         addStat(getString(R.string.percent_completed), ((int) (tbtCounts * 100.0 / 100 + 0.5)) + "%", "", year);
-        /*
-        List<Game> tbts = Game.totalTenByTen_GameGroup(gameGroup, year);
-        int tbtCounts = 0;
-        for (Game tbt : tbts){
-            if (tbt.tbtCount <= 10) { //count only uses the value if it's less than or equal to 10
-                tbtCounts = tbtCounts + tbt.tbtCount;
-            }else{//otherwise, it adds 10
-                tbtCounts = tbtCounts + 10;
-            }
-            addStat(tbt.gameName, tbt.tbtCount+"", tbt.getId()+"", year);
-        }
-        addStat(getString(R.string.percent_completed), ((int) (tbtCounts * 100.0 / 100 + 0.5)) + "%", "", year);
-        */
     }
 
     Activity mActivity;
@@ -191,7 +172,6 @@ public class StatsFragment_TenByTen extends Fragment {
         }catch (Exception ignored){}
     }
 
-    //addStat(ten.game.gameName, plays.size()+"", ten.game.getId()+"", year);
     public class TBTInfo {
         public int year;
         public long gameID;

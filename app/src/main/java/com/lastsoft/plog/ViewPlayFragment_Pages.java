@@ -89,7 +89,6 @@ public class ViewPlayFragment_Pages extends Fragment {
         viewPlayLayout.setBackgroundColor(getResources().getColor(R.color.cardview_initial_background));
         progressContainer = (LinearLayout) viewPlayLayout.findViewById(R.id.progressContainer);
         LinearLayout linLayout = (LinearLayout) viewPlayLayout.findViewById(R.id.linearLayout);
-        //Log.d("V1", "playID = " + playID);
 
         drawLayout();
 
@@ -137,7 +136,6 @@ public class ViewPlayFragment_Pages extends Fragment {
 
     public void drawLayout(){
         thisPlay = Play.findById(Play.class, playID);
-        //Log.d("V1", "imageTransID = " + imageTransID);
         options = new DisplayImageOptions.Builder()
                 .cacheOnDisk(false)
                 .cacheInMemory(false)
@@ -155,7 +153,6 @@ public class ViewPlayFragment_Pages extends Fragment {
                 Environment.DIRECTORY_PICTURES) + "/Plog/" + thisPlay.playPhoto;
         if (thisPlay.playPhoto != null && !thisPlay.playPhoto.equals("") && new File(playPhoto).exists()){
             ImageLoader.getInstance().displayImage("file://" + playPhoto, playImage, options);
-            //Picasso.with(mActivity).load("file://" + playPhoto).fit().into(playImage);
         }else{
             String gameImage = GamesPerPlay.getBaseGame(thisPlay).gameImage;
             if (gameImage != null && !gameImage.equals("")) {
@@ -163,8 +160,7 @@ public class ViewPlayFragment_Pages extends Fragment {
                     ImageLoader.getInstance().displayImage(gameImage, playImage, options);
                 }else {
                     ImageLoader.getInstance().displayImage("http:" + gameImage, playImage, options);
-                }
-                //Picasso.with(mActivity).load("http:" + GamesPerPlay.getBaseGame(thisPlay).gameThumb).fit().into(playImage);
+                };
             }else{
                 playImage.setImageDrawable(null);
             }
@@ -258,36 +254,21 @@ public class ViewPlayFragment_Pages extends Fragment {
         return myContainer;
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        //((MainActivity)mActivity).unbindDrawables(viewPlayLayout);
-    }
-
     @Nullable
     public View getSharedImageElement() {
         View view = getView().findViewById(R.id.imageView1);
-        //if (isViewInBounds(getView().findViewById(R.id.scroll_view), view)) {
-            return view;
-        //}
-        //return null;
+        return view;
     }
 
     @Nullable
     public View getSharedNameElement() {
         View view = getView().findViewById(R.id.gameName);
-        //if (isViewInBounds(getView().findViewById(R.id.scroll_view), view)) {
         return view;
-        //}
-        //return null;
     }
 
     @Nullable
     public View getSharedDateElement() {
         View view = getView().findViewById(R.id.gameDate);
-        //if (isViewInBounds(getView().findViewById(R.id.scroll_view), view)) {
         return view;
-        //}
-        //return null;
     }
 }

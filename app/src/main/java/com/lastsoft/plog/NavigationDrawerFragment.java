@@ -201,10 +201,6 @@ public class NavigationDrawerFragment extends Fragment {
         });
     }
 
-    public void openDrawer(){
-        mDrawerLayout.openDrawer(mFragmentContainerView);
-    }
-
     public void closeDrawer(){
         mDrawerLayout.closeDrawer(mFragmentContainerView);
     }

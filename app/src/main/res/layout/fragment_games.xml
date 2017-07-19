@@ -45,7 +45,7 @@
                 android:id="@+id/LoadingText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="20dp" >
+                android:textSize="20sp" >
             </TextView>
         </LinearLayout>
         <android.support.v4.widget.SwipeRefreshLayout
@@ -67,17 +67,10 @@
                     android:id="@+id/fastscroller"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"
                     android:layout_gravity="end" />
                     </RelativeLayout>
         </android.support.v4.widget.SwipeRefreshLayout>
-        <!--<xyz.danoz.recyclerviewfastscroller.vertical.VerticalRecyclerViewFastScroller
-            android:id="@+id/fastscroller"
-            android:layout_width="10dp"
-            android:layout_height="match_parent"
-            android:layout_alignParentRight="true"
-            android:layout_gravity="right"
-            />-->
     </RelativeLayout>
 
     <android.support.design.widget.FloatingActionButton
