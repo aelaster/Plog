@@ -58,7 +58,6 @@ public class Location extends SugarRecord<Location> {
     }
 
     public static Location findLocationByLatLng(double lat, double lng){
-        //List<Location> queery = Location.find(Location.class, StringUtil.toSQLName("locationLat") + " = ? and " + StringUtil.toSQLName("locationLong") + " = ?", ""+lat, ""+lng);
         String query;
         query = " SELECT " + StringUtil.toSQLName("Location") + ".*" +
                 " FROM " + StringUtil.toSQLName("Location") +

@@ -18,11 +18,13 @@ package com.lastsoft.plog.adapter;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.os.Environment;
 import android.os.SystemClock;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -30,6 +32,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -279,36 +282,41 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
         // Get element from your dataset at this position and replace the contents of the view
         // with that element
         //if (searchQuery.equals("") || (games.get(position).gameName.toLowerCase().contains(searchQuery.toLowerCase()))) {
+        SharedPreferences app_preferences;
+        app_preferences = PreferenceManager.getDefaultSharedPreferences(mActivity);
+
+        boolean isScrolling = app_preferences.getBoolean("fastScrolling", false);
+
+        viewHolder.getGameNameView().setText(GamesPerPlay.getBaseGame(plays.get(position)).gameName);
+        if (!isScrolling) {
 
             DateFormat outputFormatter = new SimpleDateFormat("MM/dd/yyyy");
             Date theDate = plays.get(position).playDate;
             long diff = new Date().getTime() - theDate.getTime();
             long days = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
             String output_date;
-            if (days == 0){
-                output_date = mActivity.getString( R.string.played_label) + mActivity.getString(R.string.less_than_a_day_ago);
-            }else if (days == 1){
-                output_date = mActivity.getString( R.string.played_label) + days + mActivity.getString(R.string.day_ago_label);
-            }else if (days <= 6){
-                output_date = mActivity.getString( R.string.played_label) + days + mActivity.getString( R.string.days_ago_label);
-            }else {
-                output_date = mActivity.getString( R.string.played_label) + outputFormatter.format(theDate); // Output : 01/20/2012
+            if (days == 0) {
+                output_date = mActivity.getString(R.string.played_label) + mActivity.getString(R.string.less_than_a_day_ago);
+            } else if (days == 1) {
+                output_date = mActivity.getString(R.string.played_label) + days + mActivity.getString(R.string.day_ago_label);
+            } else if (days <= 6) {
+                output_date = mActivity.getString(R.string.played_label) + days + mActivity.getString(R.string.days_ago_label);
+            } else {
+                output_date = mActivity.getString(R.string.played_label) + outputFormatter.format(theDate); // Output : 01/20/2012
             }
             //String output_date = outputFormatter.format(theDate); // Output : 01/20/2012
 
-            if (plays.get(position).playLocation != null){
+            if (plays.get(position).playLocation != null) {
                 output_date = output_date + " at " + Location.findById(Location.class, plays.get(position).playLocation.getId()).locationName;
             }
 
-            if (plays.get(position).playNotes != null && !plays.get(position).playNotes.equals("")){
+            if (plays.get(position).playNotes != null && !plays.get(position).playNotes.equals("")) {
                 viewHolder.getPlayDescView().setVisibility(View.VISIBLE);
-                viewHolder.getPlayDescView().setText("\""+ plays.get(position).playNotes + "\"");
-            }else{
-                Log.d("V1", "gone");
+                viewHolder.getPlayDescView().setText("\"" + plays.get(position).playNotes + "\"");
+            } else {
                 viewHolder.getPlayDescView().setVisibility(View.GONE);
             }
 
-            viewHolder.getGameNameView().setText(GamesPerPlay.getBaseGame(plays.get(position)).gameName);
             viewHolder.getPlayDateView().setText(output_date);
             viewHolder.getImageView().setTransitionName("imageTrans" + position);
             viewHolder.getImageView().setTag("imageTrans" + position);
@@ -319,7 +327,7 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
             viewHolder.getClickLayout().setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (SystemClock.elapsedRealtime() - mLastClickTime < 2000){
+                    if (SystemClock.elapsedRealtime() - mLastClickTime < 2000) {
                         return;
                     }
                     mLastClickTime = SystemClock.elapsedRealtime();
@@ -337,22 +345,26 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
             playPhoto = Environment.getExternalStoragePublicDirectory(
                     Environment.DIRECTORY_PICTURES) + "/Plog/" + plays.get(position).playPhoto;
 
-            if(plays.get(position).playPhoto != null && (plays.get(position).playPhoto.equals("") || new File(playPhoto).exists() == false)) {
-                String gameThumb = GamesPerPlay.getBaseGame(plays.get(position)).gameThumb;
-                if (gameThumb != null && !gameThumb.equals("")) {
-                    //ImageLoader.getInstance().displayImage("http:" + GamesPerPlay.getBaseGame(plays.get(position)).gameThumb, viewHolder.getImageView(), options);
+            if (plays.get(position).playPhoto != null && (plays.get(position).playPhoto.equals("") || new File(playPhoto).exists() == false)) {
+                String gameImage = GamesPerPlay.getBaseGame(plays.get(position)).gameImage;
+                if (gameImage != null && !gameImage.equals("")) {
+                    if (gameImage.contains("http")) {
+                        ImageLoader.getInstance().displayImage(GamesPerPlay.getBaseGame(plays.get(position)).gameImage, viewHolder.getImageView(), options);
+                    }else{
+                        ImageLoader.getInstance().displayImage("http:" + GamesPerPlay.getBaseGame(plays.get(position)).gameImage, viewHolder.getImageView(), options);
+                    }
                     //ImageLoader.getInstance().loadImage("http:" + GamesPerPlay.getBaseGame(plays.get(position)).gameThumb, options, null);
-                    Picasso.with(mActivity).load("http:" + GamesPerPlay.getBaseGame(plays.get(position)).gameThumb).fit().into(viewHolder.getImageView());
-                }else{
+                    //Picasso.with(mActivity).load("http:" + GamesPerPlay.getBaseGame(plays.get(position)).gameThumb).fit().into(viewHolder.getImageView());
+                } else {
                     viewHolder.getImageView().setImageDrawable(null);
                 }
-            }else{
-                String thumbPath =  playPhoto.substring(0, playPhoto.length() - 4) + "_thumb6.jpg";
+            } else {
+                String thumbPath = playPhoto.substring(0, playPhoto.length() - 4) + "_thumb6.jpg";
                 if (new File(thumbPath).exists()) {
-                    //ImageLoader.getInstance().displayImage("file://" + thumbPath, viewHolder.getImageView(), options);
+                    ImageLoader.getInstance().displayImage("file://" + thumbPath, viewHolder.getImageView(), options);
                     //ImageLoader.getInstance().loadImage("file://" + playPhoto, options, null);
-                    Picasso.with(mActivity).load("file://" + thumbPath).into(viewHolder.getImageView());
-                }else{
+                    //Picasso.with(mActivity).load("file://" + thumbPath).into(viewHolder.getImageView());
+                } else {
                     ImageLoader.getInstance().displayImage("file://" + playPhoto, viewHolder.getImageView(), options);
                     //Picasso.with(mActivity).load(playPhoto).fit().into(viewHolder.getImageView());
 
@@ -366,12 +378,12 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
 
                         if (b != null) {
                             try {
-                                b.compress(Bitmap.CompressFormat.JPEG,100, new FileOutputStream(new File(thumbPath2)));
+                                b.compress(Bitmap.CompressFormat.JPEG, 100, new FileOutputStream(new File(thumbPath2)));
                             } catch (Exception ignored) {
                             }
                             b = null;
                         }
-                        if (imageBitmap != null){
+                        if (imageBitmap != null) {
                             imageBitmap = null;
                         }
                         Picasso.with(mActivity)
@@ -393,13 +405,19 @@ public class PlayAdapter extends RecyclerView.Adapter<PlayAdapter.ViewHolder> {
             /*if (plays.get(position).winners != null) {
                 viewHolder.getPlayWinnerView().setText(mActivity.getString(R.string.winners) + plays.get(position).winners);
             }else{*/
-                String winners = Play.getWinners(plays.get(position));
-                if (winners == null) {
-                    viewHolder.getPlayWinnerView().setText(mActivity.getString(R.string.winners) + mActivity.getString(R.string.none));
-                }else{
-                    viewHolder.getPlayWinnerView().setText(mActivity.getString(R.string.winners) + winners);
-                }
+            String winners = Play.getWinners(plays.get(position));
+            if (winners == null) {
+                viewHolder.getPlayWinnerView().setText(mActivity.getString(R.string.winners) + mActivity.getString(R.string.none));
+            } else {
+                viewHolder.getPlayWinnerView().setText(mActivity.getString(R.string.winners) + winners);
+            }
             //}
+        }else{
+            viewHolder.getImageView().setImageDrawable(null);
+            viewHolder.getPlayDescView().setText(null);
+            viewHolder.getPlayDateView().setText(null);
+            viewHolder.getPlayWinnerView().setText(null);
+        }
 
     }
     // END_INCLUDE(recyclerViewOnBindViewHolder)

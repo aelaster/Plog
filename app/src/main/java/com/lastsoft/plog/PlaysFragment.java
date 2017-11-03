@@ -18,7 +18,9 @@ package com.lastsoft.plog;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.SwipeDismissBehavior;
@@ -34,6 +36,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
@@ -52,8 +55,6 @@ public class PlaysFragment extends Fragment{
 
     private static final String TAG = "PlaysFragment";
     private static final String KEY_LAYOUT_MANAGER = "layoutManager";
-    private static final int SPAN_COUNT = 2;
-    private static final int DATASET_COUNT = 60;
     private float x,y;
     private int sortType = 0;
     FloatingActionButton addPlay;
@@ -65,7 +66,6 @@ public class PlaysFragment extends Fragment{
     }
 
     protected LayoutManagerType mCurrentLayoutManagerType;
-    //private OnFragmentInteractionListener mListener;
 
     protected RecyclerView mRecyclerView;
     protected PlayAdapter mAdapter;
@@ -105,7 +105,6 @@ public class PlaysFragment extends Fragment{
             try {
 
                 if (actionBar != null) {
-                    //actionBar.setDisplayShowCustomEnabled(true);
                     actionBar.setCustomView(R.layout.search_bar_plays);
                     mSearch = (EditText) actionBar.getCustomView()
                             .findViewById(R.id.etSearch);
@@ -132,6 +131,25 @@ public class PlaysFragment extends Fragment{
 
         // Connect the recycler to the scroller (to let the scroller scroll the list)
         fastScroller.attachRecyclerView(mRecyclerView);
+        fastScroller.setOnHandleTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                SharedPreferences app_preferences;
+                SharedPreferences.Editor editor;
+                app_preferences = PreferenceManager.getDefaultSharedPreferences(mActivity);
+                editor = app_preferences.edit();
+                if ((motionEvent.getAction() == MotionEvent.ACTION_DOWN)) {
+                    editor.putBoolean("fastScrolling", true);
+                    editor.commit();
+                } else if ((motionEvent.getAction() == MotionEvent.ACTION_UP)) {
+                    editor.putBoolean("fastScrolling", false);
+                    editor.commit();
+                    mAdapter.notifyItemRangeChanged(0, mAdapter.getItemCount());
+                }
+
+                return false;
+            }
+        });
 
         addPlay = (FloatingActionButton) rootView.findViewById(R.id.add_play);
         if (fromDrawer && playListType != 2) {
@@ -140,9 +158,7 @@ public class PlaysFragment extends Fragment{
                 public void onClick(View v) {
                     int viewXY[] = new int[2];
                     v.getLocationOnScreen(viewXY);
-                    /*if (mListener != null) {
-                        mListener.onFragmentInteraction("add_play", viewXY[0], viewXY[1]);
-                    }*/
+
                     ((MainActivity)mActivity).usedFAB = true;
                     ((MainActivity)mActivity).openGames("", true, 0, getString(R.string.title_games), MainActivity.CurrentYear);
                 }
@@ -164,9 +180,6 @@ public class PlaysFragment extends Fragment{
             }
         });
 
-        // Connect the scroller to the recycler (to let the recycler scroll the scroller's handle)
-        //mRecyclerView.addOnScrollListener(fastScroller.getOnScrollListener());
-
         // LinearLayoutManager is used here, this will layout the elements in a similar fashion
         // to the way ListView would layout elements. The RecyclerView.LayoutManager defines how
         // elements are laid out.
@@ -181,13 +194,9 @@ public class PlaysFragment extends Fragment{
         }
         setRecyclerViewLayoutManager(mCurrentLayoutManagerType);
 
-        //mAdapter = new PlayAdapter(mActivity, this);
 
-        /*if (((MainActivity)mActivity).mPlayAdapter != null) {
-            mAdapter = ((MainActivity) mActivity).mPlayAdapter;
-        }else{*/
-            mAdapter = ((MainActivity) mActivity).initPlayAdapter(mSearchQuery, fromDrawer, playListType, currentYear);
-        //}
+        mAdapter = ((MainActivity) mActivity).initPlayAdapter(mSearchQuery, fromDrawer, playListType, currentYear);
+
         // Set CustomAdapter as the adapter for RecyclerView.
         mRecyclerView.setAdapter(mAdapter);
         // END_INCLUDE(initializeRecyclerView)
@@ -196,10 +205,6 @@ public class PlaysFragment extends Fragment{
             mSearch.setHint(getString(R.string.filter) + mAdapter.getItemCount() + getString(R.string.filter_plays));
         }
 
-        /*boolean pauseOnScroll = true; // or true
-        boolean pauseOnFling = true; // or false
-        NewPauseOnScrollListener listener = new NewPauseOnScrollListener(ImageLoader.getInstance(), pauseOnScroll, pauseOnFling);
-        mRecyclerView.addOnScrollListener(listener);*/
 
         if (!fromDrawer){
             RelativeLayout playsLayout = (RelativeLayout) rootView.findViewById(R.id.playsLayout);
@@ -237,8 +242,6 @@ public class PlaysFragment extends Fragment{
                     // When user changed the Text
                     if (mActivity != null) {
                         mSearchQuery = cs.toString();
-                        //initDataset();
-                        //mAdapter = new GameAdapter(PlaysFragment.this, mActivity,mSearchQuery);
                         mAdapter = ((MainActivity) mActivity).initPlayAdapter(mSearchQuery, fromDrawer, playListType, currentYear);
                         // Set CustomAdapter as the adapter for RecyclerView.
                         mRecyclerView.setAdapter(mAdapter);
@@ -257,23 +260,21 @@ public class PlaysFragment extends Fragment{
             mCancel.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if (!mSearch.getText().toString().equals("")) {
-                        mSearchQuery = "";
-                        ((MainActivity) mActivity).initPlayAdapter(mSearchQuery, fromDrawer, playListType, currentYear);
-                        mSearch.setText(mSearchQuery);
+                if (!mSearch.getText().toString().equals("")) {
+                    mSearchQuery = "";
+                    ((MainActivity) mActivity).initPlayAdapter(mSearchQuery, fromDrawer, playListType, currentYear);
+                    mSearch.setText(mSearchQuery);
+                }
 
-                        //mActivity.onBackPressed();
-                    }
+                InputMethodManager inputManager = (InputMethodManager)
+                        mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
 
-                    InputMethodManager inputManager = (InputMethodManager)
-                            mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
+                inputManager.hideSoftInputFromWindow(mActivity.getCurrentFocus().getWindowToken(),
+                        InputMethodManager.HIDE_NOT_ALWAYS);
+                mSearch.clearFocus();
+                mRecyclerView.requestFocus();
 
-                    inputManager.hideSoftInputFromWindow(mActivity.getCurrentFocus().getWindowToken(),
-                            InputMethodManager.HIDE_NOT_ALWAYS);
-                    mSearch.clearFocus();
-                    mRecyclerView.requestFocus();
-
-                    refreshDataset();
+                refreshDataset();
                 }
             });
         }
@@ -281,13 +282,6 @@ public class PlaysFragment extends Fragment{
         return rootView;
     }
 
-    public void setSearchText(String theText){
-        if (mSearch.getText().toString().equals(theText)){
-            mSearch.setText("");
-        }else {
-            mSearch.setText(theText);
-        }
-    }
 
     private MenuItem menuItem0;
     @Override

@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 import com.lastsoft.plog.R;
 import com.lastsoft.plog.db.Game;
@@ -79,62 +78,6 @@ public class UpdateBGGTask extends AsyncTask<String, Void, String> {
 
         try {
 
-            // first we search for the game by its name
-            /*URL url;
-            Log.d("V1", "https://www.boardgamegeek.com/xmlapi2/search?exact=1&query=" + URLEncoder.encode(args[0], "UTF-8"));
-            url = new URL("https://www.boardgamegeek.com/xmlapi2/search?exact=1&query=" + URLEncoder.encode(args[0], "UTF-8"));
-            URLConnection ucon = url.openConnection();
-            ucon.setConnectTimeout(3000);
-            ucon.setReadTimeout(30000);
-
-            InputStream is = ucon.getInputStream();
-            BufferedInputStream bis = new BufferedInputStream(is, 1024);
-
-            ByteArrayBuffer baf = new ByteArrayBuffer(1024);
-            int current = 0;
-            while ((current = bis.read()) != -1) {
-                baf.append((byte) current);
-            }
-
-            myString = new String(baf.toByteArray());
-            //Log.d("V1", myString);
-
-            bis.close();
-            is.close();
-
-            XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
-            factory.setNamespaceAware(true);
-            XmlPullParser parser = factory.newPullParser();
-            parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
-            parser.setInput(new StringReader(myString));
-            //parser.nextTag();
-            // parser.require(XmlPullParser.START_TAG, null, "items");
-
-            while (parser.next() != XmlPullParser.END_DOCUMENT) {
-                if (parser.getEventType() != XmlPullParser.START_TAG) {
-                    continue;
-                }
-                String name = parser.getName();
-                //Log.d("V1", "name = " + name);
-                // Starts by looking for the entry tag
-                if (name.equals("items")) {
-                    //entries.add(readEntry(parser));
-                    int total = 0;
-                    total = Integer.parseInt(readTotal(parser));
-                    if (total == 0){
-                        break;
-                    }
-                } else if (name.equals("item")) {
-                    bggID = readBGGID(parser);
-                    break;
-                } else {
-                    skip(parser);
-                }
-            }*/
-            //if (!bggID.equals("")) {
-                // then we go through and flag every expansion in my collection
-
-            //Log.d("V1", "https://www.boardgamegeek.com/xmlapi2/thing?id=" + bggID);
             URL url;
             url = new URL("https://www.boardgamegeek.com/xmlapi2/thing?id=" + bggID);
             URLConnection ucon = url.openConnection();
@@ -151,7 +94,6 @@ public class UpdateBGGTask extends AsyncTask<String, Void, String> {
             }
 
             myString = new String(baf.toByteArray());
-            //Log.d("V1", myString);
 
 
             bis.close();
@@ -162,8 +104,6 @@ public class UpdateBGGTask extends AsyncTask<String, Void, String> {
             XmlPullParser parser = factory.newPullParser();
             parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
             parser.setInput(new StringReader(myString));
-            //parser.nextTag();
-            // parser.require(XmlPullParser.START_TAG, null, "items");
 
             while (parser.next() != XmlPullParser.END_DOCUMENT) {
                 if (parser.getEventType() != XmlPullParser.START_TAG) {
@@ -179,7 +119,6 @@ public class UpdateBGGTask extends AsyncTask<String, Void, String> {
                     skip(parser);
                 }
             }
-           // }
 
             if(deleteMe){
                 BGGLogInHelper helper = new BGGLogInHelper(theContext, null);
@@ -282,9 +221,6 @@ public class UpdateBGGTask extends AsyncTask<String, Void, String> {
             XmlPullParser parser = factory.newPullParser();
             parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
             parser.setInput(new StringReader(gameInfo));
-            Log.d("V1", gameInfo);
-            //parser.nextTag();
-            // parser.require(XmlPullParser.START_TAG, null, "items");
 
             while (parser.next() != XmlPullParser.END_DOCUMENT) {
                 if (parser.getEventType() != XmlPullParser.START_TAG) {
@@ -293,9 +229,7 @@ public class UpdateBGGTask extends AsyncTask<String, Void, String> {
                 String name = parser.getName();
                 // Starts by looking for the entry tag
                 if (name.equals("items")) {
-                    //entries.add(readEntry(parser));
-                    int total = 0;
-                    total = Integer.parseInt(readTotal(parser));
+                    Integer.parseInt(readTotal(parser));
                 } else if (name.equals("item")) {
                     return readBGGCollectionID(parser);
                 } else {
@@ -389,16 +323,6 @@ public class UpdateBGGTask extends AsyncTask<String, Void, String> {
         return game;
     }
 
-
-
-    private String readBGGID(XmlPullParser parser) throws IOException, XmlPullParserException {
-        String bggid = "";
-        String tag = parser.getName();
-        if (tag.equals("item")) {
-            bggid = parser.getAttributeValue(null, "id");
-        }
-        return bggid;
-    }
 
 
     private String readTotal(XmlPullParser parser) throws IOException, XmlPullParserException {

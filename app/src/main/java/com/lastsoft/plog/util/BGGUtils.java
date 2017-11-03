@@ -40,12 +40,7 @@ public class BGGUtils {
         UrlEncodedFormEntity entity;
         if (expansionGame == null) {
             //this is the base game
-
-
             Game theGame = GamesPerPlay.getBaseGame(playToLog);
-
-//            Log.d("V1", "play to log in bsae game is " + theGame.gameName);
-
             nvps = new ArrayList<NameValuePair>();
             nvps.add(new BasicNameValuePair("ajax", "1"));
             nvps.add(new BasicNameValuePair("action", "save"));
@@ -57,7 +52,6 @@ public class BGGUtils {
             if (playToLog.bggPlayID != null && !playToLog.bggPlayID.equals("")) {
                 nvps.add(new BasicNameValuePair("playid", playToLog.bggPlayID));
             }
-            //nvps.add(new BasicNameValuePair("length", String.valueOf(60)));
             if (playToLog.playLocation == null) {
                 nvps.add(new BasicNameValuePair("location", "Plog"));
             }else{
@@ -79,10 +73,8 @@ public class BGGUtils {
                 addPair(nvps, player.getId().intValue(), "name", player.player.playerName);
                 addPair(nvps, player.getId().intValue(), "username", player.player.bggUsername);
                 addPair(nvps, player.getId().intValue(), "color", player.color);
-                //addPair(nvps, player.getId().intValue(), "position", StartingPosition);
                 NumberFormat nf = new DecimalFormat("###.#");
                 addPair(nvps, player.getId().intValue(), "score", nf.format(player.score)+"");
-                //addPair(nvps, player.getId().intValue(), "rating", String.valueOf(Rating));
                 addPair(nvps, player.getId().intValue(), "new", GamesPerPlay.hasGameBeenPlayed(theGame, player.player) ? "0" : "1");
                 addPair(nvps, player.getId().intValue(), "win", PlayersPerPlay.isWinner(playToLog, player.player) ? "1" : "0");
             }
@@ -99,7 +91,6 @@ public class BGGUtils {
             if (expansionGame.bggPlayId != null && !expansionGame.bggPlayId.equals("")) {
                 nvps.add(new BasicNameValuePair("playid", expansionGame.bggPlayId));
             }
-            //nvps.add(new BasicNameValuePair("length", String.valueOf(60)));
             if (playToLog.playLocation == null) {
                 nvps.add(new BasicNameValuePair("location", "Plog"));
             }else{
@@ -121,10 +112,8 @@ public class BGGUtils {
                 addPair(nvps, player.getId().intValue(), "name", player.player.playerName);
                 addPair(nvps, player.getId().intValue(), "username", player.player.bggUsername);
                 addPair(nvps, player.getId().intValue(), "color", player.color);
-                //addPair(nvps, player.getId().intValue(), "position", StartingPosition);
                 NumberFormat nf = new DecimalFormat("###.#");
                 addPair(nvps, player.getId().intValue(), "score", nf.format(player.score)+"");
-                //addPair(nvps, player.getId().intValue(), "rating", String.valueOf(Rating));
                 addPair(nvps, player.getId().intValue(), "new", GamesPerPlay.hasGameBeenPlayed(expansionGame.game, player.player) ? "0" : "1");
                 addPair(nvps, player.getId().intValue(), "win", PlayersPerPlay.isWinner(playToLog, player.player) ? "1" : "0");
             }
@@ -147,7 +136,6 @@ public class BGGUtils {
 
                 if (isValidResponse(theResponse)) {
                     if (theResponse.contains("playid")) {
-                        //{"playid":"15110214","numplays":"1","html":"Plays: <a href=\"\/plays\/thing\/95527?userid=515783\">1<\/a>"}
                         //in here, play is logged.  therefore, poll and get the id for the most recent play of the game and save the id
                         String[] values = theResponse.split("\\,");
                         String[] playIDarray = values[0].split("\\:");
@@ -172,8 +160,6 @@ public class BGGUtils {
                         XmlPullParser parser = factory.newPullParser();
                         parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
                         parser.setInput(new StringReader(theResponse2));
-                        //parser.nextTag();
-                        // parser.require(XmlPullParser.START_TAG, null, "items");
 
                         while (parser.next() != XmlPullParser.END_DOCUMENT) {
                             if (parser.getEventType() != XmlPullParser.START_TAG) {
@@ -182,7 +168,6 @@ public class BGGUtils {
                             String name = parser.getName();
                             // Starts by looking for the entry tag
                             if (name.equals("play")) {
-                                //entries.add(readEntry(parser));
                                 String readPlayID = "";
                                 readPlayID = readPlayID(parser);
                                 if (expansionGame == null) {
@@ -202,13 +187,9 @@ public class BGGUtils {
                     }
 
 
-                } else {
-                    //savePending(play);
                 }
             }
 
-
-            //Log.d("V1", response.getStatusLine().);
         } catch (UnsupportedEncodingException e) {
         } catch (ClientProtocolException e) {
             e.printStackTrace();

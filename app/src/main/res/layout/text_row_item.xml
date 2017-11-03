@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:text="@string/element_text"
             android:textColor="@color/black"
-            android:layout_toRightOf="@+id/imageView1"/>
+            android:layout_toEndOf="@+id/imageView1"/>
 
     </RelativeLayout>
 

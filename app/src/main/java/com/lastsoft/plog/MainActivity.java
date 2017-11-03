@@ -48,6 +48,13 @@ import com.lastsoft.plog.db.PlayersPerGameGroup;
 import com.lastsoft.plog.db.PlayersPerPlay;
 import com.lastsoft.plog.db.PlaysPerGameGroup;
 import com.lastsoft.plog.db.TenByTen;
+import com.lastsoft.plog.dialogs.DeleteGameDialogFragment;
+import com.lastsoft.plog.dialogs.DeleteGroupDialogFragment;
+import com.lastsoft.plog.dialogs.DeletePlayDialogFragment;
+import com.lastsoft.plog.dialogs.DeletePlayerDialogFragment;
+import com.lastsoft.plog.dialogs.GameChooserDialogFragment;
+import com.lastsoft.plog.dialogs.TenByTenDialogFragment;
+import com.lastsoft.plog.util.AppUtils;
 import com.lastsoft.plog.util.BGGLogInHelper;
 import com.lastsoft.plog.util.DeletePlayTask;
 import com.lastsoft.plog.util.NotificationFragment;
@@ -76,7 +83,12 @@ public class MainActivity extends AppCompatActivity
         PlayersFragment.OnFragmentInteractionListener,
         GamesFragment.OnFragmentInteractionListener,
         StatsFragment.OnFragmentInteractionListener,
-        BGGLogInHelper.LogInListener
+        BGGLogInHelper.LogInListener,
+        DeleteGroupDialogFragment.OnDialogButtonClickListener,
+        DeleteGameDialogFragment.OnDialogButtonClickListener,
+        DeletePlayerDialogFragment.OnDialogButtonClickListener,
+        DeletePlayDialogFragment.OnDialogButtonClickListener,
+        GameChooserDialogFragment.OnDialogButtonClickListener
         {
 
     static final String EXTRA_CURRENT_ITEM_POSITION = "extra_current_item_position";
@@ -246,13 +258,11 @@ public class MainActivity extends AppCompatActivity
     public PlayAdapter initPlayAdapter(String searchQuery, boolean fromDrawer, int playListType, int currentYear){
         mSearchQuery = searchQuery;
         return new PlayAdapter(this, mPlaysFragment, searchQuery, fromDrawer, playListType, 0, currentYear);
-        //return mPlayAdapter;
     }
 
     @Override
     public void onNavigationDrawerItemSelected(int position) {
         // update the main content by replacing fragments
-        //Log.d("V1", ""+position);
         forceBack = false;
         usedFAB = false;
         try {
@@ -262,10 +272,7 @@ public class MainActivity extends AppCompatActivity
                 fragUp = false;
             }
 
-
-
             String positionName = mNavigationDrawerFragment.getPositionHeading(position);
-
             if (positionName.equals(getString(R.string.title_plays))) {
                 openPlays("", true, 0, getString(R.string.title_plays), CurrentYear);
             } else if (positionName.equals(getString(R.string.title_players))) {
@@ -414,16 +421,14 @@ public class MainActivity extends AppCompatActivity
 
         mPlaysFragment = PlaysFragment.newInstance(fromDrawer, searchQuery, playListType, fragmentName, currentYear);
         mPlayAdapter = initPlayAdapter(searchQuery, fromDrawer, playListType, currentYear);
-        //initPlayAdapter();
+
         FragmentTransaction ft = fragmentManager.beginTransaction();
         if (!fromDrawer){
             ft.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right);
             ft.addToBackStack("plays");
         }
 
-        //if (mStatsFragment != null && mStatsFragment.isVisible() && !fromDrawer) {
         if (!fromDrawer) {
-            //ft.hide(mStatsFragment);
             ft.add(R.id.container, mPlaysFragment, "plays");
         }else {
             ft.replace(R.id.container, mPlaysFragment, "plays");
@@ -447,7 +452,6 @@ public class MainActivity extends AppCompatActivity
     public void setTitle(String title){
         mTitle = title;
     }
-
 
     public void setUpActionBar(int fragmentCode){
 
@@ -550,8 +554,6 @@ public class MainActivity extends AppCompatActivity
                 mTitle = getString(R.string.title_plays);
             } else if (fragmentCode == 9) {
                 //set up
-                //mNavigationDrawerFragment.mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
-                //mNavigationDrawerFragment.mDrawerToggle.setDrawerIndicatorEnabled(true);
                 actionBar.setDisplayShowCustomEnabled(false);
                 actionBar.setDisplayShowTitleEnabled(true);
                 actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
@@ -595,7 +597,6 @@ public class MainActivity extends AppCompatActivity
             // if the drawer is not showing. Otherwise, let the drawer
             // decide what to show in the action bar.
 
-            //restoreActionBar();
             setUpActionBar(currentFragmentCode);
             return true;
         }
@@ -652,12 +653,6 @@ public class MainActivity extends AppCompatActivity
         if (playersFrag != null) {
             playersFrag.showFAB();
         }
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        //Log.d("V1", "mPlayAdapter length = " + mPlayAdapter.getItemCount());
     }
 
     public void openAddPlayer(Fragment mFragment, long playerID){
@@ -719,7 +714,6 @@ public class MainActivity extends AppCompatActivity
                 Pair.create(view, view.getTransitionName())
                 ,Pair.create(statusBar, statusBar.getTransitionName())
                 ,Pair.create(navBar, navBar.getTransitionName())
-                //,Pair.create(actionBar, actionBar.getTransitionName())
         );
         startActivity(intent, options.toBundle());
     }
@@ -759,16 +753,12 @@ public class MainActivity extends AppCompatActivity
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(mTitle);
 
-        //mFragment.setExitTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.slide_top));
-
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction ft = fragmentManager.beginTransaction();
 
         fragUp = true;
 
         mAddPlayFragment = AddPlayFragment.newInstance( 0,  0, true, game_name, playID, copyPlay);
-        //mAddPlayFragment.setEnterTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.slide_bottom));
-        //mAddPlayFragment.setExitTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.slide_top));
         ft.setCustomAnimations(R.anim.slide_in_bottom, R.anim.slide_out_top, R.anim.slide_in_top, R.anim.slide_out_bottom);
         ft.add(R.id.container, mAddPlayFragment, "add_play");
         ft.addToBackStack("add_play");
@@ -781,7 +771,6 @@ public class MainActivity extends AppCompatActivity
         //this is also a way to remove them from the table
         TenByTenDialogFragment newFragment = new TenByTenDialogFragment().newInstance(gameId, -1);
         newFragment.show(getSupportFragmentManager(), "tenByTenPicker");
-        //onBackPressed();
     }
 
     public void notifyUser(int notificationId){
@@ -790,12 +779,12 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void deleteGame(long gameId){
-        DeleteGameFragment newFragment = new DeleteGameFragment().newInstance(gameId);
+        DeleteGameDialogFragment newFragment = new DeleteGameDialogFragment().newInstance(gameId);
         newFragment.show(getSupportFragmentManager(), "deleteGame");
     }
 
     public void deleteGroup(long groupId){
-        DeleteGroupFragment newFragment = new DeleteGroupFragment().newInstance(groupId);
+        DeleteGroupDialogFragment newFragment = new DeleteGroupDialogFragment().newInstance(groupId);
         newFragment.show(getSupportFragmentManager(), "deleteGroup");
     }
 
@@ -821,45 +810,91 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+    // START DELETE GROUP DIALOG FRAGMENT
+    @Override
+    public void onPositiveClick(long groupId) {
+        RemoveGroupTask removeGroup = new RemoveGroupTask(MainActivity.this, GameGroup.findById(GameGroup.class, groupId));
+        try {
+            removeGroup.execute();
+        } catch (Exception ignored) {
 
-    public class DeleteGroupFragment extends DialogFragment {
-        public DeleteGroupFragment newInstance(long groupId) {
-            DeleteGroupFragment frag = new DeleteGroupFragment();
-            Bundle args = new Bundle();
-            args.putLong("groupId", groupId);
-            frag.setArguments(args);
-            return frag;
-        }
-
-
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            // Use the Builder class for convenient dialog construction
-            final long groupId = getArguments().getLong("groupId");
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setTitle(R.string.delete);
-            builder.setMessage(R.string.confirm_delete_group)
-                    .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            dismiss();
-                            RemoveGroupTask removeGroup = new RemoveGroupTask(MainActivity.this, GameGroup.findById(GameGroup.class, groupId));
-                            try {
-                                removeGroup.execute();
-                            } catch (Exception ignored) {
-
-                            }
-                        }
-                    })
-                    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            if (mAddGroupFragment != null) mAddGroupFragment.enableDelete();
-                            dismiss();
-                        }
-                    });
-            // Create the AlertDialog object and return it
-            return builder.create();
         }
     }
+
+    @Override
+    public void onNegativeClick() {
+        if (mAddGroupFragment != null) mAddGroupFragment.enableDelete();
+    }
+    // END DELETE GROUP DIALOG FRAGMENT
+
+    @Override
+    public void onPositiveClick_DeleteGame(long gameId, boolean deleteBGGFlag) {
+        Game deleteMe = Game.findById(Game.class, gameId);
+        //check if this game has been played
+        //if so, can't delete
+        if (!GamesPerPlay.hasGameBeenPlayed(deleteMe)){
+            deleteMe.delete();
+
+            //delete from BGG
+            if (deleteBGGFlag) {
+                updateGameViaBGG(deleteMe.gameName, deleteMe.gameBGGID, deleteMe.gameBGGCollectionID, false, true);
+            }
+        }else{
+            Snackbar
+                    .make(mGamesFragment.mCoordinatorLayout,
+                            getString(R.string.unable_remove_game),
+                            Snackbar.LENGTH_LONG)
+                    .show(); // Do not forget to show!
+        }
+        onFragmentInteraction("refresh_games");
+    }
+
+    @Override
+    public void onPositiveClick_DeletePlayer(long playerId) {
+        Player deleteMe = Player.findById(Player.class, playerId);
+
+        //delete PlayersPerPlay
+        List<PlayersPerPlay> players = PlayersPerPlay.getPlayer(deleteMe);
+        for(PlayersPerPlay player:players){
+            player.delete();
+        }
+        //delete PlayersPerGameGroup
+        List<PlayersPerGameGroup> groupers = PlayersPerGameGroup.getPlayer(deleteMe);
+        for(PlayersPerGameGroup grouper:groupers){
+            grouper.delete();
+        }
+
+        //delete player
+        deleteMe.delete();
+        onFragmentInteraction("refresh_players_drop");
+        onBackPressed();
+    }
+
+    @Override
+    public void onNegativeClick_DeletePlayer() {
+        if (mAddPlayerFragment != null) mAddPlayerFragment.enableDelete();
+    }
+
+    @Override
+    public void onPositiveClick_DeletePlay(long playId) {
+        AppUtils.deletePlay(this, playId);
+        onFragmentInteraction("refresh_plays");
+    }
+
+    @Override
+    public void onItemSelected_GameChooser(String gameName, String bggID, String bggCollectionID, boolean addToCollection, boolean deleteFromBGG) {
+        updateGameViaBGG(gameName, bggID, "", addToCollection, false);
+    }
+
+    @Override
+    public void onNegativeClick_GameChooser(long gameId) {
+        if (gameId >= 0) {
+            Game updateMe = Game.findById(Game.class, gameId);
+            updateMe.delete();
+            onFragmentInteraction("update_games");
+        }
+    }
+
 
     public class RemoveGroupTask extends AsyncTask<Long, Void, Long[]> {
 
@@ -899,7 +934,6 @@ public class MainActivity extends AppCompatActivity
             }
 
             theGroup.delete();
-
             return null;
         }
 
@@ -908,66 +942,6 @@ public class MainActivity extends AppCompatActivity
             mydialog.dismiss();
             onFragmentInteraction("refresh_players_drop");
             onBackPressed();
-        }
-    }
-
-
-
-    public class DeleteGameFragment extends DialogFragment {
-        public DeleteGameFragment newInstance(long gameId) {
-            DeleteGameFragment frag = new DeleteGameFragment();
-            Bundle args = new Bundle();
-            args.putLong("gameId", gameId);
-            frag.setArguments(args);
-            return frag;
-        }
-
-
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            // Use the Builder class for convenient dialog construction
-            final long gameId = getArguments().getLong("gameId");
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            LayoutInflater inflater = getActivity().getLayoutInflater();
-            final View inflator = inflater.inflate(R.layout.dialog_delete_game_bgg, null);
-            builder.setTitle(R.string.delete);
-            builder.setMessage(R.string.confirm_delete_game);
-            builder.setView(inflator)
-                 // Add action buttons
-                 .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                     @Override
-                     public void onClick(DialogInterface dialog, int id) {
-                         Game deleteMe = Game.findById(Game.class, gameId);
-                            //check if this game has been played
-                            //if so, can't delete
-                            if (!GamesPerPlay.hasGameBeenPlayed(deleteMe)){
-                                deleteMe.delete();
-
-                                //delete from BGG
-                                CheckBox deleteBox = (CheckBox) inflator.findViewById(R.id.deleteCheckbox);
-                                if (deleteBox.isChecked()) {
-                                    updateGameViaBGG(deleteMe.gameName, deleteMe.gameBGGID, deleteMe.gameBGGCollectionID, false, true);
-                                }
-                            }else{
-                                Snackbar
-                                        .make(mGamesFragment.mCoordinatorLayout,
-                                                getString(R.string.unable_remove_game),
-                                                Snackbar.LENGTH_LONG)
-                                        .show(); // Do not forget to show!
-                            }
-
-                            onFragmentInteraction("refresh_games");
-                            //onBackPressed();
-                            dismiss();
-                     }
-                 })
-                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                     public void onClick(DialogInterface dialog, int id) {
-                         dismiss();
-                     }
-                 });
-            // Create the AlertDialog object and return it
-            return builder.create();
         }
     }
 
@@ -992,157 +966,16 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void deletePlayer(long playerID){
-        DeletePlayerFragment newFragment = new DeletePlayerFragment().newInstance(playerID);
+        DeletePlayerDialogFragment newFragment = new DeletePlayerDialogFragment().newInstance(playerID);
         newFragment.show(getSupportFragmentManager(), "deletePlayer");
 
     }
 
-    public class DeletePlayerFragment extends DialogFragment {
-        public DeletePlayerFragment newInstance(long playerID2) {
-            DeletePlayerFragment frag = new DeletePlayerFragment();
-            Bundle args = new Bundle();
-            args.putLong("playerID", playerID2);
-            frag.setArguments(args);
-            return frag;
-        }
-
-
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            // Use the Builder class for convenient dialog construction
-            final long playerID2 = getArguments().getLong("playerID");
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setTitle(R.string.delete);
-            builder.setMessage(R.string.confirm_delete_player)
-                    .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            Player deleteMe = Player.findById(Player.class, playerID2);
-
-                            //delete PlayersPerPlay
-                            List<PlayersPerPlay> players = PlayersPerPlay.getPlayer(deleteMe);
-                            for(PlayersPerPlay player:players){
-                                player.delete();
-                            }
-                            //delete PlayersPerGameGroup
-                            List<PlayersPerGameGroup> groupers = PlayersPerGameGroup.getPlayer(deleteMe);
-                            for(PlayersPerGameGroup grouper:groupers){
-                                grouper.delete();
-                            }
-
-                            //delete player
-                            deleteMe.delete();
-                            onFragmentInteraction("refresh_players_drop");
-                            onBackPressed();
-                            dismiss();
-                        }
-                    })
-                    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            if (mAddPlayerFragment != null) mAddPlayerFragment.enableDelete();
-                            dismiss();
-                        }
-                    });
-            // Create the AlertDialog object and return it
-            return builder.create();
-        }
-    }
-
     public void deletePlay(long playID){
-        DeletePlayFragment newFragment = new DeletePlayFragment().newInstance(playID);
+        DeletePlayDialogFragment newFragment = new DeletePlayDialogFragment().newInstance(playID);
         newFragment.show(getSupportFragmentManager(), "deletePlay");
     }
 
-
-    public class DeletePlayFragment extends DialogFragment {
-        public DeletePlayFragment newInstance(long playID) {
-            DeletePlayFragment frag = new DeletePlayFragment();
-            Bundle args = new Bundle();
-            args.putLong("playID", playID);
-            frag.setArguments(args);
-            return frag;
-        }
-
-
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            // Use the Builder class for convenient dialog construction
-            final long playID2 = getArguments().getLong("playID");
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setTitle(R.string.delete);
-            builder.setMessage(R.string.confirm_delete_play)
-                    .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            Play deleteMe = Play.findById(Play.class, playID2);
-
-                            //delete PlayersPerPlay
-                            List<PlayersPerPlay> players = PlayersPerPlay.getPlayers(deleteMe);
-                            for(PlayersPerPlay player:players){
-                                player.delete();
-                            }
-                            //delete GamesPerPay
-                            List<GamesPerPlay> games = GamesPerPlay.getGames(deleteMe);
-                            for(GamesPerPlay game:games){
-                                if (game.expansionFlag == true){
-                                    if (game.bggPlayId != null && !game.bggPlayId.equals("")){
-                                        DeletePlayTask deletePlay = new DeletePlayTask(getActivity());
-                                        try {
-                                            deletePlay.execute(game.bggPlayId);
-                                        } catch (Exception e) {
-
-                                        }
-                                    }
-                                }
-                                game.delete();
-                            }
-
-                            //delete plays_per_game_group
-                            List<PlaysPerGameGroup> plays = PlaysPerGameGroup.getPlays(deleteMe);
-                            for(PlaysPerGameGroup play:plays){
-                                play.delete();
-                            }
-
-                            //delete play image
-                            if(deleteMe.playPhoto != null && !deleteMe.playPhoto.equals("")) {
-                                String deletePhoto =  Environment.getExternalStoragePublicDirectory(
-                                        Environment.DIRECTORY_PICTURES) + "/Plog/" + deleteMe.playPhoto;
-                                File deleteImage = new File(deletePhoto);
-                                if (deleteImage.exists()) {
-                                    deleteImage.delete();
-                                }
-
-                                //delete play image thumb
-                                File deleteImage_thumb = new File(deletePhoto.substring(0, deletePhoto.length() - 4) + "_thumb6.jpg");
-                                if (deleteImage_thumb.exists()) {
-                                    deleteImage_thumb.delete();
-                                }
-                            }
-
-                            //delete play from bgg
-                            if (deleteMe.bggPlayID != null && !deleteMe.bggPlayID.equals("")){
-                                DeletePlayTask deletePlay = new DeletePlayTask(getActivity());
-                                try {
-                                    deletePlay.execute(deleteMe.bggPlayID);
-                                } catch (Exception e) {
-
-                                }
-                            }
-
-                            //delete play
-                            deleteMe.delete();
-
-                            onFragmentInteraction("refresh_plays");
-                            dismiss();
-                        }
-                    })
-                    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            dismiss();
-                        }
-                    });
-            // Create the AlertDialog object and return it
-            return builder.create();
-        }
-    }
 
 
     @Override
@@ -1206,7 +1039,6 @@ public class MainActivity extends AppCompatActivity
                             if (playersFrag.fabMenu.isExpanded()) {
                                 playersFrag.fabMenu.collapse();
                             } else {
-                                //mNavigationDrawerFragment.openDrawer();
                                 if (usedFAB){
                                     usedFAB = false;
                                     openPlays("", true, 0, getString(R.string.title_plays), CurrentYear);
@@ -1215,7 +1047,6 @@ public class MainActivity extends AppCompatActivity
                                 }
                             }
                         } else {
-                            //mNavigationDrawerFragment.openDrawer();
                             if (usedFAB){
                                 usedFAB = false;
                                 openPlays("", true, 0, getString(R.string.title_plays), CurrentYear);
@@ -1262,21 +1093,16 @@ public class MainActivity extends AppCompatActivity
     }
 
     protected void unbindDrawables(View view) {
-        //Log.d("V1", "unbinding drawables");
         if (view.getBackground() != null) {
             view.getBackground().setCallback(null);
         }
         if (view instanceof ViewGroup) {
             for (int i = 0; i < ((ViewGroup) view).getChildCount(); i++) {
-                //Log.d("V1", "unbinding drawables " + i);
                 unbindDrawables(((ViewGroup) view).getChildAt(i));
             }
             try{
                 ((ViewGroup) view).removeAllViews();
-                //Log.d("V1", "unbinding drawables x");
-            } catch (Exception e){
-                //Log.d("V1", "exception");
-            }
+            } catch (Exception e){}
         }
         System.gc();
     }
@@ -1299,7 +1125,7 @@ public class MainActivity extends AppCompatActivity
         boolean expansionFlag;
         long gameId;
         public GameList(Context context, boolean addToCollection, boolean expansionFlag, long gameId) {
-            super(context, addToCollection, expansionFlag);
+            super(context, expansionFlag);
             this.addToCollection = addToCollection;
             this.expansionFlag = expansionFlag;
             this.gameId = gameId;
@@ -1323,10 +1149,9 @@ public class MainActivity extends AppCompatActivity
                         theIDs.add(aGame.gameBGGID);
                     }
 
-                    GameChooserFragment newFragment = new GameChooserFragment().newInstance(theGames, theItems, theIDs, addToCollection, gameId);
+                    GameChooserDialogFragment newFragment = new GameChooserDialogFragment().newInstance(theGames, theItems, theIDs, addToCollection, gameId);
                     newFragment.show(getSupportFragmentManager(), "gamePicker");
                 }
-                //onFragmentInteraction("update_games");
             }else{
                 Game deleteMe = Game.findById(Game.class, gameId);
                 deleteMe.delete();
@@ -1339,181 +1164,4 @@ public class MainActivity extends AppCompatActivity
             }
         }
     }
-
-    public class TenByTenDialogFragment extends DialogFragment {
-
-        ArrayList<GameGroup> addedGroups;
-        ArrayList<CharSequence> theYears;
-
-        public TenByTenDialogFragment newInstance(long gameId, int year) {
-            TenByTenDialogFragment frag = new TenByTenDialogFragment();
-            Bundle args = new Bundle();
-            args.putLong("gameId", gameId);
-            args.putInt("year", year);
-
-            frag.setArguments(args);
-            return frag;
-        }
-
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            final long gameId = getArguments().getLong("gameId");
-            final int selectedYear = getArguments().getInt("year");
-
-            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-
-            if (selectedYear == -1){
-                theYears = new ArrayList<CharSequence>();
-
-                Calendar calendar = Calendar.getInstance();
-                int year = calendar.get(Calendar.YEAR);
-                for (int i = year+1; i >= 2015; i--){
-                    theYears.add(""+i);
-                }
-
-                builder.setTitle(R.string.choose_year)
-                .setItems(theYears.toArray(new CharSequence[theYears.size()]), new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int item) {
-                        dialog.dismiss();
-                        TenByTenDialogFragment newFragment = new TenByTenDialogFragment().newInstance(gameId, Integer.parseInt(theYears.get(item).toString()));
-                        newFragment.show(getSupportFragmentManager(), "tenByTenPicker");
-                    }
-                }).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                    }
-                });
-            }else {
-                addedGroups = new ArrayList<>();
-                List<String> gameGroupNames = new ArrayList<>();
-                final Game theGame = Game.findById(Game.class, gameId);
-                final List<GameGroup> gameGroups = GameGroup.listAll(GameGroup.class);
-
-                boolean checkedItems[] = new boolean[gameGroups.size()];
-
-                int i = 0;
-                for (GameGroup group : gameGroups) {
-                    if (TenByTen.isGroupAdded(group, theGame, selectedYear)) {//if this group has this one checked, it's always okay to add to the dialog
-                        gameGroupNames.add(group.groupName);
-                        checkedItems[i] = true;
-                    } else {
-                        List<TenByTen> tens = TenByTen.tenByTens_Group(group, selectedYear);
-                        if (tens.size() < 10) {//if this group doesn't have 10 selected, we can add it.  this stops adding more than 10
-                            gameGroupNames.add(group.groupName);
-                        }
-                    }
-                    i++;
-                }
-
-
-                // Set the dialog title
-                builder.setTitle(R.string.choose_groups)
-                        // Specify the list array, the items to be selected by default (null for none),
-                        // and the listener through which to receive callbacks when items are selected
-                        .setMultiChoiceItems(gameGroupNames.toArray(new CharSequence[gameGroupNames.size()]), checkedItems,
-                                new DialogInterface.OnMultiChoiceClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which,
-                                                        boolean isChecked) {
-                                        //checkedItems[which] = isChecked;
-                                        GameGroup checked = gameGroups.get(which);
-                                        if (isChecked) {
-                                            addedGroups.add(checked);
-                                        } else {
-                                            addedGroups.remove(checked);
-                                        }
-                                    }
-                                })
-                                // Set the action buttons
-                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int id) {
-                                TenByTen.deleteTenByTen(gameId, selectedYear);
-
-                                for (int i = 0; i < addedGroups.size(); i++) {
-                                    TenByTen addMe = new TenByTen(theGame, addedGroups.get(i), selectedYear);
-                                    addMe.save();
-                                }
-                            }
-                        })
-                        .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int id) {
-
-                            }
-                        });
-            }
-            return builder.create();
-        }
-    }
-
-
-    public class GameChooserFragment extends DialogFragment {
-
-
-        public GameChooserFragment newInstance(ArrayList<String> theGames, ArrayList<String> theItems, ArrayList<String> theIDs, boolean addToCollection, long gameId) {
-            GameChooserFragment frag = new GameChooserFragment();
-            Bundle args = new Bundle();
-            args.putStringArrayList("theGames", theGames);
-            args.putStringArrayList("theItems", theItems);
-            args.putStringArrayList("theIDs", theIDs);
-            args.putBoolean("addToCollection", addToCollection);
-            args.putLong("gameId", gameId);
-            frag.setArguments(args);
-            frag.setCancelable(false);
-            return frag;
-        }
-
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            final long gameId = getArguments().getLong("gameId");
-            final ArrayList<String> theIDs = getArguments().getStringArrayList("theIDs");
-            final ArrayList<String> theGames = getArguments().getStringArrayList("theGames");
-            final ArrayList<String> theItems = getArguments().getStringArrayList("theItems");
-            final boolean addToCollection = getArguments().getBoolean("addToCollection");;
-            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-            // Set the dialog title
-            builder.setCancelable(false);
-            builder.setTitle(R.string.choose_version)
-                    // Specify the list array, the items to be selected by default (null for none),
-                    // and the listener through which to receive callbacks when items are selected
-                    .setItems(theItems.toArray(new CharSequence[theItems.size()]),
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    String BGGID = theIDs.get(i);
-                                    String gameName = theGames.get(i);
-                                    Log.d("V1", "game name = " + gameName);
-                                    if (gameId >= 0) {
-                                        Game updateMe = Game.findById(Game.class, gameId);
-                                        updateMe.gameName = gameName;
-                                        updateMe.save();
-                                    }
-                                    updateGameViaBGG(gameName, BGGID, "", addToCollection, false);
-                                }
-                            })
-                    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int id) {
-                            if (gameId >= 0) {
-                                Game updateMe = Game.findById(Game.class, gameId);
-                                updateMe.delete();
-                                onFragmentInteraction("update_games");
-                            }
-                        }
-                    });
-                    builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                        @Override
-                        public void onDismiss(DialogInterface dialogInterface) {
-                            if (gameId >= 0) {
-                                Game updateMe = Game.findById(Game.class, gameId);
-                                updateMe.delete();
-                                onFragmentInteraction("update_games");
-                            }
-                        }
-                    });
-            return builder.create();
-        }
-    }
-
 }

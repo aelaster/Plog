@@ -67,7 +67,8 @@ public class Play extends SugarRecord<Play> {
                 " INNER JOIN " + StringUtil.toSQLName("Player") +
                 " ON " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("Player") + " = "+ StringUtil.toSQLName("Player") + "." + StringUtil.toSQLName("id") +
                 " where " + StringUtil.toSQLName("play") + " = P." + StringUtil.toSQLName("id") +
-                " and " + StringUtil.toSQLName("score") + " = " +
+                //score is not the lowest score
+                " and (" + StringUtil.toSQLName("score") + " = " +
                 " (" +
                     "Select Max(" + StringUtil.toSQLName("score") + ") " +
                     " from " + StringUtil.toSQLName("PlayersPerPlay") +
@@ -79,6 +80,22 @@ public class Play extends SugarRecord<Play> {
                 " from " + StringUtil.toSQLName("PlayersPerPlay") +
                 " where " + StringUtil.toSQLName("play") + " = P." + StringUtil.toSQLName("id") +
                 " )" +
+                " or " +
+                    //both the max and min are 1 (binary win in a co-op)
+                    StringUtil.toSQLName("score") + " = " +
+                    " (" +
+                    "Select Max(" + StringUtil.toSQLName("score") + ") " +
+                    " from " + StringUtil.toSQLName("PlayersPerPlay") +
+                    " where " + StringUtil.toSQLName("play") + " = P." + StringUtil.toSQLName("id") +
+                    " )" +
+                    " and " + StringUtil.toSQLName("score") + " = 1" +
+                    " and " + StringUtil.toSQLName("score") + " = " +
+                    " (" +
+                    "Select Min(" + StringUtil.toSQLName("score") + ") " +
+                    " from " + StringUtil.toSQLName("PlayersPerPlay") +
+                    " where " + StringUtil.toSQLName("play") + " = P." + StringUtil.toSQLName("id") +
+                    " )" +
+                " ) " +
                 ") as " + StringUtil.toSQLName("winners") +
                 " FROM " + StringUtil.toSQLName("Play") + " P " +
                 " WHERE P." + StringUtil.toSQLName("id") +" = ?";
@@ -93,20 +110,6 @@ public class Play extends SugarRecord<Play> {
     public static List listPlaysNewOld(int sortType, int year){
         String query;
         query = " SELECT P.* " +
-                /*"("+
-                "Select GROUP_CONCAT(" + StringUtil.toSQLName("Player") + "." + StringUtil.toSQLName("playerName") + ", ', ')  " +
-                " from " + StringUtil.toSQLName("PlayersPerPlay") +
-                " INNER JOIN " + StringUtil.toSQLName("Player") +
-                " ON " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("Player") + " = "+ StringUtil.toSQLName("Player") + "." + StringUtil.toSQLName("id") +
-                " where " + StringUtil.toSQLName("play") + " = P." + StringUtil.toSQLName("id") +
-                " and " + StringUtil.toSQLName("score") + " > 0 " +
-                " and " + StringUtil.toSQLName("score") + " = " +
-                " (" +
-                    "Select Max(" + StringUtil.toSQLName("score") + ") " +
-                    " from " + StringUtil.toSQLName("PlayersPerPlay") +
-                    " where " + StringUtil.toSQLName("play") + " = P." + StringUtil.toSQLName("id") +
-                " )" +
-                ") as " + StringUtil.toSQLName("winners") +*/
                 " FROM " + StringUtil.toSQLName("Play") + " P " +
                 " INNER JOIN " + StringUtil.toSQLName("GamesPerPlay") +
                 " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("play") + " = P." + StringUtil.toSQLName("id") +
@@ -131,9 +134,6 @@ public class Play extends SugarRecord<Play> {
                 break;
         }
         query = query + ", P." + StringUtil.toSQLName("ID") + " DESC";
-        /*Select dateSort_NewOld = Select.from(Play.class);
-        dateSort_NewOld.orderBy(StringUtil.toSQLName("playDate") + " DESC, " + StringUtil.toSQLName("ID") + " DESC");
-        return dateSort_NewOld.list();*/
 
         if (year > 0) {
             return Play.findWithQuery(Play.class, query, year + "");
@@ -153,20 +153,6 @@ public class Play extends SugarRecord<Play> {
            return listPlaysNewOld(sortType, year);
         }else {
            query =  " SELECT P.* " +
-                   /*"("+
-                   "Select GROUP_CONCAT(" + StringUtil.toSQLName("Player") + "." + StringUtil.toSQLName("playerName") + ", ', ')  " +
-                   " from " + StringUtil.toSQLName("PlayersPerPlay") +
-                   " INNER JOIN " + StringUtil.toSQLName("Player") +
-                   " ON " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("Player") + " = "+ StringUtil.toSQLName("Player") + "." + StringUtil.toSQLName("id") +
-                   " where " + StringUtil.toSQLName("play") + " = P." + StringUtil.toSQLName("id") +
-                   " and " + StringUtil.toSQLName("score") + " > 0 " +
-                   " and " + StringUtil.toSQLName("score") + " = " +
-                   " (" +
-                   "Select Max(" + StringUtil.toSQLName("score") + ") " +
-                   " from " + StringUtil.toSQLName("PlayersPerPlay") +
-                   " where " + StringUtil.toSQLName("play") + " = P." + StringUtil.toSQLName("id") +
-                   " )" +
-                   ") as " + StringUtil.toSQLName("winners") +*/
                    " FROM " + StringUtil.toSQLName("Play") + " P " +
                     " INNER JOIN " + StringUtil.toSQLName("GamesPerPlay") +
                     " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("play") + " = P." + StringUtil.toSQLName("id") +
@@ -198,7 +184,6 @@ public class Play extends SugarRecord<Play> {
                     break;
             }
             query = query + ", P." + StringUtil.toSQLName("ID") + " DESC";
-           //query = query + " order by " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("playDate") + " DESC, "  + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " DESC";
             if (year > 0) {
                 return Play.findWithQuery(Play.class, query, year + "");
             }else{
@@ -210,20 +195,6 @@ public class Play extends SugarRecord<Play> {
     public static List<Play> listPlaysNewOld_GameGroup(String gameGroup, int sortType, int year){
         String query;
         query =  " SELECT P.* " +
-                /*"("+
-                "Select GROUP_CONCAT(" + StringUtil.toSQLName("Player") + "." + StringUtil.toSQLName("playerName") + ", ', ')  " +
-                " from " + StringUtil.toSQLName("PlayersPerPlay") +
-                " INNER JOIN " + StringUtil.toSQLName("Player") +
-                " ON " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("Player") + " = "+ StringUtil.toSQLName("Player") + "." + StringUtil.toSQLName("id") +
-                " where " + StringUtil.toSQLName("play") + " = P." + StringUtil.toSQLName("id") +
-                " and " + StringUtil.toSQLName("score") + " > 0 " +
-                " and " + StringUtil.toSQLName("score") + " = " +
-                " (" +
-                "Select Max(" + StringUtil.toSQLName("score") + ") " +
-                " from " + StringUtil.toSQLName("PlayersPerPlay") +
-                " where " + StringUtil.toSQLName("play") + " = P." + StringUtil.toSQLName("id") +
-                " )" +
-                ") as " + StringUtil.toSQLName("winners") +*/
                 " FROM " + StringUtil.toSQLName("Play") + " P " +
                 " INNER JOIN " + StringUtil.toSQLName("GamesPerPlay") +
                 " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("play") + " = P." + StringUtil.toSQLName("id") +
@@ -233,7 +204,6 @@ public class Play extends SugarRecord<Play> {
                 " INNER JOIN " + StringUtil.toSQLName("PlaysPerGameGroup") +
                 " ON " + StringUtil.toSQLName("PlaysPerGameGroup") + "." + StringUtil.toSQLName("play") + " = P." + StringUtil.toSQLName("id") +
                 " and " + StringUtil.toSQLName("PlaysPerGameGroup") + "." + StringUtil.toSQLName("gameGroup") + " = ?";
-        //query = query + " order by " + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("playDate") + " DESC, "  + StringUtil.toSQLName("Play") + "." + StringUtil.toSQLName("id") + " DESC";
         if (year > 0){
             query = query + " AND STRFTIME('%Y', DATETIME(SUBSTR(P." + StringUtil.toSQLName("playDate") + ",0, 11), 'unixepoch')) = ? ";
         }
@@ -263,20 +233,6 @@ public class Play extends SugarRecord<Play> {
     public static List<Play> gameTenByTen_GameGroup(GameGroup group, Game game, int year, int sortType){
         String query;
         query =  " SELECT P.* " +
-                /*"("+
-                "Select GROUP_CONCAT(" + StringUtil.toSQLName("Player") + "." + StringUtil.toSQLName("playerName") + ", ', ')  " +
-                " from " + StringUtil.toSQLName("PlayersPerPlay") +
-                " INNER JOIN " + StringUtil.toSQLName("Player") +
-                " ON " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("Player") + " = "+ StringUtil.toSQLName("Player") + "." + StringUtil.toSQLName("id") +
-                " where " + StringUtil.toSQLName("play") + " = P." + StringUtil.toSQLName("id") +
-                " and " + StringUtil.toSQLName("score") + " > 0 " +
-                " and " + StringUtil.toSQLName("score") + " = " +
-                " (" +
-                "Select Max(" + StringUtil.toSQLName("score") + ") " +
-                " from " + StringUtil.toSQLName("PlayersPerPlay") +
-                " where " + StringUtil.toSQLName("play") + " = P." + StringUtil.toSQLName("id") +
-                " )" +
-                ") as " + StringUtil.toSQLName("winners") +*/
                 " FROM " + StringUtil.toSQLName("Play") + " P " +
                 " INNER JOIN " + StringUtil.toSQLName("PlaysPerGameGroup") + " PPGG " +
                 " ON P." + StringUtil.toSQLName("id") + " = PPGG." + StringUtil.toSQLName("play") +
@@ -317,20 +273,6 @@ public class Play extends SugarRecord<Play> {
     public static List<Play> totalPlays_TenByTen_GameGroup(GameGroup group, int year, int sortType){
         String query;
         query =  " SELECT P.* " +
-                /*"("+
-                "Select GROUP_CONCAT(" + StringUtil.toSQLName("Player") + "." + StringUtil.toSQLName("playerName") + ", ', ')  " +
-                " from " + StringUtil.toSQLName("PlayersPerPlay") +
-                " INNER JOIN " + StringUtil.toSQLName("Player") +
-                " ON " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("Player") + " = "+ StringUtil.toSQLName("Player") + "." + StringUtil.toSQLName("id") +
-                " where " + StringUtil.toSQLName("play") + " = P." + StringUtil.toSQLName("id") +
-                " and " + StringUtil.toSQLName("score") + " > 0 " +
-                " and " + StringUtil.toSQLName("score") + " = " +
-                " (" +
-                "Select Max(" + StringUtil.toSQLName("score") + ") " +
-                " from " + StringUtil.toSQLName("PlayersPerPlay") +
-                " where " + StringUtil.toSQLName("play") + " = P." + StringUtil.toSQLName("id") +
-                " )" +
-                ") as " + StringUtil.toSQLName("winners") +*/
                 " FROM " + StringUtil.toSQLName("Play") + " P " +
                 " INNER JOIN " + StringUtil.toSQLName("PlaysPerGameGroup") + " PPGG " +
                 " ON P." + StringUtil.toSQLName("id") + " = PPGG." + StringUtil.toSQLName("play") +
@@ -370,20 +312,6 @@ public class Play extends SugarRecord<Play> {
     public static List<Play> totalWins_GameGroup_Player(GameGroup group, Player player, int sortType, int year) {
         String query;
         query =  " SELECT P.* " +
-                /*"("+
-                "Select GROUP_CONCAT(" + StringUtil.toSQLName("Player") + "." + StringUtil.toSQLName("playerName") + ", ', ')  " +
-                " from " + StringUtil.toSQLName("PlayersPerPlay") +
-                " INNER JOIN " + StringUtil.toSQLName("Player") +
-                " ON " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("Player") + " = "+ StringUtil.toSQLName("Player") + "." + StringUtil.toSQLName("id") +
-                " where " + StringUtil.toSQLName("play") + " = P." + StringUtil.toSQLName("id") +
-                " and " + StringUtil.toSQLName("score") + " > 0 " +
-                " and " + StringUtil.toSQLName("score") + " = " +
-                " (" +
-                "Select Max(" + StringUtil.toSQLName("score") + ") " +
-                " from " + StringUtil.toSQLName("PlayersPerPlay") +
-                " where " + StringUtil.toSQLName("play") + " = P." + StringUtil.toSQLName("id") +
-                " )" +
-                ") as " + StringUtil.toSQLName("winners") +*/
                 " FROM " + StringUtil.toSQLName("Play") + " P " +
                 " INNER JOIN " + StringUtil.toSQLName("GamesPerPlay") +
                 " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("play") + " = P." + StringUtil.toSQLName("id") +
@@ -398,7 +326,6 @@ public class Play extends SugarRecord<Play> {
                 " AND "+ StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("player") + " = ? " +
                 " AND "+ StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("score") + " >= " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("playHighScore") +
                 " AND ("+ StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("score") + " != " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("playLowScore") + ")";
-                //" OR "+ StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("playLowScore") + " == " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("playHighScore") + ")";
         if (year > 0){
             query = query + " AND STRFTIME('%Y', DATETIME(SUBSTR(P." + StringUtil.toSQLName("playDate") + ",0, 11), 'unixepoch')) = ? ";
         }
@@ -426,20 +353,6 @@ public class Play extends SugarRecord<Play> {
     public static List<Play> totalPlays_Player(Player player, int sortType, int year) {
         String query;
         query =  " SELECT P.* " +
-                /*"("+
-                "Select GROUP_CONCAT(" + StringUtil.toSQLName("Player") + "." + StringUtil.toSQLName("playerName") + ", ', ')  " +
-                " from " + StringUtil.toSQLName("PlayersPerPlay") +
-                " INNER JOIN " + StringUtil.toSQLName("Player") +
-                " ON " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("Player") + " = "+ StringUtil.toSQLName("Player") + "." + StringUtil.toSQLName("id") +
-                " where " + StringUtil.toSQLName("play") + " = P." + StringUtil.toSQLName("id") +
-                " and " + StringUtil.toSQLName("score") + " > 0 " +
-                " and " + StringUtil.toSQLName("score") + " = " +
-                " (" +
-                "Select Max(" + StringUtil.toSQLName("score") + ") " +
-                " from " + StringUtil.toSQLName("PlayersPerPlay") +
-                " where " + StringUtil.toSQLName("play") + " = P." + StringUtil.toSQLName("id") +
-                " )" +
-                ") as " + StringUtil.toSQLName("winners") +*/
                 " FROM " + StringUtil.toSQLName("Play") + " P " +
                 " INNER JOIN " + StringUtil.toSQLName("GamesPerPlay") +
                 " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("play") + " = P." + StringUtil.toSQLName("id") +
@@ -476,20 +389,6 @@ public class Play extends SugarRecord<Play> {
     public static List<Play> totalPlays_Player_GameGroup(Player player, GameGroup group, int sortType, int year) {
         String query;
         query =  " SELECT P.* " +
-                /*"("+
-                "Select GROUP_CONCAT(" + StringUtil.toSQLName("Player") + "." + StringUtil.toSQLName("playerName") + ", ', ')  " +
-                " from " + StringUtil.toSQLName("PlayersPerPlay") +
-                " INNER JOIN " + StringUtil.toSQLName("Player") +
-                " ON " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("Player") + " = "+ StringUtil.toSQLName("Player") + "." + StringUtil.toSQLName("id") +
-                " where " + StringUtil.toSQLName("play") + " = P." + StringUtil.toSQLName("id") +
-                " and " + StringUtil.toSQLName("score") + " > 0 " +
-                " and " + StringUtil.toSQLName("score") + " = " +
-                " (" +
-                "Select Max(" + StringUtil.toSQLName("score") + ") " +
-                " from " + StringUtil.toSQLName("PlayersPerPlay") +
-                " where " + StringUtil.toSQLName("play") + " = P." + StringUtil.toSQLName("id") +
-                " )" +
-                ") as " + StringUtil.toSQLName("winners") +*/
                 " FROM " + StringUtil.toSQLName("Play") + " P " +
                 " INNER JOIN " + StringUtil.toSQLName("GamesPerPlay") +
                 " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("play") + " = P." + StringUtil.toSQLName("id") +
@@ -528,20 +427,6 @@ public class Play extends SugarRecord<Play> {
     public static List<Play> totalWins_Player(Player player, int sortType, int year) {
         String query;
         query =  " SELECT P.* " +
-                /*"("+
-                "Select GROUP_CONCAT(" + StringUtil.toSQLName("Player") + "." + StringUtil.toSQLName("playerName") + ", ', ')  " +
-                " from " + StringUtil.toSQLName("PlayersPerPlay") +
-                " INNER JOIN " + StringUtil.toSQLName("Player") +
-                " ON " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("Player") + " = "+ StringUtil.toSQLName("Player") + "." + StringUtil.toSQLName("id") +
-                " where " + StringUtil.toSQLName("play") + " = P." + StringUtil.toSQLName("id") +
-                " and " + StringUtil.toSQLName("score") + " > 0 " +
-                " and " + StringUtil.toSQLName("score") + " = " +
-                " (" +
-                "Select Max(" + StringUtil.toSQLName("score") + ") " +
-                " from " + StringUtil.toSQLName("PlayersPerPlay") +
-                " where " + StringUtil.toSQLName("play") + " = P." + StringUtil.toSQLName("id") +
-                " )" +
-                ") as " + StringUtil.toSQLName("winners") +*/
                 " FROM " + StringUtil.toSQLName("Play") + " P " +
                 " INNER JOIN " + StringUtil.toSQLName("GamesPerPlay") +
                 " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("play") + " = P." + StringUtil.toSQLName("id") +
@@ -553,7 +438,6 @@ public class Play extends SugarRecord<Play> {
                 " AND "+ StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("player") + " = ? " +
                 " AND "+ StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("score") + " >= " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("playHighScore") +
                 " AND ("+ StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("score") + " != " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("playLowScore") + ")";
-                //" OR "+ StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("playLowScore") + " == " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("playHighScore") + ")";
         if (year > 0){
             query = query + " AND STRFTIME('%Y', DATETIME(SUBSTR(P." + StringUtil.toSQLName("playDate") + ",0, 11), 'unixepoch')) = ? ";
         }
@@ -581,20 +465,6 @@ public class Play extends SugarRecord<Play> {
     public static List<Play> totalAsteriskWins_GameGroup_Player(GameGroup group, Player player, int sortType, int year) {
         String query;
         query =  " SELECT PP.* " +
-                /*"("+
-                "Select GROUP_CONCAT(" + StringUtil.toSQLName("Player") + "." + StringUtil.toSQLName("playerName") + ", ', ')  " +
-                " from " + StringUtil.toSQLName("PlayersPerPlay") +
-                " INNER JOIN " + StringUtil.toSQLName("Player") +
-                " ON " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("Player") + " = "+ StringUtil.toSQLName("Player") + "." + StringUtil.toSQLName("id") +
-                " where " + StringUtil.toSQLName("play") + " = PP." + StringUtil.toSQLName("id") +
-                " and " + StringUtil.toSQLName("score") + " > 0 " +
-                " and " + StringUtil.toSQLName("score") + " = " +
-                " (" +
-                "Select Max(" + StringUtil.toSQLName("score") + ") " +
-                " from " + StringUtil.toSQLName("PlayersPerPlay") +
-                " where " + StringUtil.toSQLName("play") + " = PP." + StringUtil.toSQLName("id") +
-                " )" +
-                ") as " + StringUtil.toSQLName("winners") +*/
                 " FROM " + StringUtil.toSQLName("Play") + " PP " +
                 " INNER JOIN " + StringUtil.toSQLName("GamesPerPlay") +
                 " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("play") + " = PP." + StringUtil.toSQLName("id") +
@@ -655,20 +525,6 @@ public class Play extends SugarRecord<Play> {
     public static List<Play> totalAsteriskWins_Player(Player player, int sortType, int year) {
         String query;
         query =  " SELECT PP.* " +
-                /*"("+
-                "Select GROUP_CONCAT(" + StringUtil.toSQLName("Player") + "." + StringUtil.toSQLName("playerName") + ", ', ')  " +
-                " from " + StringUtil.toSQLName("PlayersPerPlay") +
-                " INNER JOIN " + StringUtil.toSQLName("Player") +
-                " ON " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("Player") + " = "+ StringUtil.toSQLName("Player") + "." + StringUtil.toSQLName("id") +
-                " where " + StringUtil.toSQLName("play") + " = PP." + StringUtil.toSQLName("id") +
-                " and " + StringUtil.toSQLName("score") + " > 0 " +
-                " and " + StringUtil.toSQLName("score") + " = " +
-                " (" +
-                "Select Max(" + StringUtil.toSQLName("score") + ") " +
-                " from " + StringUtil.toSQLName("PlayersPerPlay") +
-                " where " + StringUtil.toSQLName("play") + " = PP." + StringUtil.toSQLName("id") +
-                " )" +
-                ") as " + StringUtil.toSQLName("winners") +*/
                 " FROM " + StringUtil.toSQLName("Play") + " PP " +
                 " INNER JOIN " + StringUtil.toSQLName("GamesPerPlay") +
                 " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("play") + " = PP." + StringUtil.toSQLName("id") +
@@ -718,20 +574,6 @@ public class Play extends SugarRecord<Play> {
     public static List<Play> totalGroupLosses(GameGroup group, int sortType, int year) {
         String query;
         query =  " SELECT PP.* " +
-                /*"("+
-                "Select GROUP_CONCAT(" + StringUtil.toSQLName("Player") + "." + StringUtil.toSQLName("playerName") + ", ', ')  " +
-                " from " + StringUtil.toSQLName("PlayersPerPlay") +
-                " INNER JOIN " + StringUtil.toSQLName("Player") +
-                " ON " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("Player") + " = "+ StringUtil.toSQLName("Player") + "." + StringUtil.toSQLName("id") +
-                " where " + StringUtil.toSQLName("play") + " = PP." + StringUtil.toSQLName("id") +
-                " and " + StringUtil.toSQLName("score") + " > 0 " +
-                " and " + StringUtil.toSQLName("score") + " = " +
-                " (" +
-                "Select Max(" + StringUtil.toSQLName("score") + ") " +
-                " from " + StringUtil.toSQLName("PlayersPerPlay") +
-                " where " + StringUtil.toSQLName("play") + " = PP." + StringUtil.toSQLName("id") +
-                " )" +
-                ") as " + StringUtil.toSQLName("winners") +*/
                 " FROM " + StringUtil.toSQLName("Play") + " PP " +
                 " INNER JOIN " + StringUtil.toSQLName("GamesPerPlay") +
                 " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("play") + " = PP." + StringUtil.toSQLName("id") +
@@ -794,20 +636,6 @@ public class Play extends SugarRecord<Play> {
     public static List<Play> totalGroupLosses(int sortType, int year) {
         String query;
         query =  " SELECT PP.* " +
-                /*"("+
-                "Select GROUP_CONCAT(" + StringUtil.toSQLName("Player") + "." + StringUtil.toSQLName("playerName") + ", ', ')  " +
-                " from " + StringUtil.toSQLName("PlayersPerPlay") +
-                " INNER JOIN " + StringUtil.toSQLName("Player") +
-                " ON " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("Player") + " = "+ StringUtil.toSQLName("Player") + "." + StringUtil.toSQLName("id") +
-                " where " + StringUtil.toSQLName("play") + " = PP." + StringUtil.toSQLName("id") +
-                " and " + StringUtil.toSQLName("score") + " > 0 " +
-                " and " + StringUtil.toSQLName("score") + " = " +
-                " (" +
-                "Select Max(" + StringUtil.toSQLName("score") + ") " +
-                " from " + StringUtil.toSQLName("PlayersPerPlay") +
-                " where " + StringUtil.toSQLName("play") + " = PP." + StringUtil.toSQLName("id") +
-                " )" +
-                ") as " + StringUtil.toSQLName("winners") +*/
                 " FROM " + StringUtil.toSQLName("Play") + " PP " +
                 " INNER JOIN " + StringUtil.toSQLName("GamesPerPlay") +
                 " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("play") + " = PP." + StringUtil.toSQLName("id") +
@@ -857,20 +685,6 @@ public class Play extends SugarRecord<Play> {
     public static List<Play> totalSharedWins(GameGroup group, int sortType, int year) {
         String query;
         query =  " SELECT PP.* " +
-                /*"("+
-                "Select GROUP_CONCAT(" + StringUtil.toSQLName("Player") + "." + StringUtil.toSQLName("playerName") + ", ', ')  " +
-                " from " + StringUtil.toSQLName("PlayersPerPlay") +
-                " INNER JOIN " + StringUtil.toSQLName("Player") +
-                " ON " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("Player") + " = "+ StringUtil.toSQLName("Player") + "." + StringUtil.toSQLName("id") +
-                " where " + StringUtil.toSQLName("play") + " = PP." + StringUtil.toSQLName("id") +
-                " and " + StringUtil.toSQLName("score") + " > 0 " +
-                " and " + StringUtil.toSQLName("score") + " = " +
-                " (" +
-                "Select Max(" + StringUtil.toSQLName("score") + ") " +
-                " from " + StringUtil.toSQLName("PlayersPerPlay") +
-                " where " + StringUtil.toSQLName("play") + " = PP." + StringUtil.toSQLName("id") +
-                " )" +
-                ") as " + StringUtil.toSQLName("winners") +*/
                 " FROM " + StringUtil.toSQLName("Play") + " PP " +
                 " INNER JOIN " + StringUtil.toSQLName("GamesPerPlay") +
                 " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("play") + " = PP." + StringUtil.toSQLName("id") +
@@ -933,20 +747,6 @@ public class Play extends SugarRecord<Play> {
     public static List<Play> totalSharedWins(int sortType, int year) {
         String query;
         query =  " SELECT PP.* " +
-                /*"("+
-                "Select GROUP_CONCAT(" + StringUtil.toSQLName("Player") + "." + StringUtil.toSQLName("playerName") + ", ', ')  " +
-                " from " + StringUtil.toSQLName("PlayersPerPlay") +
-                " INNER JOIN " + StringUtil.toSQLName("Player") +
-                " ON " + StringUtil.toSQLName("PlayersPerPlay") + "." + StringUtil.toSQLName("Player") + " = "+ StringUtil.toSQLName("Player") + "." + StringUtil.toSQLName("id") +
-                " where " + StringUtil.toSQLName("play") + " = P." + StringUtil.toSQLName("id") +
-                " and " + StringUtil.toSQLName("score") + " > 0 " +
-                " and " + StringUtil.toSQLName("score") + " = " +
-                " (" +
-                "Select Max(" + StringUtil.toSQLName("score") + ") " +
-                " from " + StringUtil.toSQLName("PlayersPerPlay") +
-                " where " + StringUtil.toSQLName("play") + " = P." + StringUtil.toSQLName("id") +
-                " )" +
-                ") as " + StringUtil.toSQLName("winners") +*/
                 " FROM " + StringUtil.toSQLName("Play") + " PP " +
                 " INNER JOIN " + StringUtil.toSQLName("GamesPerPlay") +
                 " ON " + StringUtil.toSQLName("GamesPerPlay") + "." + StringUtil.toSQLName("play") + " = PP." + StringUtil.toSQLName("id") +

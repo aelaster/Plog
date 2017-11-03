@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
-package com.lastsoft.plog.wizard.ui;;
+package com.lastsoft.plog.wizard.ui;
 
 import com.lastsoft.plog.wizard.model.Page;
+
+;
 
 public interface PageFragmentCallbacks {
     Page onGetPage(String key);

@@ -16,9 +16,9 @@
 
 package com.lastsoft.plog.wizard.model;
 
-import com.lastsoft.plog.wizard.ui.MultipleChoiceFragment;
-
 import android.support.v4.app.Fragment;
+
+import com.lastsoft.plog.wizard.ui.MultipleChoiceFragment;
 
 import java.util.ArrayList;
 

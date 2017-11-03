@@ -19,7 +19,7 @@
 
     <TextView style="@style/WizardPageTitle" />
 
-    <ScrollView android:layout_width="match_parent"
+    <ScrollView android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:paddingLeft="16dp"

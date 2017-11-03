@@ -67,13 +67,6 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
 
         public ViewHolder(View v) {
             super(v);
-            // Define click listener for the ViewHolder's View.
-            v.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    //Log.d(TAG, "Element " + getPosition() + " clicked.");
-                }
-            });
             myView = v;
             nameView = (TextView) v.findViewById(R.id.groupName);
             totalPlaysView = (TextView) v.findViewById(R.id.totalPlays);
@@ -133,7 +126,6 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
     // Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, final int position) {
-        //long totalPlays = ((long) PlayersPerPlay.totalPlays_GameGroup(GameGroup.findById(GameGroup.class, groups.get(position).getId())).size() / (long) GameGroup.getGroupPlayers(GameGroup.findById(GameGroup.class, groups.get(position).getId())).size());
         viewHolder.getNameView().setText(groups.get(position).groupName);
         viewHolder.getPlaysView().setText(mActivity.getString(R.string.total_plays) + groups.get(position).totalPlays);
         viewHolder.getGamesView().setText(mActivity.getString(R.string.unique_games) + groups.get(position).uniqueGames);

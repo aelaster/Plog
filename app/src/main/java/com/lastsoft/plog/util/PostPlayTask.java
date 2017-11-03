@@ -25,9 +25,6 @@ public class PostPlayTask extends AsyncTask<Play, Void, String> {
     protected String doInBackground(final Play... playToLog) {
 
         String bggProcess = "false";
-
-        //Log.d("V1", "trying to post a play to bgg");
-
         helper = new BGGLogInHelper(theContext, null);
         if (helper.canLogIn() && helper.checkCookies()) {
             //first do base game

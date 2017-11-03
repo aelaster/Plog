@@ -39,7 +39,7 @@
                     android:id="@+id/textViewDate0" />
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_gravity="center_vertical"
@@ -72,7 +72,7 @@
 
                 <ImageView
                     android:id="@+id/gamePhoto"
-                    android:layout_width="70dp"
+                    android:layout_width="0dp"
                     android:layout_height="60dp"
                     android:adjustViewBounds="true"
                     android:baselineAlignBottom="true"
@@ -110,7 +110,7 @@
                     android:id="@+id/textView3" />
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_gravity="center_vertical"
@@ -132,7 +132,7 @@
                 android:layout_height="wrap_content"
                 >
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="@string/title_players"
@@ -166,7 +166,7 @@
                 android:visibility="gone"
                 >
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="@string/expansions"

@@ -36,7 +36,6 @@
             android:maxLength="5"
             android:layout_gravity="center_vertical"
             android:inputType="numberDecimal|numberSigned"
-            android:layout_toRightOf="@id/color"
             android:hint="@string/score"/>
 
         <ImageView
@@ -45,9 +44,8 @@
             android:layout_height="match_parent"
             android:layout_gravity="center_vertical"
             android:scaleType="fitCenter"
-            android:layout_toRightOf="@id/score"
-            android:layout_alignParentRight="true"
-            android:paddingLeft="5dp"
+            android:paddingStart="5dp"
+            android:paddingEnd="5dp"
             android:src="@android:drawable/ic_menu_close_clear_cancel"
             />
 

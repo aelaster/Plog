@@ -9,9 +9,9 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
-import android.widget.ImageView;
+import android.support.v7.widget.AppCompatImageView;
 
-public class PinchImageView extends ImageView implements View.OnTouchListener {
+public class PinchImageView extends AppCompatImageView implements View.OnTouchListener {
 
     public static final int GROW = 0;
     public static final int SHRINK = 1;
@@ -22,7 +22,7 @@ public class PinchImageView extends ImageView implements View.OnTouchListener {
     public static final float MAX_SCALE = 4f;
     public static final float ZOOM = 1.5f;
 
-    ImageView im = null;
+    AppCompatImageView im = null;
     Matrix mBaseMatrix = new Matrix(),
             mSuppMatrix = new Matrix(),
             mResultMatrix = new Matrix();
@@ -46,7 +46,7 @@ public class PinchImageView extends ImageView implements View.OnTouchListener {
         _init();
     }
 
-    public PinchImageView(ImageView im) {
+    public PinchImageView(AppCompatImageView im) {
         super(im.getContext());
         _init();
         this.im = im;

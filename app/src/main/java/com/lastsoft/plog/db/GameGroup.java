@@ -22,14 +22,10 @@ public class GameGroup extends SugarRecord<GameGroup> {
     }
 
     public static List<Player> getGroupPlayers(GameGroup group){
-        //Log.d("V1", "Select * from " + StringUtil.toSQLName("Player") + " where " + StringUtil.toSQLName("id") + " in (Select " + StringUtil.toSQLName("player") + " from " + StringUtil.toSQLName("PlayersPerGameGroup") + " where " + StringUtil.toSQLName("GameGroup") + " = ?)");
         return Player.findWithQuery(Player.class, "Select * from " + StringUtil.toSQLName("Player") + " where " + StringUtil.toSQLName("id") + " in (Select " + StringUtil.toSQLName("player") + " from " + StringUtil.toSQLName("PlayersPerGameGroup") + " where " + StringUtil.toSQLName("GameGroup") + " = ?) ORDER BY " + StringUtil.toSQLName("playerName"), group.getId().toString());
     }
 
     public static List<GameGroup> listAll_AZ(boolean skipAZ, int year){
-        /*Select findGroups = Select.from(GameGroup.class);
-        findGroups.orderBy(StringUtil.toSQLName("groupName") + " ASC");
-        return findGroups.list();*/
         String query;
         query = " SELECT " + StringUtil.toSQLName("GameGroup") + ".*, COUNT("+ StringUtil.toSQLName("Game") +"." + StringUtil.toSQLName("id") + ") as " + StringUtil.toSQLName("totalPlays") + ", COUNT(DISTINCT "+ StringUtil.toSQLName("Game") +"." + StringUtil.toSQLName("id") + ") as " + StringUtil.toSQLName("uniqueGames") +
                 " FROM " + StringUtil.toSQLName("GameGroup") +
@@ -57,9 +53,6 @@ public class GameGroup extends SugarRecord<GameGroup> {
     }
 
     public static GameGroup refreshStats(GameGroup theGroup, int year){
-        /*Select findGroups = Select.from(GameGroup.class);
-        findGroups.orderBy(StringUtil.toSQLName("groupName") + " ASC");
-        return findGroups.list();*/
         String query;
         query = " SELECT " + StringUtil.toSQLName("GameGroup") + ".*, COUNT("+ StringUtil.toSQLName("Game") +"." + StringUtil.toSQLName("id") + ") as " + StringUtil.toSQLName("totalPlays") + ", COUNT(DISTINCT "+ StringUtil.toSQLName("Game") +"." + StringUtil.toSQLName("id") + ") as " + StringUtil.toSQLName("uniqueGames") +
                 " FROM " + StringUtil.toSQLName("GameGroup") +

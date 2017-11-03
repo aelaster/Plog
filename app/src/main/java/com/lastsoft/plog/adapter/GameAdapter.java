@@ -203,8 +203,6 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
     }
 
     public GameAdapter(Fragment theFragment, Activity theActivity, String mSearchQuery, boolean theFromDrawer, int mPlayListType, int mSortType, String mFragmentName, int mCurrentYear) {
-        //games = Game.listAll(Game.class);
-        //find(Class<T> type, String whereClause, String[] whereArgs, String groupBy, String orderBy, String limit)
         mFragment = theFragment;
         mActivity = theActivity;
         playListType = mPlayListType;
@@ -241,10 +239,8 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
     // Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, final int position) {
-        //Log.d(TAG, "Element " + position + " set.");
         // Get element from your dataset at this position and replace the contents of the view
         // with that element
-        //if (searchQuery.equals("") || (games.get(position).gameName.toLowerCase().contains(searchQuery.toLowerCase()))) {
 
         DateFormat outputFormatter = new SimpleDateFormat("MM/dd/yyyy");
 
@@ -262,10 +258,11 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
         }
         viewHolder.getTextView().setText(games.get(position).gameName);
         if (games.get(position).gameThumb != null  && !games.get(position).gameThumb.equals("")) {
-            //Log.d("V1", "gameThumb = " + games.get(position).gameThumb);
-            //ImageLoader.getInstance().displayImage("http:" + games.get(position).gameThumb, viewHolder.getImageView(), options);
-            Picasso.with(mActivity).load("http:" + games.get(position).gameThumb).into(viewHolder.getImageView());
-
+            if (games.get(position).gameThumb.contains("http")) {
+                Picasso.with(mActivity).load(games.get(position).gameThumb).into(viewHolder.getImageView());
+            }else {
+                Picasso.with(mActivity).load("http:" + games.get(position).gameThumb).into(viewHolder.getImageView());
+            }
         } else {
             viewHolder.getImageView().setImageDrawable(null);
         }
@@ -441,13 +438,6 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
                          return true;
                      case R.id.add_bucket_list:
                          String[] ids = TimeZone.getAvailableIDs(-5 * 60 * 60 * 1000);
-                         // if no ids were returned, something is wrong. get out.
-                         //if (ids.length == 0)
-                         //    System.exit(0);
-
-                         // begin output
-                         //System.out.println("Current Time");
-
                          // create a Eastern Standard Time time zone
                          SimpleTimeZone pdt = new SimpleTimeZone(-5 * 60 * 60 * 1000, ids[0]);
 

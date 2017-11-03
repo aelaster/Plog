@@ -41,6 +41,8 @@ import com.lastsoft.plog.db.GamesPerPlay;
 import com.lastsoft.plog.db.Play;
 import com.lastsoft.plog.db.PlayersPerPlay;
 import com.lastsoft.plog.db.PlaysPerGameGroup;
+import com.lastsoft.plog.dialogs.DeletePlayDialogFragment;
+import com.lastsoft.plog.util.AppUtils;
 import com.lastsoft.plog.util.CustomViewPager;
 import com.lastsoft.plog.util.DeletePlayTask;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -53,7 +55,9 @@ import java.util.Map;
 import static com.lastsoft.plog.MainActivity.EXTRA_CURRENT_ITEM_POSITION;
 import static com.lastsoft.plog.MainActivity.EXTRA_OLD_ITEM_POSITION;
 
-public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragment.OnFragmentInteractionListener {
+public class ViewPlayActivity extends AppCompatActivity implements
+        AddPlayFragment.OnFragmentInteractionListener,
+        DeletePlayDialogFragment.OnDialogButtonClickListener{
     private long playID;
     String imageTransID;
     String nameTransID;
@@ -84,10 +88,6 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
         public void onMapSharedElements(List<String> names, Map<String, View> sharedElements) {
             if (mIsReturning && mPlayAdapter.getItemCount() > 0) {
                 View sharedImageView = mPagerAdapter.getCurrentDetailsFragment().getSharedImageElement();
-                View sharedNameView = mPagerAdapter.getCurrentDetailsFragment().getSharedNameElement();
-                View sharedDateView = mPagerAdapter.getCurrentDetailsFragment().getSharedDateElement();
-                //Log.d("V1", "mCurrentPosition = " + mCurrentPosition);
-                //Log.d("V1", "mOriginalPosition = " + mOriginalPosition);
                 if (sharedImageView == null) {
                     // If shared view is null, then it has likely been scrolled off screen and
                     // recycled. In this case we cancel the shared element transition by
@@ -98,11 +98,7 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
                     names.clear();
                     sharedElements.clear();
                     names.add(sharedImageView.getTransitionName());
-                    //names.add(sharedNameView.getTransitionName());
-                    //names.add(sharedDateView.getTransitionName());
                     sharedElements.put(sharedImageView.getTransitionName(), sharedImageView);
-                    //sharedElements.put(sharedNameView.getTransitionName(), sharedNameView);
-                    //sharedElements.put(sharedDateView.getTransitionName(), sharedDateView);
                 }
             }
         }
@@ -142,11 +138,6 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
         TransitionSet enterTransition = new TransitionSet();
 
 
-        // Play a circular reveal animation starting beneath the shared element.
-        /*Transition circularReveal = new CircularReveal(sharedElement);
-        circularReveal.addTarget(rootView.findViewById(R.id.imageView1));
-        enterTransition.addTransition(circularReveal);*/
-
         // Slide the cards in through the bottom of the screen.
         Transition cardSlide = new Slide(Gravity.BOTTOM);
         cardSlide.addTarget(rootView.findViewById(R.id.container));
@@ -171,12 +162,6 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
                 gameDate.animate().alpha(1f).setDuration(res.getInteger(R.integer.text_background_fade_millis));
                 toolbar.animate().alpha(1f).setDuration(res.getInteger(R.integer.text_background_fade_millis));
             }
-
-            @Override
-            public void onTransitionEnd(Transition transition) {
-                //gameName.animate().alpha(1f).setDuration(res.getInteger(R.integer.text_background_fade_millis));
-                //gameDate.animate().alpha(1f).setDuration(res.getInteger(R.integer.text_background_fade_millis));
-            }
         });
 
         enterTransition.setDuration(getResources().getInteger(R.integer.transition_duration_millis));
@@ -190,29 +175,6 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
 
             TransitionSet returnTransition = new TransitionSet();
 
-            // Slide and fade the circular reveal container off the top of the screen.
-            /*TransitionSet slideFade = new TransitionSet();
-            slideFade.addTarget(rootView.findViewById(R.id.imageView1));
-            slideFade.addTransition(new Slide(Gravity.TOP));
-            slideFade.addTransition(new Fade());
-            returnTransition.addTransition(slideFade);*/
-
-            /*returnTransition.setOrdering(TransitionSet.ORDERING_TOGETHER);
-
-            Transition recolor = new Recolor();
-            recolor.addTarget(mPagerAdapter.getCurrentDetailsFragment().getSharedNameElement());
-            recolor.addTarget(mPagerAdapter.getCurrentDetailsFragment().getSharedDateElement());
-            returnTransition.addTransition(recolor);
-
-            Transition changeBounds = new ChangeBounds();
-            changeBounds.addTarget(mPagerAdapter.getCurrentDetailsFragment().getSharedNameElement());
-            changeBounds.addTarget(mPagerAdapter.getCurrentDetailsFragment().getSharedDateElement());
-            returnTransition.addTransition(changeBounds);
-
-            Transition textSize = new TextSizeTransition();
-            textSize.addTarget(mPagerAdapter.getCurrentDetailsFragment().getSharedNameElement());
-            textSize.addTarget(mPagerAdapter.getCurrentDetailsFragment().getSharedDateElement());
-            returnTransition.addTransition(textSize);*/
             try {
                 // Slide the cards off the bottom of the screen.
                 Transition cardSlide = new Slide(Gravity.BOTTOM);
@@ -274,12 +236,9 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
                 int id = item.getItemId();
                 long menuPlayId = mPlayAdapter.plays.get(mPager.getCurrentItem()).getId();
                 if (id == R.id.view_image) {
-                    //openAddPlay(GamesPerPlay.getBaseGame(Play.findById(Play.class, menuPlayId)).gameName, menuPlayId);
                     String[] photoParts = mPlayAdapter.plays.get(mPager.getCurrentItem()).playPhoto.split("/");
                     File newFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)+"/Plog/",photoParts[photoParts.length-1]);
                     Uri contentUri = FileProvider.getUriForFile(getApplicationContext(), "com.lastsoft.plog.fileprovider", newFile);
-                    //Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI.buildUpon().appendPath("Pictures/" + photoParts[photoParts.length - 1]).build();
-                    //Log.d("V1", uri.toString());
                     Intent intent = new Intent();
                     intent.setAction(Intent.ACTION_VIEW);
                     intent.setDataAndType(contentUri, "image/*");
@@ -320,13 +279,9 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
 
         postponeEnterTransition();
 
-
-        //setBackgroundColor(getResources().getColor(R.color.cardview_initial_background));
-        Log.d("V1", "viewplay current year = " + currentYear);
         mPlayAdapter = new PlayAdapter(this, null, searchQuery, fromDrawer, playListType, sortType, currentYear);
         // Instantiate a ViewPager and a PagerAdapter.
         mPager = (CustomViewPager) findViewById(R.id.pager);
-        //mPager.setBackgroundColor(getResources().getColor(R.color.cardview_initial_background));
         mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         mPager.setAdapter(mPagerAdapter);
         mPager.setCurrentItem(mCurrentPosition);
@@ -439,7 +394,6 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
     public void openAddPlay(String game_name, long playID){
 
         mPager.setPagingEnabled(false);
-        //mTitle = game_name;
 
         try{
             InputMethodManager inputManager = (InputMethodManager)
@@ -449,16 +403,10 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
                     InputMethodManager.HIDE_NOT_ALWAYS);
         }catch (Exception ignored){}
 
-        //mFragment.setExitTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.slide_top));
-
-
-
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction ft = fragmentManager.beginTransaction();
 
         mAddPlayFragment = AddPlayFragment.newInstance(0, 0, true, game_name, playID, false);
-        //mAddPlayFragment.setEnterTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.slide_bottom));
-        //mAddPlayFragment.setExitTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.slide_top));
         ft.setCustomAnimations(R.anim.slide_in_bottom, R.anim.slide_out_top, R.anim.slide_in_top, R.anim.slide_out_bottom);
         ft.add(R.id.swipeholder, mAddPlayFragment, "add_play");
         ft.addToBackStack("add_play");
@@ -467,107 +415,19 @@ public class ViewPlayActivity extends AppCompatActivity implements AddPlayFragme
 
 
     public void deletePlay(long playID){
-        DeletePlayFragment newFragment = new DeletePlayFragment().newInstance(playID);
+        DeletePlayDialogFragment newFragment = new DeletePlayDialogFragment().newInstance(playID);
         newFragment.show(getSupportFragmentManager(), "deletePlay");
     }
 
-
-    public class DeletePlayFragment extends DialogFragment {
-        public DeletePlayFragment newInstance(long playID) {
-            DeletePlayFragment frag = new DeletePlayFragment();
-            Bundle args = new Bundle();
-            args.putLong("playID", playID);
-            frag.setArguments(args);
-            return frag;
-        }
-
-
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            // Use the Builder class for convenient dialog construction
-            final long playID2 = getArguments().getLong("playID");
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setTitle(R.string.delete);
-            builder.setMessage(R.string.confirm_delete_play)
-                    .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            Play deleteMe = Play.findById(Play.class, playID2);
-
-                            //delete PlayersPerPlay
-                            List<PlayersPerPlay> players = PlayersPerPlay.getPlayers(deleteMe);
-                            for(PlayersPerPlay player:players){
-                                player.delete();
-                            }
-                            //delete GamesPerPay
-                            List<GamesPerPlay> games = GamesPerPlay.getGames(deleteMe);
-                            for(GamesPerPlay game:games){
-                                if (game.expansionFlag == true){
-                                    if (game.bggPlayId != null && !game.bggPlayId.equals("")){
-                                        DeletePlayTask deletePlay = new DeletePlayTask(getActivity());
-                                        try {
-                                            deletePlay.execute(game.bggPlayId);
-                                        } catch (Exception e) {
-
-                                        }
-                                    }
-                                }
-                                game.delete();
-                            }
-
-                            //delete plays_per_game_group
-                            List<PlaysPerGameGroup> plays = PlaysPerGameGroup.getPlays(deleteMe);
-                            for(PlaysPerGameGroup play:plays){
-                                play.delete();
-                            }
-
-                            //delete play image
-                            if(deleteMe.playPhoto != null && !deleteMe.playPhoto.equals("")) {
-                                String deletePhoto =  Environment.getExternalStoragePublicDirectory(
-                                        Environment.DIRECTORY_PICTURES) + "/Plog/" + deleteMe.playPhoto;
-                                File deleteImage = new File(deletePhoto);
-                                if (deleteImage.exists()) {
-                                    deleteImage.delete();
-                                }
-
-                                //delete play image thumb
-                                File deleteImage_thumb = new File(deletePhoto.substring(0, deletePhoto.length() - 4) + "_thumb6.jpg");
-                                if (deleteImage_thumb.exists()) {
-                                    deleteImage_thumb.delete();
-                                }
-                            }
-
-                            //delete play from bgg
-                            if (deleteMe.bggPlayID != null && !deleteMe.bggPlayID.equals("")){
-                                DeletePlayTask deletePlay = new DeletePlayTask(getActivity());
-                                try {
-                                    deletePlay.execute(deleteMe.bggPlayID);
-                                } catch (Exception e) {
-
-                                }
-                            }
-
-                            //delete play
-                            deleteMe.delete();
-
-                            mPlayAdapter = new PlayAdapter(getActivity(), null, searchQuery, fromDrawer, playListType, sortType, currentYear);
-                            mPagerAdapter.notifyDataSetChanged();
-                            if (mPlayAdapter.getItemCount() == 0){
-                                onBackPressed();
-                            }
-
-                            dismiss();
-                        }
-                    })
-                    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            dismiss();
-                        }
-                    });
-            // Create the AlertDialog object and return it
-            return builder.create();
+    @Override
+    public void onPositiveClick_DeletePlay(long playId) {
+        AppUtils.deletePlay(this, playId);
+        mPlayAdapter = new PlayAdapter(this, null, searchQuery, fromDrawer, playListType, sortType, currentYear);
+        mPagerAdapter.notifyDataSetChanged();
+        if (mPlayAdapter.getItemCount() == 0){
+            onBackPressed();
         }
     }
-
 
     private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
         ViewPlayFragment_Pages mCurrentFragment;

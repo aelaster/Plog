@@ -202,18 +202,4 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         NotificationFragment newFragment = new NotificationFragment().newInstance(notificationId);
         newFragment.show(getFragmentManager(), "notifyUser");
     }
-
-    public class AddPlayer {
-        public long playerID;
-        public String playerName;
-        public String color;
-        public float score;
-
-        public AddPlayer(long playerID, String playerName, String color, float score) {
-            this.playerID = playerID;
-            this.playerName = playerName;
-            this.color = color;
-            this.score = score;
-        }
-    }
 }

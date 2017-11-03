@@ -6,7 +6,6 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.lastsoft.plog.R;
-import com.lastsoft.plog.db.Game;
 
 import org.apache.http.util.ByteArrayBuffer;
 import org.xmlpull.v1.XmlPullParser;
@@ -30,17 +29,8 @@ public class SearchBGGTask extends AsyncTask<String, Void, ArrayList<SearchBGGTa
     Context theContext;
     private boolean expansionFlag;
 
-    public SearchBGGTask(Context context){
-        this.theContext = context;
-        mydialog = new ProgressDialog(theContext);
-    }
 
-    public SearchBGGTask(Context context, boolean addToCollection){
-        this.theContext = context;
-        mydialog = new ProgressDialog(theContext);
-    }
-
-    public SearchBGGTask(Context context, boolean addToCollection, boolean expansionFlag){
+    public SearchBGGTask(Context context, boolean expansionFlag){
         this.theContext = context;
         mydialog = new ProgressDialog(theContext);
         this.expansionFlag = expansionFlag;
@@ -62,8 +52,6 @@ public class SearchBGGTask extends AsyncTask<String, Void, ArrayList<SearchBGGTa
 
         String myString = "";
         String bggID = "";
-        int i = 0;
-        int totalCount = 0;
         ArrayList<GameInfo> returnedGames = new ArrayList<>();
 
 
@@ -72,7 +60,6 @@ public class SearchBGGTask extends AsyncTask<String, Void, ArrayList<SearchBGGTa
             // first we search for the game by its name
             URL url;
             Log.d("V1", "https://www.boardgamegeek.com/xmlapi2/search?query=" + URLEncoder.encode(args[0], "UTF-8"));
-            //url = new URL("https://www.boardgamegeek.com/xmlapi2/search?exact=1&query=" + URLEncoder.encode(args[0], "UTF-8"));
             url = new URL("https://www.boardgamegeek.com/xmlapi2/search?query=" + URLEncoder.encode(args[0], "UTF-8"));
             URLConnection ucon = url.openConnection();
             ucon.setConnectTimeout(3000);
@@ -91,7 +78,6 @@ public class SearchBGGTask extends AsyncTask<String, Void, ArrayList<SearchBGGTa
             }
 
             myString = new String(baf.toByteArray());
-            //Log.d("V1", myString);
 
             bis.close();
             is.close();
@@ -101,18 +87,14 @@ public class SearchBGGTask extends AsyncTask<String, Void, ArrayList<SearchBGGTa
             XmlPullParser parser = factory.newPullParser();
             parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
             parser.setInput(new StringReader(myString));
-            //parser.nextTag();
-            // parser.require(XmlPullParser.START_TAG, null, "items");
 
             while (parser.next() != XmlPullParser.END_DOCUMENT) {
                 if (parser.getEventType() != XmlPullParser.START_TAG) {
                     continue;
                 }
                 String name = parser.getName();
-                //Log.d("V1", "name = " + name);
                 // Starts by looking for the entry tag
                 if (name.equals("items")) {
-                    //entries.add(readEntry(parser));
                     int total = 0;
                     total = Integer.parseInt(readTotal(parser));
                     if (total == 0){
@@ -130,7 +112,6 @@ public class SearchBGGTask extends AsyncTask<String, Void, ArrayList<SearchBGGTa
                         gameTypeChecker = "boardgame";
                         gameTypeRemover = "boardgameexpansion";
                     }
-                    //Log.d("V1", gameTypeChecker);
                     if (gameType.equals(gameTypeChecker)){
                         GameInfo returnedGame = readGameInfo(parser, bggID);
                         if (!returnedGame.yearPublished.equals("")) {
@@ -142,7 +123,6 @@ public class SearchBGGTask extends AsyncTask<String, Void, ArrayList<SearchBGGTa
                             returnedGames.remove(returnedGame);
                         }
                     }
-                    //break;
                 } else {
                     skip(parser);
                 }
@@ -155,11 +135,6 @@ public class SearchBGGTask extends AsyncTask<String, Void, ArrayList<SearchBGGTa
 
     @Override
     protected void onPostExecute(final ArrayList<GameInfo> result) {
-        /*for (GameInfo aGame : result) {
-            Log.d("V1", "Game Name = " + aGame.gameName);
-            Log.d("V1", "Game Year Published = " + aGame.yearPublished);
-            Log.d("V1", "Game BGG ID = " + aGame.gameBGGID);
-        }*/
         mydialog.dismiss();
     }
 
@@ -214,38 +189,6 @@ public class SearchBGGTask extends AsyncTask<String, Void, ArrayList<SearchBGGTa
         return game;
     }
 
-    private Game readEntry(XmlPullParser parser, String gameName, String gameBGGID) throws XmlPullParserException, IOException {
-        String gameThumb = "", gameImage = "";
-
-        parser.require(XmlPullParser.START_TAG, null, "item");
-        while (parser.next() != XmlPullParser.END_TAG) {
-            if (parser.getEventType() != XmlPullParser.START_TAG) {
-                continue;
-            }
-            String name = parser.getName();
-
-            if (name.equals("thumbnail")) {
-                gameThumb = readThumbnail(parser);
-            }else if (name.equals("image")) {
-                gameImage = readImage(parser);
-            }else {
-                skip(parser);
-            }
-        }
-
-        parser.require(XmlPullParser.END_TAG, null, "item");
-        Game game = Game.findGameByName(gameName);
-        if (game != null) {
-            game.gameBGGID = gameBGGID;
-            game.gameImage = gameImage;
-            game.gameThumb = gameThumb;
-            game.save();
-        }
-        return game;
-    }
-
-
-
     private String readBGGID(XmlPullParser parser) throws IOException, XmlPullParserException {
         String bggid = "";
         String tag = parser.getName();
@@ -292,22 +235,6 @@ public class SearchBGGTask extends AsyncTask<String, Void, ArrayList<SearchBGGTa
             total = parser.getAttributeValue(null, "total");
         }
         return total;
-    }
-
-
-
-    private String readThumbnail(XmlPullParser parser) throws IOException, XmlPullParserException {
-        parser.require(XmlPullParser.START_TAG, null, "thumbnail");
-        String title = readText(parser);
-        parser.require(XmlPullParser.END_TAG, null, "thumbnail");
-        return title;
-    }
-
-    private String readImage(XmlPullParser parser) throws IOException, XmlPullParserException {
-        parser.require(XmlPullParser.START_TAG, null, "image");
-        String title = readText(parser);
-        parser.require(XmlPullParser.END_TAG, null, "image");
-        return title;
     }
 
     private String readText(XmlPullParser parser) throws IOException, XmlPullParserException {

@@ -147,7 +147,7 @@
     <string name="submit_confirm_message">Start adding players and games, creating groups, and plogging!</string>
     <string name="submit_confirm_button">Go!</string>
 
-    <string name="bgg_process_notice">BGG is processing this request.  Try again if your collection is not updated.</string>
+    <string name="bgg_process_notice">BGG is processing this request.  Try again shortly.</string>
 
     <string name="no_default_player">There isn\'t a default player set.  Go to Players and set a player as default.</string>
 

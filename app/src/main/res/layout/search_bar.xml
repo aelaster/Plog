@@ -13,7 +13,7 @@
         android:hint="@string/filter_games"
         android:textColor="#FFFFFFFF"
         android:textColorHint="#73FFFFFF"
-        android:drawableLeft="@drawable/ic_action_search"
+        android:drawableStart="@drawable/ic_action_search"
         />
     <ImageView
         android:id="@+id/closeButton"

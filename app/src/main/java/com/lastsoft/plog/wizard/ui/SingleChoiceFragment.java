@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.lastsoft.plog.wizard.ui;;
+package com.lastsoft.plog.wizard.ui;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -33,6 +33,8 @@ import com.lastsoft.plog.wizard.model.SingleFixedChoicePage;
 
 import java.util.ArrayList;
 import java.util.List;
+
+;
 
 public class SingleChoiceFragment extends ListFragment {
     private static final String ARG_KEY = "key";
