@@ -670,8 +670,10 @@ public class AddPlayFragment extends Fragment implements
                         Location addMe = new Location(place.getName().toString(), place.getAddress().toString(), place.getId(), place.getLatLng().latitude, place.getLatLng().longitude);
                         addMe.save();
                         //set this as the location for this play
-                        locationId = addMe;
-                        textViewLocation.setText(addMe.locationName);
+                        if (addMe != null) {
+                            locationId = addMe;
+                            textViewLocation.setText(addMe.locationName);
+                        }
                     }
                 }else{
                     //address contains place name, meaning the place name is just an address
@@ -1453,7 +1455,11 @@ public class AddPlayFragment extends Fragment implements
                  if (dialogType == 0) {
                      builder.setTitle(getString(R.string.are_you_at) + thePlace.getName().toString() + "?");
                  }else{
-                     builder.setTitle(getString(R.string.are_you_at) + theLocation.locationName + "?");
+                     if (theLocation != null) {
+                         builder.setTitle(getString(R.string.are_you_at) + theLocation.locationName + "?");
+                     }else{
+                         builder.setTitle(getString(R.string.title_location));
+                     }
                  }
                  builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
                      @Override
@@ -1502,8 +1508,10 @@ public class AddPlayFragment extends Fragment implements
 
                                  //set the location to be output to the screen
                                  Location useMe = Location.findLocationByName(locations.get(item));
-                                 locationId = useMe;
-                                 textViewLocation.setText(useMe.locationName);
+                                 if (useMe != null) {
+                                     locationId = useMe;
+                                     textViewLocation.setText(useMe.locationName);
+                                 }
                                  //save the location in a variable, to be saved to the play
                              }
                          }
@@ -1571,7 +1579,9 @@ public class AddPlayFragment extends Fragment implements
                                  useMe = theLocation;
                              }
                              locationId = useMe;
-                             textViewLocation.setText(useMe.locationName);
+                             if (useMe != null) {
+                                 textViewLocation.setText(useMe.locationName);
+                             }
                          }else if (dialogType == 2){
                              EditText edit = (EditText) inflator.findViewById(R.id.locationName);
                              String text = edit.getText().toString();
@@ -1597,7 +1607,9 @@ public class AddPlayFragment extends Fragment implements
                                  addMe.save();
                                  //then we will use it as the location for this play
                                  locationId = addMe;
-                                 textViewLocation.setText(addMe.locationName);
+                                 if (addMe != null) {
+                                     textViewLocation.setText(addMe.locationName);
+                                 }
                                  //set the location to be output to the screen
                              }
 

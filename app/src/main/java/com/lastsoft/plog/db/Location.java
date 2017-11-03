@@ -45,10 +45,14 @@ public class Location extends SugarRecord<Location> {
     }
 
     public static Location findLocationByName(String name){
-        List<Location> queery = Location.find(Location.class, StringUtil.toSQLName("locationName") + " = ?", name);
-        if (queery.size() > 0) {
-            return queery.get(0);
-        } else {
+        if (name != null) {
+            List<Location> queery = Location.find(Location.class, StringUtil.toSQLName("locationName") + " = ?", name);
+            if (queery.size() > 0) {
+                return queery.get(0);
+            } else {
+                return null;
+            }
+        }else{
             return null;
         }
     }
@@ -59,9 +63,6 @@ public class Location extends SugarRecord<Location> {
         query = " SELECT " + StringUtil.toSQLName("Location") + ".*" +
                 " FROM " + StringUtil.toSQLName("Location") +
                 " WHERE ROUND(" + StringUtil.toSQLName("locationLat") + ",4) = " + lat + " and ROUND(" + StringUtil.toSQLName("locationLong") + ",4) = " + lng;
-        Log.d("V1", "lat = " + lat);
-        Log.d("V1", "lng = " + lng);
-        Log.d("V1", query);
         List<Location> queery = Location.findWithQuery(Location.class, query);
         if (queery.size() > 0) {
             return queery.get(0);
